@@ -1,0 +1,3508 @@
+# Hypothesis registry — Stage 0 of the research pipeline (see CLAUDE_FUTURES.md §5).
+#
+# Every hypothesis is registered HERE BEFORE it is tested. Nothing is tested that does not
+# appear in this file, and the `mechanism` field must name who is paying you and why. If it
+# cannot be written in plain language, the hypothesis is rejected.
+#
+# Prose, evidence grades, full signal pseudocode and the "why it might fail" notes live in
+# FUTURES_STRATEGY_HYPOTHESES.md. This file is the machine-readable registry.
+#
+# SCHEMA (required)   id · name · mechanism · condition · horizon_minutes · registered · status
+# SCHEMA (metadata)   grade · tier · param_cap · session · hold_hours · test_order · symbols
+#
+# status values
+#   untested                    registered, Stage 1 not yet run
+#   stage1_inconclusive         Stage 1 ran and settled nothing — see below
+#   stage1_passed               Stage 1 cleared; not scheduled onward — see below
+#   retired                     withdrawn from testing, kept in the registry
+#   excluded                    never testable on this sample — see below
+#   dead                        structurally invalidated — do not test
+#
+# STATUS VOCABULARY CARRIED OVER FROM THE CRYPTO PROJECT, where the distinctions were
+# learned the hard way:
+#
+#   retired vs stage1_inconclusive. Retirement says the evidence points AGAINST the
+#   mechanism. Inconclusive says the evidence points the way the mechanism predicts but
+#   does not clear the bar, and the shortfall is power or multiplicity rather than sign or
+#   story. Collapsing them loses the distinction that decides whether a hypothesis is ever
+#   worth revisiting — F05 is here at all because crypto's S09 was recorded inconclusive
+#   rather than retired.
+#
+#   stage1_passed IS NOT A PROMOTION. It records that the signal-level gate was cleared and
+#   nothing more; §5 has nine stages after it. Crypto's S08 cleared Stage 1 and was still
+#   uneconomic, and filing that as a failure would have lost the information that the
+#   effect exists.
+#
+#   excluded is NEW here. It means the hypothesis cannot be evaluated on this sample at
+#   all, on measured grounds, before any trial is spent. F12 and F13 carry it. This is not
+#   a soft rejection: it is the firing-rate gate and the decay literature doing their job
+#   in advance, and it costs zero trials.
+#
+# An entry that is not `untested` carries a reason field and `test_order: null`, so nothing
+# schedules it. Whatever trials it generated stay in trials.jsonl and stay in N. Every §6
+# correction moves in the optimistic direction as N falls, so withdrawing a hypothesis must
+# never become a route to shrinking it.
+#
+# Universal constraints (FUTURES_STRATEGY_HYPOTHESES.md, "Universal rules"):
+#   - every hypothesis tests on MNQ and MGC; they are genuinely uncorrelated, which makes
+#     §5 Stage 4 a real gate here rather than the near-formality it was at BTC/ETH ρ=0.835
+#   - ES/YM/RTY are ρ≈0.9 with NQ — robustness check only, NEVER Stage 4 evidence
+#   - FLAT BY 17:00 ET, no exceptions; every hold must provably terminate before it
+#   - sessions anchored in exchange local time and converted — never a fixed ET offset
+#   - param_cap is a HARD cap (CLAUDE_FUTURES.md §5 Stage 5)
+#   - every candidate beats a random-entry benchmark with matched holding-time distribution
+#   - every candidate beats scaled buy-and-hold (index futures have real drift)
+
+- id: F01
+  name: market_intraday_momentum
+  mechanism: >
+    The first half-hour market return, measured from the previous close, predicts the last
+    half-hour return (Gao, Han, Li & Zhou, JFE 2018). Baltussen, Da, Lammers & Martens
+    (JFE 2021) supply the mechanism: hedging demand. A 2x or 3x leveraged ETF must rebalance
+    daily to maintain its multiple — buying more exposure if the index rose, selling if it
+    fell — which is structurally a short-gamma profile, and the resets are pegged to the
+    closing price so the adjustment concentrates in the final minutes. Options dealers who
+    are short gamma must trade the same direction to stay hedged. The counterparty is not a
+    trader forming a view; it is a risk system executing a formula whose direction is known
+    in advance from the day's return. Nomura estimated that at peak size every 1% move
+    required the leveraged ETF complex to trade $10 billion.
+  condition: >
+    r1 = return from previous close (16:00 ET) to 10:00 ET. At entry_time, if
+    |r1| > k * ATR(20d), enter in the direction of r1 and exit at 15:55 ET.
+    entry_time in {15:00, 15:30}, k in {0, 0.5, 1.0}, vol_filter in {none, >median, >p66}.
+    k=0 is the unconditional version and is tested — the papers find the effect
+    unconditionally, with volatility strengthening rather than enabling it.
+  horizon_minutes: [30, 60]
+  registered: 2026-08-28
+  # BLOCKED 2026-09-02 BEFORE ANY STAGE 1 RUN — reports/detectability.md.
+  # Closed on BOTH verdict routes. This is arithmetic done ahead of testing, not a
+  # finding about the market: F01 has never been run and nothing here says it would
+  # fail. It says the catalog could not tell if it had.
+  #
+  # PER-CELL ROUTE: CLOSED. entry_time is a grid axis, so a cell fixes it and fires at
+  # most once a session.
+  #     MNQ   4,125 events against 19,722 where a floor resolves   4.8x short
+  #     MGC   4,006 events against  5,620                          1.4x short
+  # All four (instrument, horizon) combinations are BELOW SWEPT RANGE.
+  #
+  # AGGREGATE ROUTE: ALSO CLOSED, AND FOR F07'S EXACT REASON. Pooling scanned positions
+  # restores sample only when they are DISJOINT IN TIME. F01's two entry times are
+  # 15:00 and 15:30 — but BOTH EXIT AT 15:55. The two positions therefore overlap for
+  # all but thirty minutes of their lives:
+  #
+  #     15:00 entry  |---------------------------|  exit 15:55  (55 min)
+  #     15:30 entry              |---------------|  exit 15:55  (25 min)
+  #                              ^^^^^^^^^^^^^^^^^  25 of 25 minutes shared
+  #
+  # The later position is entirely contained in the earlier one. Pooling them stacks
+  # two near-duplicate readings of the same ~4,000 sessions rather than accumulating
+  # 8,000 independent ones, so the aggregate ceiling stays at the per-cell ceiling.
+  # Same structural defect as F07, found by reading the EXIT rule rather than the
+  # entry times — two entries at different clock times still overlap if they share a
+  # fixed exit.
+  #
+  # SO F01 IS CLOSED ON BOTH ROUTES, not merely blocked at its stated holds. Extending
+  # the horizon list would not help: the constraint is the once-per-session event rate,
+  # and a longer hold lowers the independent count rather than raising it.
+  #
+  # WHAT WOULD UNBLOCK IT. Nothing available in this dataset. A once-a-session
+  # condition on sixteen years yields ~4,000 events; MNQ needs 19,722. That gap is a
+  # factor of five in SESSIONS, not in sampling effort — roughly eighty years of data.
+  # Either the condition fires more often, or F01 is not testable to this standard.
+  # Note the asymmetry: MGC is only 1.4x short, so a floor measured at a smaller sample
+  # would open MGC alone — but MGC carries the coverage caveat, so that route leads to
+  # a weak-form verdict on the wrong instrument for an EQUITY INDEX momentum claim.
+  #
+  # NO TRIALS SPENT. Nothing was run, so N is unchanged.
+  status: blocked_insufficient_events
+  blocked: 2026-09-02
+  blocked_reason: >
+    Closed on both verdict routes before any Stage 1 run. Per-cell:
+    entry_time is a grid axis so a cell fires once a session, giving
+    4,125 events on MNQ against the 19,722 at which a floor resolves
+    and 4,006 on MGC against 5,620 — all four combinations below the
+    swept range. Aggregate: the two entry times 15:00 and 15:30 BOTH
+    EXIT AT 15:55, so the later position is entirely contained in the
+    earlier one and pooling stacks two near-duplicate readings of the
+    same ~4,000 sessions instead of accumulating 8,000 independent
+    ones. Same structural defect as F07, found by reading the exit rule
+    rather than the entry times. This is arithmetic done ahead of
+    testing, not evidence: F01 was never run and nothing here says it
+    would fail. No trials spent.
+  grade: A
+  tier: A
+  param_cap: 3
+  session: US
+  hold_hours: [0.5, 1]
+  # Blocked before running; nothing should schedule it.
+  registered_test_order: 1
+  test_order: null
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Leveraged-ETF rebalancing and index options dealer gamma are EQUITY-INDEX mechanisms. Le
+      veraged gold ETFs exist but the complex is orders of magnitude smaller and is not pegged
+       to the equity close, so MGC is ATTENUATED rather than impossible.
+  falsification_note: >
+    Effect size is ~1 bps per session (2.47% annualized at Sharpe 0.49), which nets ~0.5 bps
+    against MNQ's 0.48 bps floor — positive but thin, and it would have been dead in crypto.
+    Published 2018 and widely known since, so decay is likely and must be tested by regime.
+    The leveraged-ETF literature is contested: Lenkey (2024) finds the associations
+    significant but argues the economic magnitudes are not. Take the mechanism as plausible,
+    not established. Exit at 15:55 rather than into the close, where the flow concentrates
+    but the spread is widest.
+
+- id: F02
+  name: order_imbalance_conditional_overnight_reversal
+  mechanism: >
+    Intermediaries absorb order imbalances at the NYSE close and are compensated for
+    carrying that inventory through higher overnight returns, earning much of it when
+    European markets open and the risk can be offloaded (Boyarchenko, Larsen & Whelan,
+    RFS 2023; Grossman-Miller inventory risk). The counterparty is the closing auction
+    participant who needed liquidity at 16:00. The conditional finding is asymmetric and
+    the asymmetry follows from the mechanism: a dealer absorbing a SELL imbalance holds
+    unwanted long inventory and must be paid to carry it, so selloffs generate robust
+    positive overnight reversals while reversals after rallies are much more modest.
+  condition: >
+    imb = return from 15:00 to 16:00 ET, a proxy for the closing order imbalance. If
+    imb < -k * sigma, enter long at the window open and exit at the window close; direction
+    is opposite the imbalance. The symmetric long-side condition is tested separately and
+    expected to be weaker. k in {0.5, 1.0, 1.5}, window in {Europe 01:30-04:00,
+    Asia 19:00-22:00}, hold in {1, 2, 4} h.
+  horizon_minutes: [60, 120, 240]
+  registered: 2026-08-28
+  # STAGE 1 RUN 2026-09-02, RECORDED UNINFORMATIVE - reports/f02_stage1.md.
+  # 144 cells: 3 k x 2 windows x 3 holds x 2 arms x 2 eras x 2 instruments. The largest
+  # single trial spend in this catalog.
+  #
+  # EVERY CELL IS UNINFORMATIVE, AND THE GATE DID NOT PREDICT THAT. Detectability showed
+  # F02 with an open per-cell route on MGC 120m/240m and an open aggregate on 5 of 6.
+  # Both rested on a DECLARED firing rate of one per session, and the declared rate was
+  # wrong by an order of magnitude:
+  #
+  #     gate assumed   4,006-4,125 per cell        aggregate 6,142-8,250
+  #     actually       106-707 per cell            aggregate ~210-1,414
+  #
+  # Two causes, neither propagated into the gate. FIRST, the condition is THRESHOLD-
+  # GATED: it fires only when |imb| > k*sigma, measured at 6-23% of rows depending on k,
+  # not every row. The declared rate counted the OPPORTUNITY, not the TRIGGER. SECOND,
+  # the mandatory regime split halves the sample again - pre-2021 holds ~3,100-3,200
+  # rows and post-2021 ~1,730 - and nothing told the gate this hypothesis must be
+  # evaluated in two eras. See decisions.md section 21.
+  #
+  # RESULTS, DESCRIPTIVE ONLY. 0 nominal separations across all 144 cells against 7.2
+  # expected by chance; 0 BH survivors in every (instrument, era, arm) family and across
+  # the whole hypothesis. Zero against 7.2 is itself informative about the TEST rather
+  # than the market: within a family the 18 cells share entry dates heavily (same k, and
+  # holds are nested), so the effective number of independent looks is far below 144.
+  #
+  # THE ONE DIRECTIONALLY CONSISTENT RESULT, AND IT IS NOT EVIDENCE. MNQ post-2021
+  # sell_imb - the mechanism's primary arm, on the equity index, in the live era -
+  # aggregates +3.27 bps gross and +2.79 net, with a best cell of +12.97 bps at 0.83x
+  # its floor and p=0.0726. That is the only family pointing the predicted way. It rests
+  # on 121-393 events against floors measured at 2,862 and up, so it CANNOT be evidence,
+  # and it is recorded here so that a future re-test knows where to look rather than as
+  # a finding.
+  #
+  # THE DECAY QUESTION IS NOT SETTLED AND CANNOT BE. Both sell_imb arms are LARGER
+  # post-2021 than pre-2021, which is the opposite of the decay the authors report for
+  # the unconditional version. But neither era's cells are informative, so this is a
+  # difference between two quantities individually indistinguishable from zero.
+  #
+  # NO REAL-DATA CONTROL EXISTS AT THIS EVENT REGIME. F14 validated the harness at
+  # ~48,000-52,000 events; F02's cells hold 106-707. No control can be built here: a
+  # once-a-session condition yields ~3,500 events before threshold gating, and F02 fires
+  # on 6-23% of those and then splits the remainder in two. This null carries the
+  # section 7.2 synthetic GARCH assurance and NOTHING from F14.
+  #
+  # NEITHER INSTRUMENT CARRIES A VERDICT. MGC was named by the gate as the open route
+  # and closes once the real rate is used. Worth stating anyway: F02 is an EQUITY-INDEX
+  # hypothesis whose counterparty is the NYSE closing auction, and a gold contract has
+  # no NYSE close - an MGC result would have been the wrong instrument for this claim
+  # even had it been informative. MGC's coverage here is 46.14%, the lowest of any
+  # window in the study.
+  # ---- REGISTRATION ERROR, RECORDED 2026-09-02: MGC SHOULD NEVER HAVE BEEN RUN ----
+  #
+  # F02's counterparty is the NYSE CLOSING AUCTION participant who needed liquidity at
+  # 16:00, and the compensation is paid to dealers carrying INDEX inventory overnight. Gold
+  # has no NYSE closing auction. The mechanism cannot exist in MGC - not weakly, not in
+  # attenuated form, not at all.
+  #
+  # This was a REGISTRATION ERROR, not a data problem. `symbols: [MNQ, MGC]` was set by
+  # default rather than derived from the mechanism, and nothing in the pipeline asked
+  # whether the mechanism could hold in both. 72 of the 144 trials went to an instrument
+  # where the hypothesis was not defined. They still count toward N - the looks happened -
+  # but they could never have been evidence for or against this claim.
+  #
+  # Stage 0 now requires every entry to name which instruments its mechanism can exist in
+  # (CLAUDE_FUTURES.md 5.10). F02 is the case that prompted it.
+  status: stage1_uninformative
+  stage1_run: 2026-09-02
+  stage1_reason: >
+    Every one of 144 cells is below the swept range, and the gate did
+    not predict it: the declared firing rate of one per session counted
+    the opportunity rather than the trigger, ignoring both the k*sigma
+    threshold (fires on 6-23% of rows) and the mandatory regime split
+    (halves the sample again). Cells hold 106-707 events against floors
+    measured at 2,862 and up. 0 nominal separations against 7.2
+    expected, 0 BH survivors anywhere - but zero against 7.2 reflects
+    heavy sharing of entry dates within each family, so effective
+    independent looks are far below 144. MNQ post-2021 sell_imb is the
+    only family pointing the predicted way (+3.27 bps aggregate, best
+    cell 0.83x floor, p=0.0726) and it could not be evidence at this
+    sample. No real-data control exists at this event regime. Not
+    retired: no route could have carried a verdict. 144 trials spent.
+  grade: A-
+  tier: A
+  param_cap: 3
+  session: Asia/Europe
+  hold_hours: [1, 4]
+  # Ran and produced no obtainable evidence; nothing should reschedule it
+  # as registered. Registration priority preserved, not renumbered.
+  registered_test_order: 4
+  test_order: null
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: null
+    rationale: >
+      The counterparty is the NYSE CLOSING AUCTION participant. Gold has no NYSE closing aucti
+      on, so the mechanism cannot exist in MGC at all.
+  # REGIME SPLIT IS MANDATORY HERE, NOT OPTIONAL. See F13: the same authors published
+  # "The Disappearing Overnight Drift" in July 2026 reporting that the UNCONDITIONAL
+  # 02:00-03:00 window has averaged near zero since 2021, having previously carried more
+  # than 60% of the contract's 5.9% annualized close-to-close return. Pre-2021 and
+  # post-2021 are different objects and an aggregate over both is uninterpretable.
+  falsification_note: >
+    The headline effect is measured as decayed by its own authors, and the conditional
+    version may have gone with it. The closing return is a proxy for order imbalance, not
+    the imbalance itself — the paper had actual imbalance data and this project does not.
+    Test the Asian-window migration too: the authors note dealers increasingly offload
+    inventory shocks at the Asian open as trading there has grown.
+
+- id: F03
+  name: half_hour_periodicity
+  mechanism: >
+    Returns are persistent at the same half-hour interval across trading days, persisting up
+    to 40 trading days (Heston, Korajczyk & Sadka). The cause is institutional execution:
+    large parent orders are worked over multiple days at similar clock times, producing
+    repeating flow at the same positions in the session. Later work attributes this
+    specifically to REPETITIVE institutional traders — non-repetitive institutions show
+    little to no predictability. The counterparty is whoever provides liquidity into a
+    schedule that an execution algorithm is following regardless of price. This is the
+    futures analogue of the crypto quarter-hour hypothesis, with a better-documented cause.
+  condition: >
+    For each half-hour slot s in the RTH session, hist = mean return of slot s over the
+    trailing N days. If |hist| > threshold and the trailing t-stat is significant, enter at
+    the slot open in sign(hist) direction and exit at the slot close.
+    N in {10, 20, 40} days, threshold in {0.5, 1.0, 1.5} x slot sigma, all 13 RTH slots.
+  horizon_minutes: [30]
+  registered: 2026-08-28
+  # RETIRED 2026-09-01 after Stage 1 on both instruments — reports/f03_stage1.md.
+  # 234 cells: 13 RTH slots x 3 lookbacks x 3 thresholds, MNQ and MGC, all scored.
+  #
+  # THE MECHANISM IS REFUTED, NOT UNDERPOWERED. That distinction is the whole reason
+  # this is `retired` and not `stage1_inconclusive`. F03 was one of the few hypotheses
+  # reports/detectability.md CLEARED on both instruments — it fires 13 times a session
+  # and reached 53,625 INDEPENDENT events on MNQ against a floor that resolves at 2.57
+  # bps. (The 150,355 figure in reports/f03_stage1.md is the sum across all 117 cells,
+  # which double-counts: the 9 (N, threshold) variants of a slot trade the SAME slot
+  # and overlap. The independent aggregate is 13 disjoint slots x 4,125 sessions =
+  # 53,625, still comfortably above the 19,722 where a floor resolves.) It had
+  # the power. It found nothing.
+  #
+  #   MNQ   8 nominal separations against 5.9 expected by chance; 0 survive BH at
+  #         FDR 0.05 (smallest p 0.0066 against a rank-1 threshold of 0.000427)
+  #   MGC   0 nominal separations against 5.9 expected; smallest p 0.0707
+  #
+  # AND THE EIGHT ARE NOT EIGHT. All eight are NEGATIVE — significant losses, not
+  # gains — and SEVEN of them are the same 09:30-10:00 slot under near-duplicate
+  # (N, threshold) combinations. That is one slot counted seven times. A hypothesis
+  # whose only signal is one slot losing money is not a weak version of the claim; it
+  # is the absence of the claim.
+  #
+  # THE AGGREGATE IS NEGATIVE BEFORE COSTS. MNQ -0.46 bps GROSS across all 117 cells;
+  # MGC +0.03 bps, indistinguishable from zero. Net of the cost floor: -0.94 and -0.62.
+  #
+  # EVEN THE CHERRY-PICKED CELL FAILS. Best-of-117 is +1.60 bps on MNQ and +1.73 on
+  # MGC, against measured detection floors of 2.57 and 4.17 (reports/calibration.md).
+  # The best cell anyone could select sits BELOW the level at which a result would
+  # carry information, so there is nothing here to pursue at any parameter setting.
+  #
+  # THE CATALOG PREDICTED THIS EXACT FAILURE MODE and named it the biggest weakness:
+  # "the original finding is on individual stocks, where one institution's order is
+  # large relative to volume. An index future is the AGGREGATE, so idiosyncratic
+  # execution schedules should largely cancel. This is the biggest weakness and the
+  # first thing to test." It was tested first, and they cancelled. A pre-registered
+  # failure mode arriving as predicted is the strongest form this evidence takes.
+  #
+  # THRESHOLD READING, decided by measurement (reports/f03_stage1.md). The condition
+  # writes the threshold as "x slot sigma" while also demanding a significant trailing
+  # t-stat. Read literally that compares a mean of N days against a ONE-DAY sigma —
+  # 9.5 standard errors at N=40, thr=1.5 — and fires a median of 40 times across 13
+  # slots and ~3,500 sessions, which is not testable. The t-stat reading fires
+  # 5,756-29,465 and makes the two clauses one. The t-stat reading was used; the
+  # literal one remains available behind --literal.
+  #
+  # MGC CAVEAT APPLIES HERE TOO: 70.85% RTH coverage, so its null is weaker evidence
+  # than MNQ's. See the standing caveat in CLAUDE_FUTURES.md section 3. It does not
+  # change the verdict — MNQ carries it at 98.31% coverage — but MGC alone would not.
+  #
+  # All 234 cells stay in N.
+  status: retired
+  retired: 2026-09-01
+  retired_reason: >
+    The mechanism is refuted, not underpowered. F03 had the power —
+    detectability cleared it on both instruments and it reached 53,625 independent
+    events on MNQ — and found nothing. 8 nominal hits against 5.9
+    expected on MNQ, none surviving Benjamini-Hochberg, ALL NEGATIVE,
+    and seven of the eight are the same 09:30-10:00 slot under
+    near-duplicate parameter combinations. The aggregate is negative on
+    MNQ before costs (-0.46 bps gross) and +0.03 bps on MGC. Even the
+    best-of-117 cell sits below the measured detection floor on both
+    instruments (+1.60 vs 2.57 on MNQ, +1.73 vs 4.17 on MGC), so no
+    parameter setting could have carried information. The catalog
+    predicted this failure mode and named it the biggest weakness: an
+    index future is the aggregate, so idiosyncratic execution schedules
+    cancel. They cancelled.
+  grade: A-
+  tier: A
+  param_cap: 3
+  session: US
+  hold_hours: [0.5]
+  # Retired; nothing should schedule it. The registration priority is
+  # preserved rather than renumbered away — the order records what was
+  # planned, and rewriting it would erase that F03 ran second.
+  registered_test_order: 2
+  test_order: null
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Institutional execution schedules on the half hour are not instrument-specific; both hol
+      d.
+  # BH WITHIN THE HYPOTHESIS ACROSS 13 SLOTS is required by the condition itself, not just
+  # by §6. A scan over 13 slots at alpha=0.05 produces 0.65 hits by chance before any
+  # parameter is varied, and the full grid is 13 x 3 x 3 = 117 cells per instrument.
+  falsification_note: >
+    The original finding is on individual stocks, where one institution's order is large
+    relative to volume. An index future is the AGGREGATE, so idiosyncratic execution
+    schedules should largely cancel — this is the biggest weakness and the first thing to
+    test. 52,000 observations means excellent power, which cuts both ways: you will detect
+    small effects, including small artifacts.
+
+- id: F04
+  name: lbma_auction_flow
+  mechanism: >
+    The LBMA runs electronic gold price auctions twice per business day, at 10:30 and 15:00
+    London time. These set the benchmark prices institutions transact on, and asset
+    managers, funds and financial institutions use those windows to rebalance or to execute
+    transactions that require the official fixing price. The 15:00 auction is the more
+    important because it covers trading in both London and New York, giving commercial
+    participants higher liquidity, and many producers are North American. The counterparty
+    is whoever provides liquidity to a participant who must transact at the benchmark
+    regardless of price. This is the same class of mechanism as F01: scheduled,
+    benchmark-anchored, non-discretionary institutional flow.
+  condition: >
+    For each auction, converted from London local time to ET with DST handling:
+    pre = return over [T - pre_window, T]. Test whether pre predicts [T, T + hold]. Test
+    both continuation and reversion; the mechanism predicts temporary impact reverting once
+    the auction clears. auction in {AM, PM} tested separately, pre_window in {15, 30, 60}
+    min, hold in {30, 60, 120} min.
+  horizon_minutes: [30, 60, 120]
+  registered: 2026-08-28
+  # RETIRED 2026-09-01 after Stage 1 on both instruments — reports/f04_stage1.md.
+  # 36 cells: 2 auctions x 3 pre-windows x 3 holds, MGC and MNQ.
+  #
+  # NO CELL SURVIVES BENJAMINI-HOCHBERG ON EITHER INSTRUMENT.
+  #   MGC  2 nominal separations against 0.9 expected; 0 survive BH at FDR 0.05
+  #        (smallest p 0.0341 against a rank-1 threshold of 0.002778)
+  #   MNQ  0 nominal separations against 0.3 expected, across its 6 informative cells
+  #
+  # AND THE BEST CELL IS NOWHERE NEAR THE FLOOR. Under the corrected per-cell gate
+  # (decisions.md section 13) only MGC 120m is per-cell informative; its best cell is
+  # 0.09x the measured detection floor. THE 0.30x FIGURE QUOTED IN THE ORIGINAL
+  # RETIREMENT IS WITHDRAWN — it came from a 60m cell now known to be below the swept
+  # range, and was never a valid comparison. The aggregate route stays open on both
+  # instruments and is negative on both: +0.47 bps gross, -0.18 net of the 0.65 bps
+  # cost floor on MGC.
+  #
+  # THE 12 MNQ CELLS AT 30m AND 60m ARE UNINFORMATIVE, NOT EVIDENCE. The condition
+  # fires twice a business day and reaches ~8,250 events against the 19,722 at which a
+  # floor first resolves for MNQ at that horizon (reports/detectability.md). They are
+  # reported for completeness and excluded from the verdict: a null there is the
+  # absence of evidence, not evidence of absence. Only MNQ's six 120-minute cells
+  # count, and they separate on nothing.
+  #
+  # THE VERDICT RESTS ON MGC, AT 70.47% FILL COVERAGE. That is correct on the
+  # mechanism — the LBMA fixes gold, not the Nasdaq, and MNQ functions here as a
+  # confound control rather than a second test of the claim. But under the standing
+  # caveat (CLAUDE_FUTURES.md section 3) forward-filling inserts zero returns, thins
+  # measured volatility and biases toward APPARENT SIGNIFICANCE, so an MGC null is the
+  # weaker kind of null. The deciding instrument is the qualified one.
+  #
+  # THE GAP IS FAR OUTSIDE WHAT A FILL ARTEFACT COULD PRODUCE. The effect sits 3x to
+  # 11x below its floor. A coverage artefact biases toward finding MORE, not less, and
+  # nothing about carrying 30% of minutes forward moves an effect an order of magnitude
+  # in the direction of nothing. The caveat qualifies the strength of this null; it
+  # does not threaten its direction.
+  #
+  # THIS IS A WEAKER RETIREMENT THAN F03's, and the difference should not be flattened.
+  #
+  #                        F03                         F04
+  #   events          150,355 on MNQ              3,880 on MGC
+  #   deciding        MNQ at 98.31% coverage      MGC at 70.47% coverage
+  #   pre-registered  yes — the catalog named     no — the catalog's stated worry
+  #   failure mode    aggregation as the          was the 10:00 ET confound, which
+  #                   biggest weakness            was never reached
+  #
+  # F03 was refuted: it had 150,000 events on a 98%-covered instrument and the catalog
+  # predicted the exact failure mode that arrived. F04 is retired on a smaller sample,
+  # on the instrument that carries the coverage qualifier, without reaching the
+  # confound control that would have been the real test had anything separated. It is
+  # a sound retirement, not an equally strong one.
+  #
+  # THE DST CONVERSION WAS LOAD-BEARING. The auctions are 10:30 and 15:00 LONDON:
+  # 05:30 and 10:00 ET in normal weeks, 06:30 and 11:00 during the divergence weeks. A
+  # fixed ET offset would have placed every auction an hour wrong for ~8% of
+  # observations, in a hypothesis whose whole content is one specific minute.
+  #
+  # NO CONFOUND CONTROL WAS RUN. The catalog requires a same-clock-time random-day
+  # benchmark for the PM auction's collision with 10:00 ET US liquidity, but only for a
+  # cell that separates. None survived BH, so running it would have characterised noise.
+  # If this hypothesis is ever revived, that control is the first thing owed.
+  #
+  # DIRECTION: reversion, as the mechanism predicts. Continuation is its exact sign
+  # flip — same p-value, negated mean — so both readings are covered by one grid.
+  #
+  # All 36 cells stay in N.
+  status: retired
+  retired: 2026-09-01
+  retired_reason: >
+    No cell survives Benjamini-Hochberg on either instrument. Under the
+    corrected per-cell gate (decisions.md section 13) ONLY MGC 120m is
+    per-cell informative, and its best cell sits at 0.09x the measured
+    detection floor. THE EARLIER 0.30x FIGURE IS WITHDRAWN: it came
+    from a 60m cell now known to be below the swept range, so it was
+    never a valid comparison. The surviving number is an order of
+    magnitude short of informative and points the same way. Both
+    instruments retain open AGGREGATE routes (MGC 4/6, MNQ 120m), and
+    the aggregate is negative on both: +0.47 bps gross and -0.18 net
+    on MGC. The 12 MNQ cells at 30m and 60m are recorded as
+    UNINFORMATIVE rather than as evidence. The verdict rests on MGC at
+    70.47% fill coverage, which under the standing caveat is the
+    weaker kind of null — but coverage bias runs toward finding more
+    rather than less, so the direction is not in doubt. This is a
+    WEAKER RETIREMENT than F03's: fewer events, the deciding
+    instrument carries the coverage qualifier, and the catalog's own
+    stated worry — the 10:00 ET confound — was never reached because
+    nothing separated.
+  grade: B+
+  tier: A
+  param_cap: 3
+  session: Europe/US
+  hold_hours: [0.5, 2]
+  # Retired; nothing should schedule it. Registration priority preserved
+  # rather than renumbered away — see the note on F03.
+  registered_test_order: 3
+  test_order: null
+  symbols: [MGC, MNQ]
+  mechanism_instruments:
+    primary: MGC
+    secondary: MNQ
+    rationale: >
+      The LBMA auction fixes the price of GOLD. MNQ holds no LBMA exposure and is a CONFOUND C
+      ONTROL here, not a second test - which is how F04's run reported it.
+  # THE CONFOUND CONTROL IS MANDATORY AND HAS NO CLEAN FORM. The 15:00 London auction is
+  # 10:00 ET — after US data has landed at 08:30 and while US liquidity peaks — so any
+  # effect could be a US-session effect wearing an auction costume. There are no
+  # non-auction weekdays to compare against, so use a same-clock-time, random-day benchmark
+  # with the signed direction sequence preserved, exactly as S04 required in the crypto work.
+  falsification_note: >
+    COMEX futures and the LBMA auction are different markets linked by arbitrage: the
+    auction is a physical OTC process and MGC is a paper future, so transmission is fast but
+    neither instantaneous nor complete. On sourcing: there is a substantial body of writing
+    claiming systematic suppression via the gold fix, typically citing an AM-higher-than-PM
+    pattern. Do not use it as evidence — the academic treatment is contested and the LBMA's
+    response notes that afternoon liquidity from the London/New York overlap and US data
+    releases account for the pattern without manipulation. Test the mechanism as scheduled
+    institutional flow; if a directional bias exists the data will show it.
+
+- id: F05
+  name: volatility_compression_expansion
+  mechanism: >
+    Volatility clustering is the single most robust empirical regularity in finance:
+    low-volatility periods are followed by expansion with high probability. This forecasts
+    MAGNITUDE, not direction, so there is no counterparty story for the directional half —
+    the trigger is a coin flip and any edge must come from payoff asymmetry rather than hit
+    rate. What is new here is session structure: compression into the cash open or into a
+    scheduled release is a mechanically different setup from compression at a random hour,
+    which is a distinction crypto's 24/7 tape could not express.
+  condition: >
+    If realized_vol(1h) is below the p20 of the trailing 20 sessions AT THE SAME CLOCK TIME,
+    arm the setup; on the first close beyond k*sigma from the compression midpoint, enter
+    that direction and exit at H or 16:55 ET, whichever comes first.
+    vol_pct in {15, 20, 25}, k in {1.5, 2, 2.5}, H in {1, 2, 3} h.
+  horizon_minutes: [60, 120, 180]
+  registered: 2026-08-28
+  # ---- BREAK DEADLINE, DERIVED FROM THE MECHANISM 2026-09-02, BEFORE ANY RUN ----
+  #
+  # The registered condition said to enter "on the first close beyond k*sigma" and never
+  # said BY WHEN. Unbounded within the session it fired on 94% of armings, which made the
+  # compression filter nearly decorative and turned the test into "does price eventually
+  # move after a quiet hour" - trivially true, and not a hypothesis.
+  #
+  # THE DERIVATION. The mechanism is volatility clustering: a quiet period forecasts
+  # NEAR-TERM expansion. A realized-volatility estimate is informative over a horizon on the
+  # order of its own estimation window - that is what the decay of the autocorrelation in
+  # |returns| means - so a vol measured over ONE HOUR speaks to the next hour, not the next
+  # six. A second and independent argument lands on the same number: the trigger measures
+  # distance from the COMPRESSION MIDPOINT, and hours later that midpoint no longer
+  # describes the current price level, so the reference the condition rests on has gone
+  # stale. Hence ONE COMPRESSION WINDOW: 60 minutes from the end of the armed hour.
+  #
+  # IT IS ONE VALUE, NOT A NEW GRID AXIS. Sweeping {30, 60, 90} would convert a
+  # specification repair into a tuning opportunity, which is the thing being repaired.
+  #
+  # ---- AND IT DOES NOT FIX THE VACUITY. THERE IS A SECOND, INDEPENDENT DEFECT. ----
+  #
+  # Re-measured with the deadline applied, F05 still fires on 79-91% of armings:
+  #
+  #     k=1.5  ~90%      k=2.0  ~86%      k=2.5  ~80%      (both instruments)
+  #
+  # THE CAUSE IS THAT sigma IS MEASURED ON THE COMPRESSED WINDOW ITSELF. Compression
+  # SELECTS hours with small sigma by construction, so k*sigma is a small distance, and
+  # price almost always travels that far within the next hour. The tighter the compression,
+  # the easier the trigger. The filter selects for exactly the condition that makes the
+  # trigger nearly certain - the specification is self-defeating, and no deadline can
+  # repair that.
+  #
+  # THE OPEN DECISION, WHICH IS NOT MINE TO MAKE. What should k*sigma be measured against?
+  #   (a) the compressed hour's own sigma - the current reading, self-defeating
+  #   (b) the trailing 20-session sigma AT THE SAME CLOCK TIME - the same quantity the p20
+  #       filter already compares against, so a break would mean "price moved a NORMAL-sized
+  #       amount", which is what an expansion claim actually asserts
+  #   (c) a daily ATR-scaled distance
+  # (b) is the reading most consistent with the rest of the condition, but choosing it is a
+  # change to the registered hypothesis and must be a deliberate decision rather than a
+  # repair made mid-audit.
+  #
+  # F05 IS NOT SCHEDULABLE until that decision is recorded. Its routes are open on event
+  # count - and that is exactly the trap: a vacuous condition with plenty of events will
+  # produce a confident-looking result about nothing.
+  # ---- RETIRED 2026-09-02 ON AN INFORMATIVE NULL ----
+  # reports/f05_stage1.md. 54 cells, 54 trials, run under the CORRECTED condition.
+  #
+  # THIS IS THE FIRST RETIREMENT IN THE CATALOG WHERE THE SAMPLE WAS DEMONSTRABLY THERE.
+  # 45 of 54 cells sit above the swept range, on 11,000-18,600 events each. The null is a
+  # statement about the market rather than about the test.
+  #
+  #   1 nominal separation against 1.35 expected by chance
+  #   0 BH survivors at FDR 0.05, on either instrument
+  #   best informative cell +0.79 bps = 0.05x its detection floor (MNQ p15 k=2.5 H=180,
+  #     5,812 events, p=0.2137)
+  #   aggregates negative net of cost on both: -0.88 bps MGC, -0.44 MNQ
+  #
+  # The single nominal separation is on MGC and does not survive BH. Nothing comes within
+  # a factor of twenty of the floor.
+  #
+  # MNQ CARRIES THE STRONGER NULL, at 83.16% coverage against MGC's 64.16%. BOTH
+  # INSTRUMENTS POINT THE SAME WAY, which is the easy case: the standing MGC caveat -
+  # forward-filling thins measured volatility and biases toward APPARENT significance -
+  # would have mattered had MGC separated and MNQ not. It did not arise. F05's mechanism
+  # is generic to speculative price series and holds in both instruments, so neither is a
+  # control for the other and neither is the wrong instrument for the claim.
+  #
+  # MNQ AT 60 MINUTES IS EXCLUDED FROM THE VERDICT as uninformative: 6,965 measured events
+  # against the 19,722 at which a floor resolves. Its nine cells are reported for
+  # completeness only.
+  #
+  # NO REAL-DATA CONTROL EXISTS AT THIS EVENT REGIME. F14 validated the harness at
+  # ~48,000-52,000 events; F05's cells hold 6,965-18,591, and no control can be built
+  # between those regimes on this data. This null therefore carries the section 7.2
+  # synthetic GARCH assurance - the harness does not promote idealised noise - and NOTHING
+  # from F14. That limit is part of the verdict, not a footnote to it.
+  #
+  # ---- THE SPECIFICATION CORRECTION IS WHAT MADE THE NULL MEANINGFUL ----
+  #
+  # AS REGISTERED, THE CONDITION TESTED NOTHING. k*sigma was measured against the
+  # COMPRESSED WINDOW'S OWN sigma, so compression shrank the trigger distance exactly when
+  # the filter fired. It broke on 79-91% of armings even after the mechanism-derived
+  # 60-minute deadline was applied, and the k axis moved the break rate by ten points
+  # across its entire range. A null from that condition would have been a statement about
+  # a trigger that fires almost always - which is to say, about nothing.
+  #
+  # The correction (decisions.md section 27) referenced the trigger to NORMAL volatility -
+  # the median of the trailing 20 sessions' sigma at the same clock hour, the quantity the
+  # p20 arming filter already used - because expansion means volatility RETURNING TOWARD
+  # NORMAL. Break rates fell to 44-78% and k discriminated for the first time.
+  #
+  # THE CORRECTION DID NOT PRODUCE A POSITIVE RESULT. It produced a null that means
+  # something. Both repairs - the deadline and the sigma reference - were derived from the
+  # mechanism and recorded BEFORE the run, which is what separates a correction from a
+  # tuning choice made after seeing a result.
+  #
+  # All 54 cells stay in N.
+  status: retired
+  retired: 2026-09-02
+  retired_reason: >
+    INFORMATIVE NULL - the first retirement here where the sample was
+    demonstrably adequate. 45 informative cells across 11,000-18,600
+    events, 1 nominal separation against 1.35 expected, no BH survivors
+    on either instrument, and the best informative cell at 0.05x its
+    detection floor. Aggregates negative net of cost on both. MNQ
+    carries the stronger null at 83.16% coverage against MGC's 64.16%,
+    and BOTH INSTRUMENTS POINT THE SAME WAY, so the standing MGC caveat
+    never had to be adjudicated. NO REAL-DATA CONTROL EXISTS AT THIS
+    EVENT REGIME: F14 validated the harness at ~48,000-52,000 events
+    and none can be built between that and F05's 6,965-18,591, so this
+    null carries the section 7.2 synthetic assurance and nothing from
+    F14. THE SPECIFICATION CORRECTION IS WHAT MADE THE NULL MEANINGFUL:
+    as registered the trigger referenced the compressed window's own
+    sigma, so it fired on 79-91% of armings and tested nothing. Both
+    repairs were derived from the mechanism and recorded before the run.
+  # ---- SPECIFICATION CORRECTION ADOPTED 2026-09-02 (decisions.md section 27) ----
+  #
+  # THE REGISTERED VERSION DID NOT TEST ITS OWN MECHANISM. k*sigma was measured against the
+  # COMPRESSED WINDOW'S OWN sigma. Compression SELECTS hours with small sigma, so the
+  # trigger distance shrank exactly when the filter fired, and F05 broke on 79-91% of
+  # armings even after the mechanism-derived 60-minute deadline was applied. The tighter
+  # the compression, the easier the trigger - the condition was self-defeating.
+  #
+  # THE CORRECTION FOLLOWS FROM THE MECHANISM, NOT FROM THE DATA. Compression forecasts
+  # EXPANSION, and expansion means volatility RETURNING TOWARD NORMAL. A trigger that
+  # asserts expansion must therefore reference NORMAL volatility for that clock hour, not
+  # the compressed sample it selected on. Normal is the MEDIAN of the trailing 20 sessions'
+  # sigma at the same clock time - the same window and the same quantity the p20 arming
+  # filter already compares against, so the condition now uses ONE consistent notion of
+  # "usual volatility at this hour" for both halves instead of two incompatible ones.
+  #
+  # This is a CORRECTION rather than a tuning choice, and the distinction is the whole
+  # point: the registered version was not a weaker test of the mechanism, it was a test of
+  # something else. It is one value, not a new grid axis.
+  #
+  # EFFECT ON THE FIRING RATE - the k axis now does work, which it previously did not:
+  #
+  #                       before (own sigma)      after (normal sigma)
+  #     k = 1.5              ~90%                     72-78%
+  #     k = 2.0              ~86%                     57-64%
+  #     k = 2.5              ~80%                     44-50%
+  #
+  # ROUTES REMAIN OPEN, 5 of 6 per-cell: MNQ 120m/180m and MGC 60m/120m/180m. MNQ 60m drops
+  # to BELOW SWEPT RANGE at 6,965 measured events against 19,722. F05 is schedulable again.
+  #
+  # The 60-minute break deadline recorded above is unchanged and still derived.
+  specification_correction: >
+    The registered condition measured k*sigma against the compressed window's own sigma,
+    which does not test the mechanism: compression selects for small sigma, so the trigger
+    shrank whenever the filter fired and it broke on 79-91% of armings. Expansion means
+    volatility returning toward NORMAL, so the trigger now references the median of the
+    trailing 20 sessions' sigma at the same clock time - the quantity the p20 arming filter
+    already uses. Break rates fall to 44-78% and the k axis discriminates for the first
+    time. Routes remain open at 5 of 6 per-cell.
+  # ---- STAGE 1 RUN 2026-09-02: DOES NOT SEPARATE ----
+  # reports/f05_stage1.md. 54 cells (3 vol_pct x 3 k x 3 holds x 2 instruments), 54 trials.
+  # Run under the CORRECTED condition - the 60-minute deadline and the normal-volatility
+  # trigger reference, both recorded before the run.
+  #
+  #   MGC  27 of 27 informative   1 nominal separation vs 1.35 expected   0 BH survivors
+  #   MNQ  18 of 27 informative   0 nominal separations vs 0.90 expected  0 BH survivors
+  #
+  # MNQ AT 60 MINUTES IS UNINFORMATIVE and its nine cells are excluded from the verdict:
+  # 6,965 measured events against the 19,722 at which a floor resolves.
+  #
+  # THE EFFECT IS NOWHERE NEAR THE FLOOR. Best informative cell is MNQ p15 k=2.5 H=180 at
+  # +0.79 bps on 5,812 events, which is 0.05x its detection floor, with p=0.2137. The
+  # single nominal separation is on MGC and does not survive BH. Aggregates are negative
+  # net of cost on both instruments: -0.88 bps MGC, -0.44 MNQ.
+  #
+  # THIS IS AN INFORMATIVE NULL, unlike F02 and F07. 45 of 54 cells sit above the swept
+  # range on samples of 11,000-18,600 events. The sample was there and the effect was not.
+  #
+  # WHICH INSTRUMENT CARRIES IT: MNQ carries the stronger null, at 83.16% coverage against
+  # MGC's 64.16%. Both point the same way, which is the easy case - the standing MGC caveat
+  # would have mattered had MGC separated and MNQ not. F05's mechanism is generic to
+  # speculative price series and holds in both, so neither is a control for the other.
+  #
+  # NO REAL-DATA CONTROL EXISTS AT THIS EVENT REGIME. F14 validated the harness at
+  # ~48,000-52,000 events; F05's cells hold 6,965-18,591. This null carries the section 7.2
+  # synthetic GARCH assurance and nothing from F14.
+  #
+  # STATUS IS UNCHANGED PENDING A DECISION. The evidence supports retirement - informative
+  # cells, adequate sample, nothing at 20x the floor - but that call is not made here.
+  # schedulable is false so nothing re-runs it in the meantime.
+  stage1_run: 2026-09-02
+  stage1_result: >
+    Does not separate. 0 BH survivors on either instrument; 1 nominal
+    separation on MGC against 1.35 expected by chance. Best informative
+    cell +0.79 bps at 0.05x its detection floor (MNQ p15 k=2.5 H=180,
+    5,812 events, p=0.2137). Aggregates negative net of cost on both:
+    -0.88 bps MGC, -0.44 MNQ. An INFORMATIVE null - 45 of 54 cells sit
+    above the swept range on 11,000-18,600 event samples - unlike F02
+    and F07, where nothing could have been learned. MNQ carries the
+    stronger null at 83.16% coverage against MGC's 64.16%. 54 trials.
+  # Already run; nothing should re-run it while the verdict is open.
+  grade: B+
+  tier: A
+  param_cap: 3
+  session: both
+  hold_hours: [1, 3]
+  # Retired; nothing should schedule it. Registration priority preserved.
+  registered_test_order: 5
+  test_order: null
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Volatility clustering is a generic property of speculative price series; both hold.
+  # CARRIED OVER FROM THE CRYPTO CATALOG AS S09, where it was recorded
+  # stage1_inconclusive rather than retired: 7 nominal hits on SOL against 2.7 expected,
+  # NONE surviving Benjamini-Hochberg at FDR 0.05, mechanism uncontradicted, and the drift
+  # explanation tested and REFUTED (signal 49.9% long, drift benchmark +/-0.00 bps). It
+  # failed on power and multiplicity, not on sign or story.
+  #
+  # It is re-registered rather than resumed. The instrument, the cost floor and the session
+  # structure are all different, so this is a new test of the same mechanism — crypto's 110
+  # trials stay in the crypto project's N and do not transfer here.
+  #
+  # WHAT A NULL MEANS. The hypothesis states its own direction is a coin flip. A hit rate
+  # near 50% is EXPECTED and is not evidence against; the mean per-event return carries the
+  # claim, because asymmetry moves the mean while leaving the hit rate at chance. A hit rate
+  # meaningfully ABOVE 50% contradicts the mechanism and indicates a bug.
+  falsification_note: >
+    Same weakness as in crypto: the variance forecast is sound and the direction is close to
+    a coin flip. Verify the win rate is near 50% and that the edge comes from payoff
+    asymmetry.
+
+- id: F06
+  name: cash_open_drive_continuation
+  mechanism: >
+    09:30 ET is a genuine liquidity event and the largest participant-composition change in
+    the day: overnight positioning meets cash liquidity and the imbalance resolves. Gao et
+    al. use the first half-hour precisely because that is where the day's directional
+    information concentrates. The counterparty is whoever holds the overnight position that
+    must be adjusted once real depth arrives. This differs from F01 by trading the NEAR
+    continuation rather than the close.
+  condition: >
+    range = high/low over [09:30, 09:30 + W]. On a close beyond the range boundary, enter
+    that direction and exit at H hours or 15:55 ET. W in {5, 15, 30} min, confirm in
+    {close beyond, 2 closes beyond}, H in {1, 2, 3} h, vol_filter in {none, >median}.
+  horizon_minutes: [60, 120, 180]
+  registered: 2026-08-28
+  # ---- REGISTRATION AUDIT 2026-09-02: TWO DEFECTS, NEITHER FIXED HERE ----
+  #
+  # 1. INSTRUMENT (attenuated, not fatal). The mechanism names 09:30 ET as the moment
+  #    "overnight positioning meets CASH liquidity". That is the EQUITY cash open. Gold's
+  #    own liquidity event is the COMEX open at 08:20 ET. On MGC this condition therefore
+  #    tests a cross-asset spillover from the equity open rather than the registered
+  #    mechanism. It may still be run - unlike F02's MGC, the mechanism is weakened rather
+  #    than absent - but an MGC result cannot carry the registered claim.
+  #
+  # 2. vol_filter IS UNDEFINED, AND IT GATES THE FIRING RATE. The condition says
+  #    "vol_filter in {none, >median}" without saying median OF WHAT, measured over WHAT
+  #    WINDOW. reports/measured_rates.md had to pick a reading to count at all (20-session
+  #    realised vol against its own trailing 250-session median), and that reading is a
+  #    MEASUREMENT CONVENIENCE, not a registered choice. It changes the event count and so
+  #    changes whether F06's routes are open.
+  #
+  # THE DECISION REQUIRED, which is not mine to make: what quantity does the vol filter
+  # threshold, and over what lookback? The same gap exists in F01 and should be settled the
+  # same way for both.
+  # ---- RETIRED 2026-09-02: NULL ON THE ONLY OPEN ROUTES, AND A WEAK ONE ----
+  # reports/f06_stage1.md. 36 cells on MGC, 36 trials. MNQ was not run.
+  #
+  # GRADED PER decisions.md SECTION 12:
+  #
+  #   deciding instrument   MGC, and the mechanism is ATTENUATED there
+  #   coverage              70.88% of 09:30-15:55 ET minutes traded
+  #   sample                12 informative cells, ~3,950 events each
+  #   margin to the floor   best informative cell -0.02 bps = 0.00x its floor; every
+  #                         informative cell is negative
+  #   failure mode          PRE-REGISTERED, twice over - see below
+  #
+  #   0 nominal separations against 0.60 expected by chance
+  #   0 BH survivors at FDR 0.05; smallest p 0.2461
+  #   informative aggregate -0.62 bps gross, -1.27 net of the 0.65 bps cost floor
+  #
+  # THE FAILURE MODE WAS PRE-REGISTERED TWICE. Its own falsification note says opening-range
+  # breakout "is possibly the most widely traded retail futures pattern in existence, and
+  # any edge has had decades of attention... Treat a POSITIVE result with more suspicion
+  # than a negative one." A negative result is what the entry expected. Separately, the
+  # scope limit recorded before the run predicted that whatever came back would be bounded
+  # by the instrument it came back on.
+  #
+  # THIS IS A WEAKER RETIREMENT THAN F05's, ON EVERY AXIS:
+  #
+  #                        F05                          F06
+  #   informative cells    45                           12
+  #   events per cell      11,000-18,600                ~3,950
+  #   deciding instrument  MNQ at 83.16% coverage       MGC at 70.88%
+  #   mechanism there      holds in both instruments    ATTENUATED - 09:30 ET is the
+  #                                                     EQUITY cash open, not gold's
+  #   resolving threshold  19,722 / 5,620               2,862, the LOWEST in the study
+  #
+  # F05 was tested where its mechanism lives, at adequate power, and the market said no.
+  # F06 was tested on the instrument where its mechanism is weakest, on the narrowest
+  # open margin available anywhere in this catalog, because that was the only route left.
+  # The null is real but it is a smaller claim.
+  #
+  # WHAT WAS NOT TESTED, AND IS NOT A NULL: MNQ, where the mechanism actually lives, is
+  # closed on every route at 1,708 measured events against 19,722. It was deliberately not
+  # run. **The registered mechanism has therefore never been tested on the instrument it
+  # describes, and this retirement does not claim otherwise.**
+  #
+  # NO REAL-DATA CONTROL EXISTS AT THIS EVENT REGIME. F14 validated the harness at
+  # ~48,000-52,000 events; F06's cells hold ~3,950, and measured control candidates at the
+  # once-per-session regime resolved in only 2 of 12 combinations. This null carries the
+  # section 7.2 synthetic GARCH assurance and nothing from F14.
+  #
+  # All 36 cells stay in N.
+  status: retired
+  retired: 2026-09-02
+  retired_reason: >
+    Null on the only open routes, and a WEAK one. 12 informative cells
+    at ~3,950 events each, 0 nominal separations against 0.60 expected,
+    0 BH survivors, every informative cell negative and the best at
+    0.00x its floor. Aggregate -0.62 bps gross, -1.27 net. The deciding
+    instrument is MGC at 70.88% coverage, where the mechanism is
+    ATTENUATED - 09:30 ET is the EQUITY cash open, not gold's - and the
+    open routes cleared on a 2,862 threshold, the lowest in the study.
+    WEAKER THAN F05's RETIREMENT on every axis: a quarter the
+    informative cells, a quarter the events, lower coverage, and a
+    deciding instrument that does not hold the mechanism. The failure
+    mode was pre-registered twice - the entry's own note says to treat
+    a positive result with more suspicion than a negative one, and the
+    scope limit was recorded before the run. MNQ, where the mechanism
+    lives, is closed on every route and was NOT RUN, so the registered
+    mechanism has never been tested on the instrument it describes.
+    No real-data control exists at this event regime.
+  # ---- vol_filter SETTLED 2026-09-02: median realised volatility, trailing 20 sessions ----
+  #
+  # The registered condition said "vol_filter in {none, >median}" and named neither the
+  # quantity nor the lookback, which left the event count - and therefore whether F06's
+  # routes were open - undetermined. It is now: this session's realised volatility,
+  # computed from its own RTH minute returns, against the MEDIAN REALISED VOLATILITY OVER
+  # THE TRAILING 20 SESSIONS, strictly prior. One lookback, matching the 20 sessions used
+  # throughout this catalog.
+  #
+  # EFFECT: measured events fall to 1,708 on MNQ and 1,785 on MGC. MNQ closes entirely.
+  # MGC 120m and 180m remain open as MIXED - 2 of 6 per-cell routes.
+  #
+  # THE INSTRUMENT CAVEAT STANDS and is not a specification defect: 09:30 ET is the EQUITY
+  # cash open, so on MGC this tests a cross-asset spillover rather than the registered
+  # mechanism (mechanism_instruments: attenuated). BOTH REMAINING OPEN ROUTES ARE ON MGC,
+  # which means F06 can now only be tested on the instrument where its mechanism is
+  # weakest. That is worth knowing before spending trials on it.
+  # ---- SCOPE LIMIT, RECORDED 2026-09-02 BEFORE THE RUN ----
+  #
+  # BOTH OPEN ROUTES ARE ON MGC - 120m and 180m - AND MGC IS WHERE THE MECHANISM IS
+  # WEAKEST. The mechanism names 09:30 ET as the moment "overnight positioning meets CASH
+  # liquidity", with the counterparty being whoever holds an overnight position that must
+  # be adjusted once real depth arrives. That is the EQUITY cash open. Gold's own liquidity
+  # event is the COMEX open at 08:20 ET.
+  #
+  # So on MGC this condition tests CROSS-ASSET SPILLOVER from the equity open, not the
+  # registered claim. The two are different propositions with different counterparties.
+  #
+  # A POSITIVE RESULT WOULD NOT SUPPORT THE MECHANISM AS WRITTEN. It would say that gold
+  # moves directionally after the equity cash open, which is interesting and is not what
+  # F06 registered. Promoting it would require RE-REGISTRATION as its own hypothesis with
+  # its own counterparty story, its own pre-committed grid and its own trial budget - the
+  # same treatment the catalog gives any scan-derived lead.
+  #
+  # MNQ - THE INSTRUMENT WHERE THE MECHANISM ACTUALLY LIVES - IS CLOSED ON EVERY ROUTE.
+  # 1,708 measured events against the 19,722 at which a floor resolves. It is NOT RUN:
+  # spending 36 trials on an instrument that cannot carry a verdict would raise SR* for the
+  # rest of the catalog and buy nothing. Its absence from the results is a closed route,
+  # NOT a null.
+  #
+  # MGC AT 60 MINUTES IS ALSO CLOSED (1,785 events against 5,620) and its cells are marked
+  # uninformative.
+  #
+  # THE HONEST SUMMARY BEFORE ANY DATA IS SEEN: F06 can only be tested where its mechanism
+  # is attenuated, on the shorter of its two open horizons, on the instrument carrying the
+  # standing coverage caveat. Whatever comes back, that is the ceiling on what it can mean.
+  scope_limit: >
+    Both open routes are MGC, where the mechanism is attenuated: 09:30 ET is the EQUITY
+    cash open, so on gold the condition tests cross-asset spillover rather than the
+    registered claim. A POSITIVE RESULT WOULD NOT SUPPORT THE MECHANISM AS WRITTEN and
+    would require re-registration as its own hypothesis with its own counterparty story and
+    trial budget. MNQ - where the mechanism actually lives - is closed on every route at
+    1,708 events against 19,722 and is NOT RUN; its absence is a closed route, not a null.
+  grade: B
+  tier: B
+  param_cap: 4
+  session: US
+  hold_hours: [1, 3]
+  # Retired; nothing should schedule it. Registration priority preserved.
+  registered_test_order: 6
+  test_order: null
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      The mechanism names 09:30 ET as the moment overnight positioning meets CASH liquidity. T
+      hat is the EQUITY cash open. Gold's own liquidity event is the COMEX open at 08:20 ET, s
+      o on MGC this tests a cross-asset spillover rather than the registered mechanism. ATTENU
+      ATED - see the audit.
+  falsification_note: >
+    Opening range breakout is possibly the most widely traded retail futures pattern in
+    existence, and any edge has had decades of attention. Treat a POSITIVE result with more
+    suspicion than a negative one — this is the one hypothesis in the catalog where a clean
+    pass is itself weak evidence of a bug.
+
+- id: F07
+  name: gold_session_specific_momentum
+  mechanism: >
+    Gold's intraday structure is not the equity structure. In the intraday momentum
+    literature, for gold the FIFTH half-hour return carries the highest and significantly
+    positive predictive power — not the first, as in equities. If that holds it says gold's
+    information arrival is anchored to a different point in the session, plausibly the
+    London/New York overlap rather than the cash open. The claim under test is that the
+    anchor differs between instruments, which is a cleaner question than testing either
+    alone.
+    NO COUNTERPARTY IS NAMED, AND THAT IS THE POINT. §5 Stage 0 requires a mechanism to say
+    who is paying you; this one cannot yet, because which slot carries the effect is being
+    discovered rather than predicted. It is registered as a SCAN, a deliberately weaker
+    object than a hypothesis: a positive result is a lead that must be re-registered with a
+    real counterparty story before it can be promoted, not a candidate in its own right.
+    Registering it honestly as exploratory is the alternative to inventing a mechanism to
+    fit whichever slot wins.
+  condition: >
+    For MGC, regress the last-half-hour return on each of the first 12 half-hour returns
+    separately and identify which slot predicts, if any. Compare against MNQ's slot
+    structure. slot in {1..12}, hold in {30, 60, 90} min.
+  horizon_minutes: [30, 60, 90]
+  registered: 2026-08-28
+  # STAGE 1 RUN 2026-09-02, RECORDED UNINFORMATIVE — reports/f07_stage1.md.
+  # NOT retired: no evidence was obtainable at any level, so there is nothing to
+  # retire it ON. See reports/decisions.md section 13.
+  #
+  # NO ROUTE TO A VERDICT, ON EITHER INSTRUMENT, AT EITHER LEVEL.
+  #   per cell    ~4,000 events vs a swept range starting at 19,722  BELOW SWEPT RANGE
+  #   aggregate   ~4,000 events                                      BELOW SWEPT RANGE
+  #
+  # THE AGGREGATE DOES NOT RESCUE IT, AND THAT IS THE INTERESTING PART. F03's 13 slots
+  # are DISJOINT trades, so pooling multiplies its observations and its aggregate
+  # carries a verdict even though no single cell does. F07's 12 slots are twelve
+  # PREDICTORS OF ONE TARGET — the catalog regresses the last half-hour on each of the
+  # first twelve — so every cell enters on the same 15:30 minute of the same session.
+  # Pooling stacks twelve correlated readings of one ~4,000-session sample.
+  #
+  # WHAT THE NUMBERS WERE, AS DESCRIPTION ONLY. 0 nominal separations on both
+  # instruments against 1.8 expected; aggregate -0.00 bps on MGC and +0.09 on MNQ,
+  # both negative net of cost. No best-cell-to-floor ratio is quoted, because no floor
+  # resolved at this sample size and the denominator would be invented.
+  #
+  # COST: 72 trials, which enter N and raise SR* for everything still untested. They
+  # bought nothing. Recorded rather than hidden.
+  #
+  # THE REDESIGN THAT WOULD MAKE IT TESTABLE: enter at the CLOSE of slot s and hold h,
+  # rather than always at 15:30. That makes the 12 positions disjoint and restores a
+  # ~48,000-event aggregate. It is A DIFFERENT HYPOTHESIS — the catalog's F07 is the
+  # Gao-style claim about which slot ANCHORS the last-half-hour move; the redesign asks
+  # whether slot-by-slot momentum exists at all. It would need its own registration and
+  # its own pre-committed grid.
+  status: stage1_uninformative
+  stage1_run: 2026-09-02
+  stage1_reason: >
+    No route to a verdict at any level on either instrument. Per-cell
+    ~4,000 events against a swept range starting at 19,722, and the
+    aggregate does not rescue it because the 12 slots are twelve
+    predictors of ONE target rather than twelve disjoint trades — every
+    cell enters at the same 15:30 minute, so pooling stacks correlated
+    readings of one sample. 0 nominal separations against 1.8 expected,
+    aggregate -0.00 bps MGC and +0.09 MNQ, but none of that is evidence.
+    72 trials spent, entering N. Not retired: nothing to retire it on.
+  grade: B
+  tier: B
+  param_cap: 3
+  session: US
+  hold_hours: [0.5, 1.5]
+  # Ran and produced no obtainable evidence; nothing should reschedule
+  # it as registered. Registration priority preserved, not renumbered.
+  registered_test_order: 8
+  test_order: null
+  symbols: [MGC, MNQ]
+  mechanism_instruments:
+    primary: MGC
+    secondary: MNQ
+    rationale: >
+      A gold session-structure claim; the catalog registers MNQ explicitly as the comparison a
+      rm rather than as a second test.
+  is_scan: true
+  # REGISTERED AS A SCAN, WHICH IS A WEAKER OBJECT THAN A HYPOTHESIS. The mechanism ("gold's
+  # session anchor differs from equities") is a real claim, but WHICH slot carries it is
+  # being discovered rather than predicted. All 12 slots are trials and BH applies within
+  # the hypothesis. A result here is a lead for a properly pre-registered hypothesis, not a
+  # candidate for promotion.
+  falsification_note: >
+    Closer to exploratory analysis than a hypothesis, and registered as such. Log all 12
+    slots as trials.
+
+- id: F08
+  name: cross_asset_risk_regime
+  mechanism: >
+    Gold and equities have an unstable but real relationship: risk-off flows bid gold and
+    sell equities, while a rising-real-yield regime pressures both. The relationship inverts
+    by regime, which is precisely why a conditional formulation is more defensible than an
+    unconditional one. The tradeable version is divergence — when MNQ and MGC both move the
+    same direction sharply during a risk-off signal, one of them is wrong, and the
+    counterparty is whoever is on the weaker-conviction side of that move.
+  condition: >
+    If sign(MNQ return over W) equals sign(MGC return over W) and both |r| > k*sigma, fade
+    the weaker-conviction leg (the lower volume-weighted move) and exit at H.
+    W in {30, 60} min, k in {1, 1.5, 2}, H in {1, 2, 3} h.
+  horizon_minutes: [60, 120, 180]
+  registered: 2026-08-28
+  # ---- REGISTRATION AUDIT 2026-09-02: THREE DEFECTS, NONE FIXED HERE ----
+  #
+  # 1. "THE LOWER VOLUME-WEIGHTED MOVE" IS UNDEFINED, and it decides which leg is traded -
+  #    that is, it decides the entire direction of the strategy. Return times volume?
+  #    Return divided by volume? Displacement from VWAP? These give different and sometimes
+  #    opposite answers, and nothing in the entry says which.
+  #
+  # 2. THE TRADED INSTRUMENT VARIES PER EVENT, so `symbols: [MNQ, MGC]` does not mean what
+  #    it means elsewhere in this registry. Every other entry runs each instrument as its
+  #    own test; F08 requires BOTH legs to fire and then trades ONE of them, chosen per
+  #    event by the undefined rule above. The measured firing rate counts JOINT triggers,
+  #    not per-instrument trades, so the per-instrument gate rows are not directly
+  #    comparable with any other hypothesis's.
+  #
+  # 3. ITS MANDATORY REGIME SPLIT LIVES IN A NOTE, NOT A FIELD. The falsification note says
+  #    "the correlation regime IS the whole strategy... so a regime split is mandatory
+  #    rather than a robustness check". That is exactly F02's situation, where the split
+  #    requirement sat in F13's exclusion note, the gate never saw it, and the sample was
+  #    halved without the gate knowing. F08 will repeat that unless the split becomes a
+  #    field the gate reads.
+  #
+  # THE DECISIONS REQUIRED, none of them mine: how "volume-weighted move" is computed; how
+  # the traded leg is recorded so its event count is comparable; and where the regime
+  # boundary falls.
+  # ---- RETIRED 2026-09-02 ON PREMISE, NOT ON POWER (decisions.md section 29) ----
+  #
+  # THE MECHANISM DOES NOT SAY WHICH LEG IS MISPRICED. It says that when MNQ and MGC move
+  # the same direction sharply during a risk-off signal, "one of them is wrong". That
+  # identifies a DIVERGENCE. It does not identify a DIRECTION, and a strategy needs one.
+  #
+  # The condition supplied a direction anyway - "fade the weaker-conviction leg (the lower
+  # volume-weighted move)" - and that rule is ARBITRARY. It appears nowhere in the
+  # mechanism, nothing derives it, and it is not even well defined: return times volume,
+  # return divided by volume, and displacement from VWAP give different and sometimes
+  # opposite answers. A rule invented at the condition stage to fill a gap the mechanism
+  # left is a free parameter wearing a mechanism's clothes.
+  #
+  # SO A RESULT WOULD HAVE BEEN UNREADABLE IN BOTH DIRECTIONS. A pass would not have
+  # supported the mechanism, because the mechanism never predicted that direction. A
+  # failure would not have refuted it, because the mechanism never predicted the opposite
+  # one either. That is the same defect that retired F11: a premise that cannot make the
+  # result mean anything.
+  #
+  # THIS IS A PREMISE FAILURE, NOT A POWER FAILURE, and the two must not blur. F08 was
+  # measured at 530-6,151 independent events with 5 of 6 routes open - it had the sample.
+  # It fails on what the mechanism licenses, and it would have failed at any sample size.
+  # Compare F10, which was retired for the opposite reason: sound premise, no power.
+  #
+  # TWO FURTHER DEFECTS, recorded because they would matter if it is ever re-registered:
+  # the traded instrument varies per event so `symbols` does not mean what it means
+  # elsewhere in this registry; and the mandatory regime split its own falsification note
+  # requires lives in that note rather than in a field, which is exactly how F02's split
+  # escaped the gate.
+  #
+  # NO TRIALS SPENT: it was never run.
+  status: retired
+  retired: 2026-09-02
+  retired_reason: >
+    PREMISE FAILURE, not a power failure. The mechanism identifies a
+    divergence - when MNQ and MGC move together sharply, one is wrong -
+    but it does not say WHICH leg is mispriced. The condition supplied a
+    direction anyway, fading the lower volume-weighted move, and that
+    rule appears nowhere in the mechanism, is derived from nothing, and
+    is not well defined. A pass would not have supported the mechanism
+    and a failure would not have refuted it. It had the sample -
+    530-6,151 measured events, 5 of 6 routes open - and would have
+    failed at any sample size. Same class as F11; the opposite of F10,
+    which had a sound premise and no power. Never run, no trials spent.
+  grade: B-
+  tier: B
+  param_cap: 3
+  session: both
+  hold_hours: [1, 3]
+  # Retired before running; nothing should schedule it. Registration priority
+  # preserved rather than renumbered away.
+  registered_test_order: 9
+  test_order: null
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Cross-asset by construction - it REQUIRES both legs. Neither is optional and neither is 
+      a control.
+  # PAYS TWO SETS OF COSTS. This is a pairs trade in disguise, so its floor is 1.13 bps
+  # (MNQ 0.48 + MGC 0.65), not 0.48. §4 requires the cost model to charge both legs, and
+  # any reported net figure that uses a single-leg floor is wrong by more than a factor of
+  # two.
+  falsification_note: >
+    The correlation regime IS the whole strategy and it is unstable across the sample, so a
+    regime split is mandatory rather than a robustness check.
+
+- id: F09
+  name: settlement_anchored_flow
+  mechanism: >
+    Daily settlement is the price institutions use for margining, P&L and risk models —
+    15:00 ET for equity index futures and 13:30 ET for COMEX gold. Positions marked against
+    it create flow into the window from anyone whose risk system references it, and
+    practitioner accounts describe a flurry of activity before the window followed by calm
+    after. The counterparty is whoever provides liquidity to a participant who must be
+    positioned by the settlement print regardless of price.
+  condition: >
+    pre = return over [S - pre_window, S - 15min]. Enter at S - 15min and exit at S + hold.
+    Test both continuation and reversion. instrument in {MNQ 15:00, MGC 13:30},
+    pre_window in {30, 60} min, hold in {30, 60, 90} min.
+  horizon_minutes: [30, 60, 90]
+  registered: 2026-08-28
+  # ---- REGISTRATION AUDIT 2026-09-02: ONE DEFECT, AND IT IS THE CLEANEST ENTRY HERE ----
+  #
+  # The condition is well specified: no undefined threshold, both directions named, and a
+  # separate settlement time given per instrument. Nothing needs deciding before it could
+  # run.
+  #
+  # THE DEFECT IS OVERLAP WITH F01, and the entry's own falsification note names it: "two
+  # hypotheses firing in the same window on the same instrument are one observation dressed
+  # as two". On MNQ, F09 enters at 14:45 ET and F01 at 15:00 or 15:30, and both are out by
+  # ~15:55. Their trades overlap for most of their lives. If both were counted as
+  # independent evidence about the same afternoon, the catalog would be double-counting.
+  #
+  # It is MOOT TODAY because F01 is blocked_insufficient_events and F09 is closed on both
+  # routes (2,365-3,406 measured events against MNQ's 19,722). It stops being moot the
+  # moment either is revived, so it is recorded rather than left to be rediscovered.
+  #
+  # No specification_defect field: there is nothing to decide, only something to remember.
+  status: untested
+  grade: B-
+  tier: B
+  param_cap: 3
+  session: US
+  hold_hours: [0.5, 1.5]
+  test_order: 7
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Both instruments have a daily settlement print that risk systems reference; the registry
+       names each one's time separately.
+  # NOT INDEPENDENT OF F01. MNQ's 15:00 ET settlement overlaps F01's entry window, so a hit
+  # on one may BE the other. §6 counts them as one family for any cross-hypothesis claim,
+  # and they must be tested jointly before either is treated as confirmed. Scheduling F09
+  # immediately after F01 (test_order 7 against F01's 1) is deliberate so the joint test is
+  # cheap to run while F01's cells are fresh.
+  falsification_note: >
+    The overlap with F01 is the main risk: two hypotheses firing in the same window on the
+    same instrument are one observation dressed as two.
+
+- id: F10
+  name: rsi_mean_reversion_control
+  mechanism: >
+    NOT A HYPOTHESIS. A control that exists to be FAILED by the harness. RSI(14) with 30/70
+    thresholds is the most widely published mean-reversion rule in retail trading; if it
+    carried an edge it would have been arbitraged decades ago. There is no counterparty
+    story, deliberately.
+  condition: >
+    RSI(14) crossing up through 30 goes long, crossing down through 70 goes short, exit
+    after hold. Thresholds and period are FIXED A PRIORI and never swept. hold is the only
+    parameter.
+  horizon_minutes: [30, 60, 120]
+  registered: 2026-08-28
+  # RETIRED 2026-09-02: SOUND PREMISE, PERMANENTLY UNPOWERED. decisions.md section 17.
+  #
+  # 1,585 to 5,594 independent events against a swept range starting at 19,722. RSI(14)
+  # crossings through 30 and 70 are simply rare: 2,434 up and 3,160 down across sixteen
+  # years of MNQ. An unpowered control coming back empty is indistinguishable from a
+  # powered one working correctly, so it cannot support the one claim it exists to make.
+  #
+  # NO TUNING FIXES A FIRING RATE. The rate is a property of the condition and the data,
+  # not a parameter, and the thresholds are fixed a priori precisely so they cannot be
+  # moved. Loosening them to fire more often would be tuning a control, which is the one
+  # thing a control may never permit.
+  #
+  # Its premise was better than F11's - RSI(14) 30/70 on intraday futures has far less
+  # published support than time-series momentum - but 'should have been arbitraged away'
+  # is still a market prediction rather than a construction. Replaced by F14, which
+  # cannot relate to returns by construction. No trials were spent: it was never run.
+  status: retired
+  retired: 2026-09-02
+  retired_reason: >
+    SOUND PREMISE, PERMANENTLY UNPOWERED. 1,585-5,594 independent events
+    against a swept range starting at 19,722, and no tuning fixes a firing
+    rate: the rate is a property of the condition and the data, not a
+    parameter, and loosening the a-priori thresholds to fire more often
+    would be tuning a control. An unpowered control coming back empty is
+    indistinguishable from a powered one working correctly. Never run, no
+    trials spent. Replaced by F14.
+  grade: D
+  tier: C
+  param_cap: 1
+  session: US
+  hold_hours: [0.5, 2]
+  test_order: null
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      An indicator computed on each instrument's own price series, so it is mechanism-agnostic
+       across both. It was retired for being permanently unpowered at its own firing rate, not
+       for any instrument mismatch.
+  is_control: true
+  # CLEARING STAGE 1 IS A HARNESS BUG, NOT A FINDING. If this separates, HALT: do not
+  # investigate the result, run the §7.2 synthetic-noise test and find what is broken. A
+  # control that passes invalidates every result the harness has produced.
+
+- id: F11
+  name: ma_crossover_control
+  mechanism: >
+    NOT A HYPOTHESIS. The second control. A fast/slow moving-average crossover is the
+    canonical published trend rule and has no counterparty story. Two parameters rather than
+    F10's one, so the pair also gives a crude read on whether the harness's behaviour
+    depends on the size of the grid it is handed.
+  condition: >
+    Long when the fast MA is above the slow MA, short when below, evaluated at bar close.
+    fast and slow fixed a priori at round values; exit at the hold.
+  horizon_minutes: [30, 60, 120]
+  registered: 2026-08-28
+  # RETIRED 2026-09-02: NOT A CONTROL. reports/decisions.md section 17.
+  #
+  # Its premise was that a canonical published trend rule SHOULD HAVE BEEN ARBITRAGED
+  # AWAY. That is a contestable prediction about the market, not a construction - and if
+  # the prediction is wrong, the control is silently a hypothesis. A fast/slow moving-
+  # average crossover is TIME-SERIES MOMENTUM, among the best-documented anomalies in
+  # futures specifically, and the managed-futures industry is built on it.
+  #
+  # DECISIVELY: F01 IN THIS CATALOG IS A MOMENTUM HYPOTHESIS and F11 is a slow momentum
+  # rule - the same family. A promotion would be unreadable: there would be no way to
+  # tell a harness failure from a true detection, which is exactly the distinction a
+  # negative control exists to draw.
+  #
+  # Note it was POWERED - 43,759 to 173,879 independent events, resolvable everywhere.
+  # It fails on premise, not on sample, and would have failed at any sample size. No
+  # trials were spent: it was never run.
+  status: retired
+  retired: 2026-09-02
+  retired_reason: >
+    NOT A CONTROL. Its premise was that a canonical published trend rule
+    should have been arbitraged away, which is a contestable market
+    prediction rather than a construction. A fast/slow MA crossover is
+    time-series momentum, the same family as F01, so a promotion would be
+    unreadable as either harness failure or true detection. It was POWERED
+    (43,759-173,879 independent events); it fails on premise and would have
+    failed at any sample size. Never run, no trials spent. Replaced by F14.
+  grade: D
+  tier: C
+  param_cap: 2
+  session: US
+  hold_hours: [0.5, 2]
+  test_order: null
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Likewise computed on each instrument's own series and agnostic across both. It was retir
+      ed because a moving-average crossover is time-series momentum - the same family as F01 -
+       and so cannot serve as a control, not for any instrument mismatch.
+  is_control: true
+
+- id: F12
+  name: pre_fomc_announcement_drift
+  mechanism: >
+    Lucca & Moench (2015) found the S&P 500 rises an average 49 basis points in the 24 hours
+    before scheduled FOMC announcements, accounting for roughly 80% of annual returns, with
+    a Sharpe of 1.14 for buying at 14:00 the prior day and selling 15 minutes before the
+    announcement, and a similar magnitude in the German DAX. The effect is not explained by
+    the announcement surprise — returns at and after the announcement are approximately zero.
+  condition: >
+    Buy at 14:00 ET the day before a scheduled FOMC announcement, sell 15 minutes before it.
+    NOT IMPLEMENTED — see the exclusion reason.
+  horizon_minutes: [1440]
+  registered: 2026-08-28
+  status: excluded
+  excluded: 2026-08-28
+  excluded_reason: >
+    Two independent reasons, either sufficient. FIRST, EVENT COUNT: eight announcements a
+    year is roughly 128 over the 2010-2026 sample, far below the firing-rate gate. A 49 bps
+    effect cannot be established on 128 observations against index volatility, and a null
+    would be uninterpretable — the test has no power to distinguish "absent" from
+    "undetectable". SECOND, THE PROP CONSTRAINT: a 24-hour hold from 14:00 the prior day
+    necessarily crosses the 17:00 ET hard exit, so the strategy as published cannot be
+    executed on this account at all. A truncated version is a different hypothesis and
+    needs its own registration and validation.
+  grade: A
+  tier: excluded
+  param_cap: 0
+  session: US
+  hold_hours: [24]
+  test_order: null
+  symbols: [MNQ]
+  # KEEP THIS ENTRY. It is this catalog's version of the crypto project's CME gap: a large,
+  # famous, well-documented effect that the pipeline cannot evaluate. Excluding it on
+  # MEASURED grounds before a single trial is spent is the gate doing its job, and recording
+  # it is what stops it being rediscovered and re-argued later.
+  #
+  # The literature is also split on whether the effect still exists — one line of work finds
+  # it essentially disappeared after 2015 in both press-conference and non-press-conference
+  # announcements, attributing it to reduced uncertainty; other commentary argues it
+  # persists. That question is unresolved AND unresolvable on this sample, which is a
+  # second-order reason rather than the reason.
+  #
+  # THE SAME EXCLUSION APPLIES TO CPI, NFP AND EVERY OTHER SCHEDULED RELEASE: ~200
+  # observations maximum over the sample, below the gate. Do not register them individually.
+
+- id: F13
+  name: unconditional_overnight_drift
+  mechanism: >
+    Boyarchenko, Larsen & Whelan (RFS 2023) documented that almost the entire US equity
+    premium accrued in the 02:00-03:00 ET window when European equity markets open — 3.6%
+    annualized over 1998-2019, and more than 60% of the contract's 5.9% annualized
+    close-to-close return.
+  condition: >
+    Buy at 02:00 ET, sell at 03:00 ET, unconditionally. NOT IMPLEMENTED — see the exclusion
+    reason.
+  horizon_minutes: [60]
+  registered: 2026-08-28
+  status: excluded
+  excluded: 2026-08-28
+  excluded_reason: >
+    Measured as decayed by its own authors. "The Disappearing Overnight Drift" (July 2026)
+    reports that the 02:00-03:00 ET window has averaged close to zero since 2021. Testing
+    the unconditional version would spend trials confirming a published null on a sample
+    where more than half the history predates the decay, and an aggregate across the break
+    would be uninterpretable in either direction. The CONDITIONAL version is registered
+    separately as F02, which is the tradeable form and carries a mandatory regime split.
+  grade: A
+  tier: excluded
+  param_cap: 0
+  session: Europe
+  hold_hours: [1]
+  test_order: null
+  symbols: [MNQ]
+  # RECORDED SO IT IS NOT REDISCOVERED. An entry that says "this was checked and it decayed"
+  # is worth more than an absent entry, because the absent entry gets re-proposed the next
+  # time someone reads the 2023 paper without the 2026 follow-up.
+
+- id: F14
+  name: timestamp_hash_control
+  # REGISTERED 2026-09-02 as the catalog's negative control, replacing F10 and F11.
+  # Firing rates measured BEFORE registration: reports/control_candidates.md.
+  #
+  # ID NOTE: requested as "F12", but F12 is the excluded pre_fomc_announcement_drift entry
+  # and reusing the id would have erased a deliberate exclusion and its two independent
+  # reasons. Registered as F14, the next free id.
+  #
+  # PARAMETERS ARE FIXED HERE, IN WRITING, BEFORE ANY RUN. That is the whole point of the
+  # ordering: a control whose parameters could be chosen after seeing a result is not a
+  # control. There are no free parameters at all - param_cap is 0, stronger than F10's 1
+  # and F11's 2 - so there is nothing to sweep and nothing to tune.
+  #
+  #     signal     SHA-256 of the bar's ISO timestamp, low bit: 1 -> long, 0 -> short
+  #     fires      at each 30-minute RTH slot open (09:30, 10:00, ... 15:30 ET)
+  #     holds      30, 60, 120 minutes
+  #     symbols    MNQ and MGC
+  #
+  # WHY IT IS MECHANISM-FREE BY CONSTRUCTION, which is the requirement F11 failed. The
+  # direction is a deterministic function of the CLOCK ALONE and never touches price. It is
+  # aperiodic, and because each date hashes differently it cannot align with time-of-day. A
+  # reader can recompute any single direction from the timestamp and confirm no price
+  # entered it. This is not a claim that the signal SHOULD have no edge; it is a claim that
+  # it CANNOT, which is the only kind of premise a control may rest on.
+  #
+  # MEASURED FIRING RATE, before registration: 9.2 firings per session on MNQ and 7.9 on
+  # MGC - NOT the 13 the RTH slot count implies, because a slot fires only when a bar exists
+  # at that exact minute. 45,513 independent events on MNQ and 38,494 on MGC, RESOLVABLE in
+  # all 12 of 12 combinations against a swept range starting at 19,722.
+  #
+  # ================= SCOPE OF WHAT THIS CONTROL LICENSES =================
+  #
+  # IT VALIDATES THE HARNESS AT F03-LIKE EVENT COUNTS ONLY. It fires roughly nine times a
+  # session, so it demonstrates that the pipeline declines to promote a mechanism-free
+  # signal on real futures data at ~40,000-event samples. It demonstrates NOTHING about
+  # behaviour at ~4,000-event samples, and that claim must not be generalised.
+  #
+  # NO CONTROL EXISTS FOR THE ONCE-A-SESSION REGIME ON THIS DATA, and none can be built. A
+  # once-a-session condition over sixteen years yields ~3,500 events against MNQ's 19,722.
+  # That is a property of the sample, not of any signal: measured candidates at that regime
+  # resolved in 2 of 12 combinations, and the two were MGC at the longest hold, on the
+  # instrument carrying the coverage caveat. F01, F02, F04, F06 and F09 all live in that
+  # regime and NONE of them has a control. The synthetic GARCH nulls in
+  # reports/integrity_futures.md remain the only check that applies there, and they test
+  # the harness on idealised noise rather than on real microstructure.
+  #
+  # =======================================================================
+  mechanism: >
+    NOT A HYPOTHESIS. The catalog's negative control, replacing F10 and F11. The direction
+    is the low bit of the SHA-256 hash of the bar's timestamp: a deterministic function of
+    the clock that never touches price, is aperiodic, and cannot align with time-of-day
+    because each date hashes differently. There is no counterparty story because there is
+    nothing for a counterparty to trade against. Unlike F10 and F11, the premise is not
+    that this effect should have been arbitraged away - a contestable prediction about the
+    market - but that it cannot relate to future returns BY CONSTRUCTION.
+  condition: >
+    At each 30-minute RTH slot open (09:30 through 15:30 ET), enter long if the low bit of
+    SHA-256 of the bar's ISO timestamp is 1, short otherwise, and exit after hold. hold in
+    {30, 60, 120} min. There are no other parameters and none may be added or swept.
+  horizon_minutes: [30, 60, 120]
+  hold_hours: [0.5, 2]
+  registered: 2026-09-02
+  # STAGE 1 RUN 2026-09-02 - PASS. The control did not separate.
+  # reports/f14_stage1.md. 6 trials, natively logged - the first native records in
+  # trials.jsonl, every earlier one having been backfilled.
+  #
+  #   MNQ  47,866 events/cell   p = 0.9902, 0.6170, 0.7827   mean -0.00 to +0.10 bps
+  #   MGC  51,753 events/cell   p = 0.7693, 0.4952, 0.6510   mean -0.11 to -0.03 bps
+  #
+  # 0 nominal separations against 0.30 expected by chance. 0 BH survivors on either
+  # instrument. Aggregate +0.06 bps MNQ and -0.08 MGC, both negative net of cost.
+  # Long share 0.497 on both, so the hash is not degenerate.
+  #
+  # WHAT THIS LICENSES, AND ONLY THIS. The harness declines to promote a signal that
+  # cannot relate to future returns by construction, on real futures data with real
+  # gaps, real volatility clustering and real session boundaries, AT ~48,000-52,000
+  # EVENT SAMPLES. See control_scope: it says nothing about the once-a-session regime
+  # where F02, F04, F06 and F09 live, and no control can be built there.
+  #
+  # STAYS untested -> stage1_passed IS NOT USED HERE. A control that behaves correctly
+  # has not been 'passed' in the sense that status means for a hypothesis - it was
+  # never a candidate. It is recorded as control_result: pass, and it should be RE-RUN
+  # whenever the harness changes, which is the opposite of a resolved entry.
+  status: untested
+  control_result: pass
+  control_last_run: 2026-09-02
+  control_reason: >
+    0 nominal separations against 0.30 expected, 0 BH survivors on
+    either instrument, aggregate +0.06 bps MNQ and -0.08 MGC and both
+    negative net of cost, across 47,866 events per cell on MNQ and
+    51,753 on MGC. Long share 0.497 on both, so the signal is not
+    degenerate. Re-run whenever the harness changes: a control is a
+    standing check, not a resolved entry.
+  grade: D
+  tier: C
+  param_cap: 0
+  session: US
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Mechanism-free by construction, so no instrument can fail to support it.
+  is_control: true
+  test_order: null
+  # A machine-readable field, NOT a comment. The scope is part of the claim the control
+  # licenses, and yaml.safe_load discards comments - anything a tool must be able to check
+  # has to live in the data. This one is asserted by
+  # test_the_live_control_states_the_regime_it_validates.
+  control_scope: >
+    Validates the harness at F03-like event counts ONLY. F14 fires ~9.2 times a session on
+    MNQ and 7.9 on MGC, reaching ~45,513 and ~38,494 independent events, so it demonstrates
+    that the pipeline declines to promote a mechanism-free signal on real futures data at
+    ~40,000-event samples. It demonstrates NOTHING about ~4,000-event samples and the claim
+    must not be generalised. NO CONTROL EXISTS FOR THE ONCE-A-SESSION REGIME on this data
+    and none can be built: a once-a-session condition over sixteen years yields ~3,500
+    events against MNQ's 19,722, which is a property of the sample rather than of any
+    signal. F01, F02, F04, F06 and F09 all live in that regime and none of them has a
+    control; the synthetic GARCH nulls in reports/integrity_futures.md are the only check
+    that applies there, and they test idealised noise rather than real microstructure.
+
+# ============================================================================
+# L-SERIES - price-level reaction. Registered 2026-09-02 from
+# LEVEL_HYPOTHESES.md. Same registry, same N, same gates.
+#
+# THE METHODOLOGICAL CORE, WHICH APPLIES TO EVERY ENTRY BELOW: price
+# mean-reverts and continues around ARBITRARY levels, so the null for a level
+# test is not "no reaction" - it is "no reaction BEYOND a matched placebo
+# level". Every L-series result reports real-minus-placebo alongside
+# real-minus-zero, and a hypothesis whose real-minus-placebo difference is
+# indistinguishable from zero is refuted even if its raw reaction is strongly
+# significant. See src/futuresres/levels/placebo.py and reports/placebo_match.md.
+#
+# THE TWO-MECHANISM PROBLEM: one mechanism (orders cluster at reference levels)
+# licenses two opposite predictions (absorption vs sweep). Testing both on the
+# same condition is the F08 failure - an invented direction rule. Each entry
+# below either pre-specifies its direction from a DISTINGUISHING CONDITION, or
+# is registered magnitude-only.
+#
+# VERDICT ROUTE: level cells overwhelmingly SHARE ENTRY TIMESTAMPS - the same
+# touch enters under multiple parameter settings - so the aggregate route is
+# ASSUMED CLOSED for every entry until disjointness is verified, per the F07
+# finding. See reports/disjointness.md.
+# ============================================================================
+
+- id: L01
+  name: vwap_reaction
+  # Stage numbering per reports/STAGES.md, adopted 2026-09-12.
+  stopped_at: S4
+  stopped_at_reason: >
+    below the detection floor: best cell 211 MGC / 237 MNQ against 2,862 / 5,884.
+  mechanism: >
+    The only level in this catalog where a named participant has a stated reason to transact
+    at it. Institutional execution algorithms are benchmarked to VWAP: a desk filling a large
+    order is measured on whether it beat VWAP, which creates genuine non-discretionary flow
+    referencing that specific price. Buy programs become more aggressive below VWAP and
+    passive above it. The counterparty is the execution desk whose benchmark is the level
+    itself. NOTED WEAKNESS, flagged at registration: the mechanism predicts flow TOWARD VWAP,
+    not reversal AT it, so the absorption direction is an additional assumption the mechanism
+    does not license. That is the weakest link in the strongest entry here.
+  condition: >
+    touch = price trades within t ticks of VWAP after being >= d ATR away for >= 15 min.
+    Direction: absorption, fade the approach. Entry on the 1m close following the touch, exit
+    at H minutes or 15:55 ET, whichever first. anchor in {RTH open, CME open, rolling 24h} -
+    the anchor is a hidden parameter and all three are tested and logged, never picked
+    silently. d in {0.5, 1.0, 1.5} ATR, H in {30, 60, 120} min.
+  horizon_minutes: [30, 60, 120]
+  hold_hours: [0.5, 2]
+  registered: 2026-09-02
+  status: blocked_insufficient_events
+  grade: B+
+  tier: A
+  param_cap: 3
+  session: US
+  symbols: [MNQ, MGC]
+  registered_test_order: 10
+  test_order: null
+  schedulable: false
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      VWAP benchmarking is universal to institutional execution and is not instrument
+      specific; both hold. MGC's thinner tape makes its VWAP noisier, which is the standing
+      coverage caveat rather than a mechanism failure.
+  verdict_route:
+    per_cell: pending measured rate
+    aggregate: >
+      ASSUMED CLOSED. The three anchors and three d filters select overlapping subsets of the
+      same touches, so cells share entry timestamps. Must be verified before any aggregate
+      claim, per F07.
+
+  # ---- RECONCILED 2026-09-09 WITH THE MEASUREMENT THAT ALREADY EXISTED. ----
+  # The batch completed 2026-09-05 and was committed, but this entry still read
+  # `untested` with no firing rate for four days, so the registry and the reports
+  # disagreed about whether the work had been done. decisions.md 36.
+  # NO STAGE 1, NO TRIAL. N stays at 576 and SR* at 0.1334.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-05'
+    remeasured_on: '2026-09-09'
+    report: reports/level_rates.md
+    data: reports/level_rates.json
+    placebo_report: reports/placebo_match.md
+    placebo_level_types_matched: 6/6
+    per_product:
+      MGC:
+        cells: 9
+        worst_cell: 0
+        best_cell: 211
+        required_60m: 5620
+        required_180m: 2862
+        best_over_180m_floor: 0.074
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 1.0
+        aggregate_route: closed_overlapping
+      MNQ:
+        cells: 9
+        worst_cell: 0
+        best_cell: 237
+        required_60m: 19722
+        required_180m: 5884
+        best_over_180m_floor: 0.04
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 1.0
+        aggregate_route: closed_overlapping
+    note: MEASURED, NEVER DECLARED - counted per Stage 1 cell with every threshold applied. Floors are
+      the 60m and 180m detection-floor cells from reports/calibration.md. No Stage 1 was run and no
+      trial was spent.
+  verdict_route_measured:
+    per_cell: blocked_insufficient_events on MGC/MNQ
+    aggregate: closed_overlapping on every product, as assumed at registration
+    measured_on: '2026-09-09'
+    note: Measured, not assumed. The `verdict_route` key above records what was ASSUMED at registration
+      and is deliberately left as written.
+  blocked_reason: 'Measured, never run. MGC best cell 211 events against a 2,862 floor at 180m (0.07x),
+    MNQ best cell 237 events against a 5,884 floor at 180m (0.04x). Blocked on event count before any
+    Stage 1: the arithmetic is the justification, and nothing here is a statement about the market.
+    reports/level_rates.md, decisions.md 36.'
+
+- id: L02
+  name: opening_range_boundary
+  # Stage numbering per reports/STAGES.md, adopted 2026-09-12.
+  stopped_at: S7
+  stopped_at_reason: >
+    ABSORPTION retired on a null: 0 of 27 separate against 1.35 expected. The SWEEP arm was withdrawn at S5 before the run.
+  mechanism: >
+    Two mechanisms compound. The opening range is a genuine liquidity event - 09:30 ET is the
+    largest participant-composition change of the day, and the first minutes establish where
+    overnight positioning meets cash liquidity, with the counterparty being whoever holds an
+    overnight position that must be adjusted once real depth arrives. It is also the most
+    watched level in retail futures, so stop clustering at its boundaries is plausible on
+    self-fulfilling grounds IN ADDITION to the structural story.
+  # ---- THE SWEEP ARM IS WITHDRAWN 2026-09-11. ABSORPTION IS UNAFFECTED. ----
+  # The two arms are registered as MUTUALLY EXCLUSIVE price paths, so absorption stands alone
+  # coherently. Measured: the sweep arm fired on EVERY opening-range level at
+  # valid_from + (k-1) - entry-minute sd 0.07-0.10 on MNQ, 0% identical minutes between
+  # adjacent k, and 92-99% of high/low pairs firing at the SAME (row, minute). k was an
+  # offset, not a selection. Cause was `confirmed_break` testing a break in EITHER direction
+  # against a level price already sits inside; fixed in the function. decisions.md 41.
+  #
+  # IF THE SWEEP CORRECTION IS EVER WANTED IT IS A NEW REGISTRATION competing on its own
+  # merits alongside L11's - NOT an inherited slot. It must earn a place against everything
+  # else unregistered rather than inherit this entry's grade, tier or test order.
+  condition: >
+    ABSORPTION ONLY as of 2026-09-11. If price penetrates the boundary by >= m ticks then
+    closes back inside within k bars, enter counter to the penetration; exit at H minutes or
+    15:55 ET. Level = high and low of [09:30, 09:30 + W] ET. W in {15, 30, 60} min, m in
+    {2, 4, 8} ticks, k in {2, 3, 5} bars, H in {60, 120, 180} min.
+    WITHDRAWN SWEEP ARM, kept for the record: "if price closes beyond the boundary for k
+    consecutive 1m bars, enter in the break direction", k in {1, 2, 3}. Never run, no trial
+    spent. decisions.md 41.
+  withdrawn_arm:
+    name: sweep
+    withdrawn: 2026-09-11
+    cells_withdrawn: 27
+    trials_spent: 0
+    reason: >
+      Degenerate: fired on every level at valid_from + (k-1), k an offset rather than a
+      selection, high and low colliding on the same (row, minute) in 92-99% of sessions.
+      A corrected directional break with an inside-range precondition is a DIFFERENT
+      condition and needs its own registration.
+  horizon_minutes: [60, 120, 180]
+  hold_hours: [1, 3]
+  registered: 2026-09-02
+  status: retired
+  retired_reason: >
+    NULL on its only resolvable route. 0 of 27 cells separate against 1.35 expected by
+    chance; range -0.62 to +1.84 bps against a 0.65 bps cost floor. 27 trials spent.
+    ABSORPTION ONLY - the sweep arm was withdrawn as degenerate before this ran
+    (decisions.md 41).
+    THIS NULL IS WEAK EVIDENCE AGAINST THE REGISTERED MECHANISM, stated in advance in
+    decisions.md 42 rather than after the fact. 09:30 ET is the EQUITY cash open; gold's is
+    the 08:20 COMEX open, so MGC tests cross-asset spillover and is attenuated exactly as F06
+    was. MNQ, where the mechanism lives, was unavailable on event count (5,178 against a
+    5,884 floor). The route is closed; the mechanism was never properly exposed.
+  report: reports/l02_stage1.md
+  cells: reports/l02_cells.json
+  trials_spent: 27
+  stage1_ran: '2026-09-11'
+  grade: B
+  tier: A
+  param_cap: 4
+  session: US
+  symbols: [MNQ, MGC]
+  # Resolved 2026-09-11. It keeps the order it was REGISTERED at and
+  # surrenders the live one - nulling both would erase that it was ever
+  # prioritised and leave an unexplained gap in the ordering.
+  registered_test_order: 12
+  test_order: null
+  schedulable: false
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      09:30 ET is the EQUITY cash open. On MGC this tests cross-asset spillover rather than
+      the registered mechanism - gold's own liquidity event is the COMEX open at 08:20 ET.
+      ATTENUATED on MGC, exactly as F06 was, and a positive result there would not support the
+      mechanism as written.
+  verdict_route:
+    per_cell: pending measured rate
+    aggregate: >
+      ASSUMED CLOSED. The sweep and absorption variants are disjoint from each other by
+      construction, but within each variant the W and k settings select overlapping subsets of
+      the same session's first break. Verify before claiming anything.
+
+  # ---- RECONCILED 2026-09-09 WITH THE MEASUREMENT THAT ALREADY EXISTED. ----
+  # The batch completed 2026-09-05 and was committed, but this entry still read
+  # `untested` with no firing rate for four days, so the registry and the reports
+  # disagreed about whether the work had been done. decisions.md 36.
+  # NO STAGE 1, NO TRIAL. N stays at 576 and SR* at 0.1334.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-05'
+    remeasured_on: '2026-09-09'
+    report: reports/level_rates.md
+    data: reports/level_rates.json
+    placebo_report: reports/placebo_match.md
+    placebo_level_types_matched: 6/6
+    per_product:
+      MGC:
+        cells: 36
+        worst_cell: 3001
+        best_cell: 5724
+        required_60m: 5620
+        required_180m: 2862
+        best_over_180m_floor: 2.0
+        events_sufficient_at_180m: true
+        max_pairwise_overlap: 0.9886204481792717
+        aggregate_route: closed_overlapping
+      MNQ:
+        cells: 36
+        worst_cell: 3560
+        best_cell: 5178
+        required_60m: 19722
+        required_180m: 5884
+        best_over_180m_floor: 0.88
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 0.9972510044406852
+        aggregate_route: closed_overlapping
+    note: MEASURED, NEVER DECLARED - counted per Stage 1 cell with every threshold applied. Floors are
+      the 60m and 180m detection-floor cells from reports/calibration.md. No Stage 1 was run and no
+      trial was spent.
+  verdict_route_measured:
+    per_cell: resolvable at 180m on MGC; below the swept range on MNQ
+    aggregate: closed_overlapping on every product, as assumed at registration
+    measured_on: '2026-09-09'
+    note: Measured, not assumed. The `verdict_route` key above records what was ASSUMED at registration
+      and is deliberately left as written.
+
+- id: L03
+  name: prior_day_sweep_and_reclaim
+  # Stage numbering per reports/STAGES.md, adopted 2026-09-12.
+  stopped_at: S7
+  stopped_at_reason: >
+    retired on a null: 0 of 18 separate against 0.90 expected, mechanism properly exposed.
+  mechanism: >
+    The mechanised version of the liquidity sweep. Stop orders cluster immediately beyond
+    obvious reference points because that is where a large number of traders place them; a
+    sweep triggers those stops, the resulting flow is forced and price-insensitive, and once
+    exhausted price returns inside. The counterparty is the trader whose stop was filled at a
+    price nobody chose. REGISTERED ONLY BECAUSE IT CAN BE FULLY MECHANISED: as usually taught,
+    swing points and displacement are defined loosely enough that any chart can be read to
+    fit, which is not falsifiable. Every term here is fixed in advance.
+  condition: >
+    sweep = price exceeds the level by >= m ticks. reclaim = a 1m close back inside the level
+    within k bars of the sweep. Entry at the close of the reclaim bar, direction counter to
+    the sweep. Exit at H minutes or 15:55 ET. level_type in {prior RTH session high/low
+    09:30-16:00, prior full trading day high/low 18:00-17:00}, m in {2, 4, 8} ticks, k in
+    {2, 3, 5} bars, H in {60, 120, 180} min.
+  horizon_minutes: [60, 120, 180]
+  hold_hours: [1, 3]
+  registered: 2026-09-02
+  status: retired
+  retired_reason: >
+    NULL, and the stronger of the two. 0 of 18 cells separate against 0.90 expected;
+    range -2.01 to +2.40 bps against a 0.65 bps cost floor. 18 trials spent. Both level types
+    matched their placebo, so nothing was excluded.
+    UNLIKE L02 THE MECHANISM WAS PROPERLY EXPOSED. Prior-day extremes as reference prices is
+    not an equity-specific story, so MGC is a legitimate test of the registered claim. MGC-only
+    is an event-count constraint alone (MNQ best cell 3,762 against a 5,884 floor, 0.64x).
+    The claim was tested where it should hold and produced nothing.
+  report: reports/l03_stage1.md
+  cells: reports/l03_cells.json
+  trials_spent: 18
+  stage1_ran: '2026-09-11'
+  grade: B
+  tier: A
+  param_cap: 4
+  session: US
+  symbols: [MNQ, MGC]
+  # Resolved 2026-09-11. It keeps the order it was REGISTERED at and
+  # surrenders the live one - nulling both would erase that it was ever
+  # prioritised and leave an unexplained gap in the ordering.
+  registered_test_order: 14
+  test_order: null
+  schedulable: false
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Stop clustering beyond a prior session extreme is not instrument specific; both hold.
+  verdict_route:
+    per_cell: pending measured rate
+    aggregate: >
+      ASSUMED CLOSED. Two level types are disjoint only when the prior RTH and prior full-day
+      extremes differ; m and k select nested subsets of the same sweeps. Verify.
+
+  # ---- RECONCILED 2026-09-09 WITH THE MEASUREMENT THAT ALREADY EXISTED. ----
+  # The batch completed 2026-09-05 and was committed, but this entry still read
+  # `untested` with no firing rate for four days, so the registry and the reports
+  # disagreed about whether the work had been done. decisions.md 36.
+  # NO STAGE 1, NO TRIAL. N stays at 576 and SR* at 0.1334.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-05'
+    remeasured_on: '2026-09-09'
+    report: reports/level_rates.md
+    data: reports/level_rates.json
+    placebo_report: reports/placebo_match.md
+    placebo_level_types_matched: 4/4
+    per_product:
+      MGC:
+        cells: 18
+        worst_cell: 3080
+        best_cell: 4674
+        required_60m: 5620
+        required_180m: 2862
+        best_over_180m_floor: 1.633
+        events_sufficient_at_180m: true
+        max_pairwise_overlap: 0.9899018232819075
+        aggregate_route: closed_overlapping
+      MNQ:
+        cells: 18
+        worst_cell: 3056
+        best_cell: 3762
+        required_60m: 19722
+        required_180m: 5884
+        best_over_180m_floor: 0.639
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 0.9820237750072485
+        aggregate_route: closed_overlapping
+    note: MEASURED, NEVER DECLARED - counted per Stage 1 cell with every threshold applied. Floors are
+      the 60m and 180m detection-floor cells from reports/calibration.md. No Stage 1 was run and no
+      trial was spent.
+  verdict_route_measured:
+    per_cell: resolvable at 180m on MGC; below the swept range on MNQ
+    aggregate: closed_overlapping on every product, as assumed at registration
+    measured_on: '2026-09-09'
+    note: Measured, not assumed. The `verdict_route` key above records what was ASSUMED at registration
+      and is deliberately left as written.
+
+- id: L04
+  name: prior_session_extremes
+  # Stage numbering per reports/STAGES.md, adopted 2026-09-12.
+  stopped_at: S7
+  # ---- CORRECTION 2026-09-12: the S7 failure is resolution as much as multiplicity ----
+  # L04's observed +3.54 bps sat BELOW ITS OWN BH rank-1 bar of 3.72 bps (bootstrap SE 1.244,
+  # 18 tests). No survivor was reachable at the effect size actually observed, so "failed the
+  # correction" understates it: the test was operating at the edge of its resolution.
+  # STATUS IS UNCHANGED AND stopped_at S7 STANDS. stage1_inconclusive with the mechanism
+  # uncontradicted remains the right reading - this makes the inconclusiveness better
+  # understood, not different.
+  # The out-of-sample test (L12, MNQ) had 76.2% power against this +3.54 estimate and
+  # delivered +0.306 bps, so THAT MAGNITUDE does not replicate. It cannot speak to a smaller
+  # real effect: power was 7-21% across the lower half of L12's registered range.
+  # decisions.md 45, reports/l12_stage1.md.
+  resolution_note:
+    observed_bps: 3.54
+    bootstrap_se_bps: 1.244
+    bh_rank1_bar_bps: 3.72
+    survivor_reachable_at_observed_effect: false
+    out_of_sample: >
+      L12 on MNQ: 76.2% power against +3.54 bps, delivered +0.306 bps. That magnitude does
+      not replicate; a smaller effect is untested.
+  stopped_at_reason: >
+    inconclusive: 5 of 18 nominal separations, ZERO surviving BH. Cleared S5, S6 and the S8 era split; failed only multiplicity.
+  mechanism: >
+    The same stop-clustering story as L03 but across more reference points, which is the point
+    of registering it separately: Asia (19:00-03:00 ET), London (03:00-11:30 ET) and US RTH
+    each leave a high and a low, and each session's extremes are watched by the participants of
+    the FOLLOWING session. Six levels are carried forward at any time, giving a materially
+    higher firing rate than L03. The counterparty is the same as L03's: the trader whose
+    protective stop rested just beyond a session extreme and was filled at a price nobody
+    chose, by flow that is forced rather than informed.
+  condition: >
+    Sweep and reclaim exactly as L03, applied per session-extreme type. Session type is a scan
+    dimension and each session type is its own cell. session in {Asia, London, US}, m in
+    {2, 4, 8} ticks, k in {2, 3, 5} bars, H in {60, 120, 180} min. Session boundaries come from
+    the DST-aware session mapper, never from a fixed UTC offset.
+  horizon_minutes: [60, 120, 180]
+  hold_hours: [1, 3]
+  registered: 2026-09-02
+  status: stage1_inconclusive
+  stage1_reason: >
+    RAN WITH ADEQUATE POWER AND DID NOT RESOLVE. 5 of 18 cells separate against 0.90
+    expected - ALL sess_Asia - and ZERO survive BH within the hypothesis. Best cell
+    sess_Asia m=8 k=2 at +3.54 bps, 5.5x the 0.65 cost floor, p=0.0045 against a rank-1 BH
+    bar of 0.00278. 18 trials spent, 9 cells excluded (sess_US placebo unmatched, touch
+    ratio 1.33).
+    THE COUNT OVERSTATES IT. L04/MGC sits at 98% pairwise overlap and all five separations
+    are adjacent m/k on one level type, so this is closer to ONE result seen five times than
+    to five findings.
+    FOUR ARTIFACTS RULED OUT (decisions.md 43): placebo mispricing, hold truncation,
+    direction mix, and drift x net-exposure gap - the last explains 1.2% of the difference.
+    The era split is positive in both halves, 10 of 10, so it neither decays nor flips -
+    though the REAL leg's sign changes between eras while the difference stays stable.
+    NOT PROMOTED AND NOT TRADEABLE. Nothing survives correction. Inconclusive rather than
+    retired because the nominal pattern survived every artifact check; the mechanism is
+    UNCONTRADICTED, not supported. Pursuing it needs a NEW REGISTRATION with sess_Asia named
+    in advance, on data that did not generate this result.
+  report: reports/l04_stage1.md
+  cells: reports/l04_cells.json
+  trials_spent: 18
+  stage1_ran: '2026-09-11'
+  grade: B-
+  tier: B
+  param_cap: 4
+  session: Asia/Europe/US
+  symbols: [MNQ, MGC]
+  # Resolved 2026-09-11. It keeps the order it was REGISTERED at and
+  # surrenders the live one - nulling both would erase that it was ever
+  # prioritised and leave an unexplained gap in the ordering.
+  registered_test_order: 15
+  test_order: null
+  schedulable: false
+  mechanism_instruments:
+    primary: MGC
+    secondary: MNQ
+    rationale: >
+      Asia and London session extremes are more plausible on MGC than on MNQ, since gold
+      trades meaningfully in those hours while index futures are thin. Both hold, but the
+      instruments are expected to diverge and a split must NOT be read as confirmation.
+  verdict_route:
+    per_cell: pending measured rate
+    aggregate: >
+      ASSUMED CLOSED, with one qualification worth testing: the three session types are
+      genuinely disjoint in time except where extremes coincide, so this is the L-series entry
+      most likely to have a real aggregate route. Verify rather than assume in either
+      direction.
+
+  # ---- RECONCILED 2026-09-09 WITH THE MEASUREMENT THAT ALREADY EXISTED. ----
+  # The batch completed 2026-09-05 and was committed, but this entry still read
+  # `untested` with no firing rate for four days, so the registry and the reports
+  # disagreed about whether the work had been done. decisions.md 36.
+  # NO STAGE 1, NO TRIAL. N stays at 576 and SR* at 0.1334.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-05'
+    remeasured_on: '2026-09-09'
+    report: reports/level_rates.md
+    data: reports/level_rates.json
+    placebo_report: reports/placebo_match.md
+    placebo_level_types_matched: 5/6
+    per_product:
+      MGC:
+        cells: 27
+        worst_cell: 168
+        best_cell: 5130
+        required_60m: 5620
+        required_180m: 2862
+        best_over_180m_floor: 1.792
+        events_sufficient_at_180m: true
+        max_pairwise_overlap: 0.98359375
+        aggregate_route: closed_overlapping
+      MNQ:
+        cells: 27
+        worst_cell: 414
+        best_cell: 5442
+        required_60m: 19722
+        required_180m: 5884
+        best_over_180m_floor: 0.925
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 0.9981515711645101
+        aggregate_route: closed_overlapping
+    note: MEASURED, NEVER DECLARED - counted per Stage 1 cell with every threshold applied. Floors are
+      the 60m and 180m detection-floor cells from reports/calibration.md. No Stage 1 was run and no
+      trial was spent.
+  verdict_route_measured:
+    per_cell: resolvable at 180m on MGC; below the swept range on MNQ
+    aggregate: closed_overlapping on every product, as assumed at registration
+    measured_on: '2026-09-09'
+    note: Measured, not assumed. The `verdict_route` key above records what was ASSUMED at registration
+      and is deliberately left as written.
+
+- id: L05
+  name: overnight_range_boundaries
+  # Stage numbering per reports/STAGES.md, adopted 2026-09-12.
+  # ---- CORRECTED 2026-09-12: S5, not S4, and the S4 arithmetic is WITHDRAWN ----
+  # L05 stops at S5, not S4. Its condition is degenerate (`confirmed_break` on the overnight
+  # range, which price sits inside at 09:30 by construction: entry-minute sd 0.05, ALL 8,234
+  # levels firing, 99.6% high/low collision - decisions.md 41), so it cannot reach S6
+  # regardless of sample size.
+  # ITS S4 BLOCK NO LONGER RESTS ON A LIVE MEASUREMENT. The degenerate measurement block was
+  # removed from level_rates.py in 41, so L05 has NO record in measured_rates.json and no
+  # live S3 input. The event count that once justified an S4 block described a condition that
+  # fired on every session - a count of SESSIONS, not of breaks - and is withdrawn with it.
+  # Reviving L05 needs a corrected condition, a fresh S3 measurement, and then S4 again.
+  stopped_at: S5
+  stopped_at_reason: >
+    DEGENERATE CONDITION (S5): fires on every session at a fixed minute, so it cannot reach
+    S6 at any n. Its former S4 block is withdrawn along with the degenerate measurement that
+    produced it - there is no live S3 rate for L05. decisions.md 41, 45.
+  mechanism: >
+    The overnight range (18:00 previous day to 09:30 ET) is where positioning accumulates
+    without cash liquidity. When RTH opens, that positioning is tested against real depth, so a
+    break of the overnight high or low during RTH is a genuine liquidity event rather than a
+    chart pattern. The counterparty is whoever accumulated overnight at prices that cash
+    liquidity will not support.
+  # ---- CONDITION MEASURED DEGENERATE 2026-09-11. NOT withdrawn; already blocked. ----
+  # `confirmed_break` on the overnight range, which price sits inside at 09:30 BY
+  # CONSTRUCTION. Measured on MNQ: entry-minute sd 0.05, ALL 8,234 levels firing, 99.6% of
+  # high/low pairs colliding on (row, minute). The 8,234 in firing_rate below is a count of
+  # SESSIONS, not of breaks, and must not be read as an event count.
+  # L05 was already blocked_insufficient_events so nothing downstream changes. Its
+  # measurement block is removed from level_rates.py rather than left publishing a
+  # meaningless rate. Reviving L05 requires a corrected condition and a fresh measurement -
+  # the shared function now REFUSES this shape. decisions.md 41.
+  condition_defect:
+    found: 2026-09-11
+    entry_minute_sd: 0.05
+    levels_firing: "8234 of 8234"
+    hi_lo_collision: "4093/4110 (99.6%)"
+    trials_spent: 0
+    note: >
+      The firing rate recorded below describes the degenerate condition. It is NOT an event
+      count for L05 and must not be inherited by any corrected version.
+  condition: >
+    During RTH only, the FIRST close beyond an overnight boundary, confirmed by k bars. Enter
+    in the break direction, exit at H minutes or 15:55 ET. Only the first break per boundary
+    per session counts; subsequent re-tests are a different claim and are not registered.
+    Level = high and low of [18:00 ET previous day, 09:30 ET]. k in {1, 2, 3} confirming bars,
+    H in {60, 120, 180} min, vol_filter in {none, ON range > median, ON range < median} where
+    the median is over the trailing 20 sessions, strictly prior.
+  horizon_minutes: [60, 120, 180]
+  hold_hours: [1, 3]
+  registered: 2026-09-02
+  status: blocked_insufficient_events
+  grade: C+
+  tier: B
+  param_cap: 3
+  session: US
+  symbols: [MNQ]
+  registered_test_order: 16
+  test_order: null
+  schedulable: false
+  # STAGE 4 IS UNREACHABLE AND THAT IS DECLARED, NOT WORKED AROUND. Stage 4 requires the
+  # effect to survive on two genuinely uncorrelated instruments, and L05's mechanism is
+  # equity-index specific - overnight positioning meeting the 09:30 CASH open. Adding MGC to
+  # the symbol list to satisfy the gate would be registering an instrument the mechanism does
+  # not hold in, which is the F02 error. L05 can therefore reach Stage 3 at most: a positive
+  # result would be a single-instrument finding and must be reported as one.
+  stage4_reachable: false
+  stage4_reason: >
+    Mechanism is equity-index specific, so only MNQ is registered and the two-instrument
+    requirement cannot be met. A positive result would be single-instrument and reported as
+    such rather than promoted.
+  mechanism_instruments:
+    primary: MNQ
+    secondary: null
+    rationale: >
+      The mechanism is overnight equity-index positioning meeting the 09:30 CASH open. Gold's
+      overnight session is not thin in the same way and its liquidity event is the COMEX open,
+      so the claim as written does not transfer. MNQ only.
+  verdict_route:
+    per_cell: pending measured rate
+    aggregate: >
+      ASSUMED CLOSED, and there is a prior reason: L05 HEAVILY OVERLAPS L02. An overnight high
+      broken at 09:35 is often also an opening-range break. The overlap must be measured and
+      reported - if the two fire on the same events they are one hypothesis and must not both
+      consume trials.
+
+  # ---- RECONCILED 2026-09-09 WITH THE MEASUREMENT THAT ALREADY EXISTED. ----
+  # The batch completed 2026-09-05 and was committed, but this entry still read
+  # `untested` with no firing rate for four days, so the registry and the reports
+  # disagreed about whether the work had been done. decisions.md 36.
+  # NO STAGE 1, NO TRIAL. N stays at 576 and SR* at 0.1334.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-05'
+    remeasured_on: '2026-09-09'
+    report: reports/level_rates.md
+    data: reports/level_rates.json
+    placebo_report: reports/placebo_match.md
+    placebo_level_types_matched: 1/1
+    per_product:
+      MNQ:
+        cells: 9
+        worst_cell: 2015
+        best_cell: 4669
+        required_60m: 19722
+        required_180m: 5884
+        best_over_180m_floor: 0.794
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 1.0
+        aggregate_route: closed_overlapping
+    note: MEASURED, NEVER DECLARED - counted per Stage 1 cell with every threshold applied. Floors are
+      the 60m and 180m detection-floor cells from reports/calibration.md. No Stage 1 was run and no
+      trial was spent.
+  verdict_route_measured:
+    per_cell: blocked_insufficient_events on MNQ
+    aggregate: closed_overlapping on every product, as assumed at registration
+    measured_on: '2026-09-09'
+    note: Measured, not assumed. The `verdict_route` key above records what was ASSUMED at registration
+      and is deliberately left as written.
+  blocked_reason: 'Measured, never run. MNQ best cell 4,669 events against a 5,884 floor at 180m (0.79x).
+    Blocked on event count before any Stage 1: the arithmetic is the justification, and nothing here
+    is a statement about the market. reports/level_rates.md, decisions.md 36.'
+
+- id: L06
+  name: session_open_reference
+  # Stage numbering per reports/STAGES.md, adopted 2026-09-12.
+  stopped_at: S6
+  stopped_at_reason: >
+    NO VALID CONTROL EXISTS. open_CME and open_RTH sit exactly at the reference price, so the distance distribution is identically zero and no arbitrary region is comparable. Not a measurement gap and not tunable.
+  mechanism: >
+    The session open price is the reference against which the session's P&L is marked.
+    Positions opened at the start of a session are at breakeven when price returns to it, which
+    is a real behavioural anchor with a real decision attached: hold or flatten. The mechanism
+    licenses "a decision happens here" - it does NOT license a direction, which is why this is
+    registered magnitude-only. The counterparty is that position holder: someone who must
+    choose to hold or flatten at a price their P&L is marked against, and whose decision is
+    driven by their entry rather than by a view on value. Magnitude-only does not excuse the
+    entry from naming who is transacting and why - it only limits what may be claimed about
+    the direction they transact in.
+  condition: >
+    cross = price crosses the open price after being >= d ATR away for >= 30 min. MAGNITUDE
+    ONLY: Stage 1 tests whether forward VOLATILITY and VOLUME differ after a cross, not whether
+    returns are directional. A directional variant is registered separately with its own trial
+    budget only if magnitude separates. open_type in {RTH 09:30, CME 18:00} converted through
+    the session mapper, d in {0.5, 1.0, 1.5} ATR, H in {60, 120, 180} min.
+  horizon_minutes: [60, 120, 180]
+  hold_hours: [1, 3]
+  registered: 2026-09-02
+  status: blocked_insufficient_events
+  grade: C+
+  tier: B
+  param_cap: 3
+  session: US
+  symbols: [MNQ, MGC]
+  registered_test_order: 13
+  test_order: null
+  schedulable: false
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Both instruments have a session open that positions are marked against; the behavioural
+      anchor is not instrument specific.
+  verdict_route:
+    per_cell: pending measured rate
+    aggregate: >
+      ASSUMED CLOSED. The d filter selects nested subsets of the same crossings. Note that
+      magnitude-only changes what a verdict means but not the route arithmetic.
+
+  # ---- RECONCILED 2026-09-09 WITH THE MEASUREMENT THAT ALREADY EXISTED. ----
+  # The batch completed 2026-09-05 and was committed, but this entry still read
+  # `untested` with no firing rate for four days, so the registry and the reports
+  # disagreed about whether the work had been done. decisions.md 36.
+  # NO STAGE 1, NO TRIAL. N stays at 576 and SR* at 0.1334.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-05'
+    remeasured_on: '2026-09-09'
+    report: reports/level_rates.md
+    data: reports/level_rates.json
+    placebo_report: reports/placebo_match.md
+    placebo_level_types_matched: 0/4
+    per_product:
+      MGC:
+        cells: 6
+        worst_cell: 18
+        best_cell: 269
+        required_60m: 5620
+        required_180m: 2862
+        best_over_180m_floor: 0.094
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 1.0
+        aggregate_route: closed_overlapping
+      MNQ:
+        cells: 6
+        worst_cell: 20
+        best_cell: 303
+        required_60m: 19722
+        required_180m: 5884
+        best_over_180m_floor: 0.051
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 1.0
+        aggregate_route: closed_overlapping
+    note: MEASURED, NEVER DECLARED - counted per Stage 1 cell with every threshold applied. Floors are
+      the 60m and 180m detection-floor cells from reports/calibration.md. No Stage 1 was run and no
+      trial was spent.
+  verdict_route_measured:
+    per_cell: blocked_insufficient_events on MGC/MNQ
+    aggregate: closed_overlapping on every product, as assumed at registration
+    measured_on: '2026-09-09'
+    note: Measured, not assumed. The `verdict_route` key above records what was ASSUMED at registration
+      and is deliberately left as written.
+  blocked_reason: 'Measured, never run. MGC best cell 269 events against a 2,862 floor at 180m (0.09x),
+    MNQ best cell 303 events against a 5,884 floor at 180m (0.05x). Blocked on event count before any
+    Stage 1: the arithmetic is the justification, and nothing here is a statement about the market.
+    reports/level_rates.md, decisions.md 36.'
+
+- id: L07
+  name: fair_value_gap_fill
+  # Stage numbering per reports/STAGES.md, adopted 2026-09-12.
+  stopped_at: S8
+  stopped_at_reason: >
+    retired on ECONOMICS, not on significance. All 108 cells separated and every one was negative at 1.8x-10.3x the cost floor.
+  mechanism: >
+    A three-bar imbalance marks a price zone that traded through quickly with little two-sided
+    activity; the claim is that price returns to fill it because the zone contains unfilled
+    interest. THE ENTRY RECORDS ITS OWN SCEPTICISM: the competing explanation is that price is
+    approximately a random walk with fat tails and revisits nearby levels regardless of what
+    happened there - gaps fill because MOST NEARBY PRICES GET REVISITED, not because the gap
+    means anything. This is the strongest possible argument for the placebo benchmark: a raw
+    fill-rate statistic will look impressive, likely 70-90%, and will be equally impressive for
+    placebo zones. Only the difference is evidence. ON THE COUNTERPARTY, HONESTLY: the claimed
+    counterparty is whoever left unfilled interest in the zone and must still transact there.
+    THE ENTRY DOES NOT BELIEVE THIS PERSON EXISTS - a zone that traded through quickly is
+    evidence of ABSENT interest, not resting interest, and no participant is identified who is
+    obliged to return. It is registered with the counterparty named so the claim can be
+    refuted rather than left vague, which is precisely what makes a clean placebo-controlled
+    null on it worth having.
+  condition: >
+    bullish FVG: high[i-1] < low[i+1], zone = [high[i-1], low[i+1]]. bearish FVG:
+    low[i-1] > high[i+1], zone = [high[i+1], low[i-1]]. Minimum zone width w ticks. Entry at
+    the first 1m close inside an unfilled zone created >= g bars earlier, direction counter to
+    the move that created the gap. Exit at H minutes or 15:55 ET. w in {2, 4, 8} ticks, g in
+    {10, 30, 60} bars, H in {60, 120, 180} min, timeframe in {1m, 5m}.
+  horizon_minutes: [60, 120, 180]
+  hold_hours: [1, 3]
+  registered: 2026-09-02
+  grade: C
+  tier: B
+  param_cap: 4
+  session: US
+  symbols: [MNQ, MGC]
+  registered_test_order: 11
+  test_order: null
+  schedulable: false
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      A three-bar imbalance is a property of any price series and is not instrument specific;
+      both hold.
+  verdict_route:
+    per_cell: pending measured rate
+    aggregate: >
+      ASSUMED CLOSED. w and g select nested subsets of the same zones and the two timeframes
+      overlap heavily. This is the entry where an unverified aggregate claim would be most
+      tempting and least defensible.
+
+  # ---- RECONCILED 2026-09-09 WITH THE MEASUREMENT THAT ALREADY EXISTED. ----
+  # The batch completed 2026-09-05 and was committed, but this entry still read
+  # `untested` with no firing rate for four days, so the registry and the reports
+  # disagreed about whether the work had been done. decisions.md 36.
+  # NO STAGE 1, NO TRIAL. N stays at 576 and SR* at 0.1334.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-05'
+    remeasured_on: '2026-09-09'
+    report: reports/level_rates.md
+    data: reports/level_rates.json
+    placebo_report: reports/placebo_match.md
+    placebo_level_types_matched: 12/12
+    per_product:
+      MGC:
+        cells: 18
+        worst_cell: 23545
+        best_cell: 655490
+        required_60m: 5620
+        required_180m: 2862
+        best_over_180m_floor: 229.032
+        events_sufficient_at_180m: true
+        max_pairwise_overlap: 1.0
+        aggregate_route: closed_overlapping
+      MNQ:
+        cells: 18
+        worst_cell: 25692
+        best_cell: 535428
+        required_60m: 19722
+        required_180m: 5884
+        best_over_180m_floor: 90.997
+        events_sufficient_at_180m: true
+        max_pairwise_overlap: 1.0
+        aggregate_route: closed_overlapping
+    note: MEASURED, NEVER DECLARED - counted per Stage 1 cell with every threshold applied. Floors are
+      the 60m and 180m detection-floor cells from reports/calibration.md. No Stage 1 was run and no
+      trial was spent.
+  verdict_route_measured:
+    per_cell: resolvable at 180m on MGC/MNQ
+    aggregate: closed_overlapping on every product, as assumed at registration
+    measured_on: '2026-09-09'
+    note: Measured, not assumed. The `verdict_route` key above records what was ASSUMED at registration
+      and is deliberately left as written.
+
+  # ---- STAGE 1 RUN AND CLOSED 2026-09-10. reports/l07_stage1.md, decisions.md 38. ----
+  # 108 trials, t-series, logged BEFORE the run. N 576 -> 684, SR* 0.1335 -> 0.1357.
+  #
+  # 108 OF 108 CELLS SEPARATE, both instruments, all three horizons, against 2.7 expected
+  # by chance per product. THAT IS NOT A FINDING and was predicted in advance: at 24,788 to
+  # 863,490 paired events a separation is assured for any effect that is not exactly zero,
+  # so the p-value measures sample size rather than substance.
+  #
+  # THE ECONOMICS IS THE RESULT, AND IT IS NEGATIVE EVERYWHERE.
+  #   MGC  -5.008 to -1.176 bps   1.8x to  7.7x the 0.65 bps cost floor
+  #   MNQ  -4.962 to -1.191 bps   2.5x to 10.3x the 0.48 bps cost floor
+  #
+  # THE DECOMPOSITION IS SHARPER THAN THE DIFFERENCE. It is not that the real zone is less
+  # good: THE REAL ZONE LOSES AND THE PLACEBO WINS. The same directional rule at a matched
+  # arbitrary region is positive (+0.9 to +1.9 bps); at a real fair-value gap it is negative
+  # (-1.0 to -1.7). Conditioning on the region being a real gap REVERSES THE SIGN.
+  #
+  # THE REGISTERED MECHANISM IS REFUTED IN THE DIRECTION IT WAS STATED. This entry said in
+  # writing that it did not believe its own counterparty existed - "a zone that traded
+  # through quickly is evidence of ABSENT interest, not resting interest". That scepticism
+  # is now measured rather than asserted.
+  #
+  # WHAT IS NOT ESTABLISHED, and it is not small. Real entries fire a median of 16 minutes
+  # earlier than their placebos on MGC and 47 on MNQ, ranging to 81 - so the two are not
+  # sampling the same part of the session, and this design cannot separate a difference in
+  # REACTION from a difference in WHEN. The volatility confound that was expected did NOT
+  # appear (real entries follow 4-11% LESS prior volatility, not more) but the structural
+  # limitation decisions.md 37 recorded still applies. reports/l07_market_state.md.
+  #
+  # Direction-mix asymmetry between real and placebo entries was NOT measured and is an open
+  # competing explanation, recorded rather than dismissed.
+  #
+  # THE MIRROR HYPOTHESIS IS NOT REGISTERED. The sign came from looking at this data, so
+  # registering the opposite direction is selecting a hypothesis by its result, and trial
+  # budget does not repair that. It also has no mechanism: the registered story is unfilled
+  # orders finally getting filled, which predicts reaction AT the zone, not continuation
+  # THROUGH it. If it is worth testing it must be frozen and run on data that did not
+  # generate it.
+  status: retired
+  retired: 2026-09-10
+  ran_on: 2026-09-10
+  report: reports/l07_stage1.md
+  cells_data: reports/l07_cells.json
+  market_state: reports/l07_market_state.md
+  trials_spent: 108
+  cells_consumed: 108
+  stage1_result: >
+    108 of 108 cells separate on both instruments against 2.7 expected by chance per
+    product - predicted in advance and not a finding at 24,788-863,490 paired events. The
+    difference is NEGATIVE IN EVERY CELL at 1.8x-10.3x the round-trip cost floor, and the
+    decomposition is sharper than the difference: the real zone LOSES (-1.0 to -1.7 bps)
+    while the matched placebo WINS (+0.9 to +1.9). Conditioning on the region being a real
+    fair-value gap reverses the sign of the trade.
+  results:
+    MGC:
+      tests: 54
+      nominal_separations: 54
+      expected_by_chance: 2.7
+      bh_survivors_fdr_0.05: 54
+      diff_bps_min: -5.0076
+      diff_bps_max: -1.1757
+      every_cell_negative: true
+      mean_real_bps: -1.4227
+      mean_placebo_bps: 1.2672
+      cost_floor_bps: 0.65
+      abs_diff_over_cost_min: 1.81
+      abs_diff_over_cost_max: 7.7
+    MNQ:
+      tests: 54
+      nominal_separations: 54
+      expected_by_chance: 2.7
+      bh_survivors_fdr_0.05: 54
+      diff_bps_min: -4.9616
+      diff_bps_max: -1.1909
+      every_cell_negative: true
+      mean_real_bps: -1.2281
+      mean_placebo_bps: 1.5877
+      cost_floor_bps: 0.48
+      abs_diff_over_cost_min: 2.48
+      abs_diff_over_cost_max: 10.34
+
+  retired_reason: >
+    Ran with a matched placebo control. 108 of 108 cells separate, which was predicted and
+    carries no information at this event count. The difference is negative in every cell on
+    both instruments at 1.8x to 10.3x the round-trip cost floor: entering at a real
+    fair-value gap under the registered direction is systematically WORSE than entering at
+    an equally-reachable arbitrary region, and the real leg loses while the placebo leg
+    wins. The registered mechanism is refuted in the direction it was stated. A residual
+    timing confound of up to 81 minutes between real and placebo entries means the
+    difference cannot be attributed to reaction at the zone specifically.
+  reopens_if: >
+    A registration with a mechanism that predicts continuation through the zone rather than
+    reaction at it, frozen before seeing data, and evaluated on history that did not
+    generate this result. The inverse of this trade is NOT that registration.
+  schedulable: false
+
+- id: L08
+  name: moving_average_reaction
+  # Stage numbering per reports/STAGES.md, adopted 2026-09-12.
+  stopped_at: S4
+  stopped_at_reason: >
+    below the detection floor: best cell 698 MGC / 705 MNQ, 0.24x and 0.12x.
+  mechanism: >
+    WEAK BY CONSTRUCTION AND THE ENTRY SAYS SO. No institution executes against a 50 EMA. The
+    only available story is self-fulfilling: enough traders watch the same standard settings
+    that orders cluster near them. Note this is the same premise that DISQUALIFIED F11 as a
+    control - "widely watched, therefore orders cluster" is a claim about the market that must
+    be tested rather than assumed. Testing it here is legitimate; it simply makes the prior
+    weak, and the grade reflects that. THE COUNTERPARTY, SUCH AS IT IS: the retail trader whose
+    resting order or stop sits at a round standard setting because a chart platform drew the
+    line there. That is a real person transacting for a non-informational reason, which is what
+    Stage 0 asks for - but unlike L01's execution desk, nothing obliges them to be there, and
+    the entry does not pretend otherwise.
+  condition: >
+    touch after >= d ATR separation for >= 30 min, fade the approach, exit at H minutes or
+    15:55 ET. period in {20, 50, 200} and timeframe in {5m, 15m}, both FIXED A PRIORI with no
+    optimisation of period - if 47 works and 50 does not, that is the tell. H in
+    {60, 120, 180} min.
+  horizon_minutes: [60, 120, 180]
+  hold_hours: [1, 3]
+  registered: 2026-09-02
+  status: blocked_insufficient_events
+  grade: D+
+  tier: C
+  param_cap: 3
+  session: US
+  symbols: [MNQ, MGC]
+  registered_test_order: 17
+  test_order: null
+  schedulable: false
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      A self-fulfilling watching story is not instrument specific; both hold equally weakly.
+  verdict_route:
+    per_cell: pending measured rate
+    aggregate: >
+      ASSUMED CLOSED. period x timeframe is a 6-cell scan whose cells share entry timestamps
+      whenever two averages sit close together, which is most of the time.
+
+  # ---- RECONCILED 2026-09-09 WITH THE MEASUREMENT THAT ALREADY EXISTED. ----
+  # The batch completed 2026-09-05 and was committed, but this entry still read
+  # `untested` with no firing rate for four days, so the registry and the reports
+  # disagreed about whether the work had been done. decisions.md 36.
+  # NO STAGE 1, NO TRIAL. N stays at 576 and SR* at 0.1334.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-05'
+    remeasured_on: '2026-09-09'
+    report: reports/level_rates.md
+    data: reports/level_rates.json
+    placebo_report: reports/placebo_match.md
+    placebo_level_types_matched: 11/12
+    per_product:
+      MGC:
+        cells: 18
+        worst_cell: 3
+        best_cell: 698
+        required_60m: 5620
+        required_180m: 2862
+        best_over_180m_floor: 0.244
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 1.0
+        aggregate_route: closed_overlapping
+      MNQ:
+        cells: 18
+        worst_cell: 4
+        best_cell: 705
+        required_60m: 19722
+        required_180m: 5884
+        best_over_180m_floor: 0.12
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 1.0
+        aggregate_route: closed_overlapping
+    note: MEASURED, NEVER DECLARED - counted per Stage 1 cell with every threshold applied. Floors are
+      the 60m and 180m detection-floor cells from reports/calibration.md. No Stage 1 was run and no
+      trial was spent.
+  verdict_route_measured:
+    per_cell: blocked_insufficient_events on MGC/MNQ
+    aggregate: closed_overlapping on every product, as assumed at registration
+    measured_on: '2026-09-09'
+    note: Measured, not assumed. The `verdict_route` key above records what was ASSUMED at registration
+      and is deliberately left as written.
+  blocked_reason: 'Measured, never run. MGC best cell 698 events against a 2,862 floor at 180m (0.24x),
+    MNQ best cell 705 events against a 5,884 floor at 180m (0.12x). Blocked on event count before any
+    Stage 1: the arithmetic is the justification, and nothing here is a statement about the market.
+    reports/level_rates.md, decisions.md 36.'
+
+- id: L09
+  name: higher_timeframe_levels
+  # Stage numbering per reports/STAGES.md, adopted 2026-09-12.
+  stopped_at: S4
+  stopped_at_reason: >
+    below the detection floor: best cell 364 MGC / 446 MNQ, 8-13x short.
+  mechanism: >
+    Prior week and prior month high/low, on the same stop-clustering story as L03 and L04. Two
+    to four levels, touched perhaps weekly. REGISTERED AS A CANDIDATE FOR BLOCKING, NOT AS
+    TESTABLE: over sixteen years the sample is roughly 830 weekly levels and 190 monthly,
+    against the ~19,722 at which a floor resolves at MNQ 60m. This entry exists so the
+    exclusion is DOCUMENTED WITH ITS ARITHMETIC rather than rediscovered by someone spending
+    trials on it. The counterparty would be L03's - the trader whose stop rested beyond a
+    prior-week or prior-month extreme - but the entry does not rest on that, because it is not
+    expected to reach a test where the counterparty matters.
+  condition: >
+    Sweep and reclaim as L03, applied to prior-week and prior-month extremes. NOT SPECIFIED
+    FURTHER because it is not expected to be schedulable; if the measured rate contradicts the
+    expectation, the condition must be completed before anything runs.
+  horizon_minutes: [60, 120, 180]
+  hold_hours: [1, 3]
+  registered: 2026-09-02
+  status: blocked_insufficient_events
+  grade: D
+  tier: C
+  param_cap: 4
+  session: US
+  symbols: [MNQ, MGC]
+  registered_test_order: 18
+  test_order: null
+  schedulable: false
+  awaiting_measurement: true
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Same stop-clustering story as L03; not instrument specific. Recorded for completeness -
+      the entry is expected to be blocked on event count before instrument choice matters.
+  verdict_route:
+    per_cell: >
+      EXPECTED CLOSED. ~830 weekly and ~190 monthly levels over sixteen years, against 19,722.
+    aggregate: >
+      EXPECTED CLOSED. Pooling two level types cannot bridge two orders of magnitude.
+
+  # ---- RECONCILED 2026-09-09 WITH THE MEASUREMENT THAT ALREADY EXISTED. ----
+  # The batch completed 2026-09-05 and was committed, but this entry still read
+  # `untested` with no firing rate for four days, so the registry and the reports
+  # disagreed about whether the work had been done. decisions.md 36.
+  # NO STAGE 1, NO TRIAL. N stays at 576 and SR* at 0.1334.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-05'
+    remeasured_on: '2026-09-09'
+    report: reports/level_rates.md
+    data: reports/level_rates.json
+    placebo_report: reports/placebo_match.md
+    placebo_level_types_matched: 3/4
+    per_product:
+      MGC:
+        cells: 18
+        worst_cell: 46
+        best_cell: 364
+        required_60m: 5620
+        required_180m: 2862
+        best_over_180m_floor: 0.127
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 1.0
+        aggregate_route: closed_overlapping
+      MNQ:
+        cells: 18
+        worst_cell: 48
+        best_cell: 446
+        required_60m: 19722
+        required_180m: 5884
+        best_over_180m_floor: 0.076
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 0.9685393258426966
+        aggregate_route: closed_overlapping
+    note: MEASURED, NEVER DECLARED - counted per Stage 1 cell with every threshold applied. Floors are
+      the 60m and 180m detection-floor cells from reports/calibration.md. No Stage 1 was run and no
+      trial was spent.
+  verdict_route_measured:
+    per_cell: blocked_insufficient_events on MGC/MNQ
+    aggregate: closed_overlapping on every product, as assumed at registration
+    measured_on: '2026-09-09'
+    note: Measured, not assumed. The `verdict_route` key above records what was ASSUMED at registration
+      and is deliberately left as written.
+  blocked_reason: 'Measured, never run. MGC best cell 364 events against a 2,862 floor at 180m (0.13x),
+    MNQ best cell 446 events against a 5,884 floor at 180m (0.08x). Blocked on event count before any
+    Stage 1: the arithmetic is the justification, and nothing here is a statement about the market.
+    reports/level_rates.md, decisions.md 36.'
+
+- id: L10
+  name: placebo_level_control
+  stopped_at: n/a
+  stopped_at_reason: >
+    the placebo control itself - it validates S6 machinery and spends no trials, so it does not stop at a stage.
+  mechanism: >
+    NOT A HYPOTHESIS. The L-series negative control. Hash-derived levels with no relationship
+    to price history, run through the identical L01 pipeline. The premise is that these levels
+    CANNOT relate to future returns by construction - the offset is a deterministic function of
+    the session date and level type and never touches price - not that they SHOULD have been
+    arbitraged away, which is the distinction that retired F11.
+  condition: >
+    Identical to L01 in every respect except that the level is placebo rather than VWAP.
+    Parameters are fixed by L01's grid and none are free. Logs to measurements.jsonl, not
+    trials.jsonl, so it spends no trials.
+  horizon_minutes: [30, 60, 120]
+  hold_hours: [0.5, 2]
+  registered: 2026-09-02
+  status: untested
+  grade: D
+  tier: C
+  param_cap: 0
+  session: US
+  symbols: [MNQ, MGC]
+  test_order: null
+  is_control: true
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      Mechanism-free by construction, so no instrument can fail to support it.
+  control_scope: >
+    TWO JOBS, and the second is what distinguishes it from F14. FIRST, a standing harness check
+    at the LEVEL-REACTION event regime, which F14 does not cover: F14 fires at fixed 30-minute
+    clock boundaries, while a level condition fires when price happens to reach a moving
+    reference, which is a different firing pattern and a different conditioning structure.
+    SECOND, and more important, DIRECT VALIDATION THAT THE PLACEBO MACHINERY IS CORRECTLY
+    MATCHED. If placebo levels are touched at a materially different rate, or sit at a
+    materially different distance from price, than real levels, then the offset distribution is
+    wrong and EVERY PLACEBO COMPARISON IN THIS CATALOG IS INVALID. Nothing in the L-series is
+    interpretable until L10 passes both. Its scope is the level-reaction regime at L01-like
+    event counts and it licenses nothing about once-per-session conditions.
+  verdict_route:
+    per_cell: n/a - a control does not carry a verdict
+    aggregate: n/a
+
+  # ---- RECONCILED 2026-09-09 WITH THE MEASUREMENT THAT ALREADY EXISTED. ----
+  # The batch completed 2026-09-05 and was committed, but this entry still read
+  # `untested` with no firing rate for four days, so the registry and the reports
+  # disagreed about whether the work had been done. decisions.md 36.
+  # NO STAGE 1, NO TRIAL. N stays at 576 and SR* at 0.1334.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-05'
+    remeasured_on: '2026-09-09'
+    report: reports/level_rates.md
+    data: reports/level_rates.json
+    placebo_report: reports/placebo_match.md
+    placebo_level_types_matched: 6/6
+    per_product:
+      MGC:
+        cells: 3
+        worst_cell: 1
+        best_cell: 91
+        required_60m: 5620
+        required_180m: 2862
+        best_over_180m_floor: 0.032
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 0.011764705882352941
+        aggregate_route: open_disjoint
+      MNQ:
+        cells: 3
+        worst_cell: 2
+        best_cell: 40
+        required_60m: 19722
+        required_180m: 5884
+        best_over_180m_floor: 0.007
+        events_sufficient_at_180m: false
+        max_pairwise_overlap: 0.05263157894736842
+        aggregate_route: open_disjoint
+    note: MEASURED, NEVER DECLARED - counted per Stage 1 cell with every threshold applied. Floors are
+      the 60m and 180m detection-floor cells from reports/calibration.md. No Stage 1 was run and no
+      trial was spent.
+  verdict_route_measured:
+    per_cell: blocked_insufficient_events on MGC/MNQ
+    aggregate: open_disjoint on MGC/MNQ
+    measured_on: '2026-09-09'
+    note: Measured, not assumed. The `verdict_route` key above records what was ASSUMED at registration
+      and is deliberately left as written.
+  schedulable: false
+
+- id: L11
+  name: bollinger_band_breakout
+  # Stage numbering per reports/STAGES.md, adopted 2026-09-12.
+  stopped_at: S5
+  stopped_at_reason: >
+    WITHDRAWN. The condition fired unconditionally at valid_from + (k-1) on every session. Its S6 placebo was measured BEFORE S5 was checked and is therefore meaningless - see degenerate_measurements.
+  # ========================= WITHDRAWN 2026-09-11 =========================
+  # REGISTERED 2026-09-10, WITHDRAWN THE NEXT DAY AS DEFECTIVE. Never run at Stage 1, no
+  # trial ever spent, N unaffected at 684 and SR* at 0.1357. decisions.md 40.
+  #
+  # WHAT WAS REGISTERED WAS NEVER A BREAKOUT TEST. Measured directly on MGC, all 4,004
+  # levels, both boundaries:
+  #
+  #     kbars=1: fired 4004, entry minute min=991 max=991   <- ZERO VARIANCE
+  #     kbars=2: fired 4004, minute 992..995
+  #     kbars=3: fired 4004, minute 993..1001
+  #
+  # 991 is exactly valid_from (RTH_OPEN + 60 + 1). The condition fires on the FIRST BAR IT
+  # EXAMINES, for every level, every session. `confirmed_break` triggers on a run beyond the
+  # level in EITHER direction, and price at 10:31 is never sitting exactly on a Bollinger
+  # band - it is above or below - so one of the two runs is satisfied immediately and stays
+  # satisfied. The registered condition reduces to "sample price at 10:31 and trade whichever
+  # side of the band it is already on", once per session.
+  #
+  # THREE CONSEQUENCES, each measured rather than inferred:
+  #   1. kbars is an OFFSET, not a selection. It shifts entry by exactly k-1 bars; every
+  #      level fires under every setting (identical minutes across kbars: 0 of 4,004).
+  #   2. `upper` and `lower` fire at IDENTICAL (row, minute). That is the 100% disjointness
+  #      figure - not kbars cells colliding, but the two sides being the same event with
+  #      opposite direction labels.
+  #   3. The 6-cell grid is one event per session wearing six labels.
+  #
+  # THE MEASUREMENTS BELOW DESCRIBE THE DEGENERATE CONDITION, NOT THIS HYPOTHESIS.
+  # They are kept because deleting them would hide what was actually run, and labelled
+  # because carrying them forward to any replacement would be the error.
+  degenerate_measurements:
+    warning: >
+      MEASURED ON THE DEFECTIVE CONDITION. NOT properties of Bollinger band breakouts and
+      MUST NOT be carried into any replacement registration. A real breakout condition
+      selects a different and far smaller population of events, so both the firing rate and
+      the placebo match would have to be measured again from scratch.
+    firing_rate:
+      MGC: {cells: 6, per_cell: 4004, floor_180m: 2862}
+      MNQ: {cells: 6, per_cell: 4123, floor_180m: 5884}
+      note: >
+        Identical across all six cells because the condition fires unconditionally once per
+        session. This is a count of SESSIONS, not of breakouts.
+    placebo_match:
+      bb20k2_60m_upper: {MGC: {distance_ratio: 1.02, touch_ratio: 1.05}, MNQ: {distance_ratio: 1.06, touch_ratio: 0.94}}
+      bb20k2_60m_lower: {MGC: {distance_ratio: 1.03, touch_ratio: 0.99}, MNQ: {distance_ratio: 0.90, touch_ratio: 1.04}}
+      note: >
+        All four inside the +/-25% tolerance - but this DOES NOT establish that a Bollinger
+        placebo matches. The entry population here is every session at a fixed minute, so
+        distance-from-price was effectively fixed by construction. The open question of
+        whether a band placebo matches when the entry population is selected by an actual
+        breakout is UNTESTED. See decisions.md 40.
+  mechanism: >
+    WITHDRAWN. The mechanism as written - self-fulfilling order clustering at widely watched
+    default settings, the same weak premise as L08 - was never reached by the condition, which
+    did not test a breakout. The premise is not disproved; it was not examined.
+  condition: >
+    WITHDRAWN AS DEFECTIVE. Registered as "confirmed break of the band boundary on 1h bars,
+    mean +/- k*sigma, period 20 and k 2.0 fixed a priori, entry on the first run of kbars
+    consecutive closes beyond the boundary". Measured to fire unconditionally at the first
+    valid minute of every session in whichever direction price already sat. Not narrowed, not
+    repaired - withdrawn. A corrected condition is DIFFERENT rather than tighter and is
+    written up in decisions.md 40 WITHOUT being registered.
+  horizon_minutes: [60, 120, 180]
+  hold_hours: [1, 3]
+  registered: 2026-09-10
+  withdrawn: 2026-09-11
+  status: excluded
+  excluded_reason: >
+    WITHDRAWN AS DEFECTIVE, not closed on evidence. The registered condition was never a
+    breakout test: it fired on the first bar it examined for every level in every session,
+    because `confirmed_break` triggers on a run beyond the level in either direction and
+    price at the sampling minute is never exactly on a band. kbars shifted entry by k-1 bars
+    rather than selecting events, and the upper and lower boundaries fired at identical
+    (row, minute). NEVER RUN AT STAGE 1 AND NO TRIAL WAS SPENT, so N stays 684 and SR* stays
+    0.1357 and nothing already closed is disturbed. The trial cost falling is a CONSEQUENCE
+    of finding the defect and was not a reason for the change. decisions.md 40.
+  grade: D+
+  tier: C
+  # ZERO. A withdrawn entry declares no parameters because it will never be tested, and
+  # `test_excluded_and_dead_entries_declare_no_parameters` enforces exactly that. It was 2
+  # (kbars, horizon) while the entry was live.
+  param_cap: 0
+  session: US
+  symbols: [MNQ, MGC]
+  registered_test_order: 19
+  test_order: null
+  schedulable: false
+  provenance:
+    source: third-party claim
+    trial_count_available: false
+    cost_assumption_available: false
+    control_available: false
+    prior_weight: none
+    note: >
+      Unchanged by the withdrawal. The external claim carried no prior weight when this was
+      registered and carries none now; the defect was in this project's wiring, not in the
+      claim.
+
+- id: L12
+  name: asia_session_extreme_reclaim_out_of_sample
+  stopped_at: S7
+  stopped_at_reason: >
+    cleared S1-S6 including the S5 gate (entry-minute sd 202-206, hi/lo collision 0.0-0.1%),
+    ran at S7 and is retired on S8 economics. reports/l12_stage1.md.
+  # ================== REGISTERED 2026-09-11, BEFORE THE RUN ==================
+  # THIS HYPOTHESIS WAS SUGGESTED BY LOOKING AT DATA. That is stated first because it is the
+  # single most important fact about it. L04 tested three session types on MGC; sess_Asia
+  # produced 5 of 18 nominal separations and sess_London produced none. Asia was SELECTED BY
+  # ITS RESULT (decisions.md 43).
+  #
+  # Selection by result is not repaired by registering the survivor and re-testing it on the
+  # SAME data - decisions.md 38 refused exactly that for L07's mirror, and 43 refused it here.
+  # It IS repaired by testing the selected claim on data that did not generate it. MNQ is that
+  # data: the Asia result came entirely from MGC, and MNQ is a different instrument with its
+  # own order flow.
+  mechanism: >
+    UNCHANGED FROM L04 AND NOT STRENGTHENED BY THE MGC RESULT. Session extremes are reference
+    prices participants transact against: a sweep beyond the Asia session's high or low that
+    fails and closes back inside marks liquidity that was taken and rejected, so the move
+    counter to the penetration is trading against a failed initiative. The counterparty is
+    whoever was stopped or filled beyond the extreme. This is the SAME story L04 registered;
+    nothing about the MGC numbers makes it more plausible, and the grade is unchanged.
+  condition: >
+    Sweep and reclaim at Asia-session extremes on MNQ, exactly as L04: price exceeds the level
+    by >= m ticks then closes back inside within k bars, entry at the reclaim close, traded
+    COUNTER to the penetration, exit at H minutes or 15:55 ET. m in {2, 4, 8} ticks, k in
+    {2, 3, 5} bars, H = 180 only. Level = high and low of the Asia session. NINE CELLS.
+  # ---- THE PREDICTION, STATED BEFORE THE RUN SO IT CANNOT BE ADJUSTED AFTER IT ----
+  # On MGC the five separating cells gave +2.13 to +3.54 bps, and the nine sess_Asia cells
+  # spanned +1.33 to +3.54. If the mechanism is real and instrument-independent, MNQ should
+  # show the SAME SIGN and a broadly similar magnitude.
+  prediction:
+    registered: 2026-09-11
+    direction: positive
+    magnitude_bps: "+1.3 to +3.5, matching the MGC sess_Asia range"
+    confirms_if: >
+      A positive mean difference across the nine cells AND at least one cell surviving BH at
+      FDR 0.05 within this hypothesis. Both, not either.
+    refutes_if: >
+      A mean difference at or below zero, or positive but with no BH survivor. A positive
+      point estimate that fails correction is NOT a confirmation - it is what L04 already
+      produced, and repeating it on a second instrument without clearing the bar leaves the
+      claim exactly where it was.
+    note: >
+      The refutation criterion is deliberately symmetric with the confirmation one. Writing
+      only the confirming condition is how a test becomes unfalsifiable.
+  # ---- POWER, AND THE HONEST VERSION OF IT ----
+  # MNQ sess_Asia fires 4,903-5,442 times against a TABULATED 180m floor of 5,884, which is
+  # why L04/MNQ was never scheduled. That floor is the sample needed to resolve the SMALLEST
+  # effect the pipeline can detect (15.66 bps at 180m on MNQ). It is not the applicable bar
+  # for a specific predicted effect - decisions.md 38 decision 4 makes that argument for L07,
+  # where 24,788 events resolved far less than the tabulated floor implied.
+  # MGC separated on 2,715 PAIRED events; MNQ's ~5,400 firings should pair to more. So this
+  # is powered for the +3.5 bps effect under test while remaining short for the tabulated
+  # minimum. A NULL HERE IS THEREFORE WEAKER EVIDENCE than a null at full power would be,
+  # and that is recorded now rather than discovered later.
+  power:
+    firings_per_cell: "4,903 - 5,442"
+    tabulated_floor_180m: 5884
+    applicable: >
+      Powered for the predicted +1.3 to +3.5 bps effect; short of the tabulated floor for the
+      pipeline's minimum resolvable effect. A null is correspondingly weaker evidence.
+  placebo_match:
+    measured: true
+    level_type: sess_Asia
+    product: MNQ
+    distance_ratio: 0.92
+    touch_ratio: 0.94
+    verdict: ok
+    note: Matched, measured before registration. reports/placebo_match.md.
+  horizon_minutes: [180]
+  hold_hours: [3]
+  registered: 2026-09-11
+  status: retired
+  retired_reason: >
+    RETIRED ON ECONOMICS, NOT ON SIGNIFICANCE. 0 of 9 cells separate and the mean difference
+    is +0.306 bps against a 0.48 bps round-trip cost floor - 0.64x, not tradeable - and 4-11x
+    short of its own registered +1.3 to +3.5 bps. Positive in 8 of 9 cells, so the SIGN
+    survived; nothing else did.
+    THE REFUTATION DELIBERATELY DOES NOT REST ON THE P-VALUES. The applicable BH rank-1
+    threshold at this n is 2.82 bps (bootstrap SE 1.016), so a survivor was reachable only in
+    the TOP FIFTH of the registered range - 6.8% power at the bottom of it. Citing p=0.5810
+    as refutation would be the S4 error this programme exists to prevent. The pre-registration
+    contained an unsatisfiable significance limb and that was not noticed until after the run;
+    decisions.md 45 records it and proposes a standing S2 check.
+    WHAT IT SETTLES: 76.2% power against L04's +3.54 bps, delivered +0.306 - that magnitude
+    does not replicate out of sample. WHAT IT DOES NOT: whether a smaller real effect exists.
+  grade: C
+  tier: B
+  param_cap: 2
+  session: Asia
+  symbols: [MNQ]
+  registered_test_order: 20
+  test_order: null
+  schedulable: false
+  # ---- MNQ ONLY, AND THAT IS THE ENTIRE POINT ----
+  # The two-instrument Stage 4 requirement cannot be met and must not be. MGC is the
+  # IN-SAMPLE instrument - it generated the claim - so adding it back would destroy the only
+  # property that makes this registration worth anything. An out-of-sample test that includes
+  # the data it is validating against is not one.
+  stage4_reachable: false
+  stage4_reason: >
+    MNQ-only by construction. MGC generated this hypothesis, so it cannot also serve as the
+    second instrument for a Stage 4 confirmation - including it would re-admit the selection
+    this registration exists to escape. If MNQ confirms, the pair becomes eligible again on
+    a later sample that is out-of-sample for BOTH.
+  mechanism_instruments:
+    primary: MNQ
+    secondary: null
+    rationale: >
+      Session extremes as reference prices is not an instrument-specific story - which is
+      exactly why MNQ is a fair test of a claim found on MGC. MGC is excluded not because the
+      mechanism fails there but because it is the sample that produced the claim.
+  # MEASURED, not declared - reports/level_rates.json, the L04/MNQ Asia cells.
+  firing_rate:
+    measured: true
+    declared: null
+    measured_on: '2026-09-09'
+    report: reports/level_rates.md
+    per_product:
+      MNQ:
+        cells: 9
+        worst_cell: 4903
+        best_cell: 5442
+        required_180m: 5884
+        best_over_180m_floor: 0.925
+        events_sufficient_at_180m: false
+    note: >
+      SHORT OF THE TABULATED FLOOR and scheduled anyway, with the reason recorded in `power`
+      above: the floor is the sample needed for the pipeline's MINIMUM resolvable effect, not
+      for the specific +1.3 to +3.5 bps under test. MGC separated on 2,715 paired events.
+  provenance:
+    source: L04 Stage 1 on MGC, decisions.md 43
+    selected_by_result: true
+    prior_weight: none
+    note: >
+      SELECTED BY RESULT and says so. The registration exists to test that selection on
+      independent data, which is the only thing that can repair it. It inherits no grade, no
+      tier and no credibility from L04 - it inherits a claim and a prediction.
+  verdict_route:
+    per_cell: nine cells, BH within the hypothesis at FDR 0.05
+    aggregate: >
+      ASSUMED CLOSED. m and k select overlapping subsets of the same reclaim, exactly as in
+      L04 where the measured overlap was 98%.
+  report: reports/l12_stage1.md
+  cells: reports/l12_cells.json
+  trials_spent: 9
+  stage1_ran: '2026-09-12'
+  result:
+    cells: 9
+    separated: 0
+    bh_survivors: 0
+    mean_diff_bps: 0.306
+    positive_cells: 8
+    smallest_p: 0.5810
+    cost_floor_bps: 0.48
+    mean_over_cost: 0.64
+    bh_rank1_threshold_bps: 2.82
+    bootstrap_se_bps: 1.016
+    power_vs_l04_estimate: 0.762
+
+- id: N04
+  name: failed_breakout_trap_swing_levels
+  stopped_at: S6
+  stopped_at_reason: >
+    WITHDRAWN AT S6 2026-09-12. Its level type has NO VALID CONTROL and cannot get
+    one: a swing pivot is definitionally at-the-money when confirmed, so 61.4% of
+    levels sit exactly at the reference price and there is no distance distribution
+    to match. Same class as L06. S5 passed and the S3 rate cleared its floor; neither
+    mattered. NO TRIAL SPENT. decisions.md 46.
+  mechanism: >
+    Breakout entrants place stops back inside the level they broke. A break that fails traps
+    them, and their forced exit is price-insensitive supply in the reversal direction. THE COUNTERPARTY is the breakout buyer; they keep doing it because breakout entry is the most widely
+    taught retail pattern and the losses are attributed to "fakeouts" rather than to the entry
+    rule itself. This is a flow story, not a self-fulfilling-watching story - which is what
+    separates it from L08 and L11, whose premise this catalogue has twice found too weak.
+  condition: >
+    5-minute fractal pivot levels, lookback L = 20 bars each side. Entry on a CONFIRMED BREAK:
+    the first run of k = 3 consecutive 5m closes beyond the pivot, traded COUNTER to the break
+    (fading it). Exit at H = 180 minutes or 15:55 ET. Break depth d in {16, 24} ticks. MNQ.
+    Upper and lower breaks are separate directions and separate cells.
+  # ---- PARAMETERS ARE A SPECIFICATION CHOICE INFORMED BY A TRANSFERRED CURVE ----
+  # L = 20 and d = 16-24 were sited from L07's selectivity sweep, extended past its own grid
+  # edge (decisions.md 45). TRANSFER LIMITATION, STATED HERE AND NOT IN A FOOTNOTE: both
+  # optima and both exponents are measured on L07, WHOSE MECHANISM SECTION 38 REFUTED. Drift
+  # was excluded at 1.2% so the effect is real and reproducible even though its interpretation
+  # is wrong, and the selectivity curve is plausibly generic to thresholded conditions - but
+  # it is a TRANSFER, not a fit. If N04's own selectivity behaviour diverges from L07's once
+  # measured, this parameter choice is wrong and must be revisited.
+  parameter_provenance:
+    sited_from: L07 selectivity sweep, reports/sweep_tight_l07.json
+    principle: >
+      Maximise eff/cost subject to eff/bar comfortably above 1. Level quality (L) is the cheap
+      knob and bar timeframe the expensive one: on L07, tightening w 8->32 at 5m moved eff/cost
+      10.34 -> 17.38 while eff/bar only fell 7.43 -> 5.34, whereas tightening tf collapsed
+      provability for almost no economic gain.
+    two_optima_is_a_preference: >
+      eff/cost peaks at 0.65 firings/session and eff/bar at 8.70; these are an order of
+      magnitude apart. The 3-6.5/session band trades ~1.5x eff/cost for ~2x provability margin.
+      A later reader will see a number matching NEITHER peak - this is why.
+    two_optima_ORPHANED: >
+      ORPHANED 2026-09-13 (decisions.md 53). This preference was reasoned between two peaks:
+      eff/cost at w=24 ticks / 30m and eff/bar at w=12 ticks / 5m. The eff/cost peak does not
+      exist in bps - eff/cost rises monotonically to the tightest setting tested - so the
+      trade-off it described no longer holds. Nothing depended on it (N04 was withdrawn at S6
+      for an unrelated reason), but the reasoning is no longer valid and must not be reused.
+    standing: >
+      Data-informed, not an out-of-sample prior. Same standing as R01's pre-registered H=30.
+  # ---- AN UPLIFT WAS CONSIDERED AND DECLINED ----
+  # Tightening from the draft's ~10 firings/session to ~6.65 implies, under L07's measured
+  # decay exponent 0.412, an effect-size uplift of x1.54 - which would raise this prediction
+  # to 3.1-7.7 bps. DECLINED. The parameters may be informed by a transferred curve because
+  # they are a specification choice; the PREDICTED MAGNITUDE is different in kind, because S2
+  # judges the hypothesis against it. Uplifting it would mean the bar this hypothesis is
+  # scored against was partly set by a transfer from a refuted mechanism - and that exponent
+  # is the first thing that fails if the transfer does not hold. The prediction is kept
+  # INDEPENDENT of the parameter choice. If N04's measured selectivity behaviour later matches
+  # L07's, that is evidence the transfer held - obtained after the fact, not a prior.
+  declined_uplift:
+    factor: 1.54
+    would_have_given_bps: [3.1, 7.7]
+    declined_because: keeps the prediction independent of a parameter choice informed by a refuted mechanism
+  prediction:
+    registered: 2026-09-12
+    direction: positive
+    magnitude_bps: "+2.0 to +5.0 (unadjusted prior, deliberately not uplifted)"
+    confirms_if: positive mean AND at least one BH survivor at FDR 0.05
+    refutes_if: mean at or below zero, OR positive with no BH survivor
+  # ---- S2 CHECK: PASSES ACROSS THE WHOLE RANGE ----
+  s2_check:
+    events_per_direction: 27410
+    deff: 1.72
+    deff_source: MEASURED on 5m swing pivots, decisions.md 45
+    effective_units: 15936
+    bh_rank1_threshold_bps: 1.42
+    predicted_low_bps: 2.0
+    verdict: >
+      PROVABLE ACROSS THE RANGE. The bottom of the predicted range (2.0) exceeds the BH bar
+      (1.42), so a survivor is reachable at any magnitude in the prediction - unlike L12,
+      whose significance limb was reachable only in the top fifth of its range.
+    eff_over_bar_mid: 2.46
+    eff_over_cost_mid: 7.3
+  s5_gate:
+    passed: true
+    measured: 2026-09-12
+    firing_rate_per_session: {up: 6.65, down: 6.39}
+    entry_minute_sd: {up: 327.3, down: 325.9}
+    note: >
+      PASSED BEFORE ANY S6 PLACEBO IS BUILT - the L11 ordering error. Degenerate signature is
+      sd ~0 with 92-99% directional collapse; this is sd 327 with up and down firing DIFFERENT
+      counts, so direction discriminates.
+  s41_guard:
+    verified: true
+    discriminates: true
+    note: >
+      VERIFIED THAT THE GUARD FIRES CORRECTLY, not merely that N04 passes it. On the opening
+      range - the L02-sweep shape, price sitting INSIDE - it RAISES DegenerateCondition at
+      44.2% already-beyond against a 25% limit. On swing pivots, where price sits AT the
+      level, it passes. The guard discriminates; it is not vacuous.
+  horizon_minutes: [180]
+  hold_hours: [3]
+  registered: 2026-09-12
+  status: excluded
+  excluded_reason: >
+    WITHDRAWN AT S6, not closed on evidence. The 5m swing-pivot level type has no valid
+    placebo: measured median distance from the reference price is 0.000 with a 61.4%
+    zero-share, against 0.1-7.1% for every other level type in the catalogue, because a
+    fractal pivot is AT the money at the moment it is confirmed. `verify` returns DEGENERATE
+    - "a property of the level definition, not a tuning failure, and no scale or construction
+    fixes it" - the identical verdict L06 receives. S5 PASSED and S3 cleared the floor, which
+    is exactly why the placebo was built before the rates were routed. NO TRIAL SPENT; N
+    stays 756. decisions.md 46.
+  withdrawn: 2026-09-12
+  grade: B
+  tier: B
+  param_cap: 0
+  session: US
+  symbols: [MNQ]
+  stage4_reachable: false
+  stage4_reason: >
+    MNQ only at registration. MGC pooling is NOT assumed - the L-series aggregate-route
+    assumption is explicitly not inherited, and cross-product overlap must be measured before
+    any pooling.
+  mechanism_instruments:
+    primary: MNQ
+    secondary: null
+    rationale: Trapped-breakout flow is not instrument specific; MNQ is chosen for cost (0.48 bps).
+  registered_test_order: 21
+  test_order: null
+  schedulable: false
+  verdict_route:
+    per_cell: nine cells, BH within the hypothesis at FDR 0.05
+    aggregate: >
+      ASSUMED CLOSED across d; MEASURED DISJOINT from N05 at 2.1% shared (row, minute), so the
+      two hypotheses are not duplicates despite sharing a level set.
+
+- id: N05
+  name: swing_level_sweep_reclaim
+  stopped_at: S6
+  stopped_at_reason: >
+    WITHDRAWN AT S6 2026-09-12. Its level type has NO VALID CONTROL and cannot get
+    one: a swing pivot is definitionally at-the-money when confirmed, so 61.4% of
+    levels sit exactly at the reference price and there is no distance distribution
+    to match. Same class as L06. S5 passed and the S3 rate cleared its floor; neither
+    mattered. NO TRIAL SPENT. decisions.md 46.
+  mechanism: >
+    Stop-clustering at swing extremes: a sweep beyond a pivot that fails and closes back inside
+    marks liquidity taken and rejected, so the move counter to the penetration trades against a
+    failed initiative. THE COUNTERPARTY is whoever was stopped or filled beyond the extreme. This is
+    L03/L04's mechanism, which discriminated properly at S5 - the failure there was EVENT
+    COUNT, not logic, and this registration exists to fix exactly that.
+  condition: >
+    5-minute fractal pivot levels, lookback L = 20. `sweep_reclaim`: price exceeds the pivot by
+    m ticks then closes back inside within k = 3 bars; entry at the reclaim close, traded
+    COUNTER to the penetration. Exit at H = 180 min or 15:55 ET. m in {16, 24}. MNQ.
+  parameter_provenance:
+    sited_from: L07 selectivity sweep (same transfer limitation as N04 - see that entry)
+    note: >
+      L IS THE DOMINANT KNOB, NOT m. At L=5 there are 286,257 pivots (69/session) and no value
+      of m reaches the target band - a 6x increase in m cut firing only 1.78x. At L=20 it is
+      38.1 levels/session. Measured, not assumed.
+  declined_uplift:
+    factor: 1.54
+    would_have_given_bps: [2.3, 6.2]
+    declined_because: same reasoning as N04 - the prediction stays independent of the parameter choice
+  prediction:
+    registered: 2026-09-12
+    direction: positive
+    magnitude_bps: "+1.5 to +4.0 (unadjusted prior, deliberately not uplifted)"
+    confirms_if: positive mean AND at least one BH survivor at FDR 0.05
+    refutes_if: mean at or below zero, OR positive with no BH survivor
+  # ---- S2 CHECK: STRADDLES. THIS IS THE MARGINAL REGISTRATION AND SAYS SO. ----
+  s2_check:
+    events: {m16: 16535, m24: 13194}
+    deff: 1.72
+    effective_units: {m16: 9613, m24: 7671}
+    bh_rank1_threshold_bps: {m16: 1.83, m24: 2.05}
+    predicted_range_bps: [1.5, 4.0]
+    verdict: >
+      STRADDLES. The BOTTOM of the predicted range (1.5) sits BELOW the BH bar (1.83-2.05), so
+      if the true effect is at the low end no survivor is reachable - the L12 defect in milder
+      form. It is registered anyway under the S2 surface-don't-reject rule: the upper two
+      thirds of the range ARE reachable, and eff/cost is 5.7x at the midpoint. N05 IS THE
+      MARGINAL REGISTRATION OF THE TWO AND A NULL FROM IT IS CORRESPONDINGLY WEAKER EVIDENCE
+      than a null from N04.
+    eff_over_bar_mid: 1.50
+    eff_over_cost_mid: 5.7
+  s5_gate:
+    passed: true
+    measured: 2026-09-12
+    firing_rate_per_session: {m16: 4.01, m24: 3.20}
+    entry_minute_sd: {m16: 260.9, m24: 250.5}
+    up_share: {m16: 0.53, m24: 0.52}
+    adjacent_m_identical_minutes: 0.794
+    note: >
+      PASSED BEFORE THE S6 PLACEBO. Counts fall with m (16,535 -> 13,194) and sd is ~255, so m
+      SELECTS rather than offsets. 79.4% of shared events keep the same minute, which is
+      expected for a nested threshold and is not the L11 signature - there the counts were
+      IDENTICAL and the minutes shared 0%.
+  horizon_minutes: [180]
+  hold_hours: [3]
+  registered: 2026-09-12
+  status: excluded
+  excluded_reason: >
+    WITHDRAWN AT S6, not closed on evidence. The 5m swing-pivot level type has no valid
+    placebo: measured median distance from the reference price is 0.000 with a 61.4%
+    zero-share, against 0.1-7.1% for every other level type in the catalogue, because a
+    fractal pivot is AT the money at the moment it is confirmed. `verify` returns DEGENERATE
+    - "a property of the level definition, not a tuning failure, and no scale or construction
+    fixes it" - the identical verdict L06 receives. S5 PASSED and S3 cleared the floor, which
+    is exactly why the placebo was built before the rates were routed. NO TRIAL SPENT; N
+    stays 756. decisions.md 46.
+  withdrawn: 2026-09-12
+  grade: B-
+  tier: B
+  param_cap: 0
+  session: US
+  symbols: [MNQ]
+  stage4_reachable: false
+  stage4_reason: MNQ only at registration; MGC pooling not assumed and not yet measured.
+  mechanism_instruments:
+    primary: MNQ
+    secondary: null
+    rationale: Stop-clustering at swing extremes is not instrument specific.
+  registered_test_order: 22
+  test_order: null
+  schedulable: false
+  verdict_route:
+    per_cell: nine cells, BH within the hypothesis at FDR 0.05
+    aggregate: >
+      ASSUMED CLOSED across m. MEASURED DISJOINT from N04 at 2.1% shared (row, minute).
+
+- id: N02
+  name: round_number_cross_continuation
+  stopped_at: S7
+  stopped_at_reason: >
+    Ran at S7 2026-09-13: 0 of 3 separate, 0 BH survivors, cells disagree on sign. Retired on
+    the pre-registered refutation clause. reports/n02_stage1.md, decisions.md 51.
+  mechanism: >
+    Osler (2003, Journal of Finance) documents from a major FX dealing bank's complete order
+    book that stop-loss orders cluster JUST BEYOND round numbers while take-profit orders
+    cluster AT them; Osler (2005, JIMF) shows rates trend rapidly after reaching
+    stop-cluster levels. Stops are positive-feedback: crossing the level triggers them and
+    extends the move. THE COUNTERPARTY is the trader whose stop sits in the obvious cluster,
+    and they keep doing it because stops are placed at the same round-number anchors that
+    define the level - anchoring is a cognitive default that does not decay with experience.
+    This is the best-evidenced mechanism in the N-series draft and the only one resting on a
+    published order-book study rather than on inference from price.
+  condition: >
+    Round-number levels on a 50-point grid: the two nearest levels above and the two below the
+    SESSION-OPEN close, four per session, valid from the open (decisions.md 49). Price trades
+    THROUGH a level by d points from the side it started on; enter in the break direction,
+    exit at H = 180 minutes or 15:55 ET. d in {2, 4, 8} points, H = 180. MNQ. Three cells.
+  # ---- S3 MEASURED, AND IT OVERTURNED THE DRAFT'S ASSUMPTION ----
+  # The draft assumed crosses were a SUBSET of approaches and therefore rarer ("lower than
+  # N01"). Measured on MNQ: of 32,590 round-number events, 26,200 (80.4%) CROSS and 6,390
+  # (19.6%) merely approach - a cross/approach ratio of 4.10. Price that reaches a round
+  # number usually goes through it. The assumption was backwards, and it decides which of the
+  # two round-number candidates is registrable.
+  s3_firing_rate:
+    measured: '2026-09-12'
+    product: MNQ
+    total_round_number_events: 32590
+    crosses: 26200
+    approaches: 6390
+    cross_approach_ratio: 4.10
+    note: >
+      MEASURED, NEVER DECLARED. The definition of a cross was fixed before measuring and was
+      not adjusted afterwards: through the level by >= 2 points on the far side from the
+      approach, within 60 minutes.
+  # ---- S2 RECOMPUTED ON THE CORRECTED POPULATION, 2026-09-13, BEFORE ANY TRIAL ----
+  # The original check below was computed on the CIRCULAR population (26,200 events) and no
+  # longer describes what will run. The corrected population fires 6,596-7,105 times at
+  # 2.24 events/session, with DEFF MEASURED at 1.42-1.66 - lower than the 2.19 measured at
+  # 7.68 events/session, as expected for sparser events. The verdict moves from PROVABLE to
+  # STRADDLES. Registered under surface-don't-reject, same standing N05 had.
+  s2_check:
+    recomputed: '2026-09-13'
+    population: corrected, two grid levels either side of the session open
+    cells: 3
+    k_note: >
+      THREE CELLS, NOT NINE. The grid is d in {2,4,8} at H=180 only. An earlier version of this
+      entry said nine; BH rank-1 is computed at k=3.
+    per_d:
+      "2": {events: 7105, deff: 1.47, units: 4821, bh_bar_bps: 2.23}
+      "4": {events: 6938, deff: 1.42, units: 4896, bh_bar_bps: 2.21}
+      "8": {events: 6596, deff: 1.66, units: 3971, bh_bar_bps: 2.46}
+    predicted_range_bps: [2.0, 5.0]
+    verdict: >
+      STRADDLES. The bottom of the predicted range (2.0) sits below the BH bar (2.21-2.46), so a
+      survivor is unreachable for a true effect in roughly the lowest 5-10% of the range.
+      eff/bar at midpoint 1.42-1.58, eff/cost 7.3x. A null from N02 is correspondingly weaker
+      evidence for effects near 2 bps.
+    superseded_check:
+      events: 26200
+      bh_rank1_threshold_bps: 1.64
+      verdict: PROVABLE ACROSS RANGE
+      why_superseded: computed on the circular population of decisions.md 49
+  prediction:
+    registered: 2026-09-12
+    direction: positive
+    magnitude_bps: "+2.0 to +5.0"
+    confirms_if: positive mean AND at least one BH survivor at FDR 0.05
+    refutes_if: mean at or below zero, OR positive with no BH survivor
+  # ---- S6 IS EXPECTED TO BE BUILDABLE, UNLIKE N04/N05 ----
+  # Round numbers are established AT A DISTANCE from the prevailing price, so they have a
+  # non-degenerate distance distribution and the arbitrary-region placebo of decisions.md 37
+  # applies. That is exactly what N04/N05 lacked (61.4% zero-distance). It is an EXPECTATION,
+  # not a measurement - S6 must still be built and matched before this can be scheduled.
+  s6_placebo:
+    built: true
+    measured: '2026-09-13'
+    verdict: MATCHED on both products
+    MNQ: {levels: 16496, real_touch: 0.401, placebo_touch: 0.395, touch_ratio: 0.98, distance_ratio: 0.82}
+    MGC: {levels: 16020, real_touch: 0.115, placebo_touch: 0.122, touch_ratio: 1.06, distance_ratio: 0.88}
+    construction_correction: >
+      THE FIRST ATTEMPT FAILED AND THE FAILURE WAS MINE. The population admitted a grid level
+      only when price came within 0.5 points of it, so real levels were touched 100.0% BY
+      DEFINITION and the placebo was asked to match an outcome the population was selected on.
+      Corrected to the two nearest grid levels above and below the SESSION-OPEN close - four
+      per session, chosen without reference to where price later goes. Touch rate then falls
+      to an observed 40.1% / 11.5%. One re-measurement, binding; decisions.md 49.
+  # ---- S8 CROSS-MARKET ROUTE IS CLOSED BEFORE IT IS TRIED ----
+  # MGC's real touch rate is 11.5%: gold's session range rarely spans two 50-point grid steps,
+  # so most of its level population is unreachable within a session. The S6 match on MGC is
+  # genuine - a correctly matched placebo against a mostly-unreachable population - which
+  # makes it easy to misread as an open route. It is not one. N02 cannot use MGC as a
+  # robustness instrument and its S8 evidence must come from the ERA SPLIT alone.
+  s8_cross_market:
+    available: false
+    reason: MGC touch rate 11.5%; most of the level population is unreachable within a session
+    consequence: S8 rests on the era split only
+  s5_gate:
+    passed: true
+    measured: '2026-09-13'
+    population: corrected (re-gated after the population changed; decisions.md 49)
+    per_d: {"2": {fired: 7184, minute_sd: 416.3}, "4": {fired: 7013, minute_sd: 414.8}, "8": {fired: 6679, minute_sd: 411.7}}
+    up_share: 0.51
+    note: >
+      PASSED on the corrected population. An earlier pass on the circular population was
+      invalidated when the population changed and the gate was re-run rather than inherited.
+  horizon_minutes: [180]
+  hold_hours: [3]
+  registered: 2026-09-12
+  status: retired
+  retired_reason: >
+    RETIRED AT S7 ON ITS PRE-REGISTERED CLAUSE: positive pooled mean (~+0.07 bps) with no BH
+    survivor, against a registered +2.0 to +5.0. Cells +1.14 / +0.15 / -1.07 bps disagree on
+    sign. Power at the 3.5 bps midpoint was 68-78%, so unlike L12 the significance limb was
+    reachable, and the magnitude limb refutes independently.
+    THE CONDITION WAS MIS-SPECIFIED FOR THIS SAMPLE, and that limits what the null says. N02
+    is in POINTS on an index that rose 14x (median 1,939 in 2010, 27,528 in 2026): d=8 points
+    was a 41 bps breakout in 2010 and a 2.9 bps one in 2026. The era split flipped sign
+    (2010-18 d=8 -8.66 bps p=0.0075; 2024-26 d=2 +4.43 p=0.033) and is UNINTERPRETABLE for
+    that reason - two different trades, not decay or emergence. The 2024-26 subset is one of
+    nine post-hoc era tests with two nominal hits in opposite directions; not a finding.
+    Weak evidence about Osler's mechanism; revival needs a new registration with d in bps or
+    volatility units and the era split pre-registered.
+  grade: B
+  tier: B
+  param_cap: 2
+  session: US
+  symbols: [MNQ]
+  stage4_reachable: false
+  stage4_reason: MNQ only at registration; MGC pooling not assumed and not measured.
+  mechanism_instruments:
+    primary: MNQ
+    secondary: null
+    rationale: >
+      Round-number anchoring is not instrument specific; MNQ is chosen for cost (0.48 bps).
+  registered_test_order: 23
+  test_order: null
+  schedulable: false
+  verdict_route:
+    per_cell: three cells (d in {2,4,8}, H=180), BH within the hypothesis at FDR 0.05
+    aggregate: ASSUMED CLOSED across d; the same cross enters under multiple depth settings.
+  report: reports/n02_stage1.md
+  cells: reports/n02_cells.json
+  trials_spent: 3
+  stage1_ran: '2026-09-13'
+
+- id: P03
+  name: thin_move_reversion
+  mechanism: >
+    Amihud/Kyle. A price move is bought with volume: absorbing informed flow takes size, so a
+    move achieved on LITTLE volume moved a thin book rather than absorbing anything. The
+    displacement it creates is therefore more likely transitory, and should give part of itself
+    back. THE COUNTERPARTY is whoever crossed a thin book without information, and they keep
+    doing it because order size is chosen from account size rather than from book depth - a
+    habit that does not decay with experience, unlike a mispricing an arbitrageur can close.
+    Measured on this series rather than assumed: at a firing the median move is 13.59 bps while
+    the move its own volume ordinarily buys is 4.21 bps, leaving 9.18 bps of excess
+    displacement (decisions.md 57).
+  condition: >
+    NQ, 5-minute bars, RTH only (09:30-16:00 ET). Per bar, illiquidity lambda = |log return in
+    bps| / bar volume. The state fires when lambda exceeds the 90th percentile of lambda over
+    the SAME 30-minute bucket across the PREVIOUS 60 sessions. Entry at the firing bar's close,
+    FADE the move: direction = -sign(that bar's return). Exit at H = 15 minutes (3 bars) or the
+    session close, whichever comes first. ONE CELL - no sweep over threshold, lookback or
+    horizon.
+  # ---- THE DENOMINATOR IS A RANK, WHICH IS WHY THE THRESHOLD IS SCALE-INVARIANT ----
+  # |return| per contract is NOT scale invariant: the NQ->MNQ splice is a 10x notional change
+  # and bar volume grows secularly besides. What is thresholded here is lambda's rank within
+  # its own trailing distribution, which is dimensionless - any rescaling common to a
+  # 60-session window divides both sides of the comparison alike. Measured evidence: the firing
+  # rate holds at 7.95-12.10% across 2012-2026 while median bar volume runs 1,752 to 5,325.
+  # NQ-only avoids the splice entirely rather than modelling it. decisions.md 56.
+  threshold_units: quantile
+  price_range_stated: true
+  price_range_note: >
+    NQ close spans roughly 1,830 (2010) to 24,000+ (2026), a ~13x range. The threshold is a
+    trailing quantile and therefore carries no price units at all, but the range is stated and
+    the era split pre-registered rather than claiming an exemption the check does not grant.
+  era_split_preregistered: true
+  # ---- S2, COMPUTED FROM MEASURED QUANTITIES BEFORE THE RUN ----
+  s2_check:
+    measured: '2026-09-13'
+    cells: 1
+    horizon_minutes: 15
+    horizon_provenance: >
+      MEASURED, NOT ASSUMED. The state's own decay half-life is 3.5 minutes (log illiquidity
+      elevation falls to 0.29 of the spike within one 5m bar), and 15 is the nearest point on
+      the grid the registry uses. R01's precedent, r-series decisions.md 17. The half-life is
+      BELOW the bar resolution, so it is resolution-limited - but any value under 5 minutes
+      maps to the same grid point, so the choice is robust to that. H=15 is nonetheless ~4
+      half-lives past decay: P03's clock is faster than the tradeable grid.
+    n_firings: 27437
+    n_sessions_post_warmup: 3559
+    warmup_cost_sessions: 566
+    deff_range: [2.19, 4.00]
+    effective_units: [12528, 6859]
+    bh_bar_bps: [0.463, 0.625]
+    bh_bar_note: >
+      NO sqrt(2) pairing inflation. The SE anchor is ALREADY a difference SE - L12 measured
+      1.016 bps as its own bootstrap SE on a real|placebo|diff table at 4,052 pairs, and
+      64.7/sqrt(4052) = 1.016. decisions.md 57.
+    k_note: >
+      The bar is computed at k=9 for comparability with decisions.md 45-54. This entry runs ONE
+      cell, where BH rank-1 would give 0.327 bps. The CONSERVATIVE k=9 figure is what the
+      refutation threshold below is pinned to, deliberately - the pre-registered bar is not
+      lowered by the fact that the sweep was declined.
+    ceiling_bps: 9.18
+    ceiling_note: >
+      The measured excess is a CEILING, not a prediction: no reversion returns more than the
+      move that was made, and an unknown part of the 9.18 is PERMANENT information rather than
+      transitory impact. THE HONEST PRIOR ON THE REVERSION FRACTION IS UNKNOWN, NOT HIGH.
+    verdict: >
+      NOT BELOW. The ceiling exceeds the binding constraint by ~15x, so the hypothesis cannot
+      be ruled out on magnitude. It cannot be ruled IN either: that needs a claim about the
+      reversion fraction, which is what the test measures.
+  # ---- THIS IS AN ECONOMICS-BINDING REGIME, STATED BEFORE THE RESULT ----
+  # Cost floor 0.48 bps against a BH bar of 0.463-0.625. The two constraints are nearly equal,
+  # so significance is no longer the binding limb. EVERY EARLIER P-SERIES ENTRY WAS
+  # SIGNIFICANCE-DOMINATED - P01 needed 4.2-5.4 bps, P09 72-102 - and that inverts what a null
+  # means here. A null at P03 says the effect is small in bps, not that the test could not see
+  # it. Recorded before the run precisely so it cannot be claimed afterwards.
+  binding_constraint: economics
+  binding_constraint_note: >
+    cost floor 0.48 bps vs BH bar 0.463-0.625 bps; binding value 0.625 bps
+  prediction:
+    registered: '2026-09-13'
+    direction: positive
+    magnitude_bps: "> +0.625"
+    threshold_derivation: >
+      6.8% of the measured 9.18 bps excess displacement, reverting within 15 minutes. The
+      fraction is the number the test resolves; the 9.18 and the 0.625 are both measured
+      before the run.
+    confirms_if: >
+      real-minus-control mean above +0.625 bps AND the control MATCHED. That is, more than 6.8%
+      of the measured excess reverts within 15 minutes.
+    refutes_if: >
+      real-minus-control mean at or below +0.625 bps, including a positive mean that is smaller.
+      A NULL IS INFORMATIVE HERE BECAUSE THE THRESHOLD IS LOW, not because the effect was
+      expected - the prior on the reversion fraction is unknown.
+  # ---- S6 IS THE MATCHED STATE CONTROL, NOT A LEVEL PLACEBO ----
+  # A state has no location, so the arbitrary-region placebo of decisions.md 37 does not apply.
+  # The control draws each firing a partner from a DIFFERENT session in the same time-of-day
+  # bucket, volatility quantile and year, where the state does not hold. decisions.md 55.
+  s6_control:
+    kind: matched_state_control
+    session_exclusion: bar
+    mode_justification: >
+      STRICT MODE IS STRUCTURALLY UNAVAILABLE. The state fires 7.71 times per session and
+      touches 92.6% of sessions; even a perfectly independent state at that rate would touch
+      ~99.9%. The 265 clean sessions that survive range from 0% of 2011 to 17.5% of 2025, and
+      strict mode FAILS on them (37.4% era fallback, 69.9% reuse). Bar mode is MATCHED at 0%
+      fallback and 7.1% reuse. Its contamination costs power, not validity: control bars sit in
+      sessions that fire elsewhere, which shrinks a real difference but cannot manufacture one,
+      because the regimes are matched pair by pair.
+    consequence: >
+      A NULL UNDER BAR MODE IS WEAKER EVIDENCE THAN A NULL UNDER STRICT MODE. Recorded before
+      the run, decisions.md 55.
+  horizon_minutes: [15]
+  hold_hours: [0.25]
+  registered: '2026-09-13'
+  status: retired
+  stopped_at: S7
+  stopped_at_reason: >
+    Ran at S7 2026-09-13, one cell, one trial. Real-minus-control +0.0794 bps against a
+    PRE-REGISTERED +0.625, so it misses its own threshold by 7.9x; not separated (p 0.691).
+    The real leg is +0.2004 bps gross and -0.2796 NET of the 0.48 bps floor - it loses money
+    before significance is reached at all. reports/p03_stage1.md, decisions.md 58.
+  retired_reason: >
+    RETIRED ON ITS PRE-REGISTERED CLAUSE. The clause was "more than 6.8% of the measured
+    9.18 bps excess reverts within 15 minutes"; the measured reversion is 0.86% of it.
+    THE BINDING LIMB IS ECONOMICS, AS REGISTERED BEFORE THE RUN: the real leg is negative
+    net of cost, so the trade fails on money rather than on power. The era split agrees
+    (early +0.0140, late +0.1449, neither significant, no sign flip), so this is not decay.
+    WHAT THE NULL DOES NOT SETTLE, also recorded before the run: the state's own decay
+    half-life is 3.5 minutes and H=15 is the shortest horizon the grid carries, so the test
+    sits ~4 half-lives past the mechanism's clock. A null there is weak evidence about
+    thin-move reversion AT ITS OWN TIMESCALE. Re-testing at a shorter horizon would be a new
+    registration with its own trial, not a re-reading of this one - R01's rule (r-series 17).
+    The control ran in `bar` mode, whose contamination costs power, which pushes the same way.
+  schedulable: false
+  test_order: null
+  registered_test_order: 1
+  grade: B
+  tier: B
+  param_cap: 2
+  param_note: >
+    Two parameters: the 60-session lookback and the Q90 threshold, both fixed a priori before
+    any run. The horizon is NOT a third - it was measured from the state's decay, not chosen.
+    No sweep over any of them.
+  session: US
+  symbols: [MNQ]
+  mechanism_instruments:
+    primary: MNQ
+    rationale: >
+      Thin-book displacement is a microstructure property of the instrument being traded, and
+      MNQ is what would be traded. The STATE is measured on the NQ lineage because it is one
+      contract over 2010-2026 and therefore free of the splice, but NQ and MNQ track the same
+      index at 1/10 notional, so a bps effect transfers directly. MGC is not claimed: gold's
+      book depth and participant mix are different enough that the mechanism must be measured
+      there rather than assumed, and it has not been.
+  instrument_note: >
+    The STATE is measured on NQ because it is one contract lineage over 2010-2026 and therefore
+    has no splice discontinuity. The TRADEABLE instrument is MNQ, same underlying at 1/10
+    notional, so the bps effect transfers and MNQ's 0.48 bps round-trip floor is the one that
+    binds.
+  stage4_reachable: false
+  stage4_reason: >
+    NQ/MNQ only. MGC would need its own state build and its own control, and neither is
+    measured; pooling is not assumed. S8 evidence therefore rests on the ERA SPLIT alone.

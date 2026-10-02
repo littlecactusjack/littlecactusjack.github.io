@@ -1,0 +1,31 @@
+# Credentials. The Databento FTP account lives here; it must never enter git history,
+# because history is not deletable in any practical sense once pushed.
+.env
+.env.*
+!.env.example
+
+# Data. GLBX.MDP3 extracts are large and reproducible from the vendor; the trial log is
+# NOT data and IS committed (see CLAUDE_FUTURES.md §6).
+#
+# THE LEADING SLASH IS LOAD-BEARING. `data/` without it matches ANY directory named data at
+# any depth, which silently excluded `src/futuresres/data/` - the entire data layer, the
+# package that builds every series the calibrations rest on - from every commit this repo
+# ever made. `/data/` anchors the rule to the repository root. decisions.md 36.
+/data/
+*.dbn
+*.dbn.zst
+*.parquet
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db

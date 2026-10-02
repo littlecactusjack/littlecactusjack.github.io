@@ -1,0 +1,556 @@
+# Checkpoint — 2026-09-02, updated 2026-09-09
+
+Written at a hard stop on 2026-09-02 and **updated 2026-09-09, when it was found to be
+issuing an instruction that had already been carried out.** The batch it says must be re-run
+completed on 2026-09-05 and was committed as `fb07e80`. Anyone who followed this file between
+those dates would have re-run twenty minutes of work for nothing.
+
+Everything below is committed; nothing is in flight on disk.
+
+---
+
+## THE STOPPING RULE — added 2026-09-29, before any seventh series is designed
+
+**This section is a gate on designing, not a summary.** Two conditions. A candidate series must
+state where it sits against both, in its own registration, before a trial is spent. Every number
+below was computed on 2026-09-29 from this repository and `r-series-research`; the derivations and
+the open decisions are in `decisions.md` §61.
+
+---
+
+### 1. Success condition — REVISED 2026-09-29 under two rulings (§62)
+
+**Two rulings supersede the first version of this section.** (a) The marking convention is
+**intraday**: the firm evaluates its trailing floor continuously, and the condition is stated as
+losing $2,000 from any point, so daily marks measure something nobody enforces. (b) The bar is **two
+objects, not one**, and the stated condition describes only the second.
+
+**The account size is derived, not assumed:** $2,000 is 4% of $50,000 and 4% is the account's own
+floor, so the condition is a 4% peak-to-trough excursion on $50,000. The rule is
+**floor = min(peak − $2,000, $50,000)** — trailing pre-lock, fixed at breakeven once the peak reaches
+$52,000.
+
+---
+
+#### PHASE 1, pre-lock: a RUIN PROBABILITY. A rate is not computable here.
+
+Before the lock the floor *is* peak − $2,000, so **the first 4% excursion is terminal** — it can
+happen at most once, and a frequency has no meaning against a single absorbing barrier.
+
+| Sharpe | P(reach lock) | **P(ruin)** |
+|---|---|---|
+| 0 (no edge) | 0.384 | **0.616** |
+| 0.59 | 0.425 | 0.575 |
+| 0.95 | 0.482 | 0.518 |
+| 1.31 | 0.564 | **0.436** |
+| 2.00 | 0.766 | 0.234 |
+| 3.00 | 0.965 | 0.035 |
+
+**Even at Sharpe 1.31 the account fails to survive phase 1 more than two times in five.** The
+zero-edge row validates the simulator against theory: it converges to exp(−1) = 0.3679 as marking
+tightens (0.4068 daily → 0.3843 at 30-min → 0.3720 at 52,416 marks), which is the figure already in
+`programme_conclusion.md` §4.
+
+#### PHASE 2, post-lock: an EVENT RATE — and it must be conditioned on survival
+
+**"A few times per year" was stated against a regime the account does not start in.** It applies
+only here, and only once cushion exists: at the lock point the floor sits **exactly one $2,000
+drawdown below equity**, so early in phase 2 "experiencing a $2k drawdown" *is* hitting the floor.
+
+**OPERATIVE BAR** — post-lock, intraday marks (3,276/yr), start $52,000, floor $50,000, events counted
+among **survivors**. Sharpe is a floor, volatility a ceiling:
+
+| annual return | ≤3 events/yr | max vol | P(floor), yr 1 | ≤5 events/yr | max vol | P(floor), yr 1 |
+|---|---|---|---|---|---|---|
+| **10%** | **SR ≥ 0.80** | 12.4% | 52.9% | SR ≥ 0.55 | 18.1% | 69.9% |
+| **15%** | **SR ≥ 1.21** | 12.4% | 42.0% | SR ≥ 0.85 | 17.7% | 62.5% |
+| **20%** | **SR ≥ 1.61** | 12.4% | 33.4% | SR ≥ 1.15 | 17.4% | 55.3% |
+
+**The event rate alone is not a sufficient bar**, because every cell that satisfies it still ruins
+often. Sharpe required to hold first-year P(floor) down, post-lock:
+
+| annual return | P ≤ 20% | P ≤ 10% | P ≤ 5% |
+|---|---|---|---|
+| 10% | 1.36 | 1.66 | 1.90 |
+| 15% | **1.71** | **2.06** | 2.34 |
+| 20% | 1.99 | 2.39 | 2.72 |
+
+**A registration is checked against the binding one, which is whichever is higher** — for 15% at
+≤3 events with P(floor) ≤ 10%, that is **SR ≥ 2.06**, not 1.21.
+
+#### SUPERSEDED — the daily-mark table, kept for the record
+
+Not deleted, because it is what the first version of this rule asserted. It is **too lenient**: daily
+marks miss excursions the firm would enforce.
+
+| annual return | ≤3 events/yr | ≤5 events/yr | ≤10 events/yr |
+|---|---|---|---|
+| 10% | SR ≥ 0.59 (vol ≤ 17.00%) | SR ≥ 0.26 (vol ≤ 38.23%) | infeasible |
+| 15% | SR ≥ 0.95 (vol ≤ 15.82%) | SR ≥ 0.44 (vol ≤ 34.24%) | infeasible |
+| 20% | SR ≥ 1.31 (vol ≤ 15.21%) | SR ≥ 0.66 (vol ≤ 30.51%) | infeasible |
+
+The bar **converges** as marking tightens, so the intraday figure is a real limit, not grid-dependent
+(R = 15%, ≤3 events, single-phase): 0.95 daily → 1.13 hourly → 1.17 at 30-min → 1.19 at 15-min →
+1.20 at 7.5-min. The ten-events column stays infeasible at daily marks for the reason recorded in
+§61: distinct episodes are bounded by new equity highs, ~0.5·√marks, giving a ceiling of 8.76/yr.
+
+---
+
+### 1b. The first version of this section, for reference
+
+**SUPERSEDED 2026-09-29 — do not register against this.** Kept because it is what the rule asserted
+on 2026-09-13, and because deleting it would hide that the bar moved. Its two "OPEN DECISION" items
+are both now **ruled on** (§62): the marking convention is intraday, and the bar is two objects. Its
+single-table framing measures a rate in a phase where the event is terminal, so it is too lenient in
+phase 1 and unconditioned in phase 2.
+
+
+The stated goal — *large profits while experiencing a trailing $2,000 drawdown no more than a few
+times per year* — is converted here so a result can be **checked** against it rather than judged.
+
+**The account follows from the number.** $2,000 is 4% of $50,000, and 4% is the account's own
+trailing-drawdown floor (§1 of `programme_conclusion.md`), so the success condition is a **4%
+peak-to-trough excursion** on a $50,000 account. Annual profit at 10 / 15 / 20% is
+$5,000 / $7,500 / $10,000.
+
+**Required Sharpe is a floor, and permitted volatility is a ceiling.** Tolerating more drawdown
+events lowers the bar; the event count falls monotonically in Sharpe (verified on a grid from
+Sharpe 0.05 to 6.0, all three return targets).
+
+| annual return | ≤3 events/yr | ≤5 events/yr | ≤10 events/yr |
+|---|---|---|---|
+| **10%** | **SR ≥ 0.59** (vol ≤ 17.00%, $8,500) | SR ≥ 0.26 (vol ≤ 38.23%, $19,114) | **infeasible** |
+| **15%** | **SR ≥ 0.95** (vol ≤ 15.82%, $7,908) | SR ≥ 0.44 (vol ≤ 34.24%, $17,119) | **infeasible** |
+| **20%** | **SR ≥ 1.31** (vol ≤ 15.21%, $7,605) | SR ≥ 0.66 (vol ≤ 30.51%, $15,255) | **infeasible** |
+
+Model: iid normal daily P&L, arithmetic dollars on a fixed $50,000 base, 252 marks/year, 20,000
+paths. An event is counted once when an excursion first reaches $2,000 deep; a **new equity high is
+required before another can be counted**, so these are distinct episodes, not days underwater.
+Using the programme's own ~245 usable sessions instead of 252 moves the required Sharpe by 0.006 —
+immaterial.
+
+**Ten events per year is infeasible at daily marks, and that is a finding about the metric, not a
+missing row.** Distinct episodes are bounded by the number of new equity highs, which for a
+low-Sharpe path grows like √(marks). Measured ceilings as Sharpe → 0, at R = 15%:
+
+| marking | marks/yr | max attainable events/yr |
+|---|---|---|
+| daily | 252 | **8.76** |
+| hourly | 1,638 | 20.81 |
+| half-hourly | 3,276 | 28.52 |
+
+≈ 0.5·√marks. So **the marking convention is load-bearing and is an open decision** (§61): finer
+marking detects more excursions, so it *raises* the required Sharpe for the same event budget.
+Measured at R = 15%: ≤3 events needs SR ≥ 0.95 at daily marks but **SR ≥ 1.14 hourly**; ≤5 needs
+0.44 daily and **0.66 hourly**; ≤10 is infeasible daily and **SR ≥ 0.23 hourly**.
+
+### Where the programme's measured effects sit against this bar
+
+**Not close, and not by a margin that precision could close.** The bar is a Sharpe floor; every
+measured effect has a non-positive net edge, and a non-positive edge is Sharpe ≤ 0 at any
+volatility.
+
+| | gross bps/event | net of 0.48 cost |
+|---|---|---|
+| R01 (largest effect measured anywhere) | +0.452 | **−0.028** |
+| L12 | +0.306 | −0.174 |
+| P03 real leg | +0.200 | −0.280 |
+| L07 | negative in 108/108 cells, 1.8–10.3× cost | wrong sign |
+
+Turned the other way — what one MNQ contract ($48,000 notional) would have to earn **gross** per
+trade to produce the target, against R01's +0.452:
+
+| trades/yr | gross @10% | gross @15% | gross @20% | ×R01 @15% |
+|---|---|---|---|---|
+| 245 | 4.732 | 6.858 | 8.983 | **15.2×** |
+| 1,000 | 1.522 | 2.042 | 2.563 | 4.5× |
+| 5,000 | 0.688 | 0.792 | 0.897 | 1.8× |
+| 25,000 | 0.522 | 0.542 | 0.563 | 1.2× |
+
+**The ratio never reaches 1 at any frequency.** Its floor as trades → ∞ is **1.062×**, because the
+0.48 bps cost floor alone exceeds the 0.452 bps best measured effect. Raising trade count cannot
+close the gap; it is closed only by a larger effect or a lower cost.
+
+For scale: **SR\* = 0.1368** at N = 760 is the bar a Sharpe must clear merely to *mean* anything.
+The lowest success bar in the table (SR ≥ 0.26) is **1.9× SR\***; the 15%/≤3 bar is **6.9×**.
+
+---
+
+### 2. Termination condition: the next series stops when its expected value falls below its cost
+
+**Base rate, measured, both logs:**
+
+| | count |
+|---|---|
+| registered hypotheses | **35** |
+| spent ≥1 trial (13 in `futures-research` + R01, R02) | **15** |
+| promoted | **0** |
+
+Per-registration promotion probability, 0 successes in 35: exact 95% one-sided upper **0.0820**,
+rule of three 0.0857, Laplace 0.0270, Jeffreys 0.0139. Per series, 0 in 6: exact 95% upper
+**0.3930**, Laplace 0.1250, Jeffreys 0.0714.
+
+**Implied prior that a seventh series promotes anything**, at the measured mean of 5.83
+registrations per series:
+
+| per-hypothesis prior | P(7th series promotes ≥1) | promotion must be worth |
+|---|---|---|
+| Jeffreys 0.0139 | **7.8%** | **12.8× one series' cost** |
+| Laplace 0.0270 | 14.8% | 6.8× |
+| rule of three 0.0857 | 40.7% | 2.5× |
+
+Read the upper end with the caveat it deserves: the rule-of-three figure is a **95% upper bound on
+what the data cannot exclude**, not an estimate. And this base rate is if anything **optimistic**
+for a seventh series, because the six spent the best ideas first — the strongest unexplored one on
+record, R04, is closed by account permission rather than by evidence (§10 of
+`programme_conclusion.md`).
+
+**Cost of one series, in the three currencies that matter:**
+
+| currency | measured |
+|---|---|
+| **trials** | mean **128.3**, median **6.5** (F 576, L 180, R 10, N 3, P 1, Q 0) — wildly skewed |
+| **SR\* imposed on all future work** | +0.0002 at 10 trials, **+0.0019 at the mean 128**, +0.0026 at 180, +0.0069 at 576 |
+| **calendar** | 6 series in **16 days** of repository history (2026-08-28 → 2026-09-13), ≈2.7 days/series |
+
+The SR\* cost is small per series and **permanent and shared**: it is paid by every future
+hypothesis, including the one that would have promoted. That is the asymmetry the trial log exists
+to make visible.
+
+---
+
+### 3. "We cannot think of new hypotheses" is NOT a valid termination condition
+
+Stated plainly because it is the rule a closed programme drifts toward.
+
+Hypothesis generation is **unbounded and cheap** — this programme drafted 66 candidates in 16 days,
+and could draft 66 more in another 16 without learning anything. A termination condition that
+depends on running out of ideas therefore **can never bind**, and a rule that cannot bind is not a
+rule.
+
+The consequence is specific, not rhetorical. If the programme stops only when ideas run out, then
+whatever eventually survives is selected by **persistence** — by how long the search continued —
+rather than by evidence. That is precisely what N, SR\* and the trial log exist to prevent, and it
+is the failure the terminal report names in its own last line (§10: *"a seventh series would be
+widening the search until something appears, which is exactly what the trial log exists to
+prevent"*).
+
+**Valid termination conditions are about cost and evidence:** the expected value of the next series
+below its cost (§2 above), or one of the four binding constraints moving — information, permission,
+cost, time (§10 of `programme_conclusion.md`). **Not** the exhaustion of imagination.
+
+---
+
+## READ FIRST — `reports/STAGES.md`
+
+**The programme uses one stage numbering, S1-S8, adopted 2026-09-12.** Every document, run
+report and `decisions.md` entry names the stage it concerns.
+
+    S1  Mechanism          who is losing money to you, and why they keep doing it
+    S2  Pre-registration   every parameter fixed before testing
+    S3  Firing rate        measured on real data, never declared
+    S4  Detection floor    smallest detectable edge vs effective n
+    S5  Condition validity negative control, fault injection, firing-minute variance
+    S6  Placebo            real vs distance-matched arbitrary level
+    S7  Multiplicity       trial log, N, SR*, BH correction
+    S8  Out-of-sample      era split, other instruments, cost floor
+
+Old language maps as: **Stage 0 ~ S1-S2, Stage 1 ~ S6-S8.** Historical `decisions.md` entries
+are NOT rewritten - the mapping lives in `STAGES.md` instead, because rewriting them would
+destroy the record of what was known when.
+
+**S5 IS A GATE AND IT IS NEW.** It had no name before 2026-09-12, and that is exactly how
+L11's placebo came to be measured against a condition that fired unconditionally: the S6
+numbers looked clean and meant nothing. No condition proceeds to S6 until it passes S5.
+
+
+---
+
+## Where things stand
+
+**The F-series is closed.** 14 registered, 576 trials, SR\* = 0.1334, 0 promoted. See
+`reports/futures_conclusion.md` — it stands alone and is the document to read first.
+
+**The L-series is registered and now MEASURED.** Ten price-level hypotheses (L01–L10) are in
+`hypotheses.yaml` under the Stage 0 schema. All remain `schedulable: false`. **No Stage 1 has
+been run on any of them and no L-series trial has been spent** — N is still 576 and SR\* still
+0.1334.
+
+The measurement says the L-series does not have a route to a verdict as it stands:
+
+- **Event count.** Only **L07** clears the 180-minute floor on both instruments. L02 and L03
+  clear on MGC at 120m+; L04 is mixed; everything else is below the swept range.
+- **Disjointness.** Nine of ten aggregate routes are **closed**, at 97–100% pairwise overlap.
+  The only open one is **L10**, which is the placebo control and spends no trials.
+- **Placebo matching: FAIL.** 53 of 55 level types under the original daily-ATR scale, **52 of
+  55 after the 2026-09-09 scale correction.** The three that pass are `prior_week`/MGC and
+  `prior_month`/MGC (both **L09**, 8–62× below floor) and `sess_US`/MGC (**L04**, US-session
+  cells only, 7–17× below floor).
+
+**Those three results cross, and the crossing is the finding.** L07 clears the floor on both
+instruments and all six of its FVG level types fail matching, at the worst distance ratios in
+the study. **L04 shows the crossing inside a single hypothesis on a single instrument**: its
+best cell fires 5,130 times but is an *Asia*-session cell whose placebo fails, while the
+*US*-session cells whose placebo passes fire 168 to 399 against a floor of 2,862.
+**No L-series hypothesis has a resolvable sample and a valid placebo in the same cells.**
+
+---
+
+## ~~The one thing that must be re-run~~ — DONE 2026-09-05, re-run again 2026-09-09
+
+```
+python -m futuresres.reporting.level_rates          # ~65 min, both instruments
+```
+
+**The runtime figure in this file used to say ~20 min and that was wrong by a factor of three.**
+Measured 2026-09-09: 64 minutes wall clock, CPU-bound throughout, on both instruments. The
+opening-range stage alone is roughly half of it, and the disjointness pass at the end holds
+every cell's firing minutes in memory and peaks near 1 GB.
+
+It writes `reports/level_rates.md`, `reports/placebo_match.md` and
+`reports/disjointness.md`, **all at the end**, so an interrupted run leaves nothing behind.
+
+**It completed on 2026-09-05** (commit `fb07e80`) and was re-run on 2026-09-09 after the
+placebo scale correction described below. **This section stood for four days telling readers
+to run work that was already finished** — recorded rather than quietly deleted, because a
+checkpoint that outlives its own instructions is its own failure mode and this project keeps
+a list of those.
+
+---
+
+## What the run is expected to produce
+
+Three things, none of them yet known:
+
+1. **Firing rate per Stage 1 cell**, thresholds applied, against the swept range.
+2. **Placebo matching** — count, distance distribution and touch frequency, verified rather
+   than asserted. `verify()` raises `PlaceboMismatch` on divergence.
+3. **Disjointness per hypothesis** — maximum pairwise overlap of firing minutes across a
+   hypothesis's cells. Per F07 the aggregate route is assumed closed until this says
+   otherwise.
+
+Then still owed, and **not yet done**: projected N and SR\* if the schedulable subset runs its
+full grids, and a flag on any hypothesis whose trial cost looks disproportionate to what it
+can establish.
+
+---
+
+## The finding that is already firm, before the batch finishes
+
+**`d ATR` does not say which ATR, and that decides whether L01, L06 and L08 are testable at
+all.**
+
+Under the natural reading — daily ATR(20), which is what the code uses and states — price is
+rarely a full daily ATR away from VWAP intraday:
+
+| L01 VWAP, MNQ, RTH anchor | sessions firing |
+|---|---|
+| d = 0.5 | 2.2% |
+| d = 1.0 | 0.0% |
+| d = 1.5 | 0.0% |
+
+At d ≥ 1.0 the condition fires on essentially nothing. A shorter ATR period, or an intraday
+ATR, would make these hypotheses fire freely.
+
+**This is an F05-class specification gap**: an unspecified reference scale that determines the
+event count and therefore the verdict. It is recorded rather than resolved, because choosing
+the period that makes L01 look schedulable would be choosing a parameter to get a result.
+**A decision is required before L01, L06 or L08 can be scheduled.**
+
+L02, L03, L04, L05, L07 and L09 do not depend on it — their thresholds are in ticks.
+
+---
+
+## Bugs found and fixed while building this
+
+Recorded because three of them would have silently misrouted the scheduling decision rather
+than failing visibly.
+
+1. **`fill_fraction` measured after forward-filling** — every product read 100%. Now 83.16%
+   MNQ / 64.16% MGC, which match F05's independently-computed figures exactly.
+2. **The "≥ d ATR away for ≥ 15 min" precondition reset on any intermediate bar.** Price must
+   pass through the middle zone to reach the level, so the condition fired 6 times in sixteen
+   years. Qualification is now earned once and survives.
+3. **VWAP and EMA were treated as static levels.** They are curves; the condition means the
+   value *at that minute*. Sampling once understated firing by orders of magnitude.
+4. **`numpy.datetime64` has no `isocalendar`** — crashed the first batch after ~15 minutes.
+   Same coercion class as F04's `datetime.combine()`.
+5. **`np.array([...tuples...], dtype=object)` builds a 2-D array**, so a tuple comparison
+   raised on an ambiguous truth value.
+6. **A stale `python -m` reference in a docstring** pointed at a module that never existed.
+   Caught by `test_every_documented_entry_point_actually_runs`, which exists because the
+   detectability gate once told people to run a command that did nothing.
+
+Level counts cross-check against the catalog: **1,658 weekly and 380 monthly levels**, against
+L09's stated ~830 weekly and ~190 monthly (×2 for high and low).
+
+---
+
+## Registry defects the existing tests caught
+
+Fixed in the entries, not by loosening the tests:
+
+- **L04, L06, L07, L08, L09 named no counterparty.** L07's and L08's are now named *and
+  doubted in the same breath* — L07 states outright that it does not believe the claimed
+  counterparty exists.
+- **L05 cannot reach Stage 4** — it is MNQ-only by mechanism. Rather than padding the symbol
+  list with an instrument the mechanism does not hold in (the F02 error), it declares
+  `stage4_reachable: false` with a reason.
+
+---
+
+## Machine limitations — DOCUMENTED, not folklore
+
+Read this before planning a run. This laptop has **2.7 GB RAM, ~1.1 GB typically available**,
+and the programme has been OOM-killed on it **seven times**. Six were fixed (decisions.md 41,
+45); one is open.
+
+### `f01_rates` is OOM-killed and is NOT fixed
+
+    python -m futuresres.reporting.measured_rates        # DIES at ~1,064 MB, during F01
+
+**A full `measured_rates` run cannot complete on this laptop.** It is killed inside
+`f01_rates`, the first hypothesis measured. The frames are not the cause - both products
+together are ~200 MB of data and ~460 MB peak - the F01 computation itself is.
+
+**Use the targeted refresh instead:**
+
+    python -m futuresres.reporting.measured_rates --only L      # works, ~1 min
+    python -m futuresres.reporting.measured_rates --only L12,L04
+
+A partial refresh **merges** into the cached file and prints what it carried forward
+(`873 refreshed, 248 carried forward`). Records it does not touch keep whatever measurement
+they last had. `--check` still compares a FULL fresh measurement, so it cannot run here
+either - which means **cache drift cannot be verified on this machine.**
+
+**A full run requires the Windows PC or a machine with more memory.** That is the fix, not a
+code change: F01's measurement is legitimate work that needs headroom.
+
+### The test suite no longer fits in one process either
+
+383 tests pass across 16 files **run individually**. Run together they accumulate past ~900 MB
+and the run is killed. No single test is heavy; the total is.
+
+    for f in tests/test_*.py; do .venv/bin/python -m pytest -q "$f"; done
+
+### Everything else runs here, after the fixes
+
+`level_rates` (~2 h, peaks ~440 MB), `roll`, `splice`, the grid loader (626 MB), and every
+Stage 1 runner. Six memory fixes got them there; see decisions.md 41 and 45 for what each one
+was, because the same patterns will recur: eager frames, global sorts that are avoidable
+rather than expensive, Python containers where a packed array belongs, and reading columns
+nothing uses.
+
+### Tools
+
+    ./progress.sh        what is running: pid, RSS, elapsed, memory, logs, parquets, OOM count
+    ./progress.sh -w     the same, refreshing every 30s
+    ./done.sh            BLOCKS until the running job exits, then prints a pasteable report
+
+## State
+
+### CURRENT, 2026-09-13 — read this, not the historical bullets beneath it
+
+**THE PROGRAMME IS CLOSED, 2026-09-13.** Read `reports/programme_conclusion.md` first; it stands
+alone. Six series, 66 candidates, 35 registered, 770 trials across two logs (futures-research 760,
+SR\* 0.1368; r-series 10), nothing promoted. The Q-series closed without registration (§60). Two
+standards adopted as gates for any future entry: the post-2021 split decides (S8), and a null is
+reportable only from a pipeline shown to recover the effect size sought at the run's n (§60).
+**Nothing is scheduled. Nothing is pending.**
+
+
+**Latest, 2026-09-13 (after P03):** N = **760**, SR\* **0.1368**. P03 retired at S7 (§58); the
+P-series closed with zero promotions. **Q-series S1 reviewed in §59, nothing registered:**
+three candidates are already in the registry (Q01 = F02, Q03 = F12, Q04 under F12's note); Q01 and
+Q02 share a conditioner (Spearman +0.972); the magnitude filter leaves one straddle (Q01, not
+testable cleanly on disk data, which ends 2026-08-27) and four below their post-2021 bars. The
+drawdown rule was confirmed with the firm and Q09 recomputed (`q09_drawdown.py`). **Open decision:**
+write up the finding, or wait for post-2026-08-27 data and test Q01 once.
+
+
+The bullets under this block were accurate on 2026-09-10 and went **stale for three sessions**
+while N moved from 684 to 759 and four series closed. They are kept, not deleted, because a
+checkpoint that silently rewrites itself hides that it was ever wrong (`decisions.md` §36).
+
+- **Four series closed. N = 759, SR\* = 0.1369, chain verified. Nothing promoted.**
+  F (14), R (5, separate repo), L (12, `reports/level_conclusion.md`), N (1 of 10 candidates
+  tested, `decisions.md` §51).
+- **P-series: S1 draft only**, `P_SERIES_CANDIDATES.md`, reviewed in `decisions.md` §54.
+  Nothing registered. One candidate (P03) is recommended first, and only after a
+  **confound-matched control for state conditions** is built — that control is the open item.
+- Stage numbering S1–S8 (`reports/STAGES.md`); S2 now carries a magnitude check and a
+  scale-invariance check (tested and fault-injected, §53).
+- 42/42 registry tests pass; the full suite must be run one file at a time on this laptop.
+
+### Historical (2026-09-10)
+
+
+- **372 tests with the data layer present; 300 from a clean clone at the pre-fix commit** (plus 3 collection
+  errors). Both figures are stated because for most of this project's life only the first was
+  ever measured, and it was measured on the one machine where the untracked package existed.
+  **The 70-test gap is the finding, not either number** — see `decisions.md` §36. Now closed:
+  `.gitignore` had `data/` unanchored, which excluded `src/futuresres/data/` from every commit
+  ever made.
+- **Measured on a clean checkout of `9fd2ae5` (2026-09-10): 372 collected, 360 passed, 12
+  skipped by design — but ONLY after `pip install zstandard`.** From the declared dependencies
+  alone it was 2 collection errors, because `data/parse.py` imports `zstandard` and
+  `pyproject.toml` never listed it. **An untracked module has untracked requirements**, and
+  restoring one does not restore the other. Declared now; `decisions.md` §39. The earlier
+  claim here that "a clean clone reads the full suite from 160ed05 onward" was true of the
+  code and false of the environment. **After L11's registration the suite is 378 collected /
+  366 passed / 12 skipped** — the 6 added tests are `bollinger_levels` band arithmetic on
+  synthetic input, which needs no market data.
+- **N = 684, SR\* = 0.1357.** L07 Stage 1 spent 108 trials on 2026-09-09 (was 576 / 0.1335). The repo now has a private remote at
+  `github.com/coltontr419-droid/futures-research` and all commits are pushed; it had none
+  until 2026-09-09, while every other programme depended on its detection floors.
+- `trials.jsonl` **N = 684, chain verified** (`ChainResult(ok=True, n_records=684)`,
+  re-verified 2026-09-10). `measurements.jsonl` holds F14's three control runs, the
+  firing-rate measurements, and L07's market-state comparison as m00115.
+  **The "N = 576" this line used to carry contradicted the line directly above it.**
+- **L07 spent 108 trials and ran Stage 1 on 2026-09-09** — retired, registered mechanism
+  refuted; `decisions.md` §38. The previous "no L-series trial spent, no Stage 1 since F06"
+  was stale on both counts.
+- **L11 registered 2026-09-10** — Bollinger band breakout, Stage 0 only, `schedulable: false`,
+  firing rate and placebo match **not measured** because `data/continuous/` is absent on the
+  laptop. No trial spent. `decisions.md` §39.
+
+## To resume
+
+1. ~~`python -m futuresres.reporting.level_rates`~~ — done; read the three reports it wrote.
+2. **Decide the `d ATR` reference period for L01/L06/L08.** Still outstanding and still not
+   mine to make. See the section above: choosing the period that makes L01 look schedulable
+   would be choosing a parameter to get a result.
+3. ~~**Decide whether the placebo control should be redesigned.**~~ **SETTLED 2026-09-09.**
+   The null is now **an arbitrary region matched on distance-from-price and checked on touch
+   frequency**, not a real level displaced. Displacement was only ever a *method* for
+   generating comparable regions, and its geometry forced a 1.4× distance mismatch at any
+   scale. `decisions.md` §37 and `LEVEL_HYPOTHESES.md` carry the reasoning and the **cost**:
+   the new control is **weaker**, because it no longer holds constant how price arrived.
+   **L06 has no valid control under it and cannot get one** — `open_RTH` and `open_CME` sit
+   exactly at the reference price, so there is no distance to match.
+4. Then: projected N and SR\*, and the disproportionate-cost flags. Both are moot while the
+   placebo is invalid, since no L-series result can be reported as real-minus-placebo.
+
+**L07 HAS RUN AND IS RETIRED** (2026-09-10, `decisions.md` §38). 108 trials spent. Every one
+of 108 cells separates on both instruments against 2.7 expected by chance per product, which
+was predicted and is not a finding at these event counts. **The difference is negative in
+every cell at 1.8×–10.3× the round-trip cost floor**, and the decomposition is sharper than
+the difference: the real zone loses while the matched placebo wins, so conditioning on the
+region being a real fair-value gap *reverses the sign* of the trade. The registered mechanism
+is refuted in the direction it was stated.
+
+**The confound that was expected did not appear, and a different one did.** Real entries
+follow 4–11% *less* prior volatility than their placebos, not more. But they fire a median of
+16 minutes earlier on MGC and 47 on MNQ, up to 81 — so real and placebo are not sampling the
+same part of the session, and this design cannot separate reaction from timing.
+`reports/l07_market_state.md`.
+
+**The mirror hypothesis is NOT registered and must not be** on this evidence. The sign came
+from looking at this data, it has no mechanism — the registered story predicts reaction at the
+zone, not continuation through it — and the timing confound applies to it equally. If it is
+worth testing it has to be frozen and evaluated on history that did not generate it.
+
+**Item 3 is settled, so that bar is lifted for the level types that now match** — but read
+§37 before running anything. A Stage 1 result on a level type that still fails matching would
+measure exposure rather than reaction and would look like a finding. **L06 can never clear
+that bar.**

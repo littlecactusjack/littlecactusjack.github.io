@@ -1,0 +1,6973 @@
+{
+  "rates": [
+    {
+      "hypothesis": "L01",
+      "product": "MNQ",
+      "cell": "anchor=RTH d=0.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 89,
+      "minutes_key": "",
+      "independent": {
+        "30": 89,
+        "60": 89,
+        "120": 89
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MNQ",
+      "cell": "anchor=RTH d=1.0",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 2,
+      "minutes_key": "",
+      "independent": {
+        "30": 2,
+        "60": 2,
+        "120": 2
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MNQ",
+      "cell": "anchor=RTH d=1.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 0,
+      "minutes_key": "",
+      "independent": {
+        "30": 0,
+        "60": 0,
+        "120": 0
+      }
+    },
+    {
+      "hypothesis": "L10",
+      "product": "MNQ",
+      "cell": "placebo curve anchor=RTH",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 2,
+      "minutes_key": "",
+      "independent": {
+        "30": 2,
+        "60": 2,
+        "120": 2
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MNQ",
+      "cell": "anchor=CME d=0.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 237,
+      "minutes_key": "",
+      "independent": {
+        "30": 237,
+        "60": 237,
+        "120": 237
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MNQ",
+      "cell": "anchor=CME d=1.0",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 10,
+      "minutes_key": "",
+      "independent": {
+        "30": 10,
+        "60": 10,
+        "120": 10
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MNQ",
+      "cell": "anchor=CME d=1.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 3,
+      "minutes_key": "",
+      "independent": {
+        "30": 3,
+        "60": 3,
+        "120": 3
+      }
+    },
+    {
+      "hypothesis": "L10",
+      "product": "MNQ",
+      "cell": "placebo curve anchor=CME",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 38,
+      "minutes_key": "",
+      "independent": {
+        "30": 38,
+        "60": 38,
+        "120": 38
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MNQ",
+      "cell": "anchor=R24 d=0.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 237,
+      "minutes_key": "",
+      "independent": {
+        "30": 237,
+        "60": 237,
+        "120": 237
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MNQ",
+      "cell": "anchor=R24 d=1.0",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 10,
+      "minutes_key": "",
+      "independent": {
+        "30": 10,
+        "60": 10,
+        "120": 10
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MNQ",
+      "cell": "anchor=R24 d=1.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 3,
+      "minutes_key": "",
+      "independent": {
+        "30": 3,
+        "60": 3,
+        "120": 3
+      }
+    },
+    {
+      "hypothesis": "L10",
+      "product": "MNQ",
+      "cell": "placebo curve anchor=R24",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 40,
+      "minutes_key": "",
+      "independent": {
+        "30": 40,
+        "60": 40,
+        "120": 40
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=15 m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5165,
+      "minutes_key": "",
+      "independent": {
+        "60": 4427,
+        "120": 4052,
+        "180": 3882
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=15 m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5175,
+      "minutes_key": "",
+      "independent": {
+        "60": 4435,
+        "120": 4057,
+        "180": 3888
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=15 m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5178,
+      "minutes_key": "",
+      "independent": {
+        "60": 4435,
+        "120": 4057,
+        "180": 3888
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=15 m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5082,
+      "minutes_key": "",
+      "independent": {
+        "60": 4372,
+        "120": 4011,
+        "180": 3848
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=15 m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5129,
+      "minutes_key": "",
+      "independent": {
+        "60": 4405,
+        "120": 4032,
+        "180": 3863
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=15 m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5150,
+      "minutes_key": "",
+      "independent": {
+        "60": 4420,
+        "120": 4040,
+        "180": 3873
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=15 m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4695,
+      "minutes_key": "",
+      "independent": {
+        "60": 4084,
+        "120": 3770,
+        "180": 3631
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=15 m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4907,
+      "minutes_key": "",
+      "independent": {
+        "60": 4237,
+        "120": 3905,
+        "180": 3748
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=15 m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5029,
+      "minutes_key": "",
+      "independent": {
+        "60": 4333,
+        "120": 3982,
+        "180": 3817
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=30 m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4716,
+      "minutes_key": "",
+      "independent": {
+        "60": 4368,
+        "120": 4062,
+        "180": 3889
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=30 m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4729,
+      "minutes_key": "",
+      "independent": {
+        "60": 4378,
+        "120": 4071,
+        "180": 3896
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=30 m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4732,
+      "minutes_key": "",
+      "independent": {
+        "60": 4381,
+        "120": 4075,
+        "180": 3900
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=30 m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4618,
+      "minutes_key": "",
+      "independent": {
+        "60": 4289,
+        "120": 3998,
+        "180": 3831
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=30 m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4683,
+      "minutes_key": "",
+      "independent": {
+        "60": 4342,
+        "120": 4038,
+        "180": 3863
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=30 m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4707,
+      "minutes_key": "",
+      "independent": {
+        "60": 4361,
+        "120": 4054,
+        "180": 3879
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=30 m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4236,
+      "minutes_key": "",
+      "independent": {
+        "60": 3945,
+        "120": 3697,
+        "180": 3563
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=30 m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4469,
+      "minutes_key": "",
+      "independent": {
+        "60": 4147,
+        "120": 3878,
+        "180": 3722
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=30 m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4587,
+      "minutes_key": "",
+      "independent": {
+        "60": 4250,
+        "120": 3972,
+        "180": 3807
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=60 m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4075,
+      "minutes_key": "",
+      "independent": {
+        "60": 3980,
+        "120": 3824,
+        "180": 3682
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=60 m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4084,
+      "minutes_key": "",
+      "independent": {
+        "60": 3989,
+        "120": 3833,
+        "180": 3690
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=60 m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4085,
+      "minutes_key": "",
+      "independent": {
+        "60": 3990,
+        "120": 3834,
+        "180": 3691
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=60 m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3975,
+      "minutes_key": "",
+      "independent": {
+        "60": 3883,
+        "120": 3735,
+        "180": 3598
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=60 m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4041,
+      "minutes_key": "",
+      "independent": {
+        "60": 3949,
+        "120": 3796,
+        "180": 3654
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=60 m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4065,
+      "minutes_key": "",
+      "independent": {
+        "60": 3970,
+        "120": 3815,
+        "180": 3674
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=60 m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3560,
+      "minutes_key": "",
+      "independent": {
+        "60": 3479,
+        "120": 3363,
+        "180": 3248
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=60 m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3781,
+      "minutes_key": "",
+      "independent": {
+        "60": 3692,
+        "120": 3558,
+        "180": 3433
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "cell": "absorb W=60 m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3930,
+      "minutes_key": "",
+      "independent": {
+        "60": 3837,
+        "120": 3695,
+        "180": 3562
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_rth m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3741,
+      "minutes_key": "",
+      "independent": {
+        "60": 3684,
+        "120": 3645,
+        "180": 3608
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_rth m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3754,
+      "minutes_key": "",
+      "independent": {
+        "60": 3700,
+        "120": 3664,
+        "180": 3626
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_rth m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3762,
+      "minutes_key": "",
+      "independent": {
+        "60": 3706,
+        "120": 3671,
+        "180": 3634
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_rth m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3641,
+      "minutes_key": "",
+      "independent": {
+        "60": 3591,
+        "120": 3552,
+        "180": 3517
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_rth m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3704,
+      "minutes_key": "",
+      "independent": {
+        "60": 3652,
+        "120": 3617,
+        "180": 3579
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_rth m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3734,
+      "minutes_key": "",
+      "independent": {
+        "60": 3680,
+        "120": 3641,
+        "180": 3600
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_rth m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3324,
+      "minutes_key": "",
+      "independent": {
+        "60": 3282,
+        "120": 3248,
+        "180": 3213
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_rth m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3483,
+      "minutes_key": "",
+      "independent": {
+        "60": 3435,
+        "120": 3397,
+        "180": 3362
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_rth m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3594,
+      "minutes_key": "",
+      "independent": {
+        "60": 3548,
+        "120": 3511,
+        "180": 3472
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_full m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3434,
+      "minutes_key": "",
+      "independent": {
+        "60": 3415,
+        "120": 3389,
+        "180": 3364
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_full m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3449,
+      "minutes_key": "",
+      "independent": {
+        "60": 3431,
+        "120": 3403,
+        "180": 3378
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_full m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3456,
+      "minutes_key": "",
+      "independent": {
+        "60": 3438,
+        "120": 3410,
+        "180": 3386
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_full m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3330,
+      "minutes_key": "",
+      "independent": {
+        "60": 3309,
+        "120": 3282,
+        "180": 3258
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_full m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3389,
+      "minutes_key": "",
+      "independent": {
+        "60": 3369,
+        "120": 3341,
+        "180": 3315
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_full m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3416,
+      "minutes_key": "",
+      "independent": {
+        "60": 3398,
+        "120": 3371,
+        "180": 3345
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_full m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3056,
+      "minutes_key": "",
+      "independent": {
+        "60": 3032,
+        "120": 3005,
+        "180": 2982
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_full m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3168,
+      "minutes_key": "",
+      "independent": {
+        "60": 3145,
+        "120": 3117,
+        "180": 3093
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "cell": "prior_full m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3267,
+      "minutes_key": "",
+      "independent": {
+        "60": 3248,
+        "120": 3220,
+        "180": 3193
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "Asia m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5420,
+      "minutes_key": "",
+      "independent": {
+        "60": 5296,
+        "120": 5100,
+        "180": 4933
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "Asia m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5438,
+      "minutes_key": "",
+      "independent": {
+        "60": 5321,
+        "120": 5122,
+        "180": 4960
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "Asia m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5442,
+      "minutes_key": "",
+      "independent": {
+        "60": 5328,
+        "120": 5130,
+        "180": 4967
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "Asia m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5318,
+      "minutes_key": "",
+      "independent": {
+        "60": 5161,
+        "120": 4962,
+        "180": 4794
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "Asia m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5368,
+      "minutes_key": "",
+      "independent": {
+        "60": 5225,
+        "120": 5032,
+        "180": 4868
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "Asia m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5405,
+      "minutes_key": "",
+      "independent": {
+        "60": 5276,
+        "120": 5084,
+        "180": 4916
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "Asia m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4903,
+      "minutes_key": "",
+      "independent": {
+        "60": 4690,
+        "120": 4492,
+        "180": 4351
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "Asia m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5108,
+      "minutes_key": "",
+      "independent": {
+        "60": 4891,
+        "120": 4690,
+        "180": 4545
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "Asia m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5242,
+      "minutes_key": "",
+      "independent": {
+        "60": 5044,
+        "120": 4857,
+        "180": 4703
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "London m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2857,
+      "minutes_key": "",
+      "independent": {
+        "60": 2842,
+        "120": 2806,
+        "180": 2750
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "London m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2874,
+      "minutes_key": "",
+      "independent": {
+        "60": 2858,
+        "120": 2822,
+        "180": 2766
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "London m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2876,
+      "minutes_key": "",
+      "independent": {
+        "60": 2860,
+        "120": 2823,
+        "180": 2767
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "London m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2765,
+      "minutes_key": "",
+      "independent": {
+        "60": 2749,
+        "120": 2716,
+        "180": 2663
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "London m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2827,
+      "minutes_key": "",
+      "independent": {
+        "60": 2812,
+        "120": 2777,
+        "180": 2723
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "London m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2858,
+      "minutes_key": "",
+      "independent": {
+        "60": 2843,
+        "120": 2806,
+        "180": 2750
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "London m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2443,
+      "minutes_key": "",
+      "independent": {
+        "60": 2428,
+        "120": 2395,
+        "180": 2348
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "London m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2604,
+      "minutes_key": "",
+      "independent": {
+        "60": 2586,
+        "120": 2554,
+        "180": 2503
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "London m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2733,
+      "minutes_key": "",
+      "independent": {
+        "60": 2716,
+        "120": 2682,
+        "180": 2631
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "US m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 536,
+      "minutes_key": "",
+      "independent": {
+        "60": 533,
+        "120": 533,
+        "180": 533
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "US m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 541,
+      "minutes_key": "",
+      "independent": {
+        "60": 538,
+        "120": 538,
+        "180": 538
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "US m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 545,
+      "minutes_key": "",
+      "independent": {
+        "60": 542,
+        "120": 542,
+        "180": 542
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "US m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 496,
+      "minutes_key": "",
+      "independent": {
+        "60": 493,
+        "120": 493,
+        "180": 493
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "US m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 509,
+      "minutes_key": "",
+      "independent": {
+        "60": 506,
+        "120": 506,
+        "180": 506
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "US m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 524,
+      "minutes_key": "",
+      "independent": {
+        "60": 521,
+        "120": 521,
+        "180": 521
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "US m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 414,
+      "minutes_key": "",
+      "independent": {
+        "60": 411,
+        "120": 411,
+        "180": 411
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "US m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 440,
+      "minutes_key": "",
+      "independent": {
+        "60": 437,
+        "120": 437,
+        "180": 437
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "cell": "US m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 451,
+      "minutes_key": "",
+      "independent": {
+        "60": 448,
+        "120": 448,
+        "180": 448
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MNQ",
+      "cell": "RTH d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 110,
+      "minutes_key": "",
+      "independent": {
+        "60": 110,
+        "120": 110,
+        "180": 110
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MNQ",
+      "cell": "RTH d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 25,
+      "minutes_key": "",
+      "independent": {
+        "60": 25,
+        "120": 25,
+        "180": 25
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MNQ",
+      "cell": "RTH d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 20,
+      "minutes_key": "",
+      "independent": {
+        "60": 20,
+        "120": 20,
+        "180": 20
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MNQ",
+      "cell": "CME d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 303,
+      "minutes_key": "",
+      "independent": {
+        "60": 303,
+        "120": 303,
+        "180": 303
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MNQ",
+      "cell": "CME d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 37,
+      "minutes_key": "",
+      "independent": {
+        "60": 37,
+        "120": 37,
+        "180": 37
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MNQ",
+      "cell": "CME d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 25,
+      "minutes_key": "",
+      "independent": {
+        "60": 25,
+        "120": 25,
+        "180": 25
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=2 tf=1m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 535428,
+      "minutes_key": "",
+      "independent": {
+        "60": 70205,
+        "120": 38747,
+        "180": 27239
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=2 tf=1m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 457955,
+      "minutes_key": "",
+      "independent": {
+        "60": 64193,
+        "120": 36534,
+        "180": 25660
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=2 tf=1m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 389679,
+      "minutes_key": "",
+      "independent": {
+        "60": 55974,
+        "120": 33260,
+        "180": 24164
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=2 tf=5m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 103369,
+      "minutes_key": "",
+      "independent": {
+        "60": 40455,
+        "120": 26745,
+        "180": 20425
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=2 tf=5m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 78154,
+      "minutes_key": "",
+      "independent": {
+        "60": 27945,
+        "120": 19313,
+        "180": 15400
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=2 tf=5m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 55934,
+      "minutes_key": "",
+      "independent": {
+        "60": 18807,
+        "120": 13317,
+        "180": 10744
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=4 tf=1m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 312885,
+      "minutes_key": "",
+      "independent": {
+        "60": 58442,
+        "120": 34054,
+        "180": 24340
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=4 tf=1m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 277339,
+      "minutes_key": "",
+      "independent": {
+        "60": 53724,
+        "120": 32116,
+        "180": 23240
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=4 tf=1m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 242200,
+      "minutes_key": "",
+      "independent": {
+        "60": 47163,
+        "120": 29191,
+        "180": 21699
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=4 tf=5m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 76194,
+      "minutes_key": "",
+      "independent": {
+        "60": 34111,
+        "120": 23449,
+        "180": 18179
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=4 tf=5m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 57789,
+      "minutes_key": "",
+      "independent": {
+        "60": 23955,
+        "120": 17131,
+        "180": 13904
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=4 tf=5m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 40897,
+      "minutes_key": "",
+      "independent": {
+        "60": 16009,
+        "120": 11755,
+        "180": 9621
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=8 tf=1m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 159858,
+      "minutes_key": "",
+      "independent": {
+        "60": 39871,
+        "120": 24587,
+        "180": 18182
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=8 tf=1m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 143137,
+      "minutes_key": "",
+      "independent": {
+        "60": 36651,
+        "120": 23155,
+        "180": 17389
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=8 tf=1m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 126008,
+      "minutes_key": "",
+      "independent": {
+        "60": 32316,
+        "120": 21069,
+        "180": 16093
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=8 tf=5m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 49503,
+      "minutes_key": "",
+      "independent": {
+        "60": 25199,
+        "120": 18022,
+        "180": 14385
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=8 tf=5m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 37148,
+      "minutes_key": "",
+      "independent": {
+        "60": 17811,
+        "120": 13245,
+        "180": 10950
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "cell": "w=8 tf=5m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 25692,
+      "minutes_key": "",
+      "independent": {
+        "60": 11797,
+        "120": 8951,
+        "180": 7499
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema20 5m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 194,
+      "minutes_key": "",
+      "independent": {
+        "60": 194,
+        "120": 194,
+        "180": 194
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema20 5m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 19,
+      "minutes_key": "",
+      "independent": {
+        "60": 19,
+        "120": 19,
+        "180": 19
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema20 5m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4,
+      "minutes_key": "",
+      "independent": {
+        "60": 4,
+        "120": 4,
+        "180": 4
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema20 15m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 488,
+      "minutes_key": "",
+      "independent": {
+        "60": 488,
+        "120": 488,
+        "180": 488
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema20 15m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 98,
+      "minutes_key": "",
+      "independent": {
+        "60": 98,
+        "120": 98,
+        "180": 98
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema20 15m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 20,
+      "minutes_key": "",
+      "independent": {
+        "60": 20,
+        "120": 20,
+        "180": 20
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema50 5m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 454,
+      "minutes_key": "",
+      "independent": {
+        "60": 454,
+        "120": 454,
+        "180": 454
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema50 5m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 91,
+      "minutes_key": "",
+      "independent": {
+        "60": 91,
+        "120": 91,
+        "180": 91
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema50 5m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 20,
+      "minutes_key": "",
+      "independent": {
+        "60": 20,
+        "120": 20,
+        "180": 20
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema50 15m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 574,
+      "minutes_key": "",
+      "independent": {
+        "60": 574,
+        "120": 574,
+        "180": 574
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema50 15m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 93,
+      "minutes_key": "",
+      "independent": {
+        "60": 93,
+        "120": 93,
+        "180": 93
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema50 15m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 26,
+      "minutes_key": "",
+      "independent": {
+        "60": 26,
+        "120": 26,
+        "180": 26
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema200 5m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 659,
+      "minutes_key": "",
+      "independent": {
+        "60": 659,
+        "120": 659,
+        "180": 659
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema200 5m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 107,
+      "minutes_key": "",
+      "independent": {
+        "60": 107,
+        "120": 107,
+        "180": 107
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema200 5m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 22,
+      "minutes_key": "",
+      "independent": {
+        "60": 22,
+        "120": 22,
+        "180": 22
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema200 15m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 705,
+      "minutes_key": "",
+      "independent": {
+        "60": 705,
+        "120": 705,
+        "180": 705
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema200 15m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 114,
+      "minutes_key": "",
+      "independent": {
+        "60": 114,
+        "120": 114,
+        "180": 114
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "cell": "ema200 15m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 25,
+      "minutes_key": "",
+      "independent": {
+        "60": 25,
+        "120": 25,
+        "180": 25
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_week m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 443,
+      "minutes_key": "",
+      "independent": {
+        "60": 443,
+        "120": 443,
+        "180": 443
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_week m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 445,
+      "minutes_key": "",
+      "independent": {
+        "60": 445,
+        "120": 445,
+        "180": 445
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_week m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 446,
+      "minutes_key": "",
+      "independent": {
+        "60": 446,
+        "120": 446,
+        "180": 446
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_week m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 429,
+      "minutes_key": "",
+      "independent": {
+        "60": 429,
+        "120": 429,
+        "180": 429
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_week m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 433,
+      "minutes_key": "",
+      "independent": {
+        "60": 433,
+        "120": 433,
+        "180": 433
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_week m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 438,
+      "minutes_key": "",
+      "independent": {
+        "60": 438,
+        "120": 438,
+        "180": 438
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_week m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 373,
+      "minutes_key": "",
+      "independent": {
+        "60": 373,
+        "120": 373,
+        "180": 373
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_week m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 401,
+      "minutes_key": "",
+      "independent": {
+        "60": 401,
+        "120": 401,
+        "180": 401
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_week m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 423,
+      "minutes_key": "",
+      "independent": {
+        "60": 423,
+        "120": 423,
+        "180": 423
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_month m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 63,
+      "minutes_key": "",
+      "independent": {
+        "60": 63,
+        "120": 63,
+        "180": 63
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_month m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 63,
+      "minutes_key": "",
+      "independent": {
+        "60": 63,
+        "120": 63,
+        "180": 63
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_month m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 63,
+      "minutes_key": "",
+      "independent": {
+        "60": 63,
+        "120": 63,
+        "180": 63
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_month m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 60,
+      "minutes_key": "",
+      "independent": {
+        "60": 60,
+        "120": 60,
+        "180": 60
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_month m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 61,
+      "minutes_key": "",
+      "independent": {
+        "60": 61,
+        "120": 61,
+        "180": 61
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_month m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 63,
+      "minutes_key": "",
+      "independent": {
+        "60": 63,
+        "120": 63,
+        "180": 63
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_month m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 48,
+      "minutes_key": "",
+      "independent": {
+        "60": 48,
+        "120": 48,
+        "180": 48
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_month m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 53,
+      "minutes_key": "",
+      "independent": {
+        "60": 53,
+        "120": 53,
+        "180": 53
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "cell": "prior_month m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 58,
+      "minutes_key": "",
+      "independent": {
+        "60": 58,
+        "120": 58,
+        "180": 58
+      }
+    },
+    {
+      "hypothesis": "L12",
+      "product": "MNQ",
+      "cell": "Asia m=2 k=2",
+      "horizons": [
+        180
+      ],
+      "firings": 5420,
+      "minutes_key": "",
+      "independent": {
+        "180": 4933
+      }
+    },
+    {
+      "hypothesis": "L12",
+      "product": "MNQ",
+      "cell": "Asia m=2 k=3",
+      "horizons": [
+        180
+      ],
+      "firings": 5438,
+      "minutes_key": "",
+      "independent": {
+        "180": 4960
+      }
+    },
+    {
+      "hypothesis": "L12",
+      "product": "MNQ",
+      "cell": "Asia m=2 k=5",
+      "horizons": [
+        180
+      ],
+      "firings": 5442,
+      "minutes_key": "",
+      "independent": {
+        "180": 4967
+      }
+    },
+    {
+      "hypothesis": "L12",
+      "product": "MNQ",
+      "cell": "Asia m=4 k=2",
+      "horizons": [
+        180
+      ],
+      "firings": 5318,
+      "minutes_key": "",
+      "independent": {
+        "180": 4794
+      }
+    },
+    {
+      "hypothesis": "L12",
+      "product": "MNQ",
+      "cell": "Asia m=4 k=3",
+      "horizons": [
+        180
+      ],
+      "firings": 5368,
+      "minutes_key": "",
+      "independent": {
+        "180": 4868
+      }
+    },
+    {
+      "hypothesis": "L12",
+      "product": "MNQ",
+      "cell": "Asia m=4 k=5",
+      "horizons": [
+        180
+      ],
+      "firings": 5405,
+      "minutes_key": "",
+      "independent": {
+        "180": 4916
+      }
+    },
+    {
+      "hypothesis": "L12",
+      "product": "MNQ",
+      "cell": "Asia m=8 k=2",
+      "horizons": [
+        180
+      ],
+      "firings": 4903,
+      "minutes_key": "",
+      "independent": {
+        "180": 4351
+      }
+    },
+    {
+      "hypothesis": "L12",
+      "product": "MNQ",
+      "cell": "Asia m=8 k=3",
+      "horizons": [
+        180
+      ],
+      "firings": 5108,
+      "minutes_key": "",
+      "independent": {
+        "180": 4545
+      }
+    },
+    {
+      "hypothesis": "L12",
+      "product": "MNQ",
+      "cell": "Asia m=8 k=5",
+      "horizons": [
+        180
+      ],
+      "firings": 5242,
+      "minutes_key": "",
+      "independent": {
+        "180": 4703
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MGC",
+      "cell": "anchor=RTH d=0.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 25,
+      "minutes_key": "",
+      "independent": {
+        "30": 25,
+        "60": 25,
+        "120": 25
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MGC",
+      "cell": "anchor=RTH d=1.0",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 1,
+      "minutes_key": "",
+      "independent": {
+        "30": 1,
+        "60": 1,
+        "120": 1
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MGC",
+      "cell": "anchor=RTH d=1.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 0,
+      "minutes_key": "",
+      "independent": {
+        "30": 0,
+        "60": 0,
+        "120": 0
+      }
+    },
+    {
+      "hypothesis": "L10",
+      "product": "MGC",
+      "cell": "placebo curve anchor=RTH",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 1,
+      "minutes_key": "",
+      "independent": {
+        "30": 1,
+        "60": 1,
+        "120": 1
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MGC",
+      "cell": "anchor=CME d=0.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 211,
+      "minutes_key": "",
+      "independent": {
+        "30": 211,
+        "60": 211,
+        "120": 211
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MGC",
+      "cell": "anchor=CME d=1.0",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 10,
+      "minutes_key": "",
+      "independent": {
+        "30": 10,
+        "60": 10,
+        "120": 10
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MGC",
+      "cell": "anchor=CME d=1.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 2,
+      "minutes_key": "",
+      "independent": {
+        "30": 2,
+        "60": 2,
+        "120": 2
+      }
+    },
+    {
+      "hypothesis": "L10",
+      "product": "MGC",
+      "cell": "placebo curve anchor=CME",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 91,
+      "minutes_key": "",
+      "independent": {
+        "30": 91,
+        "60": 91,
+        "120": 91
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MGC",
+      "cell": "anchor=R24 d=0.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 211,
+      "minutes_key": "",
+      "independent": {
+        "30": 211,
+        "60": 211,
+        "120": 211
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MGC",
+      "cell": "anchor=R24 d=1.0",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 10,
+      "minutes_key": "",
+      "independent": {
+        "30": 10,
+        "60": 10,
+        "120": 10
+      }
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MGC",
+      "cell": "anchor=R24 d=1.5",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 2,
+      "minutes_key": "",
+      "independent": {
+        "30": 2,
+        "60": 2,
+        "120": 2
+      }
+    },
+    {
+      "hypothesis": "L10",
+      "product": "MGC",
+      "cell": "placebo curve anchor=R24",
+      "horizons": [
+        30,
+        60,
+        120
+      ],
+      "firings": 85,
+      "minutes_key": "",
+      "independent": {
+        "30": 85,
+        "60": 85,
+        "120": 85
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=15 m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5678,
+      "minutes_key": "",
+      "independent": {
+        "60": 4565,
+        "120": 4207,
+        "180": 4035
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=15 m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5712,
+      "minutes_key": "",
+      "independent": {
+        "60": 4581,
+        "120": 4226,
+        "180": 4050
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=15 m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5724,
+      "minutes_key": "",
+      "independent": {
+        "60": 4589,
+        "120": 4232,
+        "180": 4056
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=15 m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5412,
+      "minutes_key": "",
+      "independent": {
+        "60": 4417,
+        "120": 4076,
+        "180": 3921
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=15 m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5540,
+      "minutes_key": "",
+      "independent": {
+        "60": 4488,
+        "120": 4140,
+        "180": 3975
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=15 m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5619,
+      "minutes_key": "",
+      "independent": {
+        "60": 4524,
+        "120": 4177,
+        "180": 3997
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=15 m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4357,
+      "minutes_key": "",
+      "independent": {
+        "60": 3681,
+        "120": 3444,
+        "180": 3332
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=15 m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4784,
+      "minutes_key": "",
+      "independent": {
+        "60": 3974,
+        "120": 3696,
+        "180": 3564
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=15 m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5118,
+      "minutes_key": "",
+      "independent": {
+        "60": 4188,
+        "120": 3888,
+        "180": 3746
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=30 m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5019,
+      "minutes_key": "",
+      "independent": {
+        "60": 4454,
+        "120": 4144,
+        "180": 3960
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=30 m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5051,
+      "minutes_key": "",
+      "independent": {
+        "60": 4479,
+        "120": 4156,
+        "180": 3970
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=30 m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5068,
+      "minutes_key": "",
+      "independent": {
+        "60": 4490,
+        "120": 4167,
+        "180": 3979
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=30 m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4766,
+      "minutes_key": "",
+      "independent": {
+        "60": 4269,
+        "120": 3978,
+        "180": 3821
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=30 m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4892,
+      "minutes_key": "",
+      "independent": {
+        "60": 4361,
+        "120": 4054,
+        "180": 3884
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=30 m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4977,
+      "minutes_key": "",
+      "independent": {
+        "60": 4418,
+        "120": 4099,
+        "180": 3920
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=30 m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3778,
+      "minutes_key": "",
+      "independent": {
+        "60": 3445,
+        "120": 3236,
+        "180": 3131
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=30 m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4163,
+      "minutes_key": "",
+      "independent": {
+        "60": 3764,
+        "120": 3527,
+        "180": 3402
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=30 m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4492,
+      "minutes_key": "",
+      "independent": {
+        "60": 4022,
+        "120": 3757,
+        "180": 3612
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=60 m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4112,
+      "minutes_key": "",
+      "independent": {
+        "60": 3976,
+        "120": 3822,
+        "180": 3682
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=60 m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4147,
+      "minutes_key": "",
+      "independent": {
+        "60": 4006,
+        "120": 3849,
+        "180": 3709
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=60 m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4159,
+      "minutes_key": "",
+      "independent": {
+        "60": 4017,
+        "120": 3858,
+        "180": 3716
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=60 m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3877,
+      "minutes_key": "",
+      "independent": {
+        "60": 3752,
+        "120": 3615,
+        "180": 3495
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=60 m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4002,
+      "minutes_key": "",
+      "independent": {
+        "60": 3872,
+        "120": 3726,
+        "180": 3594
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=60 m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4082,
+      "minutes_key": "",
+      "independent": {
+        "60": 3940,
+        "120": 3788,
+        "180": 3649
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=60 m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3001,
+      "minutes_key": "",
+      "independent": {
+        "60": 2898,
+        "120": 2814,
+        "180": 2733
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=60 m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3328,
+      "minutes_key": "",
+      "independent": {
+        "60": 3220,
+        "120": 3115,
+        "180": 3022
+      }
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "cell": "absorb W=60 m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3644,
+      "minutes_key": "",
+      "independent": {
+        "60": 3525,
+        "120": 3405,
+        "180": 3296
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_rth m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4651,
+      "minutes_key": "",
+      "independent": {
+        "60": 4620,
+        "120": 4550,
+        "180": 4507
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_rth m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4664,
+      "minutes_key": "",
+      "independent": {
+        "60": 4632,
+        "120": 4563,
+        "180": 4519
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_rth m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4674,
+      "minutes_key": "",
+      "independent": {
+        "60": 4642,
+        "120": 4572,
+        "180": 4528
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_rth m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4503,
+      "minutes_key": "",
+      "independent": {
+        "60": 4465,
+        "120": 4394,
+        "180": 4353
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_rth m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4572,
+      "minutes_key": "",
+      "independent": {
+        "60": 4535,
+        "120": 4462,
+        "180": 4423
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_rth m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4623,
+      "minutes_key": "",
+      "independent": {
+        "60": 4590,
+        "120": 4522,
+        "180": 4480
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_rth m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3907,
+      "minutes_key": "",
+      "independent": {
+        "60": 3844,
+        "120": 3782,
+        "180": 3737
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_rth m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4130,
+      "minutes_key": "",
+      "independent": {
+        "60": 4077,
+        "120": 4006,
+        "180": 3963
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_rth m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4349,
+      "minutes_key": "",
+      "independent": {
+        "60": 4299,
+        "120": 4230,
+        "180": 4188
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_full m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3559,
+      "minutes_key": "",
+      "independent": {
+        "60": 3546,
+        "120": 3525,
+        "180": 3512
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_full m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3565,
+      "minutes_key": "",
+      "independent": {
+        "60": 3552,
+        "120": 3531,
+        "180": 3518
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_full m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3572,
+      "minutes_key": "",
+      "independent": {
+        "60": 3559,
+        "120": 3538,
+        "180": 3525
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_full m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3470,
+      "minutes_key": "",
+      "independent": {
+        "60": 3456,
+        "120": 3433,
+        "180": 3422
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_full m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3515,
+      "minutes_key": "",
+      "independent": {
+        "60": 3501,
+        "120": 3479,
+        "180": 3467
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_full m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3535,
+      "minutes_key": "",
+      "independent": {
+        "60": 3521,
+        "120": 3499,
+        "180": 3486
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_full m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3080,
+      "minutes_key": "",
+      "independent": {
+        "60": 3061,
+        "120": 3040,
+        "180": 3026
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_full m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3247,
+      "minutes_key": "",
+      "independent": {
+        "60": 3229,
+        "120": 3206,
+        "180": 3195
+      }
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "cell": "prior_full m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3383,
+      "minutes_key": "",
+      "independent": {
+        "60": 3367,
+        "120": 3346,
+        "180": 3333
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "Asia m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5102,
+      "minutes_key": "",
+      "independent": {
+        "60": 5036,
+        "120": 4901,
+        "180": 4749
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "Asia m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5120,
+      "minutes_key": "",
+      "independent": {
+        "60": 5053,
+        "120": 4918,
+        "180": 4763
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "Asia m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5130,
+      "minutes_key": "",
+      "independent": {
+        "60": 5064,
+        "120": 4928,
+        "180": 4774
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "Asia m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4974,
+      "minutes_key": "",
+      "independent": {
+        "60": 4890,
+        "120": 4750,
+        "180": 4606
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "Asia m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5046,
+      "minutes_key": "",
+      "independent": {
+        "60": 4968,
+        "120": 4828,
+        "180": 4680
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "Asia m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 5084,
+      "minutes_key": "",
+      "independent": {
+        "60": 5012,
+        "120": 4873,
+        "180": 4721
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "Asia m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4321,
+      "minutes_key": "",
+      "independent": {
+        "60": 4190,
+        "120": 4053,
+        "180": 3942
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "Asia m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4597,
+      "minutes_key": "",
+      "independent": {
+        "60": 4478,
+        "120": 4345,
+        "180": 4218
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "Asia m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 4803,
+      "minutes_key": "",
+      "independent": {
+        "60": 4692,
+        "120": 4548,
+        "180": 4420
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "London m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2046,
+      "minutes_key": "",
+      "independent": {
+        "60": 2033,
+        "120": 2013,
+        "180": 2001
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "London m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2064,
+      "minutes_key": "",
+      "independent": {
+        "60": 2051,
+        "120": 2030,
+        "180": 2019
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "London m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2072,
+      "minutes_key": "",
+      "independent": {
+        "60": 2059,
+        "120": 2038,
+        "180": 2027
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "London m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 1907,
+      "minutes_key": "",
+      "independent": {
+        "60": 1893,
+        "120": 1877,
+        "180": 1865
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "London m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 1986,
+      "minutes_key": "",
+      "independent": {
+        "60": 1972,
+        "120": 1954,
+        "180": 1942
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "London m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 2034,
+      "minutes_key": "",
+      "independent": {
+        "60": 2021,
+        "120": 2000,
+        "180": 1989
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "London m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 1423,
+      "minutes_key": "",
+      "independent": {
+        "60": 1406,
+        "120": 1390,
+        "180": 1385
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "London m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 1600,
+      "minutes_key": "",
+      "independent": {
+        "60": 1585,
+        "120": 1569,
+        "180": 1561
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "London m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 1784,
+      "minutes_key": "",
+      "independent": {
+        "60": 1772,
+        "120": 1752,
+        "180": 1744
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "US m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 378,
+      "minutes_key": "",
+      "independent": {
+        "60": 377,
+        "120": 377,
+        "180": 377
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "US m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 393,
+      "minutes_key": "",
+      "independent": {
+        "60": 392,
+        "120": 392,
+        "180": 392
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "US m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 399,
+      "minutes_key": "",
+      "independent": {
+        "60": 398,
+        "120": 398,
+        "180": 398
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "US m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 292,
+      "minutes_key": "",
+      "independent": {
+        "60": 291,
+        "120": 291,
+        "180": 291
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "US m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 325,
+      "minutes_key": "",
+      "independent": {
+        "60": 324,
+        "120": 324,
+        "180": 324
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "US m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 339,
+      "minutes_key": "",
+      "independent": {
+        "60": 338,
+        "120": 338,
+        "180": 338
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "US m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 168,
+      "minutes_key": "",
+      "independent": {
+        "60": 167,
+        "120": 167,
+        "180": 167
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "US m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 201,
+      "minutes_key": "",
+      "independent": {
+        "60": 200,
+        "120": 200,
+        "180": 200
+      }
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "cell": "US m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 227,
+      "minutes_key": "",
+      "independent": {
+        "60": 226,
+        "120": 226,
+        "180": 226
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MGC",
+      "cell": "RTH d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 37,
+      "minutes_key": "",
+      "independent": {
+        "60": 37,
+        "120": 37,
+        "180": 37
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MGC",
+      "cell": "RTH d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 18,
+      "minutes_key": "",
+      "independent": {
+        "60": 18,
+        "120": 18,
+        "180": 18
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MGC",
+      "cell": "RTH d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 18,
+      "minutes_key": "",
+      "independent": {
+        "60": 18,
+        "120": 18,
+        "180": 18
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MGC",
+      "cell": "CME d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 269,
+      "minutes_key": "",
+      "independent": {
+        "60": 269,
+        "120": 269,
+        "180": 269
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MGC",
+      "cell": "CME d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 36,
+      "minutes_key": "",
+      "independent": {
+        "60": 36,
+        "120": 36,
+        "180": 36
+      }
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MGC",
+      "cell": "CME d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 26,
+      "minutes_key": "",
+      "independent": {
+        "60": 26,
+        "120": 26,
+        "180": 26
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=2 tf=1m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 655490,
+      "minutes_key": "",
+      "independent": {
+        "60": 74891,
+        "120": 40920,
+        "180": 29259
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=2 tf=1m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 527522,
+      "minutes_key": "",
+      "independent": {
+        "60": 69037,
+        "120": 39059,
+        "180": 27447
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=2 tf=1m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 429987,
+      "minutes_key": "",
+      "independent": {
+        "60": 60828,
+        "120": 35763,
+        "180": 25763
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=2 tf=5m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 136777,
+      "minutes_key": "",
+      "independent": {
+        "60": 47473,
+        "120": 30487,
+        "180": 22929
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=2 tf=5m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 97402,
+      "minutes_key": "",
+      "independent": {
+        "60": 32505,
+        "120": 22051,
+        "180": 17412
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=2 tf=5m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 65659,
+      "minutes_key": "",
+      "independent": {
+        "60": 21000,
+        "120": 14691,
+        "180": 11732
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=4 tf=1m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 339210,
+      "minutes_key": "",
+      "independent": {
+        "60": 64091,
+        "120": 37227,
+        "180": 26552
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=4 tf=1m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 294283,
+      "minutes_key": "",
+      "independent": {
+        "60": 59787,
+        "120": 35480,
+        "180": 25563
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=4 tf=1m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 250812,
+      "minutes_key": "",
+      "independent": {
+        "60": 53276,
+        "120": 32609,
+        "180": 24046
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=4 tf=5m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 92594,
+      "minutes_key": "",
+      "independent": {
+        "60": 39733,
+        "120": 26748,
+        "180": 20614
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=4 tf=5m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 67946,
+      "minutes_key": "",
+      "independent": {
+        "60": 27734,
+        "120": 19594,
+        "180": 15779
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=4 tf=5m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 46390,
+      "minutes_key": "",
+      "independent": {
+        "60": 18153,
+        "120": 13171,
+        "180": 10739
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=8 tf=1m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 121686,
+      "minutes_key": "",
+      "independent": {
+        "60": 36180,
+        "120": 23630,
+        "180": 18010
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=8 tf=1m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 109123,
+      "minutes_key": "",
+      "independent": {
+        "60": 34091,
+        "120": 22617,
+        "180": 17393
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=8 tf=1m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 95365,
+      "minutes_key": "",
+      "independent": {
+        "60": 30916,
+        "120": 20948,
+        "180": 16346
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=8 tf=5m g=10",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 45988,
+      "minutes_key": "",
+      "independent": {
+        "60": 24911,
+        "120": 18252,
+        "180": 14762
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=8 tf=5m g=30",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 34370,
+      "minutes_key": "",
+      "independent": {
+        "60": 18067,
+        "120": 13810,
+        "180": 11566
+      }
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "cell": "w=8 tf=5m g=60",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 23545,
+      "minutes_key": "",
+      "independent": {
+        "60": 12000,
+        "120": 9326,
+        "180": 7936
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema20 5m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 95,
+      "minutes_key": "",
+      "independent": {
+        "60": 95,
+        "120": 95,
+        "180": 95
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema20 5m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 8,
+      "minutes_key": "",
+      "independent": {
+        "60": 8,
+        "120": 8,
+        "180": 8
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema20 5m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 3,
+      "minutes_key": "",
+      "independent": {
+        "60": 3,
+        "120": 3,
+        "180": 3
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema20 15m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 314,
+      "minutes_key": "",
+      "independent": {
+        "60": 314,
+        "120": 314,
+        "180": 314
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema20 15m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 29,
+      "minutes_key": "",
+      "independent": {
+        "60": 29,
+        "120": 29,
+        "180": 29
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema20 15m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 12,
+      "minutes_key": "",
+      "independent": {
+        "60": 12,
+        "120": 12,
+        "180": 12
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema50 5m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 315,
+      "minutes_key": "",
+      "independent": {
+        "60": 315,
+        "120": 315,
+        "180": 315
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema50 5m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 27,
+      "minutes_key": "",
+      "independent": {
+        "60": 27,
+        "120": 27,
+        "180": 27
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema50 5m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 9,
+      "minutes_key": "",
+      "independent": {
+        "60": 9,
+        "120": 9,
+        "180": 9
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema50 15m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 445,
+      "minutes_key": "",
+      "independent": {
+        "60": 445,
+        "120": 445,
+        "180": 445
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema50 15m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 45,
+      "minutes_key": "",
+      "independent": {
+        "60": 45,
+        "120": 45,
+        "180": 45
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema50 15m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 9,
+      "minutes_key": "",
+      "independent": {
+        "60": 9,
+        "120": 9,
+        "180": 9
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema200 5m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 528,
+      "minutes_key": "",
+      "independent": {
+        "60": 528,
+        "120": 528,
+        "180": 528
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema200 5m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 61,
+      "minutes_key": "",
+      "independent": {
+        "60": 61,
+        "120": 61,
+        "180": 61
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema200 5m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 15,
+      "minutes_key": "",
+      "independent": {
+        "60": 15,
+        "120": 15,
+        "180": 15
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema200 15m d=0.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 698,
+      "minutes_key": "",
+      "independent": {
+        "60": 698,
+        "120": 698,
+        "180": 698
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema200 15m d=1.0",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 77,
+      "minutes_key": "",
+      "independent": {
+        "60": 77,
+        "120": 77,
+        "180": 77
+      }
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "cell": "ema200 15m d=1.5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 13,
+      "minutes_key": "",
+      "independent": {
+        "60": 13,
+        "120": 13,
+        "180": 13
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_week m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 363,
+      "minutes_key": "",
+      "independent": {
+        "60": 363,
+        "120": 363,
+        "180": 363
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_week m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 363,
+      "minutes_key": "",
+      "independent": {
+        "60": 363,
+        "120": 363,
+        "180": 363
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_week m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 364,
+      "minutes_key": "",
+      "independent": {
+        "60": 364,
+        "120": 364,
+        "180": 364
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_week m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 355,
+      "minutes_key": "",
+      "independent": {
+        "60": 355,
+        "120": 355,
+        "180": 355
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_week m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 358,
+      "minutes_key": "",
+      "independent": {
+        "60": 358,
+        "120": 358,
+        "180": 358
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_week m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 361,
+      "minutes_key": "",
+      "independent": {
+        "60": 361,
+        "120": 361,
+        "180": 361
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_week m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 312,
+      "minutes_key": "",
+      "independent": {
+        "60": 312,
+        "120": 312,
+        "180": 312
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_week m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 334,
+      "minutes_key": "",
+      "independent": {
+        "60": 334,
+        "120": 334,
+        "180": 334
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_week m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 343,
+      "minutes_key": "",
+      "independent": {
+        "60": 343,
+        "120": 343,
+        "180": 343
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_month m=2 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 56,
+      "minutes_key": "",
+      "independent": {
+        "60": 56,
+        "120": 56,
+        "180": 56
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_month m=2 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 56,
+      "minutes_key": "",
+      "independent": {
+        "60": 56,
+        "120": 56,
+        "180": 56
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_month m=2 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 56,
+      "minutes_key": "",
+      "independent": {
+        "60": 56,
+        "120": 56,
+        "180": 56
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_month m=4 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 54,
+      "minutes_key": "",
+      "independent": {
+        "60": 54,
+        "120": 54,
+        "180": 54
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_month m=4 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 54,
+      "minutes_key": "",
+      "independent": {
+        "60": 54,
+        "120": 54,
+        "180": 54
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_month m=4 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 55,
+      "minutes_key": "",
+      "independent": {
+        "60": 55,
+        "120": 55,
+        "180": 55
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_month m=8 k=2",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 46,
+      "minutes_key": "",
+      "independent": {
+        "60": 46,
+        "120": 46,
+        "180": 46
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_month m=8 k=3",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 49,
+      "minutes_key": "",
+      "independent": {
+        "60": 49,
+        "120": 49,
+        "180": 49
+      }
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "cell": "prior_month m=8 k=5",
+      "horizons": [
+        60,
+        120,
+        180
+      ],
+      "firings": 51,
+      "minutes_key": "",
+      "independent": {
+        "60": 51,
+        "120": 51,
+        "180": 51
+      }
+    }
+  ],
+  "disjointness": [
+    {
+      "hypothesis": "L01",
+      "product": "MNQ",
+      "n_cells": 9,
+      "max_pairwise_overlap": 1.0,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L10",
+      "product": "MNQ",
+      "n_cells": 3,
+      "max_pairwise_overlap": 0.05263157894736842,
+      "verdict": "DISJOINT",
+      "note": "cells share at most 5% of firing minutes, so an aggregate route is genuinely available."
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MNQ",
+      "n_cells": 27,
+      "max_pairwise_overlap": 0.9972510044406852,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MNQ",
+      "n_cells": 18,
+      "max_pairwise_overlap": 0.9820237750072485,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 98% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MNQ",
+      "n_cells": 27,
+      "max_pairwise_overlap": 0.9981515711645101,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MNQ",
+      "n_cells": 6,
+      "max_pairwise_overlap": 1.0,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MNQ",
+      "n_cells": 18,
+      "max_pairwise_overlap": 1.0,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MNQ",
+      "n_cells": 18,
+      "max_pairwise_overlap": 1.0,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MNQ",
+      "n_cells": 18,
+      "max_pairwise_overlap": 0.9685393258426966,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 97% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L12",
+      "product": "MNQ",
+      "n_cells": 9,
+      "max_pairwise_overlap": 0.9828981243104082,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 98% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L01",
+      "product": "MGC",
+      "n_cells": 9,
+      "max_pairwise_overlap": 1.0,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L10",
+      "product": "MGC",
+      "n_cells": 3,
+      "max_pairwise_overlap": 0.011764705882352941,
+      "verdict": "DISJOINT",
+      "note": "cells share at most 1% of firing minutes, so an aggregate route is genuinely available."
+    },
+    {
+      "hypothesis": "L02",
+      "product": "MGC",
+      "n_cells": 27,
+      "max_pairwise_overlap": 0.9886204481792717,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 99% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L03",
+      "product": "MGC",
+      "n_cells": 18,
+      "max_pairwise_overlap": 0.9899018232819075,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 99% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L04",
+      "product": "MGC",
+      "n_cells": 27,
+      "max_pairwise_overlap": 0.98359375,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 98% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L06",
+      "product": "MGC",
+      "n_cells": 6,
+      "max_pairwise_overlap": 1.0,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L07",
+      "product": "MGC",
+      "n_cells": 18,
+      "max_pairwise_overlap": 1.0,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L08",
+      "product": "MGC",
+      "n_cells": 18,
+      "max_pairwise_overlap": 1.0,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    },
+    {
+      "hypothesis": "L09",
+      "product": "MGC",
+      "n_cells": 18,
+      "max_pairwise_overlap": 1.0,
+      "verdict": "OVERLAPPING",
+      "note": "cells share up to 100% of their firing minutes - the same touch enters under multiple parameter settings, so pooling them would count one observation many times. AGGREGATE ROUTE CLOSED."
+    }
+  ],
+  "match": [
+    {
+      "level_type": "vwap_RTH",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.6474171539961013,
+      "placebo_touch_rate": 0.5757797270955166,
+      "real_distance_median": 8.943376606021957,
+      "placebo_distance_median": 6.7665325094881155,
+      "real_distance_deciles": [
+        0.08333333333348492,
+        1.2721971663542717,
+        3.423338971539033,
+        5.901667403263128,
+        8.943376606021957,
+        13.647139459112259,
+        21.59940923276508,
+        35.2675945178542,
+        58.73481783047228
+      ],
+      "placebo_distance_deciles": [
+        0.11881119758581918,
+        0.9833255330675457,
+        2.4610099459764108,
+        4.301523058347539,
+        6.7665325094881155,
+        10.459648254698545,
+        17.034587224436745,
+        29.007909645123075,
+        50.18467373281057
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "vwap_CME",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.4834307992202729,
+      "placebo_touch_rate": 0.46905458089668617,
+      "real_distance_median": 13.790276754157958,
+      "placebo_distance_median": 13.463622163671062,
+      "real_distance_deciles": [
+        1.408190791542802,
+        3.784739716004606,
+        6.358624746643409,
+        9.584359346592647,
+        13.790276754157958,
+        19.76661953707735,
+        30.793746879700752,
+        50.94840470364143,
+        90.593746759183
+      ],
+      "placebo_distance_deciles": [
+        1.5625969614416135,
+        3.5465937132772525,
+        6.023355111639102,
+        9.20818708786851,
+        13.463622163671062,
+        20.174023474910065,
+        30.747819086969677,
+        50.57953266469886,
+        86.57776643673098
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "vwap_R24",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.4834307992202729,
+      "placebo_touch_rate": 0.46101364522417154,
+      "real_distance_median": 13.790276754157958,
+      "placebo_distance_median": 13.28968097639654,
+      "real_distance_deciles": [
+        1.408190791542802,
+        3.784739716004606,
+        6.358624746643409,
+        9.584359346592647,
+        13.790276754157958,
+        19.76661953707735,
+        30.793746879700752,
+        50.94840470364143,
+        90.593746759183
+      ],
+      "placebo_distance_deciles": [
+        1.530695524985822,
+        3.4735300945212657,
+        6.050790513369337,
+        9.226643091695497,
+        13.28968097639654,
+        20.871473547084125,
+        32.296869080829765,
+        50.85255723694427,
+        87.25933870076462
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "or15",
+      "product": "MNQ",
+      "n_real": 8208,
+      "n_placebo": 8208,
+      "real_touch_rate": 0.6546052631578947,
+      "placebo_touch_rate": 0.5660331384015594,
+      "real_distance_median": 10.0,
+      "placebo_distance_median": 8.216950976769567,
+      "real_distance_deciles": [
+        0.25,
+        1.5,
+        3.75,
+        6.5,
+        10.0,
+        15.25,
+        23.0,
+        37.25,
+        66.0
+      ],
+      "placebo_distance_deciles": [
+        0.0,
+        1.2927296062261122,
+        3.0102293193384866,
+        5.211412046100304,
+        8.216950976769567,
+        12.806164030577559,
+        20.13385794263122,
+        33.85012270542321,
+        62.76112893662831
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "or30",
+      "product": "MNQ",
+      "n_real": 8208,
+      "n_placebo": 8208,
+      "real_touch_rate": 0.6102582846003899,
+      "placebo_touch_rate": 0.5285087719298246,
+      "real_distance_median": 13.0,
+      "placebo_distance_median": 9.996636721565665,
+      "real_distance_deciles": [
+        0.25,
+        2.0,
+        4.75,
+        8.5,
+        13.0,
+        19.0,
+        29.5,
+        47.75,
+        83.5
+      ],
+      "placebo_distance_deciles": [
+        0.10437364413751316,
+        1.56828447433627,
+        3.583895828777713,
+        6.291817835733492,
+        9.996636721565665,
+        15.76296185010542,
+        25.202158715852054,
+        43.678214117994514,
+        80.834679452566
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "or60",
+      "product": "MNQ",
+      "n_real": 8208,
+      "n_placebo": 8208,
+      "real_touch_rate": 0.5477582846003899,
+      "placebo_touch_rate": 0.48014132553606237,
+      "real_distance_median": 16.25,
+      "placebo_distance_median": 12.87546219050273,
+      "real_distance_deciles": [
+        0.25,
+        2.5,
+        6.25,
+        10.700000000000045,
+        16.25,
+        24.25,
+        37.5,
+        61.0,
+        108.32500000000005
+      ],
+      "placebo_distance_deciles": [
+        0.0,
+        2.1396751555721494,
+        5.001373002371656,
+        8.397442981679799,
+        12.87546219050273,
+        19.847506192014954,
+        31.681961344578568,
+        54.952062765222955,
+        102.40462633620191
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "prior_rth",
+      "product": "MNQ",
+      "n_real": 8208,
+      "n_placebo": 8208,
+      "real_touch_rate": 0.4228801169590643,
+      "placebo_touch_rate": 0.42714424951267055,
+      "real_distance_median": 33.25,
+      "placebo_distance_median": 32.991146498190574,
+      "real_distance_deciles": [
+        5.0,
+        10.25,
+        16.25,
+        23.75,
+        33.25,
+        48.25,
+        71.5,
+        116.0,
+        198.0
+      ],
+      "placebo_distance_deciles": [
+        4.544647686666576,
+        9.287199690790294,
+        15.131489534068033,
+        22.640895182330404,
+        32.991146498190574,
+        48.36395516387783,
+        76.22933742467157,
+        121.61428965117085,
+        213.73604036669823
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "prior_full",
+      "product": "MNQ",
+      "n_real": 8208,
+      "n_placebo": 8208,
+      "real_touch_rate": 0.3787768031189084,
+      "placebo_touch_rate": 0.36829922027290446,
+      "real_distance_median": 40.5,
+      "placebo_distance_median": 40.01105986687162,
+      "real_distance_deciles": [
+        6.25,
+        12.75,
+        20.0,
+        29.0,
+        40.5,
+        57.5,
+        84.75,
+        138.6500000000001,
+        242.57500000000005
+      ],
+      "placebo_distance_deciles": [
+        5.322131296570115,
+        11.35058890442051,
+        18.664093137790996,
+        27.8702612262161,
+        40.01105986687162,
+        59.71363674451531,
+        91.32903692380876,
+        147.13140755205026,
+        265.70162072553205
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "sess_Asia",
+      "product": "MNQ",
+      "n_real": 8208,
+      "n_placebo": 8208,
+      "real_touch_rate": 0.6291423001949318,
+      "placebo_touch_rate": 0.5894249512670565,
+      "real_distance_median": 12.75,
+      "placebo_distance_median": 11.697779876400546,
+      "real_distance_deciles": [
+        1.5,
+        3.5,
+        5.75,
+        8.75,
+        12.75,
+        19.0,
+        28.25,
+        43.65000000000009,
+        73.75
+      ],
+      "placebo_distance_deciles": [
+        1.6374170664249965,
+        3.3531617915952667,
+        5.439922838933671,
+        7.991350758882618,
+        11.697779876400546,
+        17.869379100208608,
+        27.658932808434745,
+        44.83937700169809,
+        78.42908941054485
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "sess_London",
+      "product": "MNQ",
+      "n_real": 8208,
+      "n_placebo": 8208,
+      "real_touch_rate": 0.4194688109161793,
+      "placebo_touch_rate": 0.38133528265107214,
+      "real_distance_median": 24.5,
+      "placebo_distance_median": 19.993810202675377,
+      "real_distance_deciles": [
+        0.25,
+        3.75,
+        9.5,
+        16.0,
+        24.5,
+        37.049999999999955,
+        57.22499999999991,
+        96.5,
+        165.75
+      ],
+      "placebo_distance_deciles": [
+        0.2002051197044239,
+        3.253933836325814,
+        7.4473025636019425,
+        12.832088453231155,
+        19.993810202675377,
+        30.896884518373188,
+        49.11905810426891,
+        84.24858508188449,
+        155.48362258968316
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "sess_US",
+      "product": "MNQ",
+      "n_real": 8208,
+      "n_placebo": 8208,
+      "real_touch_rate": 0.18043372319688109,
+      "placebo_touch_rate": 0.16922514619883042,
+      "real_distance_median": 27.5,
+      "placebo_distance_median": 20.988747842935254,
+      "real_distance_deciles": [
+        0.25,
+        4.25,
+        10.75,
+        18.0,
+        27.5,
+        41.049999999999955,
+        64.5,
+        109.5,
+        187.25
+      ],
+      "placebo_distance_deciles": [
+        0.1130114689400216,
+        3.0835886859975297,
+        7.306581733632629,
+        12.85774477324012,
+        20.988747842935254,
+        34.9616358845702,
+        59.236508317597135,
+        99.88512314228794,
+        184.30843168789895
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "open_RTH",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.7595029239766082,
+      "placebo_touch_rate": 0.0,
+      "real_distance_median": 0.0,
+      "placebo_distance_median": 0.0,
+      "real_distance_deciles": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "placebo_distance_deciles": [
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN
+      ],
+      "failures": [
+        "TOUCH-RATE MISMATCH: placebo touched 0.0% vs real 76.0% (ratio 0.00, tolerance +/-25%). The offset range is wrong: placebos sit where price goes less often than the real levels, so any real-minus-placebo difference would be a difference in EXPOSURE rather than in reaction.",
+        "DEGENERATE: every real level of this type sits exactly AT the reference price, so there is no distance distribution to match and no arbitrary region is comparable to it. This is a property of the level definition, not a tuning failure, and no scale or construction fixes it."
+      ]
+    },
+    {
+      "level_type": "open_CME",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.9549220272904484,
+      "placebo_touch_rate": 0.0,
+      "real_distance_median": 0.0,
+      "placebo_distance_median": 0.0,
+      "real_distance_deciles": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "placebo_distance_deciles": [
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN
+      ],
+      "failures": [
+        "TOUCH-RATE MISMATCH: placebo touched 0.0% vs real 95.5% (ratio 0.00, tolerance +/-25%). The offset range is wrong: placebos sit where price goes less often than the real levels, so any real-minus-placebo difference would be a difference in EXPOSURE rather than in reaction.",
+        "DEGENERATE: every real level of this type sits exactly AT the reference price, so there is no distance distribution to match and no arbitrary region is comparable to it. This is a property of the level definition, not a tuning failure, and no scale or construction fixes it."
+      ]
+    },
+    {
+      "level_type": "fvg_w2_1m",
+      "product": "MNQ",
+      "n_real": 774167,
+      "n_placebo": 774167,
+      "real_touch_rate": 0.8596207278274585,
+      "placebo_touch_rate": 0.8356336552707619,
+      "real_distance_median": 2.125,
+      "placebo_distance_median": 2.0299880374577697,
+      "real_distance_deciles": [
+        0.25,
+        0.5,
+        1.0,
+        1.375,
+        2.125,
+        3.0,
+        4.375,
+        6.75,
+        11.625
+      ],
+      "placebo_distance_deciles": [
+        0.18609681135694706,
+        0.4469778494911226,
+        0.8043583880738879,
+        1.3040472164306267,
+        2.0299880374577697,
+        3.116789641800278,
+        4.92484024981204,
+        8.348181612083138,
+        17.00492975252056
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "fvg_w2_5m",
+      "product": "MNQ",
+      "n_real": 162652,
+      "n_placebo": 162652,
+      "real_touch_rate": 0.7986006935051521,
+      "placebo_touch_rate": 0.7594065858397069,
+      "real_distance_median": 4.375,
+      "placebo_distance_median": 4.361228050253885,
+      "real_distance_deciles": [
+        0.75,
+        1.375,
+        2.125,
+        3.125,
+        4.375,
+        6.25,
+        9.0,
+        13.375,
+        22.625
+      ],
+      "placebo_distance_deciles": [
+        0.46427328797426526,
+        1.0121781705647663,
+        1.7810318682582873,
+        2.8339466244126026,
+        4.361228050253885,
+        6.628503365982394,
+        10.307731862848595,
+        17.27338802868617,
+        34.9065779288912
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "fvg_w4_1m",
+      "product": "MNQ",
+      "n_real": 458935,
+      "n_placebo": 458935,
+      "real_touch_rate": 0.8096680357784871,
+      "placebo_touch_rate": 0.7799797356924183,
+      "real_distance_median": 3.625,
+      "placebo_distance_median": 3.6049006604243914,
+      "real_distance_deciles": [
+        0.625,
+        1.25,
+        1.875,
+        2.625,
+        3.625,
+        5.0,
+        6.875,
+        9.75,
+        15.375
+      ],
+      "placebo_distance_deciles": [
+        0.360043689721897,
+        0.8432288469761261,
+        1.490670059538206,
+        2.3750874848989043,
+        3.6049006604243914,
+        5.434796935762277,
+        8.349549309904614,
+        13.584577340541,
+        26.288049388935914
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "fvg_w4_5m",
+      "product": "MNQ",
+      "n_real": 123707,
+      "n_placebo": 123707,
+      "real_touch_rate": 0.7660601259427519,
+      "placebo_touch_rate": 0.7251731914928016,
+      "real_distance_median": 6.0,
+      "placebo_distance_median": 6.109834209233668,
+      "real_distance_deciles": [
+        1.25,
+        2.125,
+        3.125,
+        4.5,
+        6.0,
+        8.25,
+        11.375,
+        16.375,
+        26.375
+      ],
+      "placebo_distance_deciles": [
+        0.6712644436764095,
+        1.4802574013399863,
+        2.5801668085428897,
+        4.03392346454457,
+        6.109834209233668,
+        9.152144733465683,
+        14.1067434357592,
+        23.27404079595217,
+        45.24570474942957
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "fvg_w8_1m",
+      "product": "MNQ",
+      "n_real": 246325,
+      "n_placebo": 246325,
+      "real_touch_rate": 0.7515802293717649,
+      "placebo_touch_rate": 0.7142190195879428,
+      "real_distance_median": 6.0,
+      "placebo_distance_median": 5.817566433430329,
+      "real_distance_deciles": [
+        1.25,
+        2.25,
+        3.375,
+        4.5,
+        6.0,
+        7.75,
+        10.0,
+        13.625,
+        20.25
+      ],
+      "placebo_distance_deciles": [
+        0.6830146656168836,
+        1.509556325964877,
+        2.5538735331218048,
+        3.938501304109013,
+        5.817566433430329,
+        8.539680356685858,
+        12.756289273758373,
+        20.008144614078265,
+        36.38618268900647
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "fvg_w8_5m",
+      "product": "MNQ",
+      "n_real": 84740,
+      "n_placebo": 84740,
+      "real_touch_rate": 0.7241208402171347,
+      "placebo_touch_rate": 0.6787821571866887,
+      "real_distance_median": 8.75,
+      "placebo_distance_median": 9.011321016845613,
+      "real_distance_deciles": [
+        2.125,
+        3.5,
+        5.0,
+        6.625,
+        8.75,
+        11.375,
+        15.0,
+        20.75,
+        31.75
+      ],
+      "placebo_distance_deciles": [
+        1.0810215755765966,
+        2.326143847676758,
+        3.896680233206007,
+        5.994215148136934,
+        9.011321016845613,
+        13.182799445050478,
+        19.949006533942697,
+        31.715372434860907,
+        58.427546299765936
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema20_5m",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.6457115009746589,
+      "placebo_touch_rate": 0.5635964912280702,
+      "real_distance_median": 8.540496539304513,
+      "placebo_distance_median": 7.151930081993669,
+      "real_distance_deciles": [
+        8.526981218892616e-08,
+        1.3002969855488118,
+        3.3057302014747165,
+        5.68154636930758,
+        8.540496539304513,
+        13.209934830049313,
+        20.956546638801587,
+        34.67134198680215,
+        58.176606609604285
+      ],
+      "placebo_distance_deciles": [
+        3.4233048609166875e-07,
+        1.0374079747622544,
+        2.6063712243014376,
+        4.539304763907239,
+        7.151930081993669,
+        10.978880606143315,
+        17.447874604297795,
+        28.58742173509163,
+        53.29199528215987
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema20_15m",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.5813840155945419,
+      "placebo_touch_rate": 0.4992690058479532,
+      "real_distance_median": 13.340044029148885,
+      "placebo_distance_median": 9.894658180328406,
+      "real_distance_deciles": [
+        0.028071038106372726,
+        1.9303701536906377,
+        5.060033225658478,
+        8.49292723121962,
+        13.340044029148885,
+        19.744502068284053,
+        31.484294401330317,
+        49.96722367652038,
+        89.5593940548155
+      ],
+      "placebo_distance_deciles": [
+        0.09058990138400988,
+        1.3654856780292903,
+        3.6524357556736957,
+        6.439522591517835,
+        9.894658180328406,
+        15.679997753361008,
+        25.588948114604584,
+        45.62882496311724,
+        81.60323534477648
+      ],
+      "failures": [
+        "DISTANCE MISMATCH: placebo median distance 9.895 vs real 13.34 (ratio 0.74, tolerance +/-25%). Placebos are not sitting at a comparable distance from price."
+      ]
+    },
+    {
+      "level_type": "ema50_5m",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.5791910331384016,
+      "placebo_touch_rate": 0.4992690058479532,
+      "real_distance_median": 12.984076075284975,
+      "placebo_distance_median": 9.961749685138784,
+      "real_distance_deciles": [
+        0.008006134714605652,
+        1.6851917985568436,
+        4.941245126922331,
+        8.540693761586954,
+        12.984076075284975,
+        19.612572946358615,
+        30.627412863692093,
+        49.26773303310911,
+        88.64037066930545
+      ],
+      "placebo_distance_deciles": [
+        0.03238514914646658,
+        1.5070595505731035,
+        3.7041530021725064,
+        6.4119173396113185,
+        9.961749685138784,
+        15.415718985484999,
+        24.494589383994747,
+        42.99756455743555,
+        82.47191655524962
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema50_15m",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.4476120857699805,
+      "placebo_touch_rate": 0.4398148148148148,
+      "real_distance_median": 17.39560033114867,
+      "placebo_distance_median": 14.827189445942395,
+      "real_distance_deciles": [
+        0.9828495882099559,
+        2.981931713044469,
+        6.327298007617897,
+        10.968778335795289,
+        17.39560033114867,
+        25.72211711489872,
+        39.87206330680164,
+        63.98783199058417,
+        112.49755968065874
+      ],
+      "placebo_distance_deciles": [
+        1.4400582988229418,
+        3.3927867024836815,
+        6.186141395547383,
+        9.898536076096116,
+        14.827189445942395,
+        21.62953265971082,
+        34.472971027658055,
+        61.47200481619657,
+        108.95887197419839
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema200_5m",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.4130116959064328,
+      "placebo_touch_rate": 0.4108187134502924,
+      "real_distance_median": 18.36619455386699,
+      "placebo_distance_median": 16.747143048271028,
+      "real_distance_deciles": [
+        1.624018593077699,
+        3.8306850725327424,
+        7.1108889852959685,
+        11.586025185604013,
+        18.36619455386699,
+        28.161958062541085,
+        42.734167398972474,
+        70.3879711620175,
+        120.54218806691341
+      ],
+      "placebo_distance_deciles": [
+        2.028745251652117,
+        4.3495605729440285,
+        7.047733077371139,
+        11.1137420101295,
+        16.747143048271028,
+        25.022269981192757,
+        38.7496815761579,
+        62.663181227791576,
+        116.61007364982946
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema200_15m",
+      "product": "MNQ",
+      "n_real": 4104,
+      "n_placebo": 4104,
+      "real_touch_rate": 0.2933723196881092,
+      "placebo_touch_rate": 0.30579922027290446,
+      "real_distance_median": 29.56573298036119,
+      "placebo_distance_median": 29.492699912533,
+      "real_distance_deciles": [
+        4.5272744784414956,
+        9.19530158509806,
+        14.14745714824503,
+        20.715828103945206,
+        29.56573298036119,
+        44.3262204823928,
+        67.29073422656329,
+        105.89811602696903,
+        178.48509727165583
+      ],
+      "placebo_distance_deciles": [
+        4.237195856300605,
+        8.60545739625768,
+        14.144912899814605,
+        20.902753835594197,
+        29.492699912533,
+        42.31812098624994,
+        65.3879218057913,
+        101.44315334623316,
+        181.60881746614726
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "prior_week",
+      "product": "MNQ",
+      "n_real": 1684,
+      "n_placebo": 1684,
+      "real_touch_rate": 0.2339667458432304,
+      "placebo_touch_rate": 0.22565320665083136,
+      "real_distance_median": 84.75,
+      "placebo_distance_median": 88.12102389038682,
+      "real_distance_deciles": [
+        11.0,
+        24.5,
+        40.724999999999994,
+        60.80000000000001,
+        84.75,
+        124.19999999999999,
+        191.82499999999993,
+        325.9500000000003,
+        567.35
+      ],
+      "placebo_distance_deciles": [
+        10.263798332201942,
+        25.96199682199722,
+        41.27186397925607,
+        62.08190184380856,
+        88.12102389038682,
+        130.1515845461341,
+        199.75712952640623,
+        331.4083114884489,
+        575.1411448339292
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "prior_month",
+      "product": "MNQ",
+      "n_real": 386,
+      "n_placebo": 386,
+      "real_touch_rate": 0.14766839378238342,
+      "placebo_touch_rate": 0.10880829015544041,
+      "real_distance_median": 195.75,
+      "placebo_distance_median": 196.00651517066353,
+      "real_distance_deciles": [
+        25.375,
+        50.25,
+        92.25,
+        147.75,
+        195.75,
+        280.25,
+        427.5,
+        757.5,
+        1221.875
+      ],
+      "placebo_distance_deciles": [
+        23.39227447387657,
+        56.17790756091472,
+        96.62029601928452,
+        142.76735846177326,
+        196.00651517066353,
+        273.17848769050397,
+        369.1218066727138,
+        661.6566228070187,
+        1240.9685949261766
+      ],
+      "failures": [
+        "TOUCH-RATE MISMATCH: placebo touched 10.9% vs real 14.8% (ratio 0.74, tolerance +/-25%). The offset range is wrong: placebos sit where price goes less often than the real levels, so any real-minus-placebo difference would be a difference in EXPOSURE rather than in reaction."
+      ]
+    },
+    {
+      "level_type": "vwap_RTH",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.7119196988707653,
+      "placebo_touch_rate": 0.6795483061480552,
+      "real_distance_median": 1.5307268722467597,
+      "placebo_distance_median": 1.4198210860486142,
+      "real_distance_deciles": [
+        0.21074128618465696,
+        0.47249595155917645,
+        0.7621218672223222,
+        1.112687217477651,
+        1.5307268722467597,
+        2.0154511358408858,
+        2.6633218832083445,
+        3.8189992051362904,
+        5.803651775872821
+      ],
+      "placebo_distance_deciles": [
+        0.19821526715859364,
+        0.46479809169632064,
+        0.7160345035008504,
+        1.022663216269075,
+        1.4198210860486142,
+        1.8957470321311123,
+        2.5209356214113976,
+        3.4751010182084436,
+        5.674041197786255
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "vwap_CME",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.4449184441656211,
+      "placebo_touch_rate": 0.41806775407779173,
+      "real_distance_median": 4.262476329601441,
+      "placebo_distance_median": 4.181497649847188,
+      "real_distance_deciles": [
+        0.7215680786232497,
+        1.4294357197897172,
+        2.224920823708044,
+        3.1683867542583366,
+        4.262476329601441,
+        5.631616585514076,
+        7.423593417900336,
+        10.03346024400808,
+        15.44372316210574
+      ],
+      "placebo_distance_deciles": [
+        0.6662407891968997,
+        1.352102151977442,
+        2.2212252061396156,
+        3.1537200116569695,
+        4.181497649847188,
+        5.534483462267099,
+        7.40480126759403,
+        10.405235390113422,
+        16.78462694648133
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "vwap_R24",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.4449184441656211,
+      "placebo_touch_rate": 0.4326223337515684,
+      "real_distance_median": 4.262476329601441,
+      "placebo_distance_median": 4.114856482227424,
+      "real_distance_deciles": [
+        0.7215680786232497,
+        1.4294357197897172,
+        2.224920823708044,
+        3.1683867542583366,
+        4.262476329601441,
+        5.631616585514076,
+        7.423593417900336,
+        10.03346024400808,
+        15.44372316210574
+      ],
+      "placebo_distance_deciles": [
+        0.6468178347266077,
+        1.358163144649143,
+        2.149656486031336,
+        3.127061202526193,
+        4.114856482227424,
+        5.594897770338321,
+        7.345415837213886,
+        10.357002040613498,
+        16.846304701249295
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "or15",
+      "product": "MGC",
+      "n_real": 7970,
+      "n_placebo": 7970,
+      "real_touch_rate": 0.7001254705144291,
+      "placebo_touch_rate": 0.6903387703889586,
+      "real_distance_median": 1.599999999999909,
+      "placebo_distance_median": 1.53655604515518,
+      "real_distance_deciles": [
+        0.1999999999998181,
+        0.5,
+        0.7999999999999545,
+        1.1000000000001364,
+        1.599999999999909,
+        2.1000000000001364,
+        2.8999999999998636,
+        4.0,
+        6.2999999999999545
+      ],
+      "placebo_distance_deciles": [
+        0.1489100205191108,
+        0.4488200187543044,
+        0.7617024430613129,
+        1.1121236852122822,
+        1.53655604515518,
+        2.0468374082093304,
+        2.724169663276302,
+        3.779208568636342,
+        6.043896053507933
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "or30",
+      "product": "MGC",
+      "n_real": 7970,
+      "n_placebo": 7970,
+      "real_touch_rate": 0.6148055207026348,
+      "placebo_touch_rate": 0.6,
+      "real_distance_median": 2.2999999999999545,
+      "placebo_distance_median": 2.246868611769628,
+      "real_distance_deciles": [
+        0.2999999999999545,
+        0.7000000000000455,
+        1.2000000000000455,
+        1.699999999999818,
+        2.2999999999999545,
+        3.0,
+        4.0,
+        5.5,
+        8.410000000000117
+      ],
+      "placebo_distance_deciles": [
+        0.27146622870213843,
+        0.7134180965228553,
+        1.1720996207866619,
+        1.6756151988612602,
+        2.246868611769628,
+        2.9268231911690683,
+        3.9012271990459553,
+        5.378973464800039,
+        8.392723263612499
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "or60",
+      "product": "MGC",
+      "n_real": 7970,
+      "n_placebo": 7970,
+      "real_touch_rate": 0.5027603513174403,
+      "placebo_touch_rate": 0.5071518193224592,
+      "real_distance_median": 3.1000000000001364,
+      "placebo_distance_median": 3.017915053478305,
+      "real_distance_deciles": [
+        0.5,
+        1.1000000000001364,
+        1.7000000000000455,
+        2.2999999999999545,
+        3.1000000000001364,
+        4.099999999999909,
+        5.400000000000091,
+        7.400000000000091,
+        11.299999999999955
+      ],
+      "placebo_distance_deciles": [
+        0.46068465166333683,
+        1.0570748192756583,
+        1.6368350023750509,
+        2.2628938548881257,
+        3.017915053478305,
+        3.969566206039461,
+        5.392255362407986,
+        7.5545703804900795,
+        12.033634161788404
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "prior_rth",
+      "product": "MGC",
+      "n_real": 7970,
+      "n_placebo": 7970,
+      "real_touch_rate": 0.5259723964868256,
+      "placebo_touch_rate": 0.5514429109159348,
+      "real_distance_median": 5.7999999999999545,
+      "placebo_distance_median": 5.566515220071892,
+      "real_distance_deciles": [
+        1.2000000000000455,
+        2.2000000000000455,
+        3.2000000000000455,
+        4.400000000000091,
+        5.7999999999999545,
+        7.400000000000091,
+        9.5,
+        13.299999999999955,
+        20.899999999999864
+      ],
+      "placebo_distance_deciles": [
+        1.1872598058071617,
+        2.1740931236341567,
+        3.1282246065853996,
+        4.282882034749991,
+        5.566515220071892,
+        7.307484259494776,
+        9.70465259908492,
+        13.558398638398653,
+        21.66514890313354
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "prior_full",
+      "product": "MGC",
+      "n_real": 7970,
+      "n_placebo": 7970,
+      "real_touch_rate": 0.385069008782936,
+      "placebo_touch_rate": 0.42396486825595986,
+      "real_distance_median": 8.899999999999977,
+      "placebo_distance_median": 9.030634724246397,
+      "real_distance_deciles": [
+        2.099999999999909,
+        3.599999999999909,
+        5.100000000000136,
+        6.900000000000091,
+        8.899999999999977,
+        11.600000000000136,
+        15.299999999999955,
+        20.700000000000045,
+        32.600000000000136
+      ],
+      "placebo_distance_deciles": [
+        2.0624784839167205,
+        3.5449609575191974,
+        5.176950078787376,
+        6.9700581803090715,
+        9.030634724246397,
+        11.635271965960964,
+        15.193985819805153,
+        21.30380074965943,
+        33.742717801921316
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "sess_Asia",
+      "product": "MGC",
+      "n_real": 7970,
+      "n_placebo": 7970,
+      "real_touch_rate": 0.6037641154328732,
+      "placebo_touch_rate": 0.6193224592220828,
+      "real_distance_median": 3.800000000000182,
+      "placebo_distance_median": 3.5721465659271416,
+      "real_distance_deciles": [
+        0.599999999999909,
+        1.2999999999999545,
+        2.0,
+        2.8999999999998636,
+        3.800000000000182,
+        5.0,
+        6.400000000000091,
+        8.799999999999955,
+        14.099999999999909
+      ],
+      "placebo_distance_deciles": [
+        0.5848153172856201,
+        1.2835820012734076,
+        1.9663076912503124,
+        2.6927480351100717,
+        3.5721465659271416,
+        4.627459863176637,
+        6.245645249459673,
+        8.65664907120836,
+        13.963287455775145
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "sess_London",
+      "product": "MGC",
+      "n_real": 7970,
+      "n_placebo": 7970,
+      "real_touch_rate": 0.24027603513174403,
+      "placebo_touch_rate": 0.27841907151819323,
+      "real_distance_median": 6.599999999999909,
+      "placebo_distance_median": 6.4414691817157745,
+      "real_distance_deciles": [
+        1.400000000000091,
+        2.599999999999909,
+        3.7000000000000455,
+        5.0,
+        6.599999999999909,
+        8.400000000000091,
+        11.199999999999818,
+        15.200000000000045,
+        23.0
+      ],
+      "placebo_distance_deciles": [
+        1.2963358242677716,
+        2.4131855176020514,
+        3.549223876519909,
+        4.838832635322979,
+        6.4414691817157745,
+        8.466078215532933,
+        11.246931909490193,
+        15.496504817351116,
+        24.427381494466843
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "sess_US",
+      "product": "MGC",
+      "n_real": 7970,
+      "n_placebo": 7970,
+      "real_touch_rate": 0.07026348808030113,
+      "placebo_touch_rate": 0.09360100376411544,
+      "real_distance_median": 5.400000000000091,
+      "placebo_distance_median": 5.276842997100289,
+      "real_distance_deciles": [
+        1.1000000000001364,
+        2.099999999999909,
+        3.099999999999909,
+        4.100000000000364,
+        5.400000000000091,
+        7.0,
+        9.199999999999818,
+        12.400000000000091,
+        19.59999999999991
+      ],
+      "placebo_distance_deciles": [
+        0.9596047114207751,
+        1.923811673614455,
+        2.897265663294069,
+        4.007474535448546,
+        5.276842997100289,
+        6.976623658928747,
+        9.289576585610817,
+        13.393001739306788,
+        22.16712816417587
+      ],
+      "failures": [
+        "TOUCH-RATE MISMATCH: placebo touched 9.4% vs real 7.0% (ratio 1.33, tolerance +/-25%). The offset range is wrong: placebos sit where price goes more often than the real levels, so any real-minus-placebo difference would be a difference in EXPOSURE rather than in reaction."
+      ]
+    },
+    {
+      "level_type": "open_RTH",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.863237139272271,
+      "placebo_touch_rate": 0.0,
+      "real_distance_median": 0.0,
+      "placebo_distance_median": 0.0,
+      "real_distance_deciles": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "placebo_distance_deciles": [
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN
+      ],
+      "failures": [
+        "TOUCH-RATE MISMATCH: placebo touched 0.0% vs real 86.3% (ratio 0.00, tolerance +/-25%). The offset range is wrong: placebos sit where price goes less often than the real levels, so any real-minus-placebo difference would be a difference in EXPOSURE rather than in reaction.",
+        "DEGENERATE: every real level of this type sits exactly AT the reference price, so there is no distance distribution to match and no arbitrary region is comparable to it. This is a property of the level definition, not a tuning failure, and no scale or construction fixes it."
+      ]
+    },
+    {
+      "level_type": "open_CME",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.9653701380175659,
+      "placebo_touch_rate": 0.0,
+      "real_distance_median": 0.0,
+      "placebo_distance_median": 0.0,
+      "real_distance_deciles": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "placebo_distance_deciles": [
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN,
+        NaN
+      ],
+      "failures": [
+        "TOUCH-RATE MISMATCH: placebo touched 0.0% vs real 96.5% (ratio 0.00, tolerance +/-25%). The offset range is wrong: placebos sit where price goes less often than the real levels, so any real-minus-placebo difference would be a difference in EXPOSURE rather than in reaction.",
+        "DEGENERATE: every real level of this type sits exactly AT the reference price, so there is no distance distribution to match and no arbitrary region is comparable to it. This is a property of the level definition, not a tuning failure, and no scale or construction fixes it."
+      ]
+    },
+    {
+      "level_type": "fvg_w2_1m",
+      "product": "MGC",
+      "n_real": 1164509,
+      "n_placebo": 1164509,
+      "real_touch_rate": 0.8920540760097174,
+      "placebo_touch_rate": 0.8912142370733073,
+      "real_distance_median": 0.3500000000001364,
+      "placebo_distance_median": 0.3704756435172385,
+      "real_distance_deciles": [
+        0.09999999999990905,
+        0.15000000000009095,
+        0.20000000000004547,
+        0.29999999999972715,
+        0.3500000000001364,
+        0.4999999999997726,
+        0.6499999999998636,
+        0.8999999999998636,
+        1.4500000000000455
+      ],
+      "placebo_distance_deciles": [
+        0.06203353570595027,
+        0.12050855083243732,
+        0.1861045424682288,
+        0.265958535879463,
+        0.3704756435172385,
+        0.5154048717936346,
+        0.7309351775709728,
+        1.0992074379743826,
+        1.9601333118278037
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "fvg_w2_5m",
+      "product": "MGC",
+      "n_real": 236873,
+      "n_placebo": 236873,
+      "real_touch_rate": 0.8294655786011914,
+      "placebo_touch_rate": 0.8208491470112677,
+      "real_distance_median": 0.650000000000091,
+      "placebo_distance_median": 0.6785830931073633,
+      "real_distance_deciles": [
+        0.15000000000009095,
+        0.25,
+        0.3500000000001364,
+        0.5,
+        0.650000000000091,
+        0.8999999999998636,
+        1.199999999999818,
+        1.650000000000091,
+        2.7000000000000455
+      ],
+      "placebo_distance_deciles": [
+        0.11204715660292096,
+        0.21319775497190677,
+        0.33331638139611636,
+        0.48321030920360497,
+        0.6785830931073633,
+        0.945476576596229,
+        1.347730987109071,
+        2.0451302261201367,
+        3.6525541062359506
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "fvg_w4_1m",
+      "product": "MGC",
+      "n_real": 609520,
+      "n_placebo": 609520,
+      "real_touch_rate": 0.8400413440084,
+      "placebo_touch_rate": 0.847734282714267,
+      "real_distance_median": 0.5499999999999545,
+      "placebo_distance_median": 0.5556803400301078,
+      "real_distance_deciles": [
+        0.20000000000004547,
+        0.25,
+        0.34999999999990905,
+        0.40000000000009095,
+        0.5499999999999545,
+        0.6999999999998181,
+        0.900000000000091,
+        1.25,
+        1.9500000000000455
+      ],
+      "placebo_distance_deciles": [
+        0.10561574919352097,
+        0.19505874416768165,
+        0.29185611584514387,
+        0.4073748702618559,
+        0.5556803400301078,
+        0.7581609983775706,
+        1.0651412594378824,
+        1.5923217410120742,
+        2.839417684511681
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "fvg_w4_5m",
+      "product": "MGC",
+      "n_real": 160236,
+      "n_placebo": 160236,
+      "real_touch_rate": 0.7913203025537332,
+      "placebo_touch_rate": 0.7882810354726778,
+      "real_distance_median": 0.8500000000001364,
+      "placebo_distance_median": 0.8911179759686547,
+      "real_distance_deciles": [
+        0.25,
+        0.3500000000003638,
+        0.5,
+        0.650000000000091,
+        0.8500000000001364,
+        1.1000000000001364,
+        1.4500000000007276,
+        2.0499999999999545,
+        3.2999999999999545
+      ],
+      "placebo_distance_deciles": [
+        0.168710175762385,
+        0.3044422527880215,
+        0.4576460344867428,
+        0.6441586938672117,
+        0.8911179759686547,
+        1.2272456700256953,
+        1.7284194626023464,
+        2.5826830496746425,
+        4.616323257655949
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "fvg_w8_1m",
+      "product": "MGC",
+      "n_real": 224498,
+      "n_placebo": 224498,
+      "real_touch_rate": 0.7921228696914895,
+      "placebo_touch_rate": 0.7837575390426641,
+      "real_distance_median": 0.8500000000003638,
+      "placebo_distance_median": 0.9314926804876222,
+      "real_distance_deciles": [
+        0.40000000000009095,
+        0.5,
+        0.599999999999909,
+        0.7000000000000455,
+        0.8500000000003638,
+        1.099999999999909,
+        1.400000000000091,
+        1.949999999999818,
+        3.0
+      ],
+      "placebo_distance_deciles": [
+        0.18284896282684712,
+        0.3357939217127296,
+        0.4955620937714001,
+        0.6846279930324727,
+        0.9314926804876222,
+        1.2749225722787738,
+        1.7892592740037343,
+        2.7163092131132553,
+        4.927770286103374
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "fvg_w8_5m",
+      "product": "MGC",
+      "n_real": 79588,
+      "n_placebo": 79588,
+      "real_touch_rate": 0.7538573654319747,
+      "placebo_touch_rate": 0.736681409257677,
+      "real_distance_median": 1.2999999999999545,
+      "placebo_distance_median": 1.346316669951193,
+      "real_distance_deciles": [
+        0.5,
+        0.6499999999998636,
+        0.7999999999999545,
+        1.0499999999997272,
+        1.2999999999999545,
+        1.650000000000091,
+        2.150000000000091,
+        2.9500000000000455,
+        4.600000000000364
+      ],
+      "placebo_distance_deciles": [
+        0.28004525397038843,
+        0.486687030998246,
+        0.7108842612094349,
+        0.9879845463570291,
+        1.346316669951193,
+        1.8588799526266482,
+        2.598811749042829,
+        3.915359538400299,
+        7.043269979024493
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema20_5m",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.6755332496863237,
+      "placebo_touch_rate": 0.6524466750313677,
+      "real_distance_median": 1.7326201656883313,
+      "placebo_distance_median": 1.6203216503367912,
+      "real_distance_deciles": [
+        0.25604642849193626,
+        0.5449941080491044,
+        0.8579628075090114,
+        1.2689772106798045,
+        1.7326201656883313,
+        2.2899825738307302,
+        3.0907207165264023,
+        4.251225464957362,
+        6.5608826527366535
+      ],
+      "placebo_distance_deciles": [
+        0.2459642729668758,
+        0.5382728399474218,
+        0.8679038686280365,
+        1.2044267664182826,
+        1.6203216503367912,
+        2.147591510790426,
+        2.994928585917341,
+        4.364761274601007,
+        7.049168954874676
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema20_15m",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.5465495608531995,
+      "placebo_touch_rate": 0.5186951066499372,
+      "real_distance_median": 2.872120241212315,
+      "placebo_distance_median": 2.939451309294782,
+      "real_distance_deciles": [
+        0.4403974991719224,
+        0.9503292822044842,
+        1.5251913302726279,
+        2.1333602129711844,
+        2.872120241212315,
+        3.9714439277107885,
+        5.42290318234418,
+        7.214221353553559,
+        10.985042951440208
+      ],
+      "placebo_distance_deciles": [
+        0.45095401946396124,
+        1.018852270664547,
+        1.5741054656634335,
+        2.200765578715255,
+        2.939451309294782,
+        3.9678422046987634,
+        5.28373119577809,
+        7.30541690640826,
+        11.554677387918446
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema50_5m",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.5560853199498118,
+      "placebo_touch_rate": 0.5267252195734002,
+      "real_distance_median": 2.7566690042592654,
+      "placebo_distance_median": 2.764355818830836,
+      "real_distance_deciles": [
+        0.42064775860203557,
+        0.906283563140687,
+        1.4626613948473277,
+        2.012344930728159,
+        2.7566690042592654,
+        3.826472338209533,
+        5.162648531155173,
+        6.886340373828671,
+        10.480218581434793
+      ],
+      "placebo_distance_deciles": [
+        0.4229852864811619,
+        0.9162423310041051,
+        1.4397317061322612,
+        2.0655764876692055,
+        2.764355818830836,
+        3.736449563079896,
+        4.935242941014575,
+        6.858099809563192,
+        11.110699941677057
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema50_15m",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.44993726474278545,
+      "placebo_touch_rate": 0.4301129234629862,
+      "real_distance_median": 4.044467437154253,
+      "placebo_distance_median": 3.913980683505315,
+      "real_distance_deciles": [
+        0.6615924973292749,
+        1.3399737504177212,
+        2.113168576436601,
+        2.977915715642803,
+        4.044467437154253,
+        5.441613810729951,
+        7.59452316204688,
+        10.317296862904373,
+        15.919493517925728
+      ],
+      "placebo_distance_deciles": [
+        0.6060736626288872,
+        1.256894318033028,
+        1.99847564585898,
+        2.872504603939524,
+        3.913980683505315,
+        5.2853138463645335,
+        7.210859414391689,
+        10.586691619050281,
+        16.96040321184355
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema200_5m",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.4273525721455458,
+      "placebo_touch_rate": 0.42358845671267253,
+      "real_distance_median": 4.5399393156585575,
+      "placebo_distance_median": 4.318611086763212,
+      "real_distance_deciles": [
+        0.7335879494068649,
+        1.4976243502517264,
+        2.3474941800236593,
+        3.2503140756061386,
+        4.5399393156585575,
+        6.036206935557494,
+        8.30178538371574,
+        11.50276650386768,
+        17.88137497144635
+      ],
+      "placebo_distance_deciles": [
+        0.694815727342575,
+        1.457710828225845,
+        2.2390385896401312,
+        3.161185137861776,
+        4.318611086763212,
+        5.873859243605148,
+        7.754869459221117,
+        10.903553049130831,
+        18.530970976335254
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "ema200_15m",
+      "product": "MGC",
+      "n_real": 3985,
+      "n_placebo": 3985,
+      "real_touch_rate": 0.30664993726474277,
+      "placebo_touch_rate": 0.317189460476788,
+      "real_distance_median": 7.053681818766563,
+      "placebo_distance_median": 6.810059368898692,
+      "real_distance_deciles": [
+        1.2536361566566487,
+        2.450644300876684,
+        3.8648759492494267,
+        5.306762767168675,
+        7.053681818766563,
+        9.291519299752055,
+        12.453337765664719,
+        16.884844996274076,
+        25.860720694041266
+      ],
+      "placebo_distance_deciles": [
+        1.0029758760459118,
+        2.1731499706198525,
+        3.536471734648785,
+        5.095166813503284,
+        6.810059368898692,
+        9.059901471263538,
+        12.029131827377523,
+        17.26522761067641,
+        26.487724023399224
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "prior_week",
+      "product": "MGC",
+      "n_real": 1652,
+      "n_placebo": 1652,
+      "real_touch_rate": 0.18401937046004843,
+      "placebo_touch_rate": 0.2033898305084746,
+      "real_distance_median": 21.700000000000045,
+      "placebo_distance_median": 20.82073157745242,
+      "real_distance_deciles": [
+        4.009999999999994,
+        7.720000000000032,
+        11.630000000000036,
+        16.399999999999956,
+        21.700000000000045,
+        27.4,
+        34.799999999999955,
+        47.180000000000085,
+        71.70000000000002
+      ],
+      "placebo_distance_deciles": [
+        4.3865420319616995,
+        8.432354844103475,
+        12.516501197861087,
+        16.42110130887227,
+        20.82073157745242,
+        27.12970362202618,
+        36.603074683041946,
+        49.656898284599336,
+        74.30942380633456
+      ],
+      "failures": []
+    },
+    {
+      "level_type": "prior_month",
+      "product": "MGC",
+      "n_real": 380,
+      "n_placebo": 380,
+      "real_touch_rate": 0.12631578947368421,
+      "placebo_touch_rate": 0.1,
+      "real_distance_median": 47.450000000000045,
+      "placebo_distance_median": 46.14666339004748,
+      "real_distance_deciles": [
+        7.360000000000081,
+        17.95999999999999,
+        26.439999999999987,
+        36.15999999999999,
+        47.450000000000045,
+        57.62000000000017,
+        79.48999999999992,
+        106.34000000000003,
+        150.50000000000023
+      ],
+      "placebo_distance_deciles": [
+        9.655963016207714,
+        20.431768379004325,
+        27.795592842351244,
+        35.111640009209715,
+        46.14666339004748,
+        56.78839522952367,
+        76.03535969574764,
+        103.87504325250664,
+        166.61802075092572
+      ],
+      "failures": []
+    }
+  ]
+}
