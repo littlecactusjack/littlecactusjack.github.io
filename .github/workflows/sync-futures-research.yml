@@ -1,0 +1,26 @@
+name: Sync futures-research from upstream
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Pull upstream into futures-research/
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          before=$(git rev-parse HEAD)
+          git subtree pull --prefix=futures-research \
+            https://github.com/coltontr419-droid/futures-research master \
+            -m "Sync futures-research from upstream"
+          if [ "$(git rev-parse HEAD)" != "$before" ]; then git push origin HEAD:main; else echo "Already up to date."; fi
