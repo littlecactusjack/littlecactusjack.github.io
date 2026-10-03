@@ -4960,6 +4960,393 @@ recommendation in §63 — collinearity measurements and the four unmeasured fir
 only items that cost no trial, and S06 remains the only entry both genuinely new and plausibly above
 its own bar, still short of the prevailing SR\* by about 2×.
 
+## 65. The T-series: T01 and T05 measured, T02–T07 closed at S2; nothing registered (S1–S6)
+
+**NOTHING REGISTERED. NO TRIAL SPENT. N stays 760, SR\* 0.1368, both chains verify. S5, S6 and S7
+not run.** `hypotheses.yaml` untouched. Measurements logged to `measurements.jsonl` here (T01 ×2,
+T02/T04 ×2, T05 ×3) and in `r-series-research` (R01's T05 split ×1), none counted in N. The draft
+is saved as `T_SERIES_CANDIDATES.md` with corrections inserted as **[§65]** blocks. Reports:
+`t01_volume_clock.md`, `t05_sign_asymmetry.md`, `t02_t04_scale_collinearity.md`, `t_series_s2.md`.
+
+An eighth series drafted against the same data: the statistical character of the price path —
+volume clocks, jump/diffusion, realised skew, path efficiency, sign asymmetry, elapsed time since a
+large move, variance ratio. It is counted in the ledger as the eighth, at 7 drafted / 0 registered.
+
+### T01 — volume clock. Reopens nothing; two premises corrected, two cells withdrawn
+
+- **There are no dead bars.** Zero `volume == 0` rows in either product; an untraded minute is
+  absent, not forward-filled. The mechanism is unequal weighting of *traded* minutes (MGC: 1 to
+  10,400 contracts a minute).
+- **Effective n falls, it does not rise.** At the mean-minute threshold, 0.48× (MNQ) and 0.41×
+  (MGC) as many bars as traded minutes. The draft's trap — "if n rises, check it is not
+  manufactured" — is never reached.
+- **Kurtosis at matched n** (volume vs a trade-minute clock): MNQ 86 vs 112, 39 vs 73, 20 vs 51.
+  MGC's only valid cell goes the other way, 67 vs 30 — single-row absorption, measured: built from
+  minutes, a volume clock can merge quiet minutes but never split a busy one.
+- **The pre-stated validity check failed in two cells, and they are withdrawn.** Before any
+  result, the module said realised variance should be close across partitions at matched n and
+  that a large divergence would mean the construction is wrong. Raw ratios came back 0.69–0.96.
+  A first draft of the write-up then *explained* that gap (bid-ask netting) instead of applying the
+  criterion — the post-hoc move the trial log exists to prevent. It was replaced by a test: restore
+  each session's dropped first leg, which differs by partition. Result 0.854–0.963 — a partial
+  explanation (most of the gap on coarse bars, almost none on fine). **MGC k=1 and k=5 stay outside
+  ±10%, so their kurtosis figures (164 vs 433, 65 vs 329) — the most striking numbers in T01 — are
+  withdrawn, not interpreted.**
+- **The three improvements the draft promised do not follow.** α: `calibration.md` §A already found
+  coverage indistinguishable at γ₄ = 115 and 226. n_min: falls, but is tens of events against
+  floors in thousands. Detection floor: a power floor on a mean, σ- and n-driven — not recalibrated
+  here, argued and labelled so.
+- **F01's "4,125 against 19,722" is the superseded ceiling.** §22 measured 3,523 (MNQ) / 3,449
+  (MGC) at best, 66 / 115 at worst. The brief repeated the pre-§22 number; the measurement uses the
+  measured one. **No S4-blocked entry crosses its floor; none qualifies for re-registration.**
+
+### T05 — sign asymmetry. Every closed conclusion survives the split, at reportable power
+
+Each split is of numbers first **reproduced exactly** from the record — all 108 L07 cells
+(`l07_cells.json`, events exact, means to 1e-9), P03 (`p03_stage1.json`), all nine R01 cells
+(`r01_checks.json`) — the §38 decision-2 practice. Gaps are tested with **sessions as the unit**;
+R01 on non-overlapping entries, the independence its registered t already assumed.
+
+| | sides | gap | verdict |
+|---|---|---|---|
+| L07 MNQ | both negative in 54/54; weaker side ≥ 2.31× cost | median +0.23 bps; BH 0/54 | survives |
+| L07 MGC | both negative in 54/54; weaker side ≥ 1.76× cost | median +0.13 bps; BH 5/54 | survives |
+| P03 | +0.133 / +0.025; neither clears +0.625; real legs net −0.32 / −0.24 | p = 0.81 | survives |
+| R01 | +0.492 long / +0.411 short (best cell) | p 0.41–0.95, sign flips | survives |
+
+**No closed entry was averaging a real effect with a null.** L07 carries one small, consistent lean —
+down-created gaps (traded long) are the more negative side on both instruments, 5–9% of the effect,
+surviving BH only on MGC in one overlapping family. That also **closes the open item in
+`level_conclusion.md`**: a bullish/bearish mix difference cannot manufacture a sign that holds on
+each side separately. R01's long side alone nominally clears the 0.48 single-leg floor by 0.012 bps;
+selecting it would be choosing a subset by its result, the split is not significant, and R01 is a
+two-leg trade against 0.96.
+
+**§60 applied to T05's own nulls.** "No asymmetry" is a null, so the pipeline had to recover an
+injected asymmetry *of the size sought* — one side carrying the whole effect, a gap of 2 × |pooled| —
+*at each run's own noise and n*, by adding it to the real paired differences. Recovered exactly and
+detected everywhere: L07's least-powered cell on both instruments (power 1.00), R01 (≥ 0.995 in
+eight cells, **0.68** in W=120 k=2.5), **P03 at 0.82**. P03's null is reportable, narrowly.
+
+### T02/T04 — not one hypothesis; each fails on its own; J is not scale-free
+
+- **Collinearity (the brief's gate):** Spearman ρ(J, ER) **+0.047 to +0.073** on non-overlapping
+  windows, both instruments, every W — the predicted direction, a tenth of the 0.6 threshold.
+  Firing overlap, the test that decided Q01/Q02, agrees: below independence, Jaccard ≤ 0.0015.
+  **Registering both would not be one bet counted twice.**
+- **But T02's condition selects almost everything:** J < j_low in 57–94% of windows. **T04's
+  almost nothing:** ER > 0.5 in 0.08–0.19% of windows, ER > 0.8 in none — a third of its grid empty.
+- **J is not scale-invariant — the P03 failure class through a new channel.** A ratio of moments of
+  one series is invariant to multiplicative scale, not to price *discreteness*: as price rises on a
+  fixed tick, fewer 1-minute returns are exactly zero, and every zero removes two bipower terms
+  against one RV term. J's median halves across eras (index 0.093 → 0.049, zero returns 18% → 3%;
+  MGC 0.112 → 0.046), so a fixed j_low selects a different share each era. **This is a transferable
+  finding and a candidate addition to finding 6 of the terminal report**; it is recorded here and not
+  promoted, which is the user's call. ER and RSkew are stable.
+
+### The S2 filter — every predictable entry fails, and SR\* binds twice
+
+Method unchanged from §54/§59/§63 (k = 54, post-2021 decisive, DEFF 5.8), plus one sensitivity §63
+lacked: SR\* converted to bps with the **outright** per-trade σ (lenient) as well as the paired-
+difference anchor. Verdicts are stated under the lenient one.
+
+| | prior | own BH bar | SR\* in bps | binds | |
+|---|---|---|---|---|---|
+| T02 | 0–0.5 | 0.85 | 2.95 | SR\* | below both |
+| T03 | 0–1.0 | 0.85 | 2.96 | SR\* | **clears its bar, below SR\*** |
+| T04 | 0–0.5 | 59–218 | 2.98 | BH bar | below both |
+| T06 | — | | | | cannot predict; F05 restated |
+| T07 | — | | | | cannot predict; no primary |
+
+T02's draft range (2–5) cites R01's +0.452 as its anchor, which supports ~0.5; its measured
+analogues (P03 +0.079, L12 +0.306, R01 +0.452) give 0–0.5. **T03 is the second instance of
+finding 9**: an entry clearing its own correction while sitting below the programme's bar. T06's
+draft distinguishes it from "L-series volatility compression"; that was F05 — tested at adequate
+power and retired — and T06 arms the same trade.
+
+### What the draft's closing paragraph may and may not say
+
+The draft asked, if T02–T06 came back null at adequate power, to state that the statistical-character
+axis is closed and is the last. **They did not come back null; they were not run** — closed at
+S1–S2 by arithmetic and by measured properties of their own conditions. That is a stronger reason
+not to run them and a weaker claim about the axis: **not shown empty by evidence, shown not worth
+searching with these instruments on this data at this cost.** And the data limit is specific — a
+true volume clock and a jump/diffusion split free of the tick grid both need trade-level data that
+is not on disk. Per §61 that is a reason to stop, not a ninth series.
+
+### Errors made and caught in this work, recorded because the record is the point
+
+1. **Figures written before they were measured.** A first draft of the [§65] markup stated
+   ρ(J, ER) ≈ −0.74 / −0.79, "exceeds 0.6, one hypothesis", and "J moves at most a few hundredths
+   across eras" — none of it measured; the measurement says +0.05 to +0.07 and a ~2× drift. Caught
+   and discarded before any commit. **The worst class of error this programme can make**, worse than
+   any §6 entry: not a constant computed for the wrong object, but no computation at all.
+2. **An event-level permutation test for T05's gap** — the §45 unit error recurring a fourth time
+   after its correction was written. Replaced by a session bootstrap; a test now pins that it is
+   wider than the event-level version under a shared session shock.
+3. **A NaN-poisoned rolling sum** in the T02/T04 module: one boundary NaN made every later window
+   NaN. The S2 filter had already consumed those NaN firing rates once; both were rerun. Pinned by
+   test.
+4. **`np.setdiff1d` inside a 10,000-iteration loop** — a multi-minute hang misread at first as data
+   size.
+5. **Memory, four times.** `definitions.load` (~626 MB) now OOMs alone on this machine with the
+   editor open; T05 builds the same grid in year chunks (470 MB) and the FVG zones in row chunks,
+   both pinned equal to the shared code by test and, at run time, by every one of 108 cells
+   reproducing to 1e-9. R01's split OOM'd calling the evaluator eighteen times and was rewritten on
+   the registered non-overlapping statistic. T02/T04 was rewritten per era. The first T01 loop was
+   split one (product, k) per process.
+6. **The T01 realised-variance criterion explained instead of applied** — above.
+7. **A wrong figure given in conversation, not committed:** MGC's tick was described as ~8 bps in
+   2010; it was 0.78 bps. The mechanism did not depend on it.
+
+### Decisions taken rather than resolved silently
+
+1. **Nothing added to `hypotheses.yaml`; S5–S7 not run.**
+2. **Withdrawn cells stay in the tables, marked**, not dropped — a cell that vanishes is
+   indistinguishable from one never computed.
+3. **R01's p-value uses the normal tail**, not Student's t: `r-series-research` does not declare
+   scipy, and at Welch df in the thousands the two agree beyond the precision reported.
+4. **ρ(J, ER) on non-overlapping windows.** The first run used every rolling window (+0.05 to
+   +0.08); windows sharing W−1 of W returns carry almost no independent information.
+5. **T04's `|net| > k × ATR` clause omitted** — the draft fixes neither k nor which ATR.
+6. **The discreteness finding is not promoted into the terminal report.** Finding 6 of
+   `programme_conclusion.md` is the natural home; adding it is left to the user.
+
+### Addendum, 2026-10-02, after `5b4e51d` — error 1 was model-dependent
+
+*Appended after commit rather than edited into the list above, so the section reads as committed.*
+
+**The figures in error 1 were written by a session running on Sonnet (`claude-sonnet-5`), selected by
+mistake for this work.** The same work was then redone on Opus, which measured them, found them
+contradicted, and discarded them before any commit. **This was not a rule failure.** The standing rule —
+measure before asserting, and nothing enters the record unverified — held: the numbers never reached a
+commit. What failed was the model, which wrote down results it had not computed. A rule that catches
+that before commit is a backstop, not a reason to keep generating the error.
+
+**Practical implication, recorded as a working rule: design and measurement tasks in this programme do
+not route to Sonnet, even when they look routine.** The figures in question were exactly the kind that
+look routine — a correlation and an era table, sitting in a markup block — which is what made them
+dangerous.
+
+**Scope, checked rather than assumed.** §64 and the terminal report's findings 9 and 10 were also
+written in that Sonnet session. Their figures restate §63's computed output, and were re-verified
+against `reports/s_series_s2.json` on 2026-10-02: the four 5m-cell bars (1.88, 1.45, 1.41, 1.19 bps),
+SR\* in bps at the N each would face (3.64–3.70), and N 760 → 1,030 / SR\* 0.1368 → 0.1406 all
+match. The incident does not extend to them.
+
+## 66. The T-series is closed (S1, S2)
+
+**CLOSED. Nothing registered, no trial spent; N 760, SR\* 0.1368, both chains verify.** Seven
+measurement records in this repository (m00116–m00122) and one in `r-series-research` (m00003), none
+counted in N. §65 is the measurement; this section is the close.
+
+**T01 closes the methodological route.** A volume clock was the one T-series idea aimed at a binding
+constraint rather than at a new effect, and it does not work here for a reason that is structural, not
+a matter of tuning: **effective n falls under it rather than rising** (0.48× MNQ, 0.41× MGC), because
+there are no dead bars to remove — the continuous series holds traded minutes only, and a volume clock
+can merge right-skewed traded minutes but never split one. So the floor that blocked L01, L08 and F01
+is a power floor that resampling does not move. That last step rests on the floor's construction (an
+injection-recovery power sweep on a mean) and on `calibration.md`'s measurement that coverage does not
+separate at γ₄ 115 against 226 — not on recalibrating the floor under a volume clock, which was not
+done.
+
+**T05 validates the programme's sign-symmetric design rather than exposing it.** Every hypothesis in
+seven series was built the same way long and short; nobody had checked that choice. Split by the sign
+of the conditioning move, L07 (all 108 cells), P03 and R01 each carry their effect on both sides, at
+power §60 accepts. No closed entry was averaging a real effect with a null. **It also closes the L07
+direction-mix item open since the L-series** (`level_conclusion.md`): a sign that holds separately for
+bullish and bearish gaps cannot come from the mix between them.
+
+**T02 and T04 are not collinear, and each fails independently.** Their conditioners correlate at
++0.05 to +0.07 and their firings overlap less than chance, so registering both would not have been one
+bet counted twice. But T02's condition holds in 57–94% of windows — it selects almost nothing — and its
+conditioner is not scale-free; T04's holds in under 0.2%. **T03 is the S-series finding repeating:** it
+clears its own BH bar (0.85 bps) while sitting below the prevailing SR\* (2.96 bps). T06 restates F05;
+T07 has no primary.
+
+**The statistical-character axis is closed alongside level, state and time.** It was the fourth and last
+structural dimension reachable from the data on disk — where price is, when, in what state the market
+is, and how price arrived. The basis is the one the Q- and S-series closed on: arithmetic and measured
+properties of each entry's own condition at S1–S2, not nulls at adequate power. **What remains requires
+a data purchase or an account structure permitting constructions this one does not** (terminal report
+§10, items 1 and 2); the T-series makes the data item concrete, since a true volume clock and a
+jump/diffusion split free of the tick grid both need trade-level data.
+
+**The discreteness finding is promoted** — as finding 11 of `programme_conclusion.md`, a new finding
+and not an amendment to finding 6. Finding 6 covers a ratio whose denominator trends, as in P03. J is a
+ratio built from one return series in which both terms scale together; it still drifts because the tick
+grid underneath does not, and T02's jump fraction halved across eras for that reason. A reader applying
+finding 6 to J would have concluded it was safe, so finding 6 does not cover it. This supersedes §65's
+decision 6.
+
+**Verification.** 19 of 20 test files pass, run one file at a time per CHECKPOINT. **`tests/test_roll.py`
+was OOM-killed after 12 of its 18 tests and is unverified this session.** It covers `data/roll` code that
+this change does not touch, and it is not claimed passing.
+
+## 67. U01 registered and blocked on event count; the fill curve is arithmetic (S1–S4)
+
+**A single hypothesis, not a series. Registered as U01, status `blocked_insufficient_events`. No
+trial spent: N 760, SR\* 0.1368, chain intact. Two measurement records (m00123 MGC, m00124 the
+index), not counted in N. S5, S6 and S7 not run.** Measurement in `reports/u01_gap_fill.md`
+(`reporting/u01_gap_fill.py`); entry in `hypotheses.yaml` and `FUTURES_STRATEGY_HYPOTHESES.md`.
+
+**The claim, and its weight.** "Large opening gaps — 0.4% or more at the open of a new day or week —
+fill same-session only about 8% of the time." The source is a social media clip describing its
+author's own backtest: no trial count, cost assumption or control visible, and no instrument or gap
+definition stated. **It carries no prior weight and is registered on its own terms**, with the same
+`provenance` block L11 carries.
+
+### The condition, fixed before counting
+
+In this programme's session convention: **daily** is the 18:00 ET reopen after the 17:00–18:00
+maintenance break against the prior session's last price; **weekly** is the Sunday 18:00 ET reopen
+against Friday's. The 09:30 RTH open against the 16:00 close is not used — index futures trade
+through it, so it is a move in continuous trading, not a gap in the futures price. Choosing between
+the two readings by which one fills less would have been selecting the condition by its result, so
+the choice was made first and is recorded as a decision the user can overrule.
+
+Validity rules, and when each was fixed:
+
+1. **Same contract** for the open and the prior close (a roll is not a gap), and a **normal break**
+   (< 6 h daily, < 3 days weekly). Fixed before counting.
+2. **The open must be an open: first print within 5 minutes of the reopen.** Fixed after seeing the
+   delay distribution — 87% of 2010 MGC sessions first traded more than 15 minutes late — and before
+   any count of large gaps or any fill rate.
+3. **The prior close must be a close: the prior session traded within 5 minutes of its own
+   scheduled close** (that product-year's modal last-print time; the schedule moved — index bars
+   after 16:15 ET do not exist before 2015, §59). **Fixed AFTER a first count and fill table had been
+   seen**, and recorded as such. It was diagnosed from a coverage anomaly, not the fill rates: index
+   "daily breaks" of ~21.5 hours in 2010–2012 traced to sessions holding ~110 bars that end around
+   20:30 ET — the early NQ data is incomplete (median 113 bars a session in 2010 against 1,380 now),
+   and MGC sessions before ~2016 are thin. **It can only remove sessions, so it cannot move the event
+   count toward the floor**; the blocking verdict is robust to it in direction. First-run counts (127
+   index, 54 MGC) are superseded by those below.
+
+### Firing rate: blocked, like F01
+
+| | daily opens | gaps ≥ 0.4% | weekly opens | gaps ≥ 0.4% | total (post-2021) | floor (180m proxy) |
+|---|---|---|---|---|---|---|
+| index (NQ→MNQ) | 2,634 | 41 | 484 | 63 | **104 (42)** | 5,884 |
+| MGC | 2,236 | 3 | 607 | 43 | **46 (28)** | 2,862 |
+
+**57× and 62× short on the full sample, more on the post-2021 half that decides.** A session-length
+hold has no resolved floor at all; the 180-minute proxy is the most generous one that exists. The
+brief anticipated "the low hundreds"; it is tens to one hundred. Nothing further is needed for the
+verdict, and the entry's `blocked_reason` states the arithmetic, not a finding about the market.
+
+### The fill curve: a smooth decline that tracks a random walk
+
+Measured as the brief asked, a measurement and not a trial: same-session fill by gap size on a grid
+fixed before measuring, daily and weekly, both instruments, against the reflection-principle
+prediction 2(1 − Φ(g/σ)) for a driftless walk, σ the session's own realised volatility after the open
+(and, as a check, the trailing 20-session median).
+
+- **Shape: a smooth decline in all four panels, with no break at 0.4% or anywhere else.** 0.4% is a
+  cut on a continuous relationship and has no special status.
+- **Weekly opens — where most large gaps are — track the random walk.** Overall MGC 83.7% observed
+  against 85.4% predicted (z −0.9); the index 76.6% against 81.9% (z −2.6, concentrated at
+  0.1–0.2%). At and above 0.4% the bins agree within a few points (73 vs 72, 69 vs 71, 56 vs 59). One
+  MGC bin (0.5–0.75%, n = 18) sits at z −3.6 with both neighbours on track: one of ~36 bins, not a
+  break.
+- **Daily opens fill MORE than the walk** (the index +7.9 points, z +7.4; MGC +4.0, z +3.5), at gaps of
+  a few ticks (median gap/σ ≈ 0.1) — consistent with the reopen print itself reverting. That is a
+  microstructure effect, in the direction opposite to the claim, far below 0.4%.
+- **The "8%" is not what happens on these instruments.** Gaps of 0.4% or more fill 46.5% (MGC weekly)
+  to 80.5% (index daily) of the time, and all three of MGC's daily ones — what arithmetic predicts. The clip may describe another
+  instrument or definition; it does not say.
+
+**By the brief's own test, U01 closes here twice over:** no effect beyond arithmetic at the stated
+threshold, and too few events for any test of it to carry a verdict.
+
+**No threshold was selected from the curve.** Picking the best-performing gap size would be a
+search over thresholds and would have to be counted as one; the curve is reported, not mined.
+
+### What the registration records, as the brief required
+
+- **The 8% is descriptive and does not support a trade.** Non-fill includes drifting sideways,
+  continuing away from the gap and partial retracement; only continuation pays. The S2 claim is
+  stated as the same-session forward return in the gap's direction, real minus a matched control,
+  against the cost floor in the post-2021 half. **Predicted magnitude 0 bps**: the only measured
+  input matches the zero-drift walk, whose signed return has mean zero.
+- **The control, chosen before any S6 work: state_control in strict (session) mode, matched on
+  ex-ante volatility quantile, time of day and year.** The alternative — a 0.4% move at the same
+  clock position with no gap — cannot be built at a reopen: any displacement at the open *is* a gap,
+  so the comparison would be taken minutes or hours later and reintroduce L07's timing confound
+  (§38), while holding displacement fixed and leaving the named confound, the volatility regime,
+  free. Clean pool for strict mode: 2,233 / 564 (MGC daily / weekly), 2,593 / 421 (index) — ample.
+- **Credit where due: 0.4% is a percentage, so the threshold passes §52 natively**, with no
+  restatement and no era-split escape hatch — unusual here (N02's points, L07's ticks, P03's ratio
+  and T02's "scale-free" J all needed correcting).
+
+### Registry changes made to admit it
+
+- **The ID and catalog checks accepted `[FLNP]\d\d`**, with a comment that the pattern widens
+  "deliberately when a series is opened". U01 is not a series; the pattern is widened to
+  `[FLNPU]` with a comment naming U as single hypotheses outside any series. Extended, not
+  loosened — an unknown letter still fails.
+- **The 8-hour hold check is stricter than the rule it stands in for.** A same-session hold from the
+  18:00 reopen to 16:55 is ~23 hours, yet never crosses 17:00 and so satisfies the account. The check
+  would reject U01 if it were untested; blocked, it does not bite. Recorded, not changed.
+
+### The base rate moves trivially
+
+Registrations go from 35 to **36**, still 0 promoted and 15 that spent a trial. §61's per-registration
+exact 95% upper bound moves from 0.0820 to 0.0798. §61 is not rewritten; the figure is noted here.
+
+### Decisions taken rather than resolved silently
+
+1. **The CME reopen reading**, not the RTH open — above. The user can overrule it; doing so would be a
+   new registration, not a re-cut of this one.
+2. **The stale-close rule was added after results were seen**, and is recorded as such with its
+   diagnosis and its one-directional effect.
+3. **MGC's thin early years are excluded by the validity rules, not by year** (2011–2015 retain
+   22–102 valid opens a year against ~238 from 2016).
+4. **The session's own realised volatility is the primary random-walk scale**, because it absorbs the
+   volatility-regime confound the brief names; the ex-ante scale is reported beside it and agrees.
+   Realised volatility on 1-minute bars slightly overstates σ through microstructure noise, which
+   biases the prediction toward MORE fill — the wrong direction to manufacture the daily excess.
+
+## 68. U01: four rulings recorded (S1, S2)
+
+**No trial spent; N 760, SR\* 0.1368. Nothing measured anew except a provenance check of the vendor
+file.** §67 is the measurement; this section records how its open points were ruled.
+
+1. **The CME reopen definition is settled, and recorded in the entry** (`definition_settled`), not
+   left as a session decision. Index futures trade through 09:30, so a cash-open displacement is a
+   move made in continuous trading rather than a gap in the futures price; the reopen is the only
+   point where the futures price can gap. **A cash-open version would be a separate registration with
+   a different mechanism** — cross-market price discovery at the equity open, not a discontinuity in
+   the futures price.
+
+2. **The daily-open observation is recorded as a measured property in its own right** — in the
+   entry (`s1_measurement.reopen_microstructure`) and in `u01_gap_fill.md`, not discarded with the
+   hypothesis. At daily reopens small gaps fill more often than a driftless walk predicts (the index
+   +4.7, +8.8 and +15.1 points at 0.05–0.3%, z +3.1 to +4.3; MGC the same direction, smaller); weekly
+   opens do not show it significantly. It was not what U01 registered and is not pursued.
+
+   **A correction to how it was first described.** §67 and the session report placed the excess "at
+   gaps of a few ticks". **They are 5–30 bps** — from about 6 ticks (MGC, 2010, smallest bin) to over
+   200 (the index today) — small only relative to session volatility (gap/σ 0.07–0.22). That matters
+   because "not tradeable at that magnitude" was ruled on the few-ticks description. On the corrected
+   scale the record does not assert it: the excess is a touch-probability difference, not a measured
+   return, so **tradeability is not established either way** — the same distinction U01's entry draws
+   for the 8% — and the observation is recorded as not pursued rather than as untradeable. The
+   reverting-reopen-print reading is an interpretation, not a test.
+
+3. **The early-NQ session-length defect is added to the terminal report's error table (§6).**
+   2010–2012 index sessions end in the evening — the 2010-06-08 session holds 119 rows ending 20:30
+   ET with none in RTH — so each such "prior close" was an evening print and the next reopen showed a
+   fake 21-hour break: every bar valid, no check failing, the count wrong downstream. **Provenance
+   checked before it was recorded:** the same 119 rows, ending 00:30Z, are in the vendor's own
+   `ohlcv-1m.NQM0.csv.zst`, the parsed parquet and the continuous series, so the defect is in the
+   SOURCE DATA and the pipeline reproduced it faithfully. It was found through the break-length
+   anomaly, not the fill rates, and the validity rule that fixed it can only remove sessions, so it
+   cannot bias the count toward the floor. (The first lookup matched `MNQM0` for `NQM0` — a substring
+   glob — and returned nothing; the exact file was then read.)
+
+4. **The 8-hour hold check is left as noted, not loosened.** A check stricter than the account rule
+   fails safe; relaxing it for a blocked entry would be fixing a test rather than an entry.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —
