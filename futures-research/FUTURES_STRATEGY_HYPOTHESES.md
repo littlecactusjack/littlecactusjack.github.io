@@ -520,3 +520,48 @@ continuing away from the gap and partial retracement; only continuation pays. Th
 claim is a forward-return distribution against a volatility-matched control, not a fill rate.
 
 `hypotheses.yaml` (U01) · `reports/u01_gap_fill.md` · `decisions.md` §67
+
+---
+
+## V01 — Reopen Displacement Reversion  *(BLOCKED at S4)*
+
+**A single hypothesis, and a post-hoc one — marked as such.** Registered 2026-10-03. The
+mechanism: the first print after the CME maintenance break is set against thin depth, so a
+displaced reopen is partly a liquidity artifact that corrects when real depth arrives; the
+counterparty is whoever quoted into the thin book. Its closest registered relative is **L02's
+absorption arm**, not L03, whose mechanism is a stop sweep. **L02 is not prior evidence against
+it** (corrected, §70): L02 tested only the 09:30 cash-open range, on MGC alone, and its own record
+calls its 0-of-27 null unable to refute its mechanism. No registered entry ever tested the CME reopen.
+
+**Provenance.** The observation came from U01's fill curve — daily reopens filling more often than a
+random walk at small gaps — so this mechanism was written after the effect was seen, though it
+predicts the direction independently. Not presented as a fresh hypothesis.
+
+**Blocked at its ceiling, with no threshold chosen.** It fires at most once per daily reopen, so the
+count of every valid daily reopen with a nonzero displacement is the largest any threshold could
+leave: 2,469 on the index and 1,926 on MGC (1,015 and 901 since 2021), below every floor. The only
+threshold on offer was the range where U01's curve showed the excess — a range chosen from a curve —
+and it was never needed.
+
+**No forward return was computed.** A real-minus-control return is the S6/S7 comparison, a trial by
+the programme's rule, and at a ceiling below every floor it could not change the verdict.
+
+`hypotheses.yaml` (V01) · `reports/v01_reopen_rate.md` · `decisions.md` §69
+
+---
+
+## W04 — Trend Plus Carry, Daily Portfolio  *(RETIRED — run 2026-10-03, t00767)*
+
+**The W-series' one registration.** Time-series momentum (Moskowitz, Ooi & Pedersen 2012) and carry
+timing (Koijen, Moskowitz, Pedersen & Vrugt 2018), at equal risk, across one CME market per sector —
+NQ, GC, HG, CL, ZN, 6E — traded through their micros at a daily horizon by chained 18:00-to-16:55
+session holds (confirmed with the firm). Published parameters, no free ones, **one trial**.
+
+**Pre-registered before the data was purchased**, amended after it arrived and before any price was read (daily UTC bars, a one-session delay, carry from same-bar closes). The decisive statistic is the post-2021 Sharpe net of the
+daily round trips, against the unit-consistent multiple-testing bar (~1.39); the economics is the
+prop-evaluation EV at that Sharpe. Prior 0.7–1.2, from the papers, labelled optimistic.
+
+`hypotheses.yaml` (W04) · `W_SERIES_CANDIDATES.md` · `decisions.md` §72–§73
+
+**Result (decisions.md §76):** post-2021 net Sharpe −0.42 against 1.31; gross 0.31. Daily re-entry on
+the lowest-volatility micros costs 0.73 of Sharpe. Retired on an informative null.

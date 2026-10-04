@@ -5347,6 +5347,674 @@ file.** §67 is the measurement; this section records how its open points were r
 4. **The 8-hour hold check is left as noted, not loosened.** A check stricter than the account rule
    fails safe; relaxing it for a blocked entry would be fixing a test rather than an entry.
 
+## 69. V01 registered and blocked at its ceiling; no forward return computed (S1–S4)
+
+**A single hypothesis, registered post-hoc and marked so. Status `blocked_insufficient_events`. No
+trial spent: N 760, SR\* 0.1368, chain intact. Two measurement records (m00125 MGC, m00126 the
+index), not counted in N. No forward return was computed; S5, S6 and S7 not run.** Measurement in
+`reports/v01_reopen_rate.md` (`reporting/v01_reopen_rate.py`).
+
+**The mechanism**, as given: the first print after the CME maintenance break is set against thin
+depth, so a displaced reopen is partly a liquidity artifact that corrects when real depth arrives;
+the counterparty is whoever quoted into the thin book, and they persist because someone has to make
+the first price.
+
+**A citation corrected before it entered the record.** The brief called this "L03's absorption
+mechanism". The absorption mechanism is **L02's** (its absorption arm: "whoever holds an overnight
+position that must be adjusted once real depth arrives") — retired at S7 on a null, 0 of 27. L03's is
+a stop sweep, forced flow beyond a reference point: a different counterparty. The entry cites L02.
+
+**Provenance, marked rather than smoothed.** The observation came from U01's fill curve (§67–§68), so
+the mechanism was written after the effect was seen, although it predicts the direction
+independently. That is the shape §38 declined to register for L07's mirror; V01 is registered only
+because it is blocked, with the order of events in its `provenance` block and the 36 looks (9 bins ×
+2 open types × 2 instruments) that produced it.
+
+### Two conflicts in the brief, and how they were resolved
+
+1. **"Measure the forward return against the volatility-matched control" versus "do not run S6 and
+   do not spend a trial".** A real-minus-control forward return IS the S6/S7 comparison, and by the
+   programme's rule a comparison is a trial logged before it runs; the P- and Q-series reviews
+   computed no forward mean before registering (§59). Measuring it unlogged would breach the trial
+   log; logging it would breach the brief.
+2. **"Whatever threshold defines the displacement range where the excess appears"** is a range chosen
+   from U01's curve — the selection the U01 brief itself ruled out.
+
+**Both dissolve on one costless measurement.** V01 fires at most once per daily reopen, so the count
+of every valid daily reopen with a nonzero displacement is the largest any threshold could leave. If
+that ceiling is below the floor, every threshold is blocked — none has to be chosen — and no return
+could change the verdict, so the outcome look is moot rather than skipped.
+
+### The ceiling
+
+| | ceiling (every reopen fires) | post-2021 | floor 60m (the mechanism's scale) | floor 180m (most generous) |
+|---|---|---|---|---|
+| index (NQ→MNQ) | **2,469** | 1,015 | 19,722 — 8.0× short | 5,884 — 2.4× short |
+| MGC | **1,926** | 901 | 5,620 — 2.9× short | 2,862 — 1.5× short |
+
+On the post-2021 half that decides, 5.8× and 3.2× short of even the generous floor. Adding the Sunday
+reopens — excluded by the mechanism's own wording, since they follow the weekend close rather than the
+maintenance break — would give 2,942 and 2,499, still below; the exclusion does not decide the verdict.
+
+### What else registration surfaced
+
+- **Scale.** Median |displacement| is 2.55 bps (MGC) and 3.01 bps (index), 0.03 of trailing session
+  volatility; p90 9.15 and 13.34 bps. Any threshold would be stated in volatility units. None was set.
+- **The S2 magnitude ceiling does not close it.** A fade cannot return more than the displacement, and
+  the median displacement sits above both cost floors. The event count closes it.
+- **No valid control as specified.** With no threshold the condition fires on every valid daily
+  reopen, so the volatility-matched control in strict mode has an empty clean pool — the L06
+  disposition, and the registration-time clean-pool check fails. A threshold would create a pool, but
+  the comparison would become large against small displacement, a dose-response design needing its
+  own justification.
+- **13.9% of MGC's valid daily reopens print exactly at the prior close** (zero displacement, no
+  direction) — counted out, not faded.
+
+### The base rate
+
+Registrations 36 → **37**, 0 promoted, 15 that spent a trial. §61's per-registration exact 95% upper
+bound moves to 0.0778. Not rewritten there; noted here.
+
+### Decisions taken rather than resolved silently
+
+1. **The forward return was not measured**, for the reasons above. If the economics number is still
+   wanted, it is a trial: logged first, against the volatility-matched control, with a threshold and a
+   horizon fixed beforehand. That is the user's decision, and it would not change the event-count
+   verdict.
+2. **No threshold was set**, rather than a curve-chosen one recorded as provisional.
+3. **The Sunday reopen is out by the mechanism's wording**, and its inclusion is reported beside the
+   verdict so the exclusion can be seen not to decide it.
+4. **The 60-minute horizon** is the mechanism's own clock ("when real depth arrives"); the 180-minute
+   proxy is reported beside it as the most generous floor.
+
+## 70. The cost-floor audit, scoped but not yet quoted; V01's prior evidence corrected (S8)
+
+**No trial spent; N 760, SR\* 0.1368. No market data downloaded, nothing purchased.**
+
+### 1. Auditing the cost floor — what the record already settles
+
+Every series closed against 0.48 bps (MNQ) and 0.65 (MGC), and the convergence result (§9 of the
+terminal report) rests on 0.48 exceeding R01's +0.452 — a margin of **0.028 bps, about $0.13 per MNQ
+round trip on $48,000**. The floor has never been checked. Its composition, from `CLAUDE_FUTURES.md`
+§4, decides what a quote pull can and cannot do to it:
+
+| | commission (fee table) | spread (one assumed tick) | floor |
+|---|---|---|---|
+| MNQ | 0.38 bps (≈ $1.82 round trip) | 0.10 | 0.48 |
+| MGC | 0.53 | 0.12 | 0.65 |
+
+- **About four-fifths of the floor is commission**, which no market data measures.
+- **For a market-order round trip, quotes can only confirm or RAISE the spread component, never lower
+  it.** A futures book cannot quote inside one tick, so crossing it costs at least the one tick the
+  0.10 already assumes; wider spreads (overnight, thin reopens, event minutes) add to it.
+- **So the convergence result inverts only through the commission or through passive execution.** At
+  exactly one tick of spread it inverts if all-in commission is below 0.352 bps — **about $1.69 per
+  round trip against the assumed $1.82**. Or if orders fill passively and EARN the spread, which is a
+  question of fill probability. The first is a fee-schedule check; the second needs order-level data
+  and the strategy's own order behaviour. **Neither is answered by mbp-1.**
+- **An inversion would not rescue R01.** R01 is a two-leg trade against a 0.96 floor, and its effect is
+  smaller than one tick of its coarser leg (0.569 bps on MES, `r01_checks.json` CHECK 2) — a spread
+  that cannot be crossed for less than the effect. The convergence statement compares the best
+  measured effect with a one-leg floor in the abstract; it is not R01's own economics.
+
+### 2. The quote, and why it is not in this section yet
+
+**There is no Databento API key on this machine.** `.env` holds FTP batch-delivery credentials (a
+12-character password, not a `db-` key), and the historical metadata API accepts only a key. The cost
+was not estimated from memory: pricing is usage-based and changes, and a remembered number in an audit
+of an assumed number would be the wrong kind of error.
+
+What exists instead, committed so the quote runs the moment a key does
+(`reporting/cost_floor_quote.py`, endpoints and parameters confirmed from Databento's own client
+source, metadata calls only — nothing downloaded or billed):
+
+- **Front-month symbology** (`MNQ.v.0`, `MGC.v.0`, stype_in `continuous`) as the primary quote: the
+  spread a strategy pays is the front month's. The ohlcv-1m pull (~$40, the scale reference) used
+  `parent` symbology — every expiry and calendar spread — which in mbp-1 would price quotes nobody
+  trades; parent is quoted beside it for the full and recent windows so the difference is visible.
+- **Three windows per instrument:** full range (MNQ from 2019-05-06, when it began; MGC from 2010-06-06),
+  the last two years, and the sample.
+- **The sample is pre-registered** (`reports/spread_sample_sessions.json`): 30 full CME sessions per
+  instrument (18:00–17:00 ET, so each spans the whole trading day), 10 per era, two per weekday, none
+  on adjacent days, drawn once with a fixed seed from sessions on disk — **before any quote or any
+  quote data exists**, so it cannot be chosen after seeing anything. It happens to include 2020-03-09
+  and 2020-03-11 on MNQ, which is what an unselected draw should be allowed to do.
+
+### 3. What a 30-session sample would and would not establish
+
+**Would establish:** the quoted spread's distribution by hour of the CME day, typical (median) and
+worst-case (p95, p99), in ticks and bps, per era; how often the spread exceeds the one tick the floor
+assumes; top-of-book size, i.e. whether a one-lot fills at the touch; the 18:00 reopen specifically
+(the thin-liquidity minute U01 and V01 concern). Those are most of what the spread component needs,
+and they can only confirm or raise it.
+
+**Would not establish:** slippage and fill probability, which depend on order type, latency and queue
+position rather than on quotes; anything about passive execution — the one route by which spread cost
+could fall below a tick; the commission, which is 79% of the floor; the spread on the specific minutes a
+strategy would trade, conditional on its signal; and rare tails — thirty sessions resolve a typical hour
+well and a news minute poorly.
+
+### 4. V01: L02 is not prior evidence against it — corrected
+
+**The V01 entry overstated the prior evidence.** It placed L02's absorption arm — same counterparty,
+retired at S7 on a null, 0 of 27 — beside V01's mechanism as though that null bore on it. **It does
+not.** L02 tested **only the 09:30 cash-open range** (`[09:30, 09:30 + W]` ET), **on MGC alone** at one
+horizon; MNQ was excluded on event count. On MGC it measured cross-asset spillover from the equity open,
+and its own note, written before it ran (§42), says the null "does not refute the mechanism, which was
+never properly exposed." **It never tested the CME reopen.** The only registered entry that touches the
+reopen at all is L06's `open_CME` level, which stopped at S6 — a magnitude-only condition with no valid
+control — and was never tested. **V01's mechanism had no prior test.** Corrected in the entry and its
+catalog section; §69 stands as written.
+
+## 71. The cost-floor audit's premise corrected; a method finding on citing prior evidence (S2, S8)
+
+**No trial spent; N 760, SR\* 0.1368. Nothing measured anew.** §70 is the analysis; this section
+records it as a correction to the audit's own premise, and promotes one method finding.
+
+### 1. The audit's premise was wrong, and the correction is recorded as such
+
+The audit was framed as: the 0.48 / 0.65 floor has never been checked, and **if the real floor is
+lower**, the convergence result inverts — so measure it with top-of-book quotes. **Quotes cannot lower
+the floor.**
+
+- **The floor is about 80% commission and 20% spread on both instruments** (MNQ 0.38 + 0.10, 79%
+  commission; MGC 0.53 + 0.12, 82%).
+- **The spread term already assumes exactly one tick, the minimum a futures book can quote.** For a
+  round trip that crosses the spread, quote data can therefore only CONFIRM or RAISE that term.
+- **The convergence result flips only if all-in commission is under about $1.69 per MNQ round trip
+  against $1.82 assumed — a margin of $0.13 — or if orders fill passively and earn the spread rather
+  than paying it.** Neither is measured by mbp-1.
+
+### 2. The practical consequence
+
+**The highest-value cost audit is confirming actual all-in commission (broker, exchange, clearing and
+NFA fees, per side, at the account's actual tier) against the assumed $1.82 MNQ round trip** — a
+fee-schedule check, not a data purchase. It addresses ~80% of the floor, where a $0.13 difference
+decides the convergence result, and costs nothing but reading a schedule.
+
+**`reporting/cost_floor_quote.py` stays committed and ready**, with its pre-registered 30-session
+sample, **but it audits the smaller term.** It can show how often and by how much the spread exceeds
+one tick — by hour, era, and at the thin 18:00 reopen — which can only add to the floor. It is worth
+running before any strategy's economics turn on the spread; it is not the audit that could invert the
+convergence result.
+
+### 3. Passive fills: the route no quote data can reach
+
+Of the two routes that could move the floor down, **passive execution is the only one that needs a
+measurement this programme cannot make from quote data.** A resting order that fills earns the spread
+instead of paying it — fully passive on both sides, the MNQ floor would fall from 0.48 to about 0.28
+bps. But whether it fills, and what it is filled against, are the questions: **fill probability and
+adverse selection require resting orders and a measured fill rate** — order-level data at minimum,
+and properly the strategy's own orders on a live or demo account. Quote data describes the queue a
+resting order would join; it cannot say whether the order would have been filled, or on which side of
+the move.
+
+**The other route, commission, is not a measurement problem.** It moves the floor by whatever the fee
+schedule says — by more than the $0.13 margin if the real schedule differs materially (an all-in $1.20
+round trip would put MNQ's floor near 0.35 bps) — and §2's check determines it exactly.
+
+### 4. Method finding — promoted to the terminal report as finding 12
+
+**An entry can be recorded as previously refuted by matching on counterparty description rather than
+on what was actually tested.** V01's registration placed L02's absorption-arm null (retired at S7, 0
+of 27) beside V01's mechanism because the two name the same counterparty — whoever is positioned
+against thin depth when real liquidity arrives. **What L02 tested was different in every respect that
+matters:** the 09:30 cash-open range, on MGC alone, where it measured spillover from the equity open
+into gold — and a note written before it ran (§42) stated that its null could not refute its own
+mechanism. **V01's mechanism had never been tested by anything** (§70).
+
+**Two steps produced it, and both are recorded.** The brief named the prior entry by its mechanism
+(and as L03, corrected to L02 in §69). The registration then carried that mechanism match through to
+the prior entry's RESULT without checking its test — the session, the instrument, the horizon, and the
+entry's own statement of what its null could establish. The second step is the one a rule can catch,
+and it was mine.
+
+**Rule:** before citing a prior entry as evidence for or against a new one, check what it TESTED —
+session and clock, instrument, horizon, condition, and any pre-written limit on what its result can
+establish — not what it is ABOUT. A shared counterparty is a mechanism match, not an evidence match.
+
+## 72. The W-series: daily horizons were reachable all along; what binds there instead (S1, S2)
+
+**Designed, not registered. No trial spent; N 760, SR\* 0.1368. Two measurement records (feasibility:
+dispersions, granularity, correlation — no strategy return computed).** Draft: `W_SERIES_CANDIDATES.md`;
+measurement: `reports/w_series_feasibility.md`.
+
+Asked to find where the record's "end of the road" is wrong rather than to add another intraday search.
+
+### The premise the record got wrong
+
+**Daily horizons were filed as forbidden (terminal report §10) and are not.** The rule is flat by 17:00;
+an 18:00-to-16:55 hold never crosses it, and chaining such holds re-creates daily exposure. Measured: the
+excluded 16:55→reopen window carries 1.1–1.6% of a day's variance, the held part correlates 0.99 with the
+full day, and one round trip is 0.34–0.56% of a day's SD (1.2%/yr MNQ, 1.6%/yr MGC traded every day).
+**At a daily horizon the cost floor does not bind.** No series ever tested a daily-horizon strategy. The
+firm's reading of an overnight hold inside one CME trading day is the load-bearing premise to confirm.
+
+### What binds instead — corrected mid-design on the user's point
+
+A first draft concluded that account size binds. **The user corrected it: a prop account permits 20–30
+micros, so it is not margin-limited.** Correct, and the draft had framed a risk limit as a capacity limit.
+What remains is the $2,000 trailing drawdown, and what it implies depends on the objective:
+
+- **Under §62's ruled bar** (ruin ≤ 10%, max vol 12.4%): total risk ≈ $391/day of σ. One MNQ ($847/day at
+  $59k notional) or one MGC ($538) exceeds it alone; diversifying inside it needs small contracts whose
+  forced daily round trip drags Sharpe by several tenths.
+- **Under prop-evaluation economics** (the fee as capital at risk): risk is set by EV per attempt, large
+  size can be rational, standard micros fit, and cost drag stays at 0.04–0.09. The success condition
+  becomes EV = P(pass) × payout − fee; R06's barrier machinery computes it once this account's terms are
+  supplied (R06 itself used 10% structures).
+- **Under both: evidence.** Sizing multiplies an edge and cannot supply one (§59: 36.8% pass at no edge, at
+  every size).
+
+### The multiple-testing bar for daily strategies — a decision to rule
+
+SR\* has been one per-observation number (0.1368) built from mostly per-trade intraday Sharpes. Read on a
+daily observation it is **2.17** annualised. The unit-consistent version — null variance of a daily Sharpe
+at the strategy's own T, N unchanged — gives **0.96** (full sample) and **1.39** (post-2021, decisive).
+Not resolved here. **Either way, the 760 trials already spent are now the main wall for daily strategies**
+— the permanent shared cost §61 described, arriving where cost stopped binding.
+
+### The candidates and the filter (priors sourced, arithmetic shown in the draft)
+
+| | prior | vs 0.96 | vs 1.39 | vs 2.06 |
+|---|---|---|---|---|
+| W01 trend, MNQ + MGC | 0.41–0.64 | below | below | below |
+| W02 trend, ~10 micros | 0.73–0.89 | below | below | below |
+| W03 carry timing | 0.6–0.9 | below | below | below |
+| **W04 trend + carry** | **0.77–1.27** | **straddles** | below | below |
+| W05 vol-managed index | 0.4–0.5 | below | below | below |
+
+Sources: Moskowitz, Ooi & Pedersen 2012 (0.3–0.5 per market, ~1.0 across 58); Koijen, Moskowitz, Pedersen
+& Vrugt 2018 (carry timing 0.6 per class, 0.9 global — read from the manuscript text); Moreira & Muir 2017
+with Cederburg et al. 2020 (no out-of-sample gain). W04's combination assumes a trend–carry correlation of
+0–0.5, unsourced and labelled.
+
+### What this overturns, stated no more strongly than it is
+
+**Overturned:** cost binds everywhere (it does not at a daily horizon), and daily horizons are unreachable
+(they are, subject to the firm). **W04 is the first candidate in nine series whose published prior reaches
+a multiple-testing bar on this data.** **Not overturned:** no prior clears the post-2021 bar or §62's 2.06,
+and nothing here is evidence of an edge — it is the first design whose prior makes a trial worth spending.
+
+### Open, for the user
+
+1. Confirm with the firm that an 18:00-to-16:55 hold is within "flat by 17:00".
+2. Choose the objective: §62's bar or prop-evaluation EV — and for EV supply fee, target, payout split,
+   reset cost, daily loss limit, contract limit.
+3. Rule on the SR\* convention for daily strategies.
+4. Buy ohlcv-1d for W02–W04's added markets (price once an API key exists).
+5. If all four go the right way: register W04 alone, one portfolio-level trial.
+
+## 73. W04 registered before its data; the prop-evaluation success condition computed (S1, S2, S8)
+
+**One registration (W04), no trial spent; N 760, SR\* 0.1368. One computation logged to
+`measurements.jsonl` (prop-evaluation EV, not counted in N).** Entry: `hypotheses.yaml` W04; EV:
+`reports/w_prop_ev.md` (`reporting/w_prop_ev.py`).
+
+### The rulings received (answers to §72's five open points)
+
+1. **The firm confirmed** that an 18:00-to-16:55 hold is within "flat by 17:00". Daily horizons are open.
+2. **Objective: prop-evaluation EV.** Terms supplied: $80 fee, +$3,000 target, a $2,000 buffer before
+   payout, 90/10 split, no resets, $1,000 daily loss limit, 30 micros. Two terms were ambiguous and are
+   modelled, not chosen: the daily loss limit is run both HARD (breach ends the account) and SOFT (flat
+   for the day); "a $2k buffer before payout" is read as withdrawals only above $52,000, the lock point.
+3. **SR\* convention left to the analyst; chosen: unit-consistent.** The single per-observation SR\*
+   (2.17 read daily) compares a daily Sharpe with per-trade intraday Sharpes, which are not the same
+   units. W04 is decided at the post-2021 unit-consistent bar, **≈1.39** at N = 761; the full-sample 0.96
+   is reported beside it, not decisive.
+4. **Data purchased by the user** (below).
+5. **W04 registered alone, as one portfolio-level trial.**
+
+### The data, and what changed because of it
+
+**ohlcv-eod is not offered for GLBX.MDP3.** The settings given earlier named it from the schema enum
+without checking it against the dataset; the error was the analyst's. ohlcv-1h costs ~10× ohlcv-1d, so
+**ohlcv-1d was bought.** Its bars close at 00:00 UTC (19:00/20:00 ET): each misses the first 1–2 hours
+of its own session and carries the first 1–2 hours of the next. Two consequences, both written into the
+entry before any price was read:
+
+- **Look-ahead, removed by construction.** A month-end close at 20:00 ET lies after the 18:00 reopen, so
+  a signal traded at that reopen would use prices not yet seen. The entry now delays every position by
+  one session; for a monthly signal this costs almost nothing.
+- **Alignment, to be measured before use.** With positions constant between monthly rebalances, the
+  shifted hours telescope within a holding period; what remains is day-level noise and the rebalance
+  edges, unbiased in sign. It is MEASURED, not assumed: UTC-day against 18:00→16:55 session returns on
+  the on-disk 1-minute MNQ and MGC, daily and 21-day correlation — price dispersions only, no strategy
+  return.
+
+**Received** (job GLBX-20261003-SDXCG4PTPA; three manifest SHA-256 hashes verified; parent symbology;
+2010-06-06 to **2026-09-11**, three weeks short of today, ~15 of ~1,320 post-2021 sessions): every W04
+product with all expiries — NQ, GC, HG, CL, ZN, 6E from 2010; micros M6E and MGC from 2010, MNQ 2019,
+MCL and 10Y 2021, MHG 2022 (micros are used for costs only). **The file also holds ES and MES, which are
+not in W04's universe and will not be used**, and calendar spreads and strips (about half the rows),
+which are discarded.
+
+**Amendments to the entry, made after the data arrived and before any price in it was read** (only the
+symbol and date inventory above was looked at): ohlcv-1d and the one-session delay; carry from the
+**same bar's** closes, with F2 the highest-volume outright expiring after F1, so a stale serial month
+(gold lists every month, trades mainly the even ones) is never used; outright contracts only; ES/MES
+excluded; weights netted per market; the economics row read at two sizes (below).
+
+**One registry check changed.** `test_registry_consistency.py` capped holds at 8 hours; W04 holds 22.9.
+§68 ruled it be left, not loosened, for U01: "a check stricter than the account rule fails safe;
+relaxing it for a blocked entry would be fixing a test rather than an entry." It is now replaced by the account's own bound — a hold must fit inside one CME trading day — because W04
+needs the longer hold and the firm has confirmed it. This departs from §68's letter for a live entry,
+and is recorded as such; the 8-hour figure was a heuristic for "flat by 17:00", not the rule.
+
+### The success condition, computed
+
+Simulator: daily-horizon P&L marked 13 times a session, Student-t (ν = 5) innovations, the account's
+trailing floor, lock, target, daily limit and monthly withdrawals; funded account followed two years;
+an evaluation not passed in a year counts as failed. **Validated against the closed form first**: no
+drift, no daily limit, P(pass) 0.260 against exp(−1)·2/3 = 0.245 — inside tolerance, but high by
+~0.015 from discrete monitoring, so **every EV below is slightly optimistic.** 6,000 paths per cell.
+
+EV per $80 evaluation (USD), HARD daily limit, selected cells:
+
+| Sharpe | $100/day σ | $150 | $250 | $400 | $600 | $900 |
+|---|---|---|---|---|---|---|
+| 0 | −63 | +26 | +97 | +47 | −34 | −74 |
+| 1.0 | +364 | +1,158 | +1,048 | +367 | +18 | −66 |
+| 1.25 | +683 | +1,872 | +1,616 | +543 | +61 | −61 |
+| 1.5 | +1,168 | +2,680 | +2,312 | +748 | +80 | −61 |
+
+SOFT is close to HARD at small size and diverges above $400/day: at Sharpe 1.0, +720 at $400 and +431 at
+$900 (HARD: +367, −66). Full grid in the report. Four findings:
+
+1. **The edge, not the size, drives EV.** At $150/day, Sharpe 0 → +$26; Sharpe 1.0 → +$1,158; at the
+   decision bar 1.39 (interpolated) ≈ **+$2,300 per evaluation**.
+2. **EV is not evidence.** At zero edge it is positive at moderate size (+$97 HARD at $250; +$152 SOFT at
+   $900): the firm absorbs losses beyond the fee. Matches §59 (sizing multiplies an edge, never supplies
+   one). EV is therefore an economics row in W04's decision rule; the Sharpe bar decides.
+3. **The optimum is small: ~$150–250/day of σ**, the opposite of R06's high-volatility optima under 10%
+   structures. Below $150 the one-year evaluation cap binds (an assumed term; the firm's real time limit
+   was not supplied). Above ~$400 the $1,000 daily limit and the $2,000 floor dominate.
+4. **Granularity binds again, at this objective.** One MNQ is $847/day of σ and one MGC $538 (§72,
+   measured). Under W04's registered equal-risk sizing, any integer book that holds MNQ at all holds every
+   market near $847/day — on the order of $2,000/day with all six on. **That is above the grid's top
+   size, where under the HARD reading EV is already −$66 at Sharpe 1.0 and −$47 at Sharpe 2.0; under SOFT
+   it is +$431 at 1.0.** The
+   trial's statistic (Sharpe) is scale-free and unaffected; its economics are not. The entry now requires
+   the runner to report EV at both the EV-optimal (fractional) size and the smallest integer book.
+
+**Not modelled:** consistency rules, minimum trading days, payout caps, funded-account time limits,
+slippage beyond the assumed one tick, the firm's real evaluation time limit. The 30-micro cap does not
+bind at any size the grid reaches.
+
+### Open, for the user
+
+1. **Ask the firm which reading of the $1,000 daily loss limit applies** — breach, or flat for the day.
+   Under HARD, W04 as registered cannot be traded near its EV optimum; under SOFT it can be traded at
+   positive EV if its edge is real.
+2. If HARD: whether to register, BEFORE W04 runs, a variant whose book drops markets that cannot be held
+   at under one contract at the target size. That would be a separate entry with its own trial, not an
+   edit to W04.
+3. W04 becomes schedulable once the alignment measurement is recorded and the runner passes outcome
+   injection at Sharpe 1.39.
+
+## 74. W04's daily bars measured against the sessions it trades: they stand in (S8)
+
+**No trial spent; N 760. Two measurement records (correlations of price changes, no strategy return).**
+`reports/w_daily_alignment.md` (`reporting/w_daily_alignment.py`). Owed by §73 before W04 could be
+scheduled.
+
+From the on-disk 1-minute data, UTC-day returns (last close before 00:00 UTC, Sunday bars dropped so
+Monday runs from Friday, same contract only) against the 18:00-to-16:55 held session return:
+
+| | era | days | corr, same session | corr, next session | SD ratio | corr, 21-day blocks |
+|---|---|---|---|---|---|---|
+| index | full | 3,166 | 0.966 | −0.065 | 1.016 | 0.981 |
+| index | post-2021 | 1,384 | 0.972 | −0.068 | 1.020 | 0.990 |
+| MGC | full | 3,131 | 0.972 | 0.012 | 1.022 | 0.987 |
+| MGC | post-2021 | 1,381 | 0.969 | 0.010 | 1.025 | 0.989 |
+
+**A UTC bar stands in for its session at 0.97 daily and 0.98–0.99 over 21-day blocks**, the span a
+monthly rule lives on. The UTC series is 2% more volatile (it carries a few extra hours). The
+next-session correlation is small; on the index it is negative, which the 1–2 hour overlap alone would
+not produce, so it is not attributed here — the one-session delay removes it from W04 whatever its source.
+**ohlcv-1d is adequate; ohlcv-1h is not needed.**
+
+**What the vendor bar is, checked.** On the purchased file's MNQ and MGC rows, the 1d close equals the
+1-minute last close before 00:00 UTC for the same contract and date on 99.4% and 98.7% of matched bars
+(median difference 0 ticks). Matches cover only contracts the continuous file holds that day (2,233 of
+7,572 MNQ bars; 4,879 of 28,813 MGC), since the purchased file carries every expiry.
+
+**Two facts the W04 runner must handle, found here:**
+- **Sunday-evening bars exist** (952 MNQ, 3,046 MGC): the Globex reopen falls on a Sunday UTC date.
+  They are dropped, so Monday's return spans Friday's close to Monday's, as measured above.
+- **The vendor names contracts with a one-digit year** (`MGCM9`). The decade is resolved from the bar's
+  date; a wrong decade would splice unrelated contracts.
+
+W04 now needs only its runner and the outcome-injection test at Sharpe 1.39 to be schedulable.
+
+## 75. The daily loss limit is soft (ruling)
+
+**Ruled by the user 2026-10-03, from the firm: hitting the $1,000 daily loss limit stops trading for that
+day; it does not end the account.** §73's SOFT reading governs; the HARD columns in
+`reports/w_prop_ev.md` stay as published, as the reading that was not adopted.
+
+**What it settles.** §73's fourth finding was conditional on this. Under SOFT, W04's integer book —
+about $2,000/day of σ once MNQ is held at equal risk — stays positive-EV if the edge is real: at the
+grid's top size ($900/day) SOFT EV is +$431 at Sharpe 1.0 against −$66 under HARD, and +$1,120 at
+Sharpe 2.0. That book still sits well above the ~$150–250/day optimum, so it gives up EV against the
+fractional optimum; the runner reports both. **No reduced-universe variant is needed**, and none is
+registered. W04's entry now names SOFT and computes the integer-book EV at that book's own σ (beyond the
+grid) with the same simulator. No trial spent; N 760.
+
+## 76. W04 run: it does not clear, gross or net; the daily-horizon cost premise corrected (S5–S8)
+
+**One trial spent: t00767. N 760 → 761; SR\* 0.1368 (unchanged to four places).** Report:
+`reports/w04_trial.md`. Runner committed before the run (`e5b62db`): `data/daily_bars.py`,
+`signals/w04.py` (positions only), `signals/portfolio.py` (the evaluator, a new runner entry point in
+the boundary test), `signals/w04_trial.py`; `tests/test_w04.py` (9, incl. no look-ahead).
+
+### The bar, by the registered rule — lower than the number quoted
+
+The entry fixes the bar as the unit-consistent SR\* "at the post-2021 sample's own T". The daily file
+has **1,481** post-2021 bars (weekdays on the union of six markets' calendars), not the 1,320 sessions
+of the 1-minute sample §72 used, so **the bar is 1.31, not the ≈1.39 quoted.** The registered rule is
+applied; the quoted figure was an estimate of it. It decides nothing here.
+
+### Outcome injection first (§60), synthetic only
+
+A carry edge planted in six synthetic t(5) markets, calibrated so the pipeline's own long-sample Sharpe
+is 1.29 (sought 1.31), recovered at n = 1,481 as 1.32 on average over 200 runs (bias 0.03, Monte Carlo
+SE 0.034); SD of the estimate 0.48; **power at the bar 51%**, and a true Sharpe of 2.10 clears it 95% of
+the time. `reports/w04_injection.json`.
+
+### The result
+
+| | T | gross | net | bar |
+|---|---|---|---|---|
+| **post-2021 (decides)** | 1,481 | 0.31 | **−0.42** | 1.31 |
+| full | 3,972 | 0.37 | −0.49 | 0.80 |
+| pre-2021 | 2,491 | 0.40 | −0.54 | — |
+
+Sleeves, net post-2021: trend −0.60, carry −0.62. Rotation null (500): mean −0.81, 95th percentile
+−0.15; 13.4% of rotations at or above the real — **the timing is not distinguishable from its own null.**
+
+**W04 does not clear, and would not have cleared at zero cost:** gross 0.31 against 1.31. With the
+estimate's SD of 0.48, the gross result's one-sided 95% upper bound is ≈1.10, so a true gross Sharpe at
+the bar is itself unlikely (p ≈ 0.02) — this null is informative about the bar despite 51% power at it.
+The published priors (0.7–1.2, pre-decay) were not met in either era: 0.40 gross before 2021, 0.31 after.
+
+### What was wrong in the premise: cost DOES bind at a daily horizon, on low-volatility markets
+
+§72 measured the chained round trip at 0.34–0.56% of a day's SD on MNQ and MGC and concluded **"at a
+daily horizon the cost floor does not bind."** True of those two; **false as a portfolio statement.**
+Measured here (post-2021, assumed $1.82 + one tick per micro round trip):
+
+| micro | round trip / day's SD |
+|---|---|
+| MNQ | 0.5% |
+| MGC | 1.2% |
+| MCL | 1.5% |
+| MHG | 1.7% |
+| micro 10Y (ZN equivalent, DV01 assumed $70) | **4.7%** |
+| M6E | **4.9%** |
+
+Equal-risk sizing gives the two lowest-volatility markets the largest notional, and a daily re-entry
+charges them every day: **the drag is 0.73 of Sharpe** (gross 0.31 → net −0.42). §72's wording stands
+corrected by this section; its feasibility measurements were right for what they measured. The finding
+generalises: **chained session holds cost one round trip per market per day, and in units of a day's
+risk that is ~10× larger on FX and rates micros than on the index.**
+
+### The economics row — defective as defined, and moot
+
+The "smallest integer-micro book" was implemented as each held position rounding to at least one
+micro. Netting the two sleeves leaves some markets with tiny weights, which forces the scale up: daily
+$σ $7,173, median 39 micros, over the 30-micro cap on 61% of days — **not a tradable book.** Its soft-limit
+EV (+$548) is the zero-edge lottery effect at huge size (P(pass) 38%, against §59's 36.8% with no edge),
+not value. At the EV-optimal sizes with the measured Sharpe: −$51 ($150/day), −$5 ($250/day). The verdict
+does not depend on this row; the definition is recorded as a defect, not repaired after the fact.
+
+### Status
+
+**W04 retired** (`hypotheses.yaml`), on an informative null. The W-series has no other registration.
+W01–W03 and W05 were closed at S2 below every bar; **W04's result is no evidence for or against them, but
+W02 and W03 share its universe and its daily re-entry, so they share its cost drag.**
+
+## 77. X-series S1 reviewed: overlap with W, the flatten tax, the monthly floor — closed at X02 (S1, S2, S4)
+
+**No trial spent; N 761, SR\* 0.1368 (r-series chain: 10, unchanged). Nothing registered. Two
+measurement records (m00132 X01, m00133 X02).** Draft: `X_SERIES_CANDIDATES.md` (supplied by the user,
+committed as received apart from a status banner). Measurement: `reports/x01_x02.md` (`reporting/x01_x02.py`).
+
+### Step zero — the overlap with the W-series
+
+The draft did not know the W-series' contents. They are: **W01** TSMOM on MNQ + MGC, **W02** TSMOM across
+~10 micros, **W03** carry timing, **W05** volatility-managed index — all four closed at S2 below every bar
+and never registered — and **W04** trend + carry across NQ, GC, HG, CL, ZN, 6E, **registered, run (t00767)
+and retired**: post-2021 net −0.42 against 1.31 (§76). W04 reports each sleeve: **trend (12-month sign,
+inverse-vol, monthly) gross 0.28 / net −0.60 post-2021, gross 0.54 full; carry gross 0.15 / net −0.62.**
+
+| X | verdict | against |
+|---|---|---|
+| X01 flatten tax | **measurement, partly on file** — §72 measured MNQ and MGC, §76 all six W04 micros; extended here to fees, MES, and days-in-market | §72, §76 |
+| X02 monthly floor | **new measurement** | — |
+| X03 TSMOM | **repeat / parameter variation**: W02's rule, and W04's trend sleeve already ran it at L = 12 on six of X's seven markets; X03 adds ES and sweeps L ∈ {3, 6, 12}, vol window ∈ {20, 60} | W02, W04 trend sleeve |
+| X04 selective TSMOM | **parameter variation** of X03 (a magnitude threshold on the same signal) | W02 / W04 |
+| X05 long-horizon reversal | **new** — no entry in either registry tests 24–60-month reversal | — |
+| X06 cross-asset lead-lag | **new** — R01 is intraday NQ/ES relative value, R04 cross-sectional ranking (closed on permission); neither is a daily lead-lag | — |
+| X07 carry | **repeat**: W03's rule, and W04's carry sleeve ran it | W03, W04 carry sleeve |
+
+Three of seven are repeats or variations of on-file work: X03 and X07 directly, X04 by construction on
+X03. **Their information is on file at one trial already spent**, and re-running them would spend trials
+on it. The draft's statement that carry is "likely blocked on data" because only the front month is on
+disk is wrong — see X07 below.
+
+### X01 — the flatten tax, measured
+
+Post-2021 daily bars; one micro round trip per market per day held. **Fees:** exchange fees per side from
+secondary sources, because CME's fee-schedule PDF refuses automated download (it returned a bot-block page
+for both the CME and CBOT/NYMEX schedules dated 2026-02-01): equity micros $0.35 and MGC $0.60 (AMP's
+notice of the 2025-02-01 change, $0.50 → $0.60) are corroborated; **MHG $0.62, MCL $0.52, M6E ~$0.43 and
+10Y $0.30 are from search summaries and unverified.** NFA $0.02 per side. **The account's
+broker/clearing charge is not known** and is assumed at $1.08 per round trip, the residual of the
+programme's $1.82 MNQ assumption. **Spread: one tick per round trip, assumed** (no quote data on disk;
+it can only be higher, §71).
+
+| micro | round trip | bps of notional | / one day's $σ | Sharpe drag at d = 63 / 126 / 189 / 252 | verdict |
+|---|---|---|---|---|---|
+| MNQ | $2.32 | 0.71 | 0.51% | 0.04 / 0.06 / 0.07 / 0.08 | **eligible** |
+| MES | $3.07 | 1.31 | 1.27% | 0.10 / 0.14 / 0.17 / 0.20 | marginal |
+| MGC | $3.32 | 1.65 | 1.45% | 0.12 / 0.16 / 0.20 / 0.23 | marginal |
+| MCL | $3.16 | 4.21 | 1.73% | 0.14 / 0.19 / 0.24 / 0.27 | marginal |
+| MHG | $3.61 | 3.35 | 2.03% | 0.16 / 0.23 / 0.28 / 0.32 | **excluded** |
+| 10Y | $2.72 | n/a (yield-quoted) | 3.72% | 0.30 / 0.42 / 0.51 / 0.59 | **excluded** |
+| M6E | $3.23 | 2.34 | 5.12% | 0.41 / 0.57 / 0.70 / 0.81 | **excluded** |
+
+Drag in Sharpe units is √d × (round trip / day's $σ) for a position at its own volatility; in % of
+notional it is d × bps / 100. **The right unit is risk, not notional**: MCL costs the most per dollar of
+notional (4.21 bps) but crude moves enough that it is only marginal; M6E costs about half as much per
+notional and is excluded because the euro barely moves. The draft ranked by bps of notional and so had
+MCL as the worst and M6E as middling — the reverse of the measured order. **Only MNQ is cost-eligible at
+full time in market; MES, MGC and MCL are marginal; M6E, the micro 10Y and MHG are excluded before any
+hypothesis names them** — the same mechanism that cost W04 0.73 of Sharpe (§76).
+
+### X02 — the monthly floor, measured
+
+Non-overlapping calendar-month returns of the seven front contracts; full months only. The test is the
+programme's: clearing the unit-consistent SR\* at the sample's own T, so 80% power at a true monthly
+Sharpe s needs s√T ≥ F_N + 0.84, with **F_N = 3.18 at N = 762**. Pooling: effective number of independent
+instruments from the eigenvalues of the measured monthly correlation matrix, (Σλ)²/Σλ² — invariant to the
+signs of the correlations, so "signed" and "absolute" agree.
+
+**Measured correlation, post-2021:** NQ–ES **0.91**; ZN–6E 0.54, GC–6E 0.52, ES–ZN 0.51, HG–6E 0.51; mean
+|ρ| 0.32. **M_eff: 3.75 of 7 post-2021 (4.17 full); 2.71 of the 4 cost survivors** (NQ, ES, GC, CL — NQ and
+ES are almost one market).
+
+| monthly Sharpe (annual) | SR\* floor | post-2021 pooled, all 7 | post-2021 pooled, cost survivors | full pooled, all 7 |
+|---|---|---|---|---|
+| 0.1 (0.35) | 1,615 | 255 — power 6% | 185 — 3% | 813 — 37% |
+| **0.2 (0.69)** | **404** | **255 — power 51%** | **185 — 32%** | 813 — 99% |
+| 0.3 (1.04) | 179 | 255 — 95% | 185 — 82% | 813 — 100% |
+
+The single-test floor (one-sided 5%, no multiplicity) is 155 at 0.2; post-2021 clears it. **The SR\* floor
+governs** (ruling 3 below).
+
+**The draft's "~190 months, marginal" was right about the calendar and wrong about the decision.** It
+counted the full sample; the post-2021 half decides (S8), and that half has **68 months**. Pooled across
+all seven markets it carries 255 effective months, against 404 needed.
+
+**By the brief's own rule, the series closes here:** post-2021 pooled effective n falls below the floor at
+0.2 monthly Sharpe, on the full universe (255 < 404) and more so on the instruments X01 leaves (185).
+**Nothing is registered.**
+
+### Does this horizon clear the injection standard?
+
+**The standard (§60) can be met at this horizon, and already has been: W04 recovered its sought effect at
+its run's own n (§76), and its null is informative** — its gross Sharpe's one-sided 95% bound sits below
+the bar. So the brief's "first horizon in nine series where a null means absence" was reached by W04,
+not by this series. **What X02 adds is the size at which it holds:** post-2021, pooled across all seven
+markets, a null means absence only for per-market monthly Sharpes of about **0.25 or more (≈0.87 a
+year)** — 80% power needs s ≥ (3.18 + 0.84)/√255. On the cost survivors that rises to ≈0.30 (≈1.03 a year).
+The literature's per-market TSMOM is 0.3–0.5 annual (MOP), so **a null at this horizon cannot speak to the
+effect sizes the literature reports** — it can only rule out effects two to three times larger.
+
+### X07 — data availability
+
+**Not blocked.** The purchased file is parent symbology, every listed expiry, from 2010 (§73–§74); carry was
+computed from it for six markets in W04, with F2 the highest-volume later outright on the same bar (ZN's
+carry was undefined on 17% of bars, where no later ZN contract traded). Carry is on file as W04's sleeve
+and closed as W03.
+
+### X03 — two notes the brief asks to be carried into any entry
+
+1. **The anti-hedging suppression rule must be fixed at registration.** It removes positions
+   non-randomly (precisely the opposite-signed correlated pairs), so choosing it after seeing results
+   would be a free parameter. Post-2021 NQ–ES is ρ 0.91: the pair the firm names would be in conflict
+   whenever their 12-month signs differ.
+2. **Prior refutation, cited by what it tested (finding 12).** Oliveira, Guzman & Firoozye (2025),
+   *(Non-Parametric) Bootstrap Robust Optimization for Portfolios and Trading Strategies*, arXiv
+   2510.12725: **on 21 ETFs, daily from 2006, 80/20 train/test, the in-sample-optimised TSMOM
+   parameterisations' "test-period Sharpe ratios become negative for nearly all parameterizations"**
+   (verbatim); on a futures dataset (commodities, bonds, currencies, equity indices) they report in-sample
+   ~0.6 and "severe out-of-sample degradation". **What it tested is parameter selection, not MOP's fixed
+   12-month rule** — so it bears directly on X03's sweep over L and vol window, and less on a single
+   published parameterisation. The brief's "negative on both ETF and futures" is verbatim only for ETFs.
+
+### Rulings made here, logged rather than resolved silently
+
+1. **Fees from secondary sources**, four unverified; broker/clearing assumed at $1.08 per round trip;
+   spread assumed one tick. The verdicts that could move: MHG sits at 0.32 (excluded) on a $0.62 fee that
+   is unverified. The others are not close to a boundary.
+2. **Eligibility thresholds**, Sharpe drag at full time in market: eligible ≤ 0.15, excluded > 0.30 —
+   half and all of MOP's lower per-market estimate (0.3). A strategy in the market less of the time pays
+   √(fraction) of that.
+3. **The SR\* floor governs X02's closing rule, not the single-test floor.** Every registration since §73
+   is decided by SR\* at its own T; a floor that ignores 761 trials would certify power against a bar
+   no entry is judged by.
+4. **Pooling assumes equal per-instrument Sharpe and equal risk weights.** Unequal Sharpes or the
+   anti-hedging suppression would lower M_eff; this is the optimistic case.
+5. **N at registration taken as 762** (the next trial).
+
+### Status
+
+**X-series closed at X02, nothing registered.** X05 and X06 are new and are the only candidates not
+already on file. Neither changes the X02 arithmetic: X05 loses 24–60 months of the 68 to its lookback,
+and X06 adds up to 56 ordered pairs of multiplicity. They are closed with the series.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —

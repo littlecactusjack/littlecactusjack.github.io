@@ -1,8 +1,9 @@
 # The futures research programme — terminal report
 
-**Six series registered; a seventh and an eighth drafted and closed at S2; one single hypothesis
-registered and blocked. 83 candidates drafted, 36 registered, 770 trials across two hash-chained
-logs. Nothing promoted.**
+**Six series registered; a seventh and an eighth drafted and closed at S2; two single hypotheses
+registered and blocked; a ninth series (W, daily horizons) designed, one hypothesis registered and
+retired; a tenth (X, monthly horizon) closed at its floor measurement. 96 candidates drafted, 38
+registered, 771 trials across two hash-chained logs. Nothing promoted.**
 
 **No edge accessible at this cost structure and account size was found in intraday, calendar or
 non-price futures signals, across six independently designed series.**
@@ -321,6 +322,17 @@ was found only because J was measured by era rather than declared scale-free fro
 zero returns, however its algebra scales; thresholds on it are ranks within its own trailing
 distribution.
 
+**12. Citing a prior entry as evidence requires matching on what it tested, not on what it is about
+(§69–§71).** V01 (reopen displacement reversion) was registered with L02's absorption-arm null — 0 of
+27 — beside its mechanism, because both name the same counterparty: whoever is positioned against thin
+depth when real liquidity arrives. But L02 tested the 09:30 cash-open range, on MGC only, where it
+measured spillover from the equity open into gold, and a note written before it ran said its null
+could not refute its own mechanism. Nothing had ever tested V01's mechanism. The record would have
+read as "refuted in advance" by an entry that never examined the reopen. **Rule:** before a prior
+entry is cited for or against a new one, check its session and clock, instrument, horizon, condition,
+and any pre-written limit on what its result can establish. A shared counterparty is a mechanism
+match, not an evidence match.
+
 ---
 
 ## 6. Errors found inside corrections
@@ -538,7 +550,7 @@ grid, both need trade-level data.
 
 | log | N | covers | SR\* | chain |
 |---|---|---|---|---|
-| `futures-research/trials.jsonl` | **760** | F 576, L 180, N 3, P 1, Q 0 | **0.1368** | verifies |
+| `futures-research/trials.jsonl` | **761** | F 576, L 180, N 3, P 1, Q 0, W 1 | **0.1368** | verifies |
 | `r-series-research/trials.jsonl` | **10** | R01 9, R02 1 | never binding | verifies |
 
 Controls, firing-rate measurements and computations (F14, L10, R06, the Q09 drawdown arithmetic) are
@@ -556,7 +568,10 @@ stay in the registry, and their trials stay in N.
 | **S** | **9** | **0** | **0** | **0** |
 | **T** | **7** | **0** | **0** | **0** |
 | **U01** (single) | **1** | **1** | **0** | **0** |
-| **total** | **83** | **36** | **770** | **0** |
+| **V01** (single) | **1** | **1** | **0** | **0** |
+| **W** | **5** | **1** | **1** | **0** |
+| **X** | **7** | **0** | **0** | **0** |
+| **total** | **96** | **38** | **771** | **0** |
 
 "Drafted" counts candidates written up as hypotheses in a series document. The R-series also named an
 R05 direction that was never drafted as a hypothesis, and it is not counted.
@@ -579,3 +594,36 @@ their effect on both sides of a sign split.
 ("large opening gaps fill only ~8% of the time"), **registered and blocked on event count**: 104 and
 46 gaps of 0.4% or more in sixteen years against floors of 5,884 and 2,862. Its fill-rate curve
 tracks a driftless random walk, and gaps that size fill 46–100% of the time here (46–81% where n exceeds three). `decisions.md` §67.
+
+**The V01 row was added 2026-10-03** — reopen displacement reversion, a mechanism written after U01's
+fill curve showed the effect and registered post-hoc, marked so. **Blocked at its ceiling**: even if
+every valid daily reopen fired, 2,469 and 1,926 events against floors of 5,884 and 2,862 — so no
+threshold had to be chosen, and no forward return was computed. `decisions.md` §69.
+
+**The W row was added 2026-10-03** — a ninth series at **daily horizons**, which this report's §10
+filed as forbidden and which chained 18:00-to-16:55 session holds reach (subject to the firm's
+confirmation). Measured: the chain keeps 98–99% of a day's variance at ~0.4% of a day's SD per round
+trip, so **cost stops binding**. What binds instead is the multiple-testing bar for daily strategies
+(Sharpe 0.96–1.39 at N = 760) and, under §62's objective, the drawdown risk budget. Its best candidate,
+trend plus carry (prior 0.77–1.27), is the first in nine series whose published prior reaches a
+multiple-testing bar here. Designed, not registered. `decisions.md` §72.
+
+**W04 was registered 2026-10-03** — trend plus carry across six sectors, one portfolio-level trial,
+decided at the unit-consistent post-2021 bar (≈1.39), registered before its daily data was bought and
+amended before any of it was read. Its success condition, prop-evaluation EV for this account, was
+computed: ≈+$2,300 per $80 evaluation at the bar's Sharpe, at a small optimal size that one MNQ
+contract already exceeds. `decisions.md` §73.
+
+**W04 was run 2026-10-03 (trial t00767) and retired**: post-2021 net Sharpe −0.42 against its bar of
+1.31, and only 0.31 before costs — it would not have cleared at zero cost. The run also corrected the
+W-series' central premise: **cost does bind at a daily horizon on low-volatility markets** — a daily
+round trip is ~5% of a day's SD on the euro and 10-year micros against 0.5% on MNQ, and equal-risk
+sizing loads exactly those, costing 0.73 of Sharpe. N 761, SR\* 0.1368. `decisions.md` §76.
+
+**The X row was added 2026-10-03** — a tenth series at the monthly horizon, drafted outside this
+repository, **closed at its own floor measurement with nothing registered.** Three of its seven
+candidates repeat W work (TSMOM and carry ran as W04's sleeves). Measured: the daily flatten tax
+excludes the euro, 10-year and copper micros on cost, and post-2021 the seven markets pool to 255
+effective months against 404 needed to see a 0.2 monthly Sharpe at the SR\* bar (185 on the cost
+survivors). A null at this horizon could rule out only effects two to three times the literature's
+per-market TSMOM. `decisions.md` §77.

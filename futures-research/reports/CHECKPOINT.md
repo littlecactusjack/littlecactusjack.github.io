@@ -452,8 +452,8 @@ nothing uses.
 ### CURRENT, 2026-09-13 — read this, not the historical bullets beneath it
 
 **THE PROGRAMME IS CLOSED, 2026-09-13.** Read `reports/programme_conclusion.md` first; it stands
-alone. Six series registered plus a seventh and an eighth drafted, and one single hypothesis (U01), 83 candidates, 36 registered, 770 trials across
-two logs (futures-research 760, SR\* 0.1368; r-series 10), nothing promoted. The Q-series closed
+alone. Six series registered plus a seventh and an eighth drafted, and two single hypotheses (U01, V01), a ninth series designed (W) with one registration (W04, run and retired), and a tenth (X) closed at X02, 96 candidates, 38 registered, 771 trials across
+two logs (futures-research 761, SR\* 0.1368; r-series 10), nothing promoted. The Q-series closed
 without registration (§60). Two standards adopted as gates for any future entry: the post-2021 split
 decides (S8), and a null is reportable only from a pipeline shown to recover the effect size sought at
 the run's n (§60). **Nothing is scheduled. Nothing is pending.**
@@ -523,6 +523,62 @@ separate registration); the daily-reopen fill excess is recorded as a measured p
 corrected scale of 5–30 bps, tradeability not established; the early-NQ session-length defect
 (a source-data truncation, verified in the vendor CSV) is in the terminal report's error table; the
 8-hour hold check stays as it is.
+
+**V01, 2026-10-03 — REGISTERED POST-HOC, BLOCKED AT ITS CEILING (§69).** Reopen displacement
+reversion: the first print after the maintenance break, set against thin depth, corrects when depth
+arrives (closest relative L02's absorption arm, not L03). Written after U01's curve showed the effect,
+and marked so. **Every valid daily reopen firing would give 2,469 index / 1,926 MGC events (1,015 / 901
+since 2021), below every floor — so no threshold was chosen and no forward return computed** (a
+real-minus-control return is the S6/S7 comparison, i.e. a trial). No valid strict-mode control without
+a threshold. Registrations now 37. **Open, for the user:** whether the forward-return economics is
+still wanted as a logged trial; it cannot change the verdict.
+
+**COST-FLOOR AUDIT, 2026-10-03 (§70) — SCOPED, NOT YET QUOTED.** The floor is ~80% commission; quotes
+can only confirm or raise the spread part, so the convergence result inverts only via commission (below
+~$1.69 per MNQ round trip vs the assumed $1.82) or passive fills — neither measured by mbp-1. The
+30-session sample is pre-registered (`reports/spread_sample_sessions.json`) and the quote script is
+committed (`reporting/cost_floor_quote.py`). **Blocked on a Databento API key** — the `.env` holds FTP
+credentials only. **V01 corrected:** L02 tested only the 09:30 cash open on MGC; no entry ever tested the
+CME reopen, so V01's mechanism had no prior test.
+
+**Premise corrected (§71):** quotes cannot lower the floor — the spread term already assumes the
+one-tick minimum. **The audit that matters is a fee-schedule check of all-in commission against the
+assumed $1.82 MNQ round trip** (the flip point is ~$1.69); `cost_floor_quote.py` stays ready but audits
+the smaller term. Passive fills are the one route needing a measurement quotes cannot make (resting
+orders, measured fill probability). **Finding 12** promoted: cite prior evidence by what it tested,
+not by counterparty.
+
+**W-SERIES, 2026-10-03 — DESIGNED, NOT REGISTERED (§72).** Daily horizons via chained 18:00-to-16:55
+session holds: the record filed them as forbidden; measured, the chain keeps 98–99% of the day's
+variance and cost stops binding. Binding instead: the multiple-testing bar for daily strategies (0.96
+full / 1.39 post-2021, or 2.17 under the single SR\*) and, under §62's objective, the drawdown risk
+budget (not contract count — a prop account allows 20–30 micros). Best candidate W04 (trend + carry,
+prior 0.77–1.27) straddles the full-sample bar. **Open, for the user:** confirm the overnight-inside-the-
+session hold with the firm; choose §62's bar or prop-evaluation EV (and supply the eval terms); rule on
+the SR\* convention; buy ohlcv-1d; then W04 as one trial.
+
+**W04 REGISTERED, 2026-10-03 (§73). No trial spent; N 760.** The firm confirmed the hold; objective =
+prop-evaluation EV ($80 fee, +$3k target, $2k buffer, 90/10, no resets, $1k daily limit, 30 micros); SR\*
+unit-consistent, decided post-2021 at ≈1.39. Daily data on disk (ohlcv-1d, to 2026-09-11), **not yet
+read**; entry amended before reading it (one-session delay, same-bar carry). EV computed
+(`reports/w_prop_ev.md`): optimum ~$150–250/day of σ, ≈+$2,300 per evaluation at Sharpe 1.39; positive
+at zero edge at some sizes, so not evidence; one MNQ ($847/day) puts the integer book above the optimum,
+where a HARD daily limit makes EV negative. **Alignment measured (§74):** UTC-day bars track the
+held sessions at 0.97 daily, 0.98–0.99 over 21 days; ohlcv-1d is adequate. **Next:** the W04 runner
+with outcome injection at 1.39 (drop Sunday bars; resolve the vendor's one-digit contract years). **Daily loss limit ruled SOFT (§75)** — flat for the day, not a breach.
+
+**W04 RUN AND RETIRED, 2026-10-03 (§76), trial t00767; N 761.** Post-2021 net Sharpe −0.42 vs bar 1.31
+(SR\* at the file's own T = 1,481); gross 0.31, so not even at zero cost. Rotation null: 13.4% at or
+above. Injection recovered (1.29 → 1.32, power 51% at the bar). **Premise corrected:** a daily round
+trip is ~5% of a day's SD on M6E and the micro 10Y (0.5% on MNQ); equal-risk sizing loads them; drag
+0.73 Sharpe. Integer-book economics row defective (over the 30-micro cap 61% of days) and moot.
+**Nothing is scheduled.**
+
+**X-SERIES, 2026-10-03 — CLOSED AT X02, NOTHING REGISTERED (§77).** Overlap: X03/X04/X07 repeat W
+work (W04's sleeves); X05, X06 new. X01: only MNQ cost-eligible at full time in market; MES, MGC, MCL
+marginal; M6E, micro 10Y, MHG excluded (fees partly unverified; broker charge assumed). X02: post-2021
+pooled effective n 255 (185 on cost survivors) vs SR\* floor 404 at 0.2 monthly Sharpe. X07 not
+blocked on data. **Nothing is scheduled.**
 
 
 **Latest, 2026-09-13 (after P03):** N = **760**, SR\* **0.1368**. P03 retired at S7 (§58); the
