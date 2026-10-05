@@ -1,0 +1,16 @@
+# Credentials. DATABENTO_API_KEY lives in .env or the shell, never in git: this repo is public.
+.env
+.env.*
+
+# Market data: large, licensed, re-downloadable. Leading slash anchors it to research/
+# (futures-research decisions.md 36: an unanchored data/ rule silently excluded source code).
+/data/
+*.dbn
+*.dbn.zst
+*.parquet
+
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/

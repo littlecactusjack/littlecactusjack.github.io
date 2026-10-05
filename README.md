@@ -1,5 +1,11 @@
 # littlecactusjack.github.io
 
+## research/
+
+Our own CISD/POI strategy research, run under futures-research's rules: pre-registration in
+`hypotheses.yaml`, every run logged to a hash-chained `trials.jsonl`, DSR deflated by our trials
+plus futures-research's. Start with [`research/HANDOFF.md`](research/HANDOFF.md).
+
 ## futures-research/
 
 Imported with full commit history from

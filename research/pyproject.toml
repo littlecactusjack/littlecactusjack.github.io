@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "strategyres"
+version = "0.1.0"
+description = "CISD/POI futures strategy research, run under the futures-research discipline"
+# Also needs futuresres (../futures-research), installed editable alongside: its trial log,
+# DSR and PBO are used as-is rather than copied, so a fix upstream reaches us via the sync.
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+data = ["databento>=0.40"]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
