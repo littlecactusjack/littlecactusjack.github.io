@@ -86,6 +86,7 @@ footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
 
   <h2>Verdict</h2>
   <div class="card">
+    <p id="headline" class="lede"></p>
     <p><strong>No edge accessible at this cost structure and account size was found in intraday, calendar or
       non-price futures signals, across six independently designed series.</strong></p>
     <ul class="findings">
@@ -141,7 +142,7 @@ const REPO = 'littlecactusjack/littlecactusjack.github.io';
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt = (x, d = 0) => Number(x).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
-const SERIES = { F: 'F · published anomalies', L: 'L · price levels', N: 'N · levels revisited', P: 'P · non-price', Q: 'Q · event portfolio', R: 'R · relative value' };
+const SERIES = { F: 'F · published anomalies', L: 'L · price levels', N: 'N · levels revisited', P: 'P · non-price', Q: 'Q · event portfolio', R: 'R · relative value', W: 'W · daily horizons' };
 
 async function get(path) {
   const r = await fetch(BASE + path + '?t=' + Date.now(), { cache: 'no-store' });
@@ -149,7 +150,38 @@ async function get(path) {
   return r.text();
 }
 
-// Each line is written as canonical JSON, so SHA-256 of the raw line is the record hash.
+// Re-serializes one JSON line the way futuresres.stats.trials.canonical does:
+// json.dumps(sort_keys=True, separators=(",", ":")) with ASCII escaping. Number tokens are
+// copied verbatim, because JS would print Python's 2.0 as 2 and 1e-05 as 0.00001.
+function canonical(src) {
+  let i = 0;
+  const ws = () => { while (/\s/.test(src[i])) i++; };
+  const pyStr = (s) => JSON.stringify(s).replace(/[\u007f-￿]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+  function str() { const j = i++; while (src[i] !== '"') i += src[i] === '\\' ? 2 : 1; i++; return JSON.parse(src.slice(j, i)); }
+  function val() {
+    ws();
+    const c = src[i];
+    if (c === '{') {
+      i++; const kv = [];
+      ws(); if (src[i] === '}') { i++; return '{}'; }
+      for (;;) { ws(); const k = str(); ws(); i++; kv.push([k, val()]); ws(); if (src[i++] === '}') break; }
+      kv.sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
+      return '{' + kv.map(([k, v]) => pyStr(k) + ':' + v).join(',') + '}';
+    }
+    if (c === '[') {
+      i++; const xs = [];
+      ws(); if (src[i] === ']') { i++; return '[]'; }
+      for (;;) { xs.push(val()); ws(); if (src[i++] === ']') break; }
+      return '[' + xs.join(',') + ']';
+    }
+    if (c === '"') return pyStr(str());
+    const m = /^(-?\d+(\.\d+)?([eE][+-]?\d+)?|true|false|null)/.exec(src.slice(i));
+    i += m[0].length; return m[0];
+  }
+  return val();
+}
+
+// Mirrors TrialLog.verify_chain: each prev_hash is SHA-256 of the previous record's canonical form.
 async function verifyChain(text) {
   const lines = text.split('\n').filter(l => l.trim());
   let expected = '';
@@ -157,7 +189,7 @@ async function verifyChain(text) {
   for (let i = 0; i < lines.length; i++) {
     const rec = JSON.parse(lines[i]);
     if (rec.prev_hash !== expected) return { ok: false, n: lines.length, at: i, id: rec.trial_id };
-    const buf = await crypto.subtle.digest('SHA-256', enc.encode(lines[i]));
+    const buf = await crypto.subtle.digest('SHA-256', enc.encode(canonical(lines[i])));
     expected = [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
   }
   return { ok: true, n: lines.length };
@@ -277,7 +309,10 @@ async function feed() {
 }
 
 async function load() {
-  const [trialsText, measText, yamlText] = await Promise.all([get('trials.jsonl'), get('measurements.jsonl'), get('hypotheses.yaml')]);
+  const [trialsText, measText, yamlText, report] = await Promise.all([get('trials.jsonl'), get('measurements.jsonl'), get('hypotheses.yaml'), get('reports/programme_conclusion.md').catch(() => '')]);
+  // The report's opening paragraph is its running scoreboard; show it as written.
+  const head = (report.split(/\n\s*\n/)[1] || '').replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
+  $('headline').textContent = head;
   const trials = trialsText.split('\n').filter(l => l.trim()).map(l => JSON.parse(l));
   const nMeas = measText.split('\n').filter(l => l.trim()).length;
   registry = jsyaml.load(yamlText, { json: true }) || []; // json: duplicate keys resolve last-wins, as PyYAML does
