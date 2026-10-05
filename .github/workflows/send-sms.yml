@@ -1,0 +1,60 @@
+name: Send SMS
+
+# Sends a text through a carrier's email-to-SMS gateway via Gmail SMTP.
+# Needs repo secrets SMTP_USER (Gmail address) and SMTP_APP_PASSWORD (Gmail app password).
+
+on:
+  workflow_dispatch:
+    inputs:
+      to:
+        description: "10-digit phone number"
+        required: true
+      carrier:
+        description: "Recipient's carrier"
+        required: true
+        type: choice
+        options: [verizon, tmobile, mint, googlefi, uscellular, cricket, boost]
+      message:
+        description: "Text to send"
+        required: true
+
+permissions: {}
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send
+        env:
+          TO: ${{ inputs.to }}
+          CARRIER: ${{ inputs.carrier }}
+          MESSAGE: ${{ inputs.message }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_APP_PASSWORD: ${{ secrets.SMTP_APP_PASSWORD }}
+        shell: python
+        run: |
+          import os, re, smtplib
+          from email.message import EmailMessage
+
+          gateways = {
+              "verizon": "vtext.com",
+              "tmobile": "tmomail.net",
+              "mint": "tmomail.net",
+              "googlefi": "msg.fi.google.com",
+              "uscellular": "email.uscc.net",
+              "cricket": "sms.cricketwireless.net",
+              "boost": "sms.myboostmobile.com",
+          }
+          number = re.sub(r"\D", "", os.environ["TO"])[-10:]
+          if len(number) != 10:
+              raise SystemExit("Phone number must have 10 digits")
+
+          msg = EmailMessage()
+          msg["From"] = os.environ["SMTP_USER"]
+          msg["To"] = f"{number}@{gateways[os.environ['CARRIER']]}"
+          msg.set_content(os.environ["MESSAGE"])
+
+          with smtplib.SMTP_SSL("smtp.gmail.com", 465) as s:
+              s.login(os.environ["SMTP_USER"], os.environ["SMTP_APP_PASSWORD"])
+              s.send_message(msg)
+          print(f"Sent to ...{number[-4:]} via {os.environ['CARRIER']}")
