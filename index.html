@@ -470,7 +470,8 @@ async function loadTopstep() {
   const fetchJson = async p => { const r = await fetch(p + '?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) throw new Error(p + ': HTTP ' + r.status); return r.json(); };
   [ts, wps] = await Promise.all([fetchJson('research/reports/topstep_ev.json'), fetchJson(BASE + 'reports/w_prop_ev.json')]);
   const A = bestBy(scenRows(TS_MAIN)), z = A.find(g => g.sharpe === 0), one = A.find(g => g.sharpe === 1);
-  const sameZ = Math.max(...scenRows(TS_MAIN).filter(g => g.sharpe === 0).map(g => g.ev_same_size));
+  const bufRows = scenRows('eod_trailing|1|above_buffer|5000').filter(g => g.sharpe === 1);
+  const bufSep = Math.max(...bufRows.map(g => g.ev)), bufSame = Math.max(...bufRows.map(g => g.ev_same_size));
   const Bz = bestBy(wps.grid.filter(g => g.daily_limit === 'soft')).find(g => g.sharpe === 0);
   const v = ts.validation;
   $('tsStatus').innerHTML = `<span><span class="dot ${v.ok ? 'ok' : 'bad'}"></span>Simulator validated: no-edge pass rate ${v.p_pass.toFixed(3)} vs closed form ${v.closed_form.toFixed(3)}</span><span>${fmt(ts.n_paths)} paths per cell</span>`;
@@ -483,7 +484,7 @@ async function loadTopstep() {
     `<b>With no edge, both firms are slightly positive.</b> Topstep ${money(z.ev)} (${(z.p_pass * 100).toFixed(0)}% pass) vs Colton's firm ${money(Bz.ev)} (${(Bz.p_pass * 100).toFixed(0)}% pass). In both, the fee caps your loss while the firm absorbs the drawdown.`,
     `<b>An edge is worth far less at Topstep.</b> At Sharpe 1.0: ${money(one.ev)} here vs ${money(bestBy(wps.grid.filter(g => g.daily_limit === 'soft')).find(g => g.sharpe === 1).ev)} at Colton's firm. The $5k Express cap and the one-month limit truncate the upside.`,
     `<b>Size works the opposite way.</b> Colton's one-year evaluation favoured small size ($150–250/day of σ). Topstep's one month forces about $${fmt(z.daily_sigma)}/day in the evaluation, roughly one MNQ or more held through the session.`,
-    `<b>The two phases have different rules, so they are sized separately.</b> The evaluation has a target, a 50% consistency rule and a one-month clock; the funded account has none of those, pays out 50% of balance after every 5 winning days, and drops its floor to $0 after the first payout. Sizing each phase on its own gives ${money(z.ev)} at no edge, against ${money(sameZ)} if one size is forced on both.`,
+    `<b>The two phases have different rules, so they are sized separately.</b> The evaluation has a target, a 50% consistency rule and a one-month clock; the funded account has none of those, pays out 50% of balance after every 5 winning days, and drops its floor to $0 after the first payout. Under the published payout rule that changes almost nothing (${money(z.ev)} either way at no edge): the best funded size is about the evaluation's. It matters under the buffer reading, where a real edge pays best by trading the funded account small: at Sharpe 1.0, ${money(bufSep)} sized separately vs ${money(bufSame)} at one size.`,
     `<b>None of the old tests produced a usable edge.</b> W04 measured −0.42 net, left of every simulated point. The intraday strategies (L07, P03 and the rest) were net-negative per trade. So the Sharpe 0 row is the realistic one, and it describes a lottery with a small positive expectation, not a strategy.`,
   ].map(t => `<li>${t}</li>`).join('');
   tsChart(); tsGrid();
