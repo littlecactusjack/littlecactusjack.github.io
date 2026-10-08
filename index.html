@@ -383,6 +383,7 @@ async function load() {
   const N = trials.length, star = srStar(N, sharpes);
   const promoted = registry.filter(h => h.status === 'promoted').length;
   const last = trials.reduce((a, t) => t.timestamp > a ? t.timestamp : a, '');
+  const span = trials.reduce(([a, b], t) => [t.date_range[0] < a ? t.date_range[0] : a, t.date_range[1] > b ? t.date_range[1] : b], ['9999', '0000']);
 
   $('tiles').innerHTML = [
     [fmt(N), 'trials logged (N)'], [star.toFixed(4), 'SR*, the luck bar at N'],
@@ -398,6 +399,7 @@ async function load() {
   const chip = (c, name) => c.ok ? `<span><span class="dot ok"></span>${name}: ${fmt(c.n)} records, hash chain intact</span>`
     : `<span><span class="dot bad"></span>${name}: chain BROKEN at record ${c.at} (${esc(c.id)})</span>`;
   $('status').innerHTML = chip(c1, 'trials.jsonl') + chip(c2, 'measurements.jsonl') +
+    `<span>Data used: ${span[0]} to ${span[1]} (~${((new Date(span[1]) - new Date(span[0])) / 3.15576e10).toFixed(1)} yr of 1-minute bars, per the trial records)</span>` +
     `<span>Last trial ${new Date(last).toLocaleDateString()} · fetched ${new Date().toLocaleTimeString()}</span>`;
 }
 
@@ -474,7 +476,7 @@ async function loadTopstep() {
   const bufSep = Math.max(...bufRows.map(g => g.ev)), bufSame = Math.max(...bufRows.map(g => g.ev_same_size));
   const Bz = bestBy(wps.grid.filter(g => g.daily_limit === 'soft')).find(g => g.sharpe === 0);
   const v = ts.validation;
-  $('tsStatus').innerHTML = `<span><span class="dot ${v.ok ? 'ok' : 'bad'}"></span>Simulator validated: no-edge pass rate ${v.p_pass.toFixed(3)} vs closed form ${v.closed_form.toFixed(3)}</span><span>${fmt(ts.n_paths)} paths per cell</span>`;
+  $('tsStatus').innerHTML = `<span><span class="dot ${v.ok ? 'ok' : 'bad'}"></span>Simulator validated: no-edge pass rate ${v.p_pass.toFixed(3)} vs closed form ${v.closed_form.toFixed(3)}</span><span>Data used: no market data; ${fmt(ts.n_paths)} simulated paths per cell, return model from Colton's W-series</span>`;
   $('tsTiles').innerHTML = [
     [money(z.ev), 'EV per eval with no edge'], [(z.p_pass * 100).toFixed(0) + '%', 'pass rate with no edge'],
     [(100 - z.p_pass * 100).toFixed(0) + '%', 'chance of losing the $90'], ['$' + fmt(z.daily_sigma) + ' → $' + fmt(z.funded_sigma), 'best daily σ, eval → funded'],

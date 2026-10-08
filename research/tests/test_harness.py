@@ -5,6 +5,9 @@ from futuresres.stats.trials import TrialLog
 from strategyres import harness as h
 
 
+SPAN = h.DataSpan("test", "2023-01-03", "2025-12-31", 750, 300_000)
+
+
 @pytest.fixture
 def reg(tmp_path):
     p = tmp_path / "hypotheses.yaml"
@@ -18,7 +21,7 @@ def log(tmp_path):
 
 
 def run(log, reg, hid="C99", backtest=lambda: [1.0, -0.5, 2.0, 0.3]):
-    return h.run_logged(hid, params={"x": 1}, symbol="MNQ", date_range=("2023-01-01", "2026-01-01"),
+    return h.run_logged(hid, params={"x": 1}, symbol="MNQ", data=SPAN,
                         cost_bps=None, backtest=backtest, log=log, registry=reg)
 
 
@@ -81,3 +84,15 @@ def test_cost_stress_and_upstream_deflation(log, reg):
     assert e.net_mean_2x_cost_bps == pytest.approx(gross.mean() - 0.96)
     assert e.dsr_with_upstream.n_trials == e.dsr_own.n_trials + 761
     assert e.dsr_with_upstream.dsr < e.dsr_own.dsr
+
+
+def test_every_logged_run_records_how_much_data_it_used(log, reg):
+    run(log, reg)
+    (t,) = log.read_all()
+    assert t.date_range == ("2023-01-03", "2025-12-31")
+    assert "750 sessions (~3.0 yr), 300,000 bars" in t.note
+
+
+def test_an_implausible_data_span_is_refused():
+    with pytest.raises(ValueError):
+        h.DataSpan("x", "2026-01-01", "2023-01-01", 750, 1)

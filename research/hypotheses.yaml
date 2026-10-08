@@ -46,6 +46,7 @@
       No edge already reaches 6.6% (1 in 15): P(pass) 0.276 x P(> $1,000 | funded) 0.239.
       Reaching 10% takes a net annual Sharpe of about 1.0 (0.4 -> 7.5%, 1.0 -> 10.5%, 2.0 -> 15.8%).
     confidence: >
-      TO DECIDE: whether the point estimate must clear 10%, or a lower confidence bound must.
-      Three years of daily data measures Sharpe to about +/-0.6, so a lower bound at 95% would
-      need a point estimate near Sharpe 2.
+      Point estimate (user, 2026-10-08): "we just need to work with what the data gives us."
+      M01 passes if the rate computed from the data clears 10%, with no confidence margin.
+      Every result must state the data it used (sessions, years, bars); three years measures
+      Sharpe to about +/-0.6, so a pass on three years is weaker evidence than one on more.

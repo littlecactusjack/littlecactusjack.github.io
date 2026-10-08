@@ -11,5 +11,7 @@ mirror synced daily from upstream: never edit it (edits conflict with the sync).
   never edit, reorder or delete a line. Errors and abandoned runs count toward N.
 - **Report DSR at our N plus upstream N** for anything overlapping futures-research's tested
   mechanisms. Report net of cost and at 2× cost. Any suspicion flag means hunt for a bug first.
+- **Every result states its data**: source, date range, sessions (and years), bars. `run_logged`
+  requires a `DataSpan`; reports and the site must carry the same line next to each number.
 - Spending money (Databento downloads) needs the user's explicit go-ahead each time.
 - Setup: `pip install -e ../futures-research -e ".[dev,data]"`, then `pytest -q`.

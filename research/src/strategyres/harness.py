@@ -49,6 +49,30 @@ class Unregistered(RuntimeError):
     pass
 
 
+@dataclass(frozen=True)
+class DataSpan:
+    """How much data a result rests on. Required on every logged run, so no result is quoted
+    without it: a verdict from 3 years and one from 16 are not the same verdict."""
+
+    source: str      # e.g. "databento GLBX.MDP3 ohlcv-1m MNQ.c.0", plus the manifest sha256 prefix
+    start: str       # first session used, ISO date
+    end: str         # last session used, ISO date
+    sessions: int
+    bars: int
+
+    def __post_init__(self) -> None:
+        if self.sessions < 1 or self.bars < 1 or self.start > self.end:
+            raise ValueError(f"implausible data span: {self}")
+
+    @property
+    def years(self) -> float:
+        return self.sessions / 252
+
+    def describe(self) -> str:
+        return (f"data: {self.source}, {self.start}..{self.end}, {self.sessions:,} sessions "
+                f"(~{self.years:.1f} yr), {self.bars:,} bars")
+
+
 def registered_ids(path: Path = REGISTRY) -> set[str]:
     entries = yaml.safe_load(path.read_text()) or []
     return {e["id"] for e in entries if e.get("status") == "registered"}
@@ -146,7 +170,7 @@ def evaluate(gross_bps: Sequence[float], *, symbol: str, trades_per_year: float,
 
 
 def run_logged(hypothesis_id: str, *, params: dict[str, Any], symbol: str,
-               date_range: tuple[str, str], cost_bps: float | None,
+               data: DataSpan, cost_bps: float | None,
                backtest: Callable[[], Sequence[float]], note: str = "",
                log: TrialLog | None = None, registry: Path = REGISTRY) -> list[float]:
     """Run `backtest` (returning per-trade gross bps) and log it as a trial, whatever happens."""
@@ -178,6 +202,6 @@ def run_logged(hypothesis_id: str, *, params: dict[str, Any], symbol: str,
         # "lc" prefix keeps our trial ids distinct from upstream's "t" ids
         log.append(Trial(
             trial_id=log.next_id(prefix="lc"), hypothesis_id=hypothesis_id, params=params, symbol=symbol,
-            date_range=date_range, status=status, sharpe=sharpe, trade_count=n,
-            profit_factor=pf, note="; ".join(x for x in (note, err) if x),
+            date_range=(data.start, data.end), status=status, sharpe=sharpe, trade_count=n,
+            profit_factor=pf, note="; ".join(x for x in (data.describe(), note, err) if x),
         ))
