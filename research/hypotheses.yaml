@@ -33,5 +33,19 @@
     - The manual direction input is a discretionary parameter. It must be replaced by a
       rule fixed in advance, or the backtest is testing the trader, not the signal.
     - Pine Script source is not in the repo yet (research/pine/).
-  success_rule: >
-    TO DECIDE. Being rewritten by the user (2026-10-08); must be fixed here before registration.
+  success_rule:
+    # Set by the user 2026-10-08.
+    pass_if: >
+      At least 1 in 10 evaluations purchased ends with the trader taking home more than $1,000
+      in total (after the 90/10 split, summed across payouts, before Live).
+    measured_by: >
+      M01's own daily net P&L, resampled by day, run through strategyres.topstep_ev under
+      Topstep's published terms: EOD-trailing $2k MLL, one month per $90 evaluation, payouts of
+      50% of balance capped at $2,000 per request, each phase sized to maximise this rate.
+    benchmark: >
+      No edge already reaches 6.6% (1 in 15): P(pass) 0.276 x P(> $1,000 | funded) 0.239.
+      Reaching 10% takes a net annual Sharpe of about 1.0 (0.4 -> 7.5%, 1.0 -> 10.5%, 2.0 -> 15.8%).
+    confidence: >
+      TO DECIDE: whether the point estimate must clear 10%, or a lower confidence bound must.
+      Three years of daily data measures Sharpe to about +/-0.6, so a lower bound at 95% would
+      need a point estimate near Sharpe 2.

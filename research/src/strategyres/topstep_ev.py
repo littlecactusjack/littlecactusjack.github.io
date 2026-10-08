@@ -134,7 +134,9 @@ def simulate_funded(rng, n, sigma, sharpe, mode, per_request_cap, payout_rule="h
         paid += w; pnl -= w
         wins = np.where(due, 0, wins)
         floor_zero |= due
-    return {"expected_payout": float(SPLIT * paid.mean()), "p_reach_live": float((paid >= TOTAL_CAP).mean())}
+    take_home = SPLIT * paid
+    return {"expected_payout": float(take_home.mean()), "p_reach_live": float((paid >= TOTAL_CAP).mean()),
+            "p_take_home_over_1000": float((take_home > 1_000).mean())}
 
 
 def validate(rng) -> dict:
