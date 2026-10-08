@@ -48,5 +48,7 @@
     confidence: >
       Point estimate (user, 2026-10-08): "we just need to work with what the data gives us."
       M01 passes if the rate computed from the data clears 10%, with no confidence margin.
-      Every result must state the data it used (sessions, years, bars); three years measures
-      Sharpe to about +/-0.6, so a pass on three years is weaker evidence than one on more.
+      No minimum amount of data (user, 2026-10-08): whatever span is supplied is run the same
+      way. Every result records its span: dates, sessions, bars and trades.
+    first_round_data: >
+      The maximum Databento holds for each symbol (GLBX.MDP3 ohlcv-1m, continuous front month).

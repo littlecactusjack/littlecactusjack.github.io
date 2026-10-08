@@ -52,7 +52,8 @@ class Unregistered(RuntimeError):
 @dataclass(frozen=True)
 class DataSpan:
     """How much data a result rests on. Required on every logged run, so no result is quoted
-    without it: a verdict from 3 years and one from 16 are not the same verdict."""
+    without it. There is no minimum: three weeks runs exactly like sixteen years, and the line
+    recorded next to the result is what tells them apart."""
 
     source: str      # e.g. "databento GLBX.MDP3 ohlcv-1m MNQ.c.0", plus the manifest sha256 prefix
     start: str       # first session used, ISO date
@@ -68,9 +69,10 @@ class DataSpan:
     def years(self) -> float:
         return self.sessions / 252
 
-    def describe(self) -> str:
+    def describe(self, trades: int | None = None) -> str:
+        t = f", {trades:,} trades" if trades is not None else ""
         return (f"data: {self.source}, {self.start}..{self.end}, {self.sessions:,} sessions "
-                f"(~{self.years:.1f} yr), {self.bars:,} bars")
+                f"(~{self.years:.1f} yr), {self.bars:,} bars{t}")
 
 
 def registered_ids(path: Path = REGISTRY) -> set[str]:
@@ -203,5 +205,5 @@ def run_logged(hypothesis_id: str, *, params: dict[str, Any], symbol: str,
         log.append(Trial(
             trial_id=log.next_id(prefix="lc"), hypothesis_id=hypothesis_id, params=params, symbol=symbol,
             date_range=(data.start, data.end), status=status, sharpe=sharpe, trade_count=n,
-            profit_factor=pf, note="; ".join(x for x in (data.describe(), note, err) if x),
+            profit_factor=pf, note="; ".join(x for x in (data.describe(n), note, err) if x),
         ))

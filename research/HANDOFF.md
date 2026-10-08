@@ -13,7 +13,7 @@ it is deliberately **not** recorded here (this repo is public) and must be rotat
 
 ## Data plan
 Databento, `ohlcv-1m`, continuous front month (`NQ.c.0`, `ES.c.0`, `MNQ.c.0`, `MES.c.0`),
-about 3 years. `python -m strategyres.fetch` prices the pull and downloads only with `--yes`.
+the full history Databento holds (2010 on for NQ/ES; MNQ/MES from May 2019). `python -m strategyres.fetch` prices the pull and downloads only with `--yes`.
 Fallbacks: FirstRate Data (~$100/yr, up to 18 years of NQ), or a free Kaggle NQ 1-min 2022–2025 set.
 
 Sandboxes with restricted egress (the Cowork one, and this Claude Code cloud environment

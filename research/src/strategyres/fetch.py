@@ -4,8 +4,9 @@
     python -m strategyres.fetch                    # price the default pull, download nothing
     python -m strategyres.fetch --yes              # download it
 
-Default pull, from the handoff: GLBX.MDP3, continuous front month (NQ, ES, MNQ, MES), ohlcv-1m,
-three years. Each symbol lands in research/data/raw/<symbol>.dbn.zst with a manifest entry
+Default pull: GLBX.MDP3, continuous front month (NQ, ES, MNQ, MES), ohlcv-1m, from the earliest
+date Databento holds for the dataset (each symbol simply has no bars before it listed; MNQ and MES
+start May 2019). Pass --start to take less. Each symbol lands in research/data/raw/<symbol>.dbn.zst with a manifest entry
 carrying its sha256, so a later run can prove which bytes a result was computed from.
 """
 from __future__ import annotations
@@ -14,7 +15,7 @@ import argparse
 import hashlib
 import json
 import os
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -49,7 +50,7 @@ def sha256(path: Path) -> str:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--symbols", nargs="+", default=SYMBOLS)
-    ap.add_argument("--start", default=(date.today() - timedelta(days=3 * 365)).isoformat())
+    ap.add_argument("--start", default=None, help="ISO date; default is the dataset's earliest")
     ap.add_argument("--end", default=date.today().isoformat())
     ap.add_argument("--schema", default=SCHEMA)
     ap.add_argument("--yes", action="store_true", help="actually download (costs money)")
@@ -58,6 +59,8 @@ def main(argv: list[str] | None = None) -> int:
     import databento as db
 
     client = db.Historical(api_key())
+    if a.start is None:
+        a.start = str(client.metadata.get_dataset_range(dataset=DATASET)["start"])[:10]
     common = dict(dataset=DATASET, schema=a.schema, stype_in="continuous", start=a.start, end=a.end)
     quotes = {s: client.metadata.get_cost(symbols=[s], **common) for s in a.symbols}
     for s, usd in quotes.items():

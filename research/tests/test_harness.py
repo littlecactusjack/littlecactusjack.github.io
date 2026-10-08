@@ -90,9 +90,17 @@ def test_every_logged_run_records_how_much_data_it_used(log, reg):
     run(log, reg)
     (t,) = log.read_all()
     assert t.date_range == ("2023-01-03", "2025-12-31")
-    assert "750 sessions (~3.0 yr), 300,000 bars" in t.note
+    assert "750 sessions (~3.0 yr), 300,000 bars, 4 trades" in t.note
 
 
 def test_an_implausible_data_span_is_refused():
     with pytest.raises(ValueError):
         h.DataSpan("x", "2026-01-01", "2023-01-01", 750, 1)
+
+
+def test_three_weeks_runs_exactly_like_three_years(log, reg):
+    short = h.DataSpan("test", "2026-09-14", "2026-10-02", 15, 6_000)
+    h.run_logged("C99", params={"x": 1}, symbol="MNQ", data=short, cost_bps=None,
+                 backtest=lambda: [1.0, -0.5, 0.8], log=log, registry=reg)
+    (t,) = log.read_all()
+    assert t.status == "completed" and "15 sessions (~0.1 yr), 6,000 bars, 3 trades" in t.note
