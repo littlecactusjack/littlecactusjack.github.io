@@ -13,5 +13,8 @@ mirror synced daily from upstream: never edit it (edits conflict with the sync).
   mechanisms. Report net of cost and at 2× cost. Any suspicion flag means hunt for a bug first.
 - **Every result states its data**: source, date range, sessions (and years), bars. `run_logged`
   requires a `DataSpan`; reports and the site must carry the same line next to each number.
+- **Session history**: append each request and response to `session_history.json` (2-3
+  sentences each, plain language; the repo is public, so no keys or private details). The
+  site's Session history tab reads it.
 - Spending money (Databento downloads) needs the user's explicit go-ahead each time.
 - Setup: `pip install -e ../futures-research -e ".[dev,data]"`, then `pytest -q`.

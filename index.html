@@ -70,6 +70,10 @@ td.num { text-align: right; font-variant-numeric: tabular-nums; }
 .chip { display: inline-block; padding: 1px 8px; border-radius: 999px; background: var(--chip); font-size: 12px; white-space: nowrap; }
 .reason { color: var(--text-2); max-width: 56ch; }
 details summary { cursor: pointer; }
+.hist-day { margin: 28px 0 10px; font-size: 15px; color: var(--text-2); }
+.hist { margin-bottom: 10px; }
+.hist .q { font-weight: 600; margin-bottom: 4px; }
+.hist .a { color: var(--text-2); margin: 0; }
 ul.feed { list-style: none; padding: 0; margin: 0; }
 ul.feed li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
 ul.feed .when { color: var(--muted); font-size: 12px; }
@@ -90,6 +94,7 @@ footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
   <nav class="tabs" role="tablist">
     <a href="#ledger" role="tab" data-tab="ledger">Research ledger</a>
     <a href="#topstep" role="tab" data-tab="topstep">Topstep EV</a>
+    <a href="#history" role="tab" data-tab="history">Session history</a>
   </nav>
   <section id="tab-ledger" role="tabpanel">
   <h1>Futures Research Ledger</h1>
@@ -185,6 +190,13 @@ footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
   </ul>
   <p style="margin-top:12px"><a href="https://github.com/littlecactusjack/littlecactusjack.github.io/blob/main/research/reports/topstep_ev.md">Full tables and terms →</a></p>
   </div>
+  </section>
+
+  <section id="tab-history" role="tabpanel" hidden>
+  <h1>Session History</h1>
+  <p class="lede">Short summaries of each request and response while building this project, newest first.
+    Read from <code>research/session_history.json</code> on every load.</p>
+  <div id="historyList"></div>
   </section>
 
   <footer>
@@ -492,13 +504,27 @@ async function loadTopstep() {
   tsChart(); tsGrid();
 }
 
+async function loadHistory() {
+  const r = await fetch('research/session_history.json?t=' + Date.now(), { cache: 'no-store' });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const items = (await r.json()).map((x, i) => ({ ...x, i })).sort((a, b) => b.date.localeCompare(a.date) || b.i - a.i);
+  let html = '', day = '';
+  for (const x of items) {
+    if (x.date !== day) { day = x.date; html += `<h2 class="hist-day">${new Date(day + 'T12:00:00Z').toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h2>`; }
+    html += `<div class="card hist"><div class="q">${esc(x.request)}</div><p class="a">${esc(x.response)}</p></div>`;
+  }
+  $('historyList').innerHTML = html || '<p>No entries yet.</p>';
+}
+
+const TABS = ['ledger', 'topstep', 'history'];
 function showTab() {
-  const t = location.hash === '#topstep' ? 'topstep' : 'ledger';
+  const h = location.hash.slice(1), t = TABS.includes(h) ? h : 'ledger';
   document.querySelectorAll('nav.tabs a').forEach(a => a.setAttribute('aria-selected', a.dataset.tab === t));
-  $('tab-ledger').hidden = t !== 'ledger'; $('tab-topstep').hidden = t !== 'topstep';
+  TABS.forEach(k => $('tab-' + k).hidden = k !== t);
 }
 window.addEventListener('hashchange', showTab);
 showTab();
+loadHistory().catch(e => { $('historyList').innerHTML = `<p>Could not load history (${esc(e.message)}).</p>`; });
 loadTopstep().catch(e => { $('tsStatus').innerHTML = `<span><span class="dot bad"></span>Failed to load simulation: ${esc(e.message)}</span>`; });
 
 load().catch(e => { $('status').innerHTML = `<span><span class="dot bad"></span>Failed to load ledger: ${esc(e.message)}</span>`; });
