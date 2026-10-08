@@ -169,8 +169,8 @@ footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
   <h2>Full grid</h2>
   <div class="card">
     <div class="filters" id="tsScen"></div>
-    <div class="sub">Each cell: EV per evaluation, with the pass rate below it. σ is the strategy's daily dollar
-      volatility; holding one MNQ through the session is about $850/day.</div>
+    <div class="sub">Columns are the evaluation's daily dollar volatility (one MNQ held through the session is about $850/day).
+      Each cell: EV per evaluation, the pass rate, and the funded-account size that maximises payout, chosen separately.</div>
     <div class="tablewrap"><table id="tsGrid"></table></div>
   </div>
 
@@ -179,7 +179,9 @@ footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
     <li>Anything a Live account pays after the $5k Express cap (excluded, so EV is understated there).</li>
     <li>The firm refusing payouts on accounts it judges were gamed. This is the largest real risk, and no simulation prices it.</li>
     <li>Terms read from your description and third-party sites, since topstep.com was unreachable: the per-payout cap
-      ($5k or $2k, both run) and whether the $90 renews monthly (both run).</li>
+      ($2k reported for accounts without a daily loss limit, $5k headline; both run), the payout rule (50% of balance
+      as published, or above a $2k buffer as you described; both run) and whether the $90 renews monthly (both run).</li>
+    <li>The funded scaling plan (2, 3 then 5 lots by balance). It is in full-size contracts, far above every size here, so it never binds.</li>
   </ul>
   <p style="margin-top:12px"><a href="https://github.com/littlecactusjack/littlecactusjack.github.io/blob/main/research/reports/topstep_ev.md">Full tables and terms →</a></p>
   </div>
@@ -401,15 +403,17 @@ async function load() {
 
 // ── Topstep EV tab ─────────────────────────────────────────────────────────
 const TS_SCEN = [
-  { key: 'eod_trailing|1|5000', label: 'Topstep rule · 1 month' },
-  { key: 'eod_trailing|1|2000', label: '$2k payout cap' },
-  { key: 'eod_trailing|6|5000', label: 'Renew monthly (6 mo)' },
-  { key: 'day_anchored|1|5000', label: 'Floor reset daily (literal reading)' },
+  { key: 'eod_trailing|1|half_balance|2000', label: 'Topstep rules as published' },
+  { key: 'eod_trailing|1|half_balance|5000', label: '$5k per-request cap' },
+  { key: 'eod_trailing|1|above_buffer|5000', label: 'Payout above $2k buffer' },
+  { key: 'eod_trailing|6|half_balance|2000', label: 'Renew monthly (6 mo)' },
+  { key: 'day_anchored|1|half_balance|2000', label: 'Floor reset daily (literal reading)' },
 ];
+const TS_MAIN = TS_SCEN[0].key;
 const W04_SHARPE = -0.42; // futures-research reports/w04_trial.md, post-2021 net
 let ts = null, wps = null, tsScen = TS_SCEN[0].key;
 const money = v => (v >= 0 ? '+' : '−') + '$' + fmt(Math.abs(v));
-const scenRows = k => ts.grid.filter(g => `${g.mll}|${g.months}|${g.per_request_cap}` === k);
+const scenRows = k => ts.grid.filter(g => `${g.mll}|${g.months}|${g.payout_rule}|${g.per_request_cap}` === k);
 function bestBy(rows) {
   const by = {};
   rows.forEach(g => { if (!by[g.sharpe] || g.ev > by[g.sharpe].ev) by[g.sharpe] = g; });
@@ -417,7 +421,7 @@ function bestBy(rows) {
 }
 
 function tsChart() {
-  const A = bestBy(scenRows('eod_trailing|1|5000')), B = bestBy(wps.grid.filter(g => g.daily_limit === 'soft'));
+  const A = bestBy(scenRows(TS_MAIN)), B = bestBy(wps.grid.filter(g => g.daily_limit === 'soft'));
   const W = 640, H = 280, m = { l: 56, r: 16, t: 16, b: 34 };
   const xlo = -0.5, xhi = 2.0, all = [...A, ...B].map(g => g.ev);
   const ylo = Math.min(-200, ...all), yhi = Math.max(...all) * 1.08;
@@ -435,7 +439,7 @@ function tsChart() {
   [[B, 'var(--series-2)', "Colton's firm"], [A, 'var(--series-1)', 'Topstep 50K']].forEach(([rows, c, name]) => {
     s += `<polyline fill="none" stroke="${c}" stroke-width="2" points="${rows.map(g => `${x(g.sharpe)},${y(g.ev)}`).join(' ')}"/>`;
     rows.forEach(g => s += `<circle cx="${x(g.sharpe)}" cy="${y(g.ev)}" r="4.5" fill="${c}" stroke="var(--surface)" stroke-width="2"/>
-      <circle cx="${x(g.sharpe)}" cy="${y(g.ev)}" r="12" fill="transparent" data-tip="<b>${name}</b><br>Sharpe ${g.sharpe}: ${money(g.ev)} per eval<br>pass ${(g.p_pass * 100).toFixed(0)}% at σ $${g.daily_sigma}/day"/>`);
+      <circle cx="${x(g.sharpe)}" cy="${y(g.ev)}" r="12" fill="transparent" data-tip="<b>${name}</b><br>Sharpe ${g.sharpe}: ${money(g.ev)} per eval<br>pass ${(g.p_pass * 100).toFixed(0)}% at σ $${g.daily_sigma}/day${g.funded_sigma ? `, funded at $${g.funded_sigma}/day` : ''}"/>`);
     const last = rows[rows.length - 1];
     s += `<text x="${x(last.sharpe) - 6}" y="${y(last.ev) - 10}" text-anchor="end" style="fill:var(--text-2)">${name}</text>`;
   });
@@ -446,14 +450,14 @@ function tsChart() {
 function tsGrid() {
   const rows = scenRows(tsScen), sig = [...new Set(rows.map(g => g.daily_sigma))], sh = [...new Set(rows.map(g => g.sharpe))];
   const maxAbs = Math.max(...rows.map(g => Math.abs(g.ev)));
-  let h = `<thead><tr><th>Sharpe</th>${sig.map(v => `<th class="num">σ $${fmt(v)}</th>`).join('')}</tr></thead><tbody>`;
+  let h = `<thead><tr><th>Sharpe</th>${sig.map(v => `<th class="num">eval σ $${fmt(v)}</th>`).join('')}</tr></thead><tbody>`;
   sh.forEach(s => {
     h += `<tr><td><b>${s}</b></td>`;
     sig.forEach(v => {
       const g = rows.find(r => r.sharpe === s && r.daily_sigma === v);
       const pct = Math.round(Math.sqrt(Math.abs(g.ev) / maxAbs) * 40);
       const bg = `color-mix(in srgb, ${g.ev >= 0 ? 'var(--pos)' : 'var(--neg)'} ${pct}%, var(--surface))`;
-      h += `<td class="ev" style="background:${bg}">${money(g.ev)}<br><small>${(g.p_pass * 100).toFixed(0)}% pass</small></td>`;
+      h += `<td class="ev" style="background:${bg}">${money(g.ev)}<br><small>${(g.p_pass * 100).toFixed(0)}% pass · funded $${fmt(g.funded_sigma)}</small></td>`;
     });
     h += '</tr>';
   });
@@ -465,19 +469,21 @@ function tsGrid() {
 async function loadTopstep() {
   const fetchJson = async p => { const r = await fetch(p + '?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) throw new Error(p + ': HTTP ' + r.status); return r.json(); };
   [ts, wps] = await Promise.all([fetchJson('research/reports/topstep_ev.json'), fetchJson(BASE + 'reports/w_prop_ev.json')]);
-  const A = bestBy(scenRows('eod_trailing|1|5000')), z = A.find(g => g.sharpe === 0), one = A.find(g => g.sharpe === 1);
+  const A = bestBy(scenRows(TS_MAIN)), z = A.find(g => g.sharpe === 0), one = A.find(g => g.sharpe === 1);
+  const sameZ = Math.max(...scenRows(TS_MAIN).filter(g => g.sharpe === 0).map(g => g.ev_same_size));
   const Bz = bestBy(wps.grid.filter(g => g.daily_limit === 'soft')).find(g => g.sharpe === 0);
   const v = ts.validation;
   $('tsStatus').innerHTML = `<span><span class="dot ${v.ok ? 'ok' : 'bad'}"></span>Simulator validated: no-edge pass rate ${v.p_pass.toFixed(3)} vs closed form ${v.closed_form.toFixed(3)}</span><span>${fmt(ts.n_paths)} paths per cell</span>`;
   $('tsTiles').innerHTML = [
     [money(z.ev), 'EV per eval with no edge'], [(z.p_pass * 100).toFixed(0) + '%', 'pass rate with no edge'],
-    [(100 - z.p_pass * 100).toFixed(0) + '%', 'chance of losing the $90'], ['$' + fmt(z.daily_sigma), 'best daily σ with no edge'],
+    [(100 - z.p_pass * 100).toFixed(0) + '%', 'chance of losing the $90'], ['$' + fmt(z.daily_sigma) + ' → $' + fmt(z.funded_sigma), 'best daily σ, eval → funded'],
     [money(one.ev), 'EV per eval at Sharpe 1.0'], ['−0.42', 'best daily strategy measured (W04)']
   ].map(([a, b]) => `<div class="tile"><div class="v">${a}</div><div class="k">${b}</div></div>`).join('');
   $('tsCompare').innerHTML = [
     `<b>With no edge, both firms are slightly positive.</b> Topstep ${money(z.ev)} (${(z.p_pass * 100).toFixed(0)}% pass) vs Colton's firm ${money(Bz.ev)} (${(Bz.p_pass * 100).toFixed(0)}% pass). In both, the fee caps your loss while the firm absorbs the drawdown.`,
     `<b>An edge is worth far less at Topstep.</b> At Sharpe 1.0: ${money(one.ev)} here vs ${money(bestBy(wps.grid.filter(g => g.daily_limit === 'soft')).find(g => g.sharpe === 1).ev)} at Colton's firm. The $5k Express cap and the one-month limit truncate the upside.`,
-    `<b>Size works the opposite way.</b> Colton's one-year evaluation favoured small size ($150–250/day of σ). Topstep's one month forces about $900–1,200/day (the two are within simulation noise), roughly one MNQ held through the session.`,
+    `<b>Size works the opposite way.</b> Colton's one-year evaluation favoured small size ($150–250/day of σ). Topstep's one month forces about $${fmt(z.daily_sigma)}/day in the evaluation, roughly one MNQ or more held through the session.`,
+    `<b>The two phases have different rules, so they are sized separately.</b> The evaluation has a target, a 50% consistency rule and a one-month clock; the funded account has none of those, pays out 50% of balance after every 5 winning days, and drops its floor to $0 after the first payout. Sizing each phase on its own gives ${money(z.ev)} at no edge, against ${money(sameZ)} if one size is forced on both.`,
     `<b>None of the old tests produced a usable edge.</b> W04 measured −0.42 net, left of every simulated point. The intraday strategies (L07, P03 and the rest) were net-negative per trade. So the Sharpe 0 row is the realistic one, and it describes a lottery with a small positive expectation, not a strategy.`,
   ].map(t => `<li>${t}</li>`).join('');
   tsChart(); tsGrid();
