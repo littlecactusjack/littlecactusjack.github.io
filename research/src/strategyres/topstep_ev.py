@@ -17,16 +17,27 @@ terms are the user's, cross-read against third-party summaries. Ambiguities are 
                                 frozen at the start balance once it gets there; breached intraday.
                  day_anchored   the user's wording read literally: floor = that day's opening balance
                                 - $2,000, recomputed every day (in effect a $2,000 per-day limit).
-  funded (XFA) starts at +$0 with the same MLL. Standard payout path, not the consistency path:
-               after every 5 winning days (net >= $150), withdraw everything above a $2,000 buffer,
-               up to `per_request_cap`; the trader keeps 90%; the MLL then sits at $0 for good.
-               At $5,000 withdrawn in total the account moves to Live: counting stops there, so EV
-               excludes anything a Live account later pays (conservative). Followed for at most 2 years.
-  trader       stops for the day once the day is up $1,500 (so no day breaks the 50% rule) or the
-               target is reached. A gamer would; it costs nothing in expectation at zero edge.
+  funded (XFA) its OWN rules, not the evaluation's: no profit target, no consistency rule (standard
+               payout path), no time limit. Balance starts at $0 with the MLL at -$2,000, trailing
+               end of day and stopping at $0; after the first payout the MLL sits at $0 for good.
+               After every 5 winning days (net >= $150) one withdrawal, by `payout_rule`:
+                 half_balance   Topstep's published rule: up to 50% of the balance
+                 above_buffer   the user's description: everything above a $2,000 buffer
+               capped per request at `per_request_cap` ($2,000 is reported for a 50K with no daily
+               loss limit; $5,000 is the headline figure), the trader keeping 90%. At $5,000 withdrawn
+               in total the account moves to Live: counting stops there, so EV excludes anything a
+               Live account later pays (conservative). Followed for at most 2 years.
+               Scaling plan (2 / 3 / 5 lots by balance) is not modelled: it is in full-size contracts,
+               and 2 NQ is ~$17,000/day of sigma, far above every size in the grid, so it never binds.
+  sizing       the trader picks a size per phase. The evaluation needs size to finish in a month; the
+               funded account does not. Because the funded account starts fresh, the two optimise
+               separately: best EV = max over eval sizes of P(pass) x max over funded sizes of payout,
+               minus fees. The same-size-in-both-phases figure is reported alongside.
+  trader       in the evaluation only, stops for the day once up $1,500 (so no day breaks the 50%
+               rule) or once the target is reached. A gamer would; it costs nothing at zero edge.
 
-NOT MODELLED: Live account value, scaling plans, per-request 50%-of-balance caps beyond the buffer,
-inactivity rules, slippage beyond the cost already inside Sharpe, the firm refusing a payout.
+NOT MODELLED: Live account value, inactivity rules, slippage beyond the cost already inside Sharpe,
+the firm refusing a payout.
 """
 from __future__ import annotations
 
@@ -94,7 +105,7 @@ def simulate_eval(rng, n, sigma, sharpe, mode, months=1, rules=True, intraday_pe
     return {"p_pass": float(passed.mean()), "fees": float(FEE * months_paid.mean())}
 
 
-def simulate_funded(rng, n, sigma, sharpe, mode, per_request_cap):
+def simulate_funded(rng, n, sigma, sharpe, mode, per_request_cap, payout_rule="half_balance"):
     pnl = np.zeros(n); eod_peak = np.zeros(n); alive = np.ones(n, bool); paid = np.zeros(n)
     wins = np.zeros(n); floor_zero = np.zeros(n, bool)
     for _ in range(FUNDED_DAYS):
@@ -113,8 +124,13 @@ def simulate_funded(rng, n, sigma, sharpe, mode, per_request_cap):
         ok = active & alive
         eod_peak = np.where(ok, np.maximum(eod_peak, pnl), eod_peak)
         wins += ok & (pnl - day_open >= WIN_DAY)
-        due = ok & (wins >= WIN_DAYS_PER_PAYOUT) & (pnl > BUFFER)
-        w = np.where(due, np.minimum.reduce([pnl - BUFFER, np.full(n, per_request_cap), TOTAL_CAP - paid]), 0.0)
+        if payout_rule == "half_balance":
+            due, avail = ok & (wins >= WIN_DAYS_PER_PAYOUT) & (pnl > 0), 0.5 * pnl
+        elif payout_rule == "above_buffer":
+            due, avail = ok & (wins >= WIN_DAYS_PER_PAYOUT) & (pnl > BUFFER), pnl - BUFFER
+        else:
+            raise ValueError(payout_rule)
+        w = np.where(due, np.minimum.reduce([avail, np.full(n, per_request_cap), TOTAL_CAP - paid]), 0.0)
         paid += w; pnl -= w
         wins = np.where(due, 0, wins)
         floor_zero |= due
@@ -130,49 +146,71 @@ def validate(rng) -> dict:
     return {"p_pass": r["p_pass"], "closed_form": target, "tolerance": tol, "ok": abs(r["p_pass"] - target) <= tol}
 
 
+FUNDED_SCEN = [("half_balance", 2_000.0), ("half_balance", 5_000.0), ("above_buffer", 5_000.0)]
+
+
 def run(n: int = 6_000, seed: int = 20261008) -> dict:
     rng = np.random.default_rng(seed)
     val = validate(rng)
     if not val["ok"]:
         raise SystemExit(f"simulator fails validation: {val}")
+    evals, funded = [], []
+    for mode in ("eod_trailing", "day_anchored"):
+        for s in SHARPES:
+            for sig in SIGMAS:
+                for months in (1, 6):
+                    evals.append({"mll": mode, "months": months, "sharpe": s, "daily_sigma": sig,
+                                  **simulate_eval(rng, n, sig, s, mode, months=months)})
+                for rule, cap in FUNDED_SCEN:
+                    funded.append({"mll": mode, "payout_rule": rule, "per_request_cap": cap, "sharpe": s,
+                                   "daily_sigma": sig, **simulate_funded(rng, n, sig, s, mode, cap, rule)})
+                print(f"{mode} S={s} sig={sig} done", flush=True)
     grid = []
     for mode in ("eod_trailing", "day_anchored"):
         for months in (1, 6):
-            for cap in (5_000.0, 2_000.0):
-                if months == 6 and cap == 2_000.0:
-                    continue
+            for rule, cap in FUNDED_SCEN:
                 for s in SHARPES:
-                    for sig in SIGMAS:
-                        e = simulate_eval(rng, n, sig, s, mode, months=months)
-                        f = simulate_funded(rng, n, sig, s, mode, cap)
-                        ev = e["p_pass"] * f["expected_payout"] - e["fees"]
-                        grid.append({"mll": mode, "months": months, "per_request_cap": cap, "sharpe": s,
-                                     "daily_sigma": sig, **e, **f, "ev": ev})
-                        print(f"{mode} m={months} cap={cap:.0f} S={s} sig={sig} pass {e['p_pass']:.3f} "
-                              f"payout {f['expected_payout']:6.0f} EV {ev:+6.0f}", flush=True)
-    return {"validation": val, "n_paths": n, "grid": grid}
+                    E = [e for e in evals if (e["mll"], e["months"], e["sharpe"]) == (mode, months, s)]
+                    F = [f for f in funded if (f["mll"], f["payout_rule"], f["per_request_cap"], f["sharpe"]) == (mode, rule, cap, s)]
+                    bf = max(F, key=lambda f: f["expected_payout"])
+                    for e in E:
+                        same = next(f for f in F if f["daily_sigma"] == e["daily_sigma"])
+                        grid.append({"mll": mode, "months": months, "payout_rule": rule, "per_request_cap": cap,
+                                     "sharpe": s, "daily_sigma": e["daily_sigma"], "p_pass": e["p_pass"], "fees": e["fees"],
+                                     "ev_same_size": e["p_pass"] * same["expected_payout"] - e["fees"],
+                                     "funded_sigma": bf["daily_sigma"], "expected_payout": bf["expected_payout"],
+                                     "p_reach_live": bf["p_reach_live"],
+                                     "ev": e["p_pass"] * bf["expected_payout"] - e["fees"]})
+    return {"validation": val, "n_paths": n, "evals": evals, "funded": funded, "grid": grid}
+
+
+SCENARIOS = [
+    ("eod_trailing", 1, "half_balance", 2_000.0, "Topstep rules as published · 1 month · 50% of balance, $2k per request"),
+    ("eod_trailing", 1, "half_balance", 5_000.0, "Same, with a $5k per-request cap"),
+    ("eod_trailing", 1, "above_buffer", 5_000.0, "Payout = everything above a $2k buffer (your description)"),
+    ("eod_trailing", 6, "half_balance", 2_000.0, "Evaluation renewed monthly, up to 6 months"),
+    ("day_anchored", 1, "half_balance", 2_000.0, "Loss floor reset to each day's open (literal reading)"),
+]
 
 
 def render(r: dict) -> str:
     v = r["validation"]
     w = ["# Topstep 50K — EV per evaluation", "",
          "Generated by `python -m strategyres.topstep_ev`. A computation, no trial. Terms and readings in "
-         "the module docstring. Sharpe is annual and net of cost; σ is the strategy's daily $ volatility.", "",
+         "the module docstring. Sharpe is annual and net of cost; σ is the strategy's daily $ volatility "
+         "in the evaluation. The funded account is sized separately, at whatever σ maximises its payout.", "",
          f"**Validated first:** P(pass) {v['p_pass']:.3f} against the closed form {v['closed_form']:.3f} "
          f"(tolerance {v['tolerance']:.3f}).", ""]
-    sections = [("eod_trailing", 1, 5000.0, "MLL end-of-day trailing (Topstep's rule) · 1 month · $5k per request"),
-                ("eod_trailing", 1, 2000.0, "MLL end-of-day trailing · 1 month · $2k per request"),
-                ("eod_trailing", 6, 5000.0, "MLL end-of-day trailing · renew monthly, up to 6 months · $5k per request"),
-                ("day_anchored", 1, 5000.0, "MLL anchored to each day's open (literal reading) · 1 month · $5k per request")]
-    for mode, months, cap, title in sections:
-        w += [f"## {title}", "", "| Sharpe | " + " | ".join(f"σ ${s}" for s in SIGMAS) + " | best |",
-              "|---|" + "---|" * (len(SIGMAS) + 1)]
+    for mode, months, rule, cap, title in SCENARIOS:
+        w += [f"## {title}", "", "| Sharpe | " + " | ".join(f"eval σ ${s}" for s in SIGMAS) + " | best | funded σ | same size both phases |",
+              "|---|" + "---|" * (len(SIGMAS) + 3)]
         for s in SHARPES:
-            row = [g for g in r["grid"] if (g["mll"], g["months"], g["per_request_cap"], g["sharpe"]) == (mode, months, cap, s)]
-            best = max(row, key=lambda g: g["ev"])
+            row = [g for g in r["grid"] if (g["mll"], g["months"], g["payout_rule"], g["per_request_cap"], g["sharpe"]) == (mode, months, rule, cap, s)]
+            best = max(row, key=lambda g: g["ev"]); same = max(row, key=lambda g: g["ev_same_size"])
             w.append(f"| {s} | " + " | ".join(f"{g['ev']:+,.0f} ({g['p_pass']:.0%})" for g in row)
-                     + f" | **{best['ev']:+,.0f}** at ${best['daily_sigma']} |")
-        w += ["", "Cells: EV in USD (P(pass)). EV = P(pass) × expected payout (90%, to the $5k Live cap) − fees.", ""]
+                     + f" | **{best['ev']:+,.0f}** at ${best['daily_sigma']} | ${best['funded_sigma']} "
+                     f"| {same['ev_same_size']:+,.0f} at ${same['daily_sigma']} |")
+        w += ["", "Cells: EV in USD (P(pass)). EV = P(pass) × expected funded payout (90%, to the $5k Live cap) − fees.", ""]
     return "\n".join(w)
 
 

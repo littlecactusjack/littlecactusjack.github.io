@@ -22,3 +22,9 @@ def test_one_month_costs_one_fee_and_renewal_costs_more():
     one = t.simulate_eval(np.random.default_rng(3), 2000, 150, 0.0, "eod_trailing", months=1)
     six = t.simulate_eval(np.random.default_rng(3), 2000, 150, 0.0, "eod_trailing", months=6)
     assert one["fees"] == t.FEE and six["fees"] > t.FEE and six["p_pass"] >= one["p_pass"]
+
+
+def test_payout_rule_must_be_named():
+    import pytest
+    with pytest.raises(ValueError):
+        t.simulate_funded(np.random.default_rng(4), 200, 900, 0.0, "eod_trailing", 2_000.0, "everything")
