@@ -63,5 +63,10 @@
     "date": "2026-10-08",
     "request": "Add a session history tab with short summaries of each request and response, and publish everything from today.",
     "response": "Added a Session history tab that reads this log, with today's thirteen exchanges including this one. Committed and published it with everything else from today."
+  },
+  {
+    "date": "2026-10-08",
+    "request": "Format the session history like this chat, with requests on one side and results on the other.",
+    "response": "Restyled the tab as a chat: your requests in bubbles on the right, what was done on the left, oldest first within each day."
   }
 ]
