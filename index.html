@@ -12,6 +12,7 @@
   --text: #0b0b0b; --text-2: #52514e; --muted: #7a7974;
   --grid: #ecebe7; --series-1: #2a78d6; --ref: #e34948;
   --good: #008300; --bad: #c53030; --chip: #f0efec;
+  --series-2: #eb6834; --pos: #2a78d6; --neg: #e34948;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -20,6 +21,7 @@
     --text: #ffffff; --text-2: #c3c2b7; --muted: #8f8e86;
     --grid: #2a2a27; --series-1: #3987e5; --ref: #e66767;
     --good: #4cb04c; --bad: #e66767; --chip: #2a2a27;
+    --series-2: #d95926; --pos: #3987e5; --neg: #e66767;
   }
 }
 :root[data-theme="dark"] {
@@ -28,6 +30,7 @@
   --text: #ffffff; --text-2: #c3c2b7; --muted: #8f8e86;
   --grid: #2a2a27; --series-1: #3987e5; --ref: #e66767;
   --good: #4cb04c; --bad: #e66767; --chip: #2a2a27;
+  --series-2: #d95926; --pos: #3987e5; --neg: #e66767;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text);
@@ -71,11 +74,24 @@ ul.feed { list-style: none; padding: 0; margin: 0; }
 ul.feed li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
 ul.feed .when { color: var(--muted); font-size: 12px; }
 code { font-size: 13px; }
+nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 0 0 24px; }
+nav.tabs a { padding: 10px 14px; color: var(--text-2); text-decoration: none; font-weight: 600; font-size: 14px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; }
+nav.tabs a[aria-selected="true"] { color: var(--text); border-bottom-color: var(--text); }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-2); margin-bottom: 6px; }
+.legend i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+td.ev { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.ev small { color: var(--text-2); }
 footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
 </style>
 </head>
 <body>
 <main>
+  <nav class="tabs" role="tablist">
+    <a href="#ledger" role="tab" data-tab="ledger">Research ledger</a>
+    <a href="#topstep" role="tab" data-tab="topstep">Topstep EV</a>
+  </nav>
+  <section id="tab-ledger" role="tabpanel">
   <h1>Futures Research Ledger</h1>
   <p class="lede">A pre-registered search for an intraday edge in MNQ (Micro Nasdaq-100) and MGC (Micro Gold)
     futures under prop-account rules. Every test is logged to a hash-chained file <em>before</em> it runs,
@@ -126,6 +142,48 @@ footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
 
   <h2>Latest activity</h2>
   <div class="card"><ul class="feed" id="feed"><li>Loading commits…</li></ul></div>
+
+  </section>
+
+  <section id="tab-topstep" role="tabpanel" hidden>
+  <h1>Prop Evaluation EV</h1>
+  <p class="lede">Is a Topstep 50K evaluation worth buying, and how much does a real edge add? A simulation on
+    your account's rules, not a backtest: it uses no market data and spends no trials. Built on Colton's W-series
+    simulator and compared with his results.</p>
+  <div class="status" id="tsStatus"><span><span class="dot"></span>Loading simulation…</span></div>
+  <div class="tiles" id="tsTiles"></div>
+
+  <h2>Best EV per evaluation, by edge</h2>
+  <div class="card">
+    <h3>Expected dollars per evaluation at the best position size</h3>
+    <div class="sub">Edge is annual Sharpe net of costs. Each point is the best of six sizes. The dashed line is W04, the
+      only daily-horizon strategy Colton measured.</div>
+    <div class="legend"><span><i style="background:var(--series-1)"></i>Topstep 50K (your terms)</span>
+      <span><i style="background:var(--series-2)"></i>Colton's firm (W-series, $80 eval)</span></div>
+    <div class="tablewrap"><div id="tsChart" style="min-width:560px"></div></div>
+  </div>
+
+  <h2>How it compares to the old tests</h2>
+  <div class="card"><ul class="findings" id="tsCompare"></ul></div>
+
+  <h2>Full grid</h2>
+  <div class="card">
+    <div class="filters" id="tsScen"></div>
+    <div class="sub">Each cell: EV per evaluation, with the pass rate below it. σ is the strategy's daily dollar
+      volatility; holding one MNQ through the session is about $850/day.</div>
+    <div class="tablewrap"><table id="tsGrid"></table></div>
+  </div>
+
+  <h2>Not in the model</h2>
+  <div class="card"><ul class="findings">
+    <li>Anything a Live account pays after the $5k Express cap (excluded, so EV is understated there).</li>
+    <li>The firm refusing payouts on accounts it judges were gamed. This is the largest real risk, and no simulation prices it.</li>
+    <li>Terms read from your description and third-party sites, since topstep.com was unreachable: the per-payout cap
+      ($5k or $2k, both run) and whether the $90 renews monthly (both run).</li>
+  </ul>
+  <p style="margin-top:12px"><a href="https://github.com/littlecactusjack/littlecactusjack.github.io/blob/main/research/reports/topstep_ev.md">Full tables and terms →</a></p>
+  </div>
+  </section>
 
   <footer>
     Research and code by <a href="https://github.com/coltontr419-droid/futures-research">coltontr419-droid</a>, mirrored here
@@ -340,6 +398,99 @@ async function load() {
   $('status').innerHTML = chip(c1, 'trials.jsonl') + chip(c2, 'measurements.jsonl') +
     `<span>Last trial ${new Date(last).toLocaleDateString()} · fetched ${new Date().toLocaleTimeString()}</span>`;
 }
+
+// ── Topstep EV tab ─────────────────────────────────────────────────────────
+const TS_SCEN = [
+  { key: 'eod_trailing|1|5000', label: 'Topstep rule · 1 month' },
+  { key: 'eod_trailing|1|2000', label: '$2k payout cap' },
+  { key: 'eod_trailing|6|5000', label: 'Renew monthly (6 mo)' },
+  { key: 'day_anchored|1|5000', label: 'Floor reset daily (literal reading)' },
+];
+const W04_SHARPE = -0.42; // futures-research reports/w04_trial.md, post-2021 net
+let ts = null, wps = null, tsScen = TS_SCEN[0].key;
+const money = v => (v >= 0 ? '+' : '−') + '$' + fmt(Math.abs(v));
+const scenRows = k => ts.grid.filter(g => `${g.mll}|${g.months}|${g.per_request_cap}` === k);
+function bestBy(rows) {
+  const by = {};
+  rows.forEach(g => { if (!by[g.sharpe] || g.ev > by[g.sharpe].ev) by[g.sharpe] = g; });
+  return Object.values(by).sort((a, b) => a.sharpe - b.sharpe);
+}
+
+function tsChart() {
+  const A = bestBy(scenRows('eod_trailing|1|5000')), B = bestBy(wps.grid.filter(g => g.daily_limit === 'soft'));
+  const W = 640, H = 280, m = { l: 56, r: 16, t: 16, b: 34 };
+  const xlo = -0.5, xhi = 2.0, all = [...A, ...B].map(g => g.ev);
+  const ylo = Math.min(-200, ...all), yhi = Math.max(...all) * 1.08;
+  const x = v => m.l + (v - xlo) / (xhi - xlo) * (W - m.l - m.r), y = v => m.t + (yhi - v) / (yhi - ylo) * (H - m.t - m.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Best EV per evaluation by Sharpe, Topstep vs Colton's firm">`;
+  const step = yhi - ylo > 3000 ? 1000 : 500;
+  for (let t = Math.ceil(ylo / step) * step; t <= yhi; t += step)
+    s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${m.l - 6}" y="${y(t) + 4}" text-anchor="end">${t === 0 ? '$0' : money(t)}</text>`;
+  s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}" stroke="var(--muted)"/>`;
+  for (let t = -0.5; t <= 2.001; t += 0.5) s += `<text x="${x(t)}" y="${H - 14}" text-anchor="middle">${t.toFixed(1)}</text>`;
+  s += `<text x="${(m.l + W - m.r) / 2}" y="${H - 1}" text-anchor="middle">edge (annual Sharpe, net of cost)</text>`;
+  s += `<line x1="${x(W04_SHARPE)}" x2="${x(W04_SHARPE)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--ref)" stroke-width="2" stroke-dasharray="4 3"/>`;
+  s += `<text x="${x(W04_SHARPE) + 6}" y="${m.t + 12}" style="fill:var(--text)">W04 measured: −0.42</text>`;
+  s += `<text x="${x(W04_SHARPE) + 6}" y="${m.t + 26}">below anything simulated</text>`;
+  [[B, 'var(--series-2)', "Colton's firm"], [A, 'var(--series-1)', 'Topstep 50K']].forEach(([rows, c, name]) => {
+    s += `<polyline fill="none" stroke="${c}" stroke-width="2" points="${rows.map(g => `${x(g.sharpe)},${y(g.ev)}`).join(' ')}"/>`;
+    rows.forEach(g => s += `<circle cx="${x(g.sharpe)}" cy="${y(g.ev)}" r="4.5" fill="${c}" stroke="var(--surface)" stroke-width="2"/>
+      <circle cx="${x(g.sharpe)}" cy="${y(g.ev)}" r="12" fill="transparent" data-tip="<b>${name}</b><br>Sharpe ${g.sharpe}: ${money(g.ev)} per eval<br>pass ${(g.p_pass * 100).toFixed(0)}% at σ $${g.daily_sigma}/day"/>`);
+    const last = rows[rows.length - 1];
+    s += `<text x="${x(last.sharpe) - 6}" y="${y(last.ev) - 10}" text-anchor="end" style="fill:var(--text-2)">${name}</text>`;
+  });
+  $('tsChart').innerHTML = s + '</svg>';
+  bindTips($('tsChart'));
+}
+
+function tsGrid() {
+  const rows = scenRows(tsScen), sig = [...new Set(rows.map(g => g.daily_sigma))], sh = [...new Set(rows.map(g => g.sharpe))];
+  const maxAbs = Math.max(...rows.map(g => Math.abs(g.ev)));
+  let h = `<thead><tr><th>Sharpe</th>${sig.map(v => `<th class="num">σ $${fmt(v)}</th>`).join('')}</tr></thead><tbody>`;
+  sh.forEach(s => {
+    h += `<tr><td><b>${s}</b></td>`;
+    sig.forEach(v => {
+      const g = rows.find(r => r.sharpe === s && r.daily_sigma === v);
+      const pct = Math.round(Math.sqrt(Math.abs(g.ev) / maxAbs) * 40);
+      const bg = `color-mix(in srgb, ${g.ev >= 0 ? 'var(--pos)' : 'var(--neg)'} ${pct}%, var(--surface))`;
+      h += `<td class="ev" style="background:${bg}">${money(g.ev)}<br><small>${(g.p_pass * 100).toFixed(0)}% pass</small></td>`;
+    });
+    h += '</tr>';
+  });
+  $('tsGrid').innerHTML = h + '</tbody>';
+  $('tsScen').innerHTML = TS_SCEN.map(o => `<button data-k="${o.key}" aria-pressed="${o.key === tsScen}">${esc(o.label)}</button>`).join('');
+  $('tsScen').querySelectorAll('button').forEach(b => b.onclick = () => { tsScen = b.dataset.k; tsGrid(); });
+}
+
+async function loadTopstep() {
+  const fetchJson = async p => { const r = await fetch(p + '?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) throw new Error(p + ': HTTP ' + r.status); return r.json(); };
+  [ts, wps] = await Promise.all([fetchJson('research/reports/topstep_ev.json'), fetchJson(BASE + 'reports/w_prop_ev.json')]);
+  const A = bestBy(scenRows('eod_trailing|1|5000')), z = A.find(g => g.sharpe === 0), one = A.find(g => g.sharpe === 1);
+  const Bz = bestBy(wps.grid.filter(g => g.daily_limit === 'soft')).find(g => g.sharpe === 0);
+  const v = ts.validation;
+  $('tsStatus').innerHTML = `<span><span class="dot ${v.ok ? 'ok' : 'bad'}"></span>Simulator validated: no-edge pass rate ${v.p_pass.toFixed(3)} vs closed form ${v.closed_form.toFixed(3)}</span><span>${fmt(ts.n_paths)} paths per cell</span>`;
+  $('tsTiles').innerHTML = [
+    [money(z.ev), 'EV per eval with no edge'], [(z.p_pass * 100).toFixed(0) + '%', 'pass rate with no edge'],
+    [(100 - z.p_pass * 100).toFixed(0) + '%', 'chance of losing the $90'], ['$' + fmt(z.daily_sigma), 'best daily σ with no edge'],
+    [money(one.ev), 'EV per eval at Sharpe 1.0'], ['−0.42', 'best daily strategy measured (W04)']
+  ].map(([a, b]) => `<div class="tile"><div class="v">${a}</div><div class="k">${b}</div></div>`).join('');
+  $('tsCompare').innerHTML = [
+    `<b>With no edge, both firms are slightly positive.</b> Topstep ${money(z.ev)} (${(z.p_pass * 100).toFixed(0)}% pass) vs Colton's firm ${money(Bz.ev)} (${(Bz.p_pass * 100).toFixed(0)}% pass). In both, the fee caps your loss while the firm absorbs the drawdown.`,
+    `<b>An edge is worth far less at Topstep.</b> At Sharpe 1.0: ${money(one.ev)} here vs ${money(bestBy(wps.grid.filter(g => g.daily_limit === 'soft')).find(g => g.sharpe === 1).ev)} at Colton's firm. The $5k Express cap and the one-month limit truncate the upside.`,
+    `<b>Size works the opposite way.</b> Colton's one-year evaluation favoured small size ($150–250/day of σ). Topstep's one month forces about $900–1,200/day (the two are within simulation noise), roughly one MNQ held through the session.`,
+    `<b>None of the old tests produced a usable edge.</b> W04 measured −0.42 net, left of every simulated point. The intraday strategies (L07, P03 and the rest) were net-negative per trade. So the Sharpe 0 row is the realistic one, and it describes a lottery with a small positive expectation, not a strategy.`,
+  ].map(t => `<li>${t}</li>`).join('');
+  tsChart(); tsGrid();
+}
+
+function showTab() {
+  const t = location.hash === '#topstep' ? 'topstep' : 'ledger';
+  document.querySelectorAll('nav.tabs a').forEach(a => a.setAttribute('aria-selected', a.dataset.tab === t));
+  $('tab-ledger').hidden = t !== 'ledger'; $('tab-topstep').hidden = t !== 'topstep';
+}
+window.addEventListener('hashchange', showTab);
+showTab();
+loadTopstep().catch(e => { $('tsStatus').innerHTML = `<span><span class="dot bad"></span>Failed to load simulation: ${esc(e.message)}</span>`; });
 
 load().catch(e => { $('status').innerHTML = `<span><span class="dot bad"></span>Failed to load ledger: ${esc(e.message)}</span>`; });
 feed();
