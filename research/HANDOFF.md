@@ -23,7 +23,7 @@ unless `hist.databento.com` is allowed) return 403 for Databento. A local machin
 - Every run, abandoned or crashed included, is appended to `trials.jsonl` (hash-chained,
   never edited). Enforced by `strategyres.harness.run_logged`.
 - DSR (Bailey & López de Prado) is the headline metric, not raw Sharpe. Reported at our N and
-  at our N plus futures-research's N, because C01 overlaps its L02/L03/L07.
+  at our N plus futures-research's N, because M01 overlaps its L02/L03/L07.
 - PBO via CSCV over every configuration tried; reject above 0.5.
 - Benjamini–Hochberg at 5% FDR across any multi-cell scan.
 - Detection floor: a null below the floor is absence of evidence, and is reported as such.
@@ -46,6 +46,6 @@ counterparty risk (withdrawal freezes, payout denials) as real.
 1. Add the Pine Script to `pine/`.
 2. Rotate the Databento key; pull data (`strategyres.fetch`).
 3. Harness: built, tested (`pytest`), before any backtest.
-4. Write C01 in `hypotheses.yaml` to registration standard, then port the Pine logic to Python
+4. Write M01 in `hypotheses.yaml` to registration standard, then port the Pine logic to Python
    and verify the port bar-for-bar against TradingView's trade list.
 5. Only after a result survives: sim/demo routing through the existing Flask/Tradovate stack.

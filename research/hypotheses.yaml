@@ -13,9 +13,12 @@
 # status: draft → registered → completed | retired | inconclusive | blocked
 # Nothing is ever deleted. Withdrawn entries stay, and their trials stay in N.
 
-- id: C01
+# M-series: our own work, branched off futures-research. No upstream series uses M.
+
+- id: M01
   name: cisd_with_htf_poi_filter
   status: draft
+  renamed_from: C01  # 2026-10-08, while still a draft with zero trials; nothing was logged under C01
   mechanism: >
     TO WRITE. The strategy's own logic: a Change In State of Delivery on the execution
     timeframe, taken only inside a higher-timeframe point-of-interest zone, in a manually
@@ -24,9 +27,11 @@
     Overlaps futures-research L02 (opening range boundary), L03 (prior-day sweep and reclaim)
     and L07 (fair value gap fill), all tested on MNQ 2010-2026 and all closed. L07 was
     negative in 108 of 108 cells at 1.8-10.3x cost, and its decisions.md 38 refused a
-    perfect-looking separation over a real-vs-placebo timing confound. C01 must state how
+    perfect-looking separation over a real-vs-placebo timing confound. M01 must state how
     it differs from each before registration.
   open_questions:
     - The manual direction input is a discretionary parameter. It must be replaced by a
       rule fixed in advance, or the backtest is testing the trader, not the signal.
     - Pine Script source is not in the repo yet (research/pine/).
+  success_rule: >
+    TO DECIDE. Being rewritten by the user (2026-10-08); must be fixed here before registration.
