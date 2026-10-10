@@ -6015,6 +6015,1005 @@ and closed as W03.
 already on file. Neither changes the X02 arithmetic: X05 loses 24–60 months of the 68 to its lookback,
 and X06 adds up to 56 ordered pairs of multiplicity. They are closed with the series.
 
+## 78. The blocked-entry reconciliation: two superseded numbers corrected, no gap narrowed (S4, S8)
+
+**No trial spent; N 761, SR\* 0.1368 (r-series chain: 10, unchanged). Nothing re-measured and nothing
+logged.** Corrections to `hypotheses.yaml` (F01, L05), `reports/futures_conclusion.md` (F01 row),
+`tests/test_registry_consistency.py` (pinned set) and the records named below.
+
+**The §65 caveat applies to the source reconciliation.** It ran on Sonnet (`claude-sonnet-5-5`) at the
+user's instruction, after the model rule was raised. It recomputed gaps from the record — each a recorded
+count divided by a recorded floor — and measured nothing. The F01 counts it relies on are the §22
+measurement carried forward: `f01_rates` is OOM-killed on this machine (CHECKPOINT) and could not be
+re-run.
+
+### What was reconciled
+
+Every entry closed on an event count: the eight registry entries with status
+`blocked_insufficient_events` (F01, L01, L05, L06, L08, L09, U01, V01), R03 (r-series), and F12
+(`excluded`, "roughly 128" events, a declared estimate never measured). Counts as recorded at the time,
+set against the current conventions: §13 (per cell, not per scan), §22 (measured, worst cell gates),
+§41 and §45 (L05's count was sessions, not breaks, and is withdrawn), S4 (effective n), S8 (post-2021
+decides), §65 (F01's 4,125 superseded), §67–§69 (U01's validity rule, V01's ceiling).
+
+### The finding
+
+**Every event-count block was re-derived under current conventions and no gap narrowed.** Two entries
+carried superseded numbers; both corrections widen the gap.
+
+| entry | as first recorded | under current conventions | gap |
+|---|---|---|---|
+| F01 | 4,125 MNQ / 4,006 MGC "events" — the pre-§22 declared ceiling | best cell 3,523 / 3,449; worst cell 66 / 115 (§22, carried forward) | 60m proxy: 4.8× / 1.4× → 5.6× / 1.63× at the best cell; 299× / 49× at the worst |
+| L05 | MNQ best cell 4,669, worst 2,015; 0.794× of the 5,884 floor at 180m | **no valid count** — withdrawn (§41, §45) | the 1.26× short it implied does not stand |
+| U01 | 54 MGC / 127 index (before the stale-prior-close rule, §67) | 46 / 104 (28 / 42 post-2021) | 180m proxy: 53× / 46× → 62× / 57×; post-2021 102× / 140× |
+
+L01, L06, L08, L09, V01 and R03 are unchanged from their recorded counts. The L-series registry blocks
+match the live `level_rates.json` cell for cell, except L05, which the cache no longer holds.
+
+### V01's 1.15× is the narrowest live figure and is not a candidate
+
+On MGC with the Sunday reopens added (2,499 events), V01 is **1.15× short** at the 180-minute proxy
+(2,862), **2.25× short** at its own 60-minute horizon (5,620), and **4.9× short** on the post-2021 half
+(1,150 events). It is not a candidate: it is a **ceiling count** — every valid reopen firing, no threshold
+applied — so any real condition fires on fewer, and the 180-minute proxy is not V01's horizon. The Sunday
+reopens are excluded by V01's own wording (§69); as defined, the same three figures are **1.49×, 2.92×
+and 6.2×**. The one place the record shows a gap this narrow is a ceiling at the wrong horizon.
+
+### Corrections made
+
+1. **F01.** `blocked_reason` now carries the §22 figures, the widened gap, and the fact that the
+   worst-cell counts use a volatility filter (`>median`, `>p66`) with no stated quantity or lookback, which
+   §28 left open. The text first registered is preserved as `blocked_reason_as_registered`. The F01 row of
+   `futures_conclusion.md` carries the correction inline, marked with its date, rather than replacing the
+   old figure silently. Status stays `blocked_insufficient_events` — the block is real, only its number
+   was stale.
+2. **L05.** Status `blocked_insufficient_events` → **`excluded`**, with an `excluded_reason`; the old
+   status is kept as `status_before_2026_10_09` and the old reason as `blocked_reason_superseded`. The
+   `firing_rate` and `verdict_route_measured` blocks are kept as history and marked withdrawn.
+   `condition_defect` already said the figure must not be inherited; the status now agrees with it.
+
+### Decisions taken rather than resolved silently
+
+1. **`excluded` is the status chosen for L05, and it reverses §41's "noted, not withdrawn".** §41's
+   reason was that L05 was "already blocked, so nothing downstream changes". §45 then withdrew the S4
+   count that block rested on, so the reason no longer held. The registry's vocabulary is closed (§36
+   decision 3): `blocked_insufficient_events` is defined as arithmetic showing no route can carry a
+   verdict, which is no longer true of L05; `untested` requires a live `test_order`; `retired` means
+   closed on evidence. `excluded` is the existing status for a condition withdrawn as defective, and L11
+   (the same `confirmed_break` defect) is the precedent. **The user can overrule it; doing so reopens the
+   contradiction between L05's status and its own `stopped_at_reason`.**
+2. **The pinned excluded set in the registry test now includes L05**, with the reason in the test's
+   docstring as that test requires. `param_cap` is 0 as the excluded-entry test requires; the registered
+   value, 3, is kept as `param_cap_registered`.
+3. **As-registered text is preserved**, under a renamed key, as the registry does elsewhere
+   (`verdict_route` beside `verdict_route_measured`).
+4. **Not corrected here:** `reports/catalog_status.md` is a generated report last built 2026-09-13 and
+   still shows L05 as blocked with an unmeasured rate; it is stale in more than this respect and
+   regenerating it would bring unrelated changes. The L-series counts that are correct but conditional —
+   L01, L06 and L08 on the open `d` ATR scale, L09 and L05 on tick thresholds (§52) — are unchanged.
+
+## 79. The Y-series: the account's payoff structure, measured on real paths (S1, S2, S8)
+
+**Designed, not registered. No trial spent; N 761, SR\* 0.1368. Two computation records (m00134 Y01,
+m00135 its sensitivity).** Draft: `Y_SERIES_CANDIDATES.md`. Engine: `reporting/y01_structure_ev.py`;
+sensitivity: `reporting/y01_sensitivity.py`.
+
+Asked for a series with a high chance of producing something that performs in the prop account, after
+the record had concluded that searching should stop. **The answer is not another market search.** At
+N = 761 a new market claim needs a post-2021 Sharpe of ~1.3, and no published effect tested came close.
+What the record had found and not followed up is §73's finding that the evaluation is worth more than its
+fee at zero edge.
+
+### What was measured
+
+**Y01: zero-edge EV of one $80 evaluation on resampled real MNQ sessions**, drift removed per era, the
+account's rules as supplied (§73, §75), the intraday trailing floor tested on each minute's low, the soft
+daily limit, $2.32 round trip. 2,638 complete sessions 2015-11-20 to 2026-08-27 (the U01 completeness
+rule excludes earlier, incomplete NQ sessions, so "pre-2021" here is 2015–2020).
+
+- **Positive in every cell and both eras: +$5 to +$127 per $80** (post-2021: +$31 to +$127). RTH 2 MNQ:
+  +$119 (2015–20), +$127 (post-2021). ±$10 Monte Carlo error per cell.
+- **Robust:** RTH 2 MNQ stays at +$77 under an imposed long Sharpe of −0.3; doubling cost moves it by
+  ~$18.
+- **Extremely skewed:** 10 evaluations ($800) finish net positive 26% of the time with a median of −$800;
+  40 evaluations ($3,200) 59%, median +$2,061, mean +$4,935.
+
+### Why the number is a constant, not a tunable edge
+
+At zero drift P(pass) ≈ e⁻¹·⅔ = 0.245 at any size (time-change invariance of a martingale), and the
+funded account's expected withdrawals are bounded by the identity E[final equity] + E[withdrawals] =
+$50,000: ≈ 0.632 × ($2,000 − $836) ≈ $736. **EV ≈ 0.245 × 0.9 × $736 − $80 ≈ +$82.** The measured cells sit
+around it. Sizing and timing cannot move it much; drift, overshoot, the fee and the payout rules can.
+
+### A validation failure that is itself a finding
+
+The engine first failed its closed-form check (0.290 against 0.245). Not a code fault: a finite pool of
+3,000 random-walk sessions carried a residual drift of ~$20/day, an annual Sharpe of ~0.5, which alone
+moved P(pass) from 0.22 to 0.29 across seeds. Demeaned, it validates at 0.247–0.255. **Pass rates are
+very sensitive to small drifts**, which is why cost and any real premium matter more than sizing, and
+why the real paths are demeaned exactly before use.
+
+### Decisions taken rather than resolved silently
+
+1. **The Y entries are not market hypotheses and are not registered.** Y01 removes drift, so it makes no
+   claim about direction; a forward demo test (Y05) uses new data and makes no predictive claim. Neither
+   is a trial. **If a Y entry ever asserts a premium from this data, that assertion is a trial.**
+2. **The long tilt (Y04) rests on an external prior (equity premium, Sharpe ~0.3), labelled and never
+   estimated here.** The policy's EV is positive without it (zero drift) and at an imposed −0.3.
+3. **The operating policy (Y03: RTH, 2 MNQ, long) was fixed from Y01's grid before the sensitivity run**
+   and stated in that module's docstring, so it was not chosen from the sensitivity results.
+4. **The account terms not supplied are assumed and listed** (evaluation cap 252 sessions, funded
+   horizon 504, monthly unlimited withdrawals, intraday trailing floor). **Y02 — the firm's full
+   rulebook — blocks any real-money use**; consistency rules and payout caps in particular could remove
+   most of the EV.
+5. **Cross-account opposite positions are excluded outright** as typically prohibited by the firm.
+
+## 80. Y02: the evaluation under Tradeify's daily-account rules — still positive; the policy changes (S2, S8)
+
+**No trial spent; N 761, SR\* 0.1368. One computation record (Y02).** `reports/y02_tradeify.md`
+(`reporting/y02_tradeify.py`), on Y01's demeaned real MNQ sessions.
+
+### The rules, supplied by the user 2026-10-09, and the readings taken
+
+Firm: **Tradeify, daily accounts.** **40% consistency rule in the evaluation, none funded. Payouts capped
+at $1,250 until live, no cap after; no maximum number of payouts. No evaluation time limit. End-of-day
+floor.** Readings where the rule was not fully specified, each modelled rather than chosen:
+- **Consistency:** pass needs profit ≥ $3,000 and the best day ≤ 40% of total profit, tested at a day's
+  close; a failing ratio means trading on.
+- **End-of-day floor:** set from the highest closing balance, $2,000 below it, fixed at $50,000 once that
+  reaches $52,000. **Primary reading: falling to the day's floor intraday still fails**; the close-only
+  reading is reported beside it.
+- **Payout frequency was not supplied:** daily, weekly and monthly all run. **When the account goes live
+  was not supplied:** the $1,250 cap is applied throughout (conservative), uncapped reported beside it.
+- Unchanged: $80 fee, soft $1,000 daily limit, $2.32 round trip; funded account followed 504 sessions;
+  evaluations capped at 2,000 sessions (none reached it).
+
+Engine checked against Y01's validated engine where the two rules coincide (one bar per session):
+identical, 0.3026 each.
+
+### Result: still positive, and the consistency rule picks the size
+
+| policy (primary reading) | P(pass) | EV per $80, 2015–20 | EV per $80, post-2021 |
+|---|---|---|---|
+| **RTH, 1 MNQ** | 21–22% | **+$93 to +$100** | **+$104 to +$145** |
+| RTH, 2 MNQ | 16% | +$71 to +$100 | +$71 to +$73 |
+| full session, 1 MNQ | 17–18% | +$39 to +$64 | +$37 to +$48 |
+| full session, 2 MNQ | 11–12% | −$12 to +$16 | +$31 to +$53 |
+
+(Ranges span the three payout frequencies; ±$15–25 Monte Carlo error.)
+
+- **The consistency rule is what binds, and it binds hardest on large positions**: post-2021, RTH 2 MNQ
+  passes 27% without it and 16% with it; RTH 1 MNQ 26% → 22%. A large position reaches $3,000 in a few
+  big days, each too large a share of the profit. **The policy moves from RTH 2 MNQ (Y01) to RTH 1 MNQ.**
+- **The payout cap and frequency barely matter** — differences sit inside the noise. Capping can even
+  help: equity left in the account is cushion above the floor.
+- **The close-only floor reading would raise RTH 1 MNQ to +$208.** Which reading Tradeify applies is
+  worth confirming.
+- **Robust to an adverse market:** RTH 1 MNQ under an imposed long Sharpe of −0.3 gives +$53 (19% pass);
+  zero +$139; +0.3 +$265.
+- **Budget, RTH 1 MNQ, monthly:** 10 evaluations net positive 35% (median −$800, mean +$1,480); 40
+  evaluations 62% (median +$2,308, mean +$5,889).
+
+### Decisions taken rather than resolved silently
+
+1. **The primary floor reading is the stricter one** (intraday breach of the end-of-day floor fails);
+   the gentler reading is reported, not used.
+2. **The $1,250 cap is applied for the whole funded horizon**, because the point at which the account goes
+   live was not supplied.
+3. **The operating policy (Y03) is revised to RTH 09:30–16:00, 1 MNQ, long**, chosen as positive in both
+   eras at every payout frequency and under the adverse drift. RTH 2 MNQ, Y01's choice, is set aside
+   because the consistency rule cuts its pass rate by ~40%.
+
+## 81. Tradeify's rules confirmed; the final-rules EV (S2, S8)
+
+**No trial spent; N 761, SR\* 0.1368. One computation record (Y02, final rules).** Appended to
+`reports/y02_tradeify.md` (`y02_tradeify.py --final`).
+
+### The three open points of §80, answered by the user 2026-10-09
+
+1. **Falling below the end-of-day floor intraday fails the account immediately** — the primary reading of
+   §80, now confirmed; the gentler close-only reading (+$208) does not apply.
+2. **Payouts are daily**, capped at $1,250 until the account goes **live, after 3 payouts on one account
+   or 10 in total**; uncapped after. Modelled per account (live after 3 payouts on that account); the
+   10-in-total route across accounts is not modelled, so this is the conservative case. **Assumed:** any
+   nonzero withdrawal above the $52,000 buffer counts as a payout (no minimum payout size was supplied),
+   and going live changes nothing but the cap.
+3. **The fee is $80.**
+
+### Result
+
+| policy | P(pass) | EV per $80, 2015–20 | EV per $80, post-2021 |
+|---|---|---|---|
+| **RTH 09:30–16:00, 1 MNQ** | 21–22% | **+$85** | **+$125** |
+| RTH, 2 MNQ | 16–18% | +$92 | +$79 |
+| full session, 1 MNQ | 18% | +$60 | +$54 |
+
+- **RTH, 1 MNQ under an imposed long Sharpe:** −0.3 → +$69; 0 → +$112; +0.3 → +$175 (the 0 cell repeats the
+  table's +$125 on a fresh draw; the gap is Monte Carlo error, ±$15–25).
+- **About 37% of funded accounts take at least one payout.** Daily payouts with the live rule make
+  outcomes less lumpy than monthly: **10 evaluations ($800) finish net positive 46% of the time** (median
+  −$333, mean +$1,268); **20, 61%** (median +$1,124); **40, 76%** (median +$3,707, mean +$5,010).
+- **The operating policy stands: RTH, 1 MNQ, long.** RTH 2 MNQ is within noise of it before 2021 and well
+  below it after; the full session is lower in both eras.
+
+### What the figures still assume
+
+The funded account is followed two years; going live changes only the cap; no minimum payout size; the
+$2.32 round trip (commission assumed, §71). **The forward demo test (Y05) is the check on all of it.**
+
+## 82. Correction: the evaluation's floor never locks; §80–§81's evaluation figures superseded (S2)
+
+**No trial spent; N 761, SR\* 0.1368. One computation record (Y02, corrected final rules).**
+
+### What was wrong
+
+§79–§81 gave the evaluation the same floor rule as the funded account: trailing $2,000 below the peak,
+**fixed at $50,000 once the peak reached $52,000**. That rule came from the account as first described
+(§62, §73) and was carried into the Tradeify model without being checked. **The user corrected it
+2026-10-09: Tradeify's evaluation floor starts at $48,000 and keeps trailing the end-of-day balance with
+no lock — at $52,999 the floor is $50,999.** The funded account's floor is as modelled: fixed at $50,000
+once the end-of-day balance reaches $52,000. Also confirmed: passing needs $53,000, and the funded
+account must build the $2,000 buffer to $52,000 before anything is withdrawable — both as modelled.
+
+Without the lock the evaluation is a single trailing-drawdown race to +$3,000: at zero drift, continuous
+monitoring, P(pass) = exp(−3,000/2,000) = 0.223, against 0.245 with the lock. Checked on the engine with
+one Gaussian bar a day: 0.245, which is what the discrete-monitoring correction (≈0.58σ on each barrier)
+predicts, exp(−2,913/2,087) ≈ 0.248.
+
+### Corrected result (Tradeify as confirmed)
+
+| policy | P(pass) | EV per $80, 2015–20 | EV per $80, post-2021 |
+|---|---|---|---|
+| **RTH 09:30–16:00, 1 MNQ** | 18–19% | **+$62** | **+$78** |
+| full session, 1 MNQ | 13–16% | +$29 | +$44 |
+| RTH, 2 MNQ | 11% | +$22 | +$23 |
+
+- RTH, 1 MNQ under an imposed long Sharpe: −0.3 → **+$45**; 0 → +$87; +0.3 → +$138.
+- Budget, RTH 1 MNQ: 10 evaluations net positive **40%** (median −$657, mean +$796); 20, **53%** (median
+  +$280); 40, **67%** (median +$1,981, mean +$3,140).
+- **The policy stands: RTH, 1 MNQ, long** — best in both eras, positive under the adverse drift. Larger
+  positions lose more to the unlocked floor and the consistency rule together.
+
+### What is superseded, and what is not
+
+- **§80's evaluation figures and §81's results table are superseded** for Tradeify by the table above.
+  They are left as written, with this section as the correction.
+- **Y01 (§79) is not wrong for the account it modelled** — the lock rule as first described — but that is
+  not Tradeify's evaluation. Its martingale argument still holds; its constant becomes
+  0.223 × 0.9 × E[withdrawals] − $80.
+- The method point, recorded because it is the same shape as finding 12: **a rule carried from an
+  earlier account description into a new firm's model, without being re-checked against the new firm's
+  terms.**
+
+## 83. Y03: session, direction and instrument under Tradeify's rules — two stable policies (S2, S8)
+
+**No trial spent; N 761, SR\* 0.1368. Two computation records (Y03, MNQ and MGC).**
+`reports/y03_sessions.md` (`reporting/y03_sessions.py`), on Tradeify's confirmed rules (§81–§82) and
+demeaned real sessions; one contract.
+
+### Fixed before running
+
+Windows: **Asia 19:00–03:00 ET and London 03:00–11:30 ET, the repo's own definitions**
+(`levels/definitions.py`; London overlaps the US morning by two hours, as defined); RTH 09:30–16:00 and
+its halves, 09:30–12:00 and 12:00–16:00 (the shorter-window check §82 proposed). Long and short. 1 MNQ
+($2.32 round trip) and 1 MGC ($3.32). **Selection rule: per instrument, the highest 2015–20 EV is the
+pick and its post-2021 EV the confirmation.** MGC's complete sessions run from 2011-02-01 (2,863); MNQ's
+from 2015-11-20 (2,638).
+
+### Result
+
+- **The pre-registered pick failed for MNQ:** Asia long, +$97 in 2015–20, fell to **+$17** post-2021
+  (+$74 → +$22 at 16,000 accounts). **For MGC it held:** London long, +$74 → **+$75**.
+- **Across the 4,000-account grid, most MNQ cells moved between eras by more than the ±$15–25 Monte Carlo
+  error.** At zero edge, choosing among windows and directions is mostly choosing noise and regime;
+  **the finding is how little the choice matters once one stable cell is in hand**, not which cell wins.
+- **Shorter windows do not help systematically.** MGC's 12:00–16:00 window is slightly negative (−$7 to
+  +$6): its small daily swing makes the fixed round trip a larger share and slows resolution.
+- **Long and short show no consistent difference with drift removed**, as expected; a real equity
+  premium can only favour long on MNQ.
+
+**Contenders re-run at 16,000 accounts** (chosen after the grid; precision, not a new selection; the
+quoted ± is Monte Carlo error given the historical pool, and is smaller than the real uncertainty the
+era-to-era difference shows):
+
+| policy | EV 2015–20 | EV post-2021 | 10 evaluations net positive | 40 |
+|---|---|---|---|---|
+| **MNQ 09:30–16:00, long** | **+$67** | **+$82** | 40% | 67% |
+| **MGC London 03:00–11:30, long** | **+$68** | **+$70** | 41% | 67% |
+| MNQ 09:30–16:00, short | +$13 | +$62 | 37% | 62% |
+| MNQ Asia 19:00–03:00, long | +$74 | +$22 | 33% | 50% |
+
+### Decisions taken rather than resolved silently
+
+1. **Two operating policies, both stable across eras: MNQ 09:30–16:00 long (Y03's original) and MGC
+   London 03:00–11:30 long.** They are on different instruments with a low measured correlation
+   (post-2021 monthly NQ–GC ρ 0.16, §77), so evaluations run on both are closer to independent than two
+   on one — a budget split across them should be less lumpy. **Not computed jointly**; stated as a
+   direction, not a figure.
+2. **The MNQ Asia cell is not adopted** despite winning its selection: it failed its own confirmation.
+3. **The contender re-run was chosen after seeing the grid** and is labelled so; it refines estimates,
+   it does not add a selection.
+
+## 84. Y04: MNQ New York and MGC London on one account — worse than each on its own (S2)
+
+**No trial spent; N 761, SR\* 0.1368. One computation record (Y04).** `reports/y04_combined.md`
+(`reporting/y04_combined.py`), Tradeify's confirmed rules, drift removed, 16,000 accounts.
+
+Asked by the user: trade both stable policies (§83) on the same account. Built by pairing the two
+instruments' sessions BY DATE (2,499 dates both have complete, 2016-01-27 to 2026-08-27), so their real
+co-movement is kept: MGC long 03:00–11:30, MNQ long 09:30–16:00, one floor, one soft daily limit, the 40%
+consistency rule on the combined daily P&L, both round trips ($5.64). The combined minute low is the sum
+of the two legs' lows — conservative, it can only overstate an excursion.
+
+| | daily $σ | EV per $80, 2016–20 | EV per $80, post-2021 | 40 evaluations net positive, post-2021 |
+|---|---|---|---|---|
+| **both, one account** | 712 / 817 | **+$65** | **+$46** | 56% |
+| MNQ New York alone | 618 / 699 | +$71 | +$82 | 66% |
+| MGC London alone | 318 / 386 | +$45 | +$74 | 69% |
+
+**One account holding both is worse than either alone after 2021, and worse than MNQ alone in both
+eras.** The legs are nearly uncorrelated (daily P&L ρ +0.06), so combining them raises the day's swing
+(to $817 after 2021) — and with it the share of profit a single good day carries against the 40%
+consistency rule — and doubles the daily cost, without changing the structural value per account. Per
+dollar of fees, **two separate accounts, one per instrument, return about +$156 per $160 post-2021 (+$82
+and +$74) against +$46 per $80 combined.**
+
+### Decisions taken rather than resolved silently
+
+1. **Recommended: separate accounts per instrument, not both on one.** Whether Tradeify permits one
+   trader several evaluations or funded accounts at once, and on what terms, was not supplied and must be
+   checked.
+2. **MGC London's 2016–20 figure here (+$45) is below §83's 2015–20 (+$68)** because the paired sample
+   starts in 2016 rather than 2011 and uses only dates MNQ also has; §83's single-instrument figure stands
+   for MGC alone.
+
+## 85. Y05 historical replay: real order weakens and widens the structure value (S8)
+
+**No trial spent; N 761, SR\* 0.1368. Two computation records (Y05 replay, MNQ and MGC, block bootstrap
+included).** `reports/y05_replay.md` (`reporting/y05_replay.py`).
+
+Asked by the user: instead of months of demo accounts, start accounts on many historical dates and see
+how they would have done. Done exhaustively rather than at random: **an account started on every
+complete session that leaves room for an evaluation and a two-year funded period** (MNQ 2,038 start
+dates, 2015-11-20 to 2024-03-14; MGC 2,263, 2011-02-01 to 2024-03-13), walking forward through the
+sessions **in their real order** under Tradeify's confirmed rules, with the two policies fixed in §83.
+
+### Result
+
+| | P(pass) | median days to pass | EV per $80, drift removed | EV per $80, actual history | share of accounts net positive (actual) |
+|---|---|---|---|---|---|
+| MNQ 09:30–16:00 long | 23% (actual 32%) | 31 | **+$1** | +$119 | 14% |
+| MGC London long | 22% (actual 24%) | 58 | **+$44** | +$115 | 12% |
+
+**"Actual history" includes the market's real moves** — for long MNQ, the 2016–2026 rise; for long gold,
+the 2024–25 rally. It is descriptive only, asserts no premium and is not counted as evidence (§79
+decision 1). **The drift-removed replay is the rule structure alone, and it is far below the resampled
+simulation** (§83: +$67 / +$82 MNQ, +$68 / +$70 MGC).
+
+**By start year the outcome is dominated by when the account starts.** MNQ drift-removed: −$80 to
++$408 (2023 starts); MGC: −$80 to +$1,803 (2015 starts). Accounts started near each other share their
+fate, so 2,000 start dates hold only a few dozen independent episodes.
+
+### Why — a block bootstrap separates clustering from noise
+
+Accounts built from random runs of consecutive real sessions (8,000 per cell, drift removed): runs of
+one day are the resampling of Y01–Y04; longer runs keep real clustering and trends inside each run.
+
+| EV per $80 | 1 day | 21 days | 63 days | 252 days |
+|---|---|---|---|---|
+| MNQ, 2015–20 | +$56 | +$2 | +$10 | −$61 |
+| MNQ, post-2021 | +$99 | +$55 | +$84 | +$49 |
+| MGC, 2011–20 | +$72 | +$72 | +$116 | +$162 |
+| MGC, post-2021 | +$64 | +$49 | +$13 | +$42 |
+
+- **Runs of one day reproduce the resampled simulation** (+$56 to +$99) — the wiring is consistent.
+- **With real runs kept, EV ranges from −$61 to +$162 with no consistent direction.** Removing each era's
+  mean drift leaves the multi-month trends inside it, and those decide much of an account's fate. Long
+  runs have few distinct episodes, so they describe particular years more than a law.
+- **The resampled simulation's ±$3–5 was the error of a model that assumed independent days. The real
+  uncertainty is an order of magnitude larger.**
+
+### What changes in the Y-series' claims
+
+1. **The zero-edge value is now stated as "positive in most estimates, roughly $0 to $80 per $80 fee
+   with real-order uncertainty of the same size", not as +$70–80.** MNQ's real-order replay is at zero.
+2. **Accounts started at the same time are not diversified against each other.** A budget should be
+   spread over time, not spent at once; the earlier budget tables (§79–§84) assumed independent
+   evaluations and overstate how quickly a budget converges.
+3. **The forward demo test (Y05) is not replaced** by this replay: the replay checks real-order dynamics
+   on old data, not current fills, current rules or the next regime. It does shorten what the demo test
+   must answer.
+
+## 86. The Z-series: decide on external out-of-sample evidence; Z01, front-running rebalancers (S1, S2)
+
+**Designed, not registered. No trial spent; N 761, SR\* 0.1368. Nothing measured on our data.**
+Draft: `Z_SERIES_CANDIDATES.md`.
+
+The user closed the Y-series' practical use: the account structure is worth too little to build income
+on (§85). Asked for a different basis.
+
+### The basis
+
+Income needs a real edge, and a modest one is worth a lot in this account (§73: Sharpe 0.4 ≈ +$250 per
+evaluation, 1.0 ≈ +$1,100). This programme can no longer discover one on its own searched history (SR\*
+≈1.3 at N = 761). **The Z-series takes its evidence from outside**: an effect published by others,
+replicated exactly as published, tested only on data AFTER the authors' sample ends.
+
+### The literature, checked before choosing (web sources in the draft)
+
+Turn-of-the-month faded after 1990; the Treasury auction cycle reportedly reversed after 2010; the
+pre-FOMC drift disappeared after 2015. **Calendar and event anomalies decay once published.** The one
+candidate with a forced counterparty and no post-publication record: **Harvey, Mazzoleni & Melone (NBER
+w33554, 2025/2026), front-running pension and balanced-fund rebalancing** — read from the paper itself:
+next-day equity returns 17 bps lower when equities are overweight; long S&P / short 10-year futures by
+the signal, 1997-09-10 to 2023-03-17: 10.2% a year, 9.2% volatility, **Sharpe 1.11 (≈1 net)**, alphas
+t > 4, **skewness +5.2**; Sharpe 0.90 excluding the 2008–09 and 2020 crises; weaker in calm markets.
+
+### Z01 and Z02, specified before any data is touched
+
+The construction is copied from the paper's Appendix B and Section 4 (60/40 drift simulation; Threshold
+signal averaged over δ = 0–2.5%; Calendar signal with the last-week and first-day rules; weight = mean of
+−Threshold/1.5% and the modified Calendar). **Z01**: the published long/short ES–ZN spread. **Z02**: the
+equity leg alone, on MES. **Test window: 2023-03-18 to 2026-09-11**, about 880 daily observations the
+authors never saw; signals from the purchased ES and ZN daily bars; entry at 20:00 ET after bar D's
+close, exit 16:55 ET on D+1.
+
+### Rulings needed before anything runs
+
+1. **The decision rule.** SR\* at N = 762 and this test's length is ≈1.7 — a bar for claims found by
+   searching our data, which Z01 was not. Proposed: confirm if the post-2023 Sharpe is > 0 with the
+   published sign and the prop EV at the posterior Sharpe (prior 0.5 ± 0.35, the published ~1.0 halved
+   for decay) is positive; reject if ≤ 0. **This departs from every earlier registration's rule and is
+   the user's to make.**
+2. **Tradeify's rule on opposite positions** in correlated products, for long-equity / short-bond (Z01).
+   Z02 avoids the question.
+3. **Optional data:** ES and ZN 1-hour bars would replace the UTC-close approximation of the entry.
+
+### Decisions taken rather than resolved silently
+
+- **Z01 was chosen among four literature candidates by their post-publication record**, not by any
+  result on our data; that selection is recorded here and does not touch our history.
+- **The 2010–2023 construction check is not evidence**: the paper already used those years, and it
+  compares signal properties only.
+- **Honest odds:** a realistic prior after decay is Sharpe ~0.5; the post-2023 test (SE ≈ 0.54) can catch
+  a dead effect but only weakly confirm a live one.
+
+## 87. Z02 registered: rulings, two readings, construction check and injection — before the trial (S1–S5)
+
+**One registration (Z02). No trial spent yet; N 761, SR\* 0.1368.** Entry: `hypotheses.yaml` Z02;
+construction `signals/z02.py`; runner `signals/z02_trial.py`; tests `tests/test_z02.py` (5, including
+the paper's own worked example: a +10% equity day moves both signals by +2.26%).
+
+### Rulings received (§86's three open points), user 2026-10-09
+
+1. **The decision rule is accepted**: confirm if the post-2023-03-17 Sharpe is > 0 with the published
+   sign AND the Tradeify EV at the posterior Sharpe (prior Normal(0.5, 0.35)) is positive; reject if ≤ 0.
+   It replaces the SR\* bar for this externally specified hypothesis.
+2. **Long equity with short bonds counts as hedging and is not allowed.** Z01, the paper's long/short
+   spread, is therefore untradeable and **is not run** (it would spend a trial on information that
+   cannot change what is traded). **Z02, the S&P leg alone on MES, is the one test.**
+3. **Daily bars first**; hourly ES/ZN only if needed.
+
+### Two readings, both fixed before any return was computed
+
+- **The Threshold reset (B.1).** The PDF text loses the notation, leaving it open whether a breach is
+  judged on the previous day's weight or on the day's drifted weight. **Calibrated against the paper's
+  own published signal property** (Table C.1: Threshold AR(1) 0.61) on 2010–2023, signals only:
+  previous-day reading **0.78** (0.80 and 0.77 in the two halves — not an era effect); drifted-weight
+  reading **0.65**. **The drifted-weight reading is used.** The construction check had been set at ±0.10
+  before running; the literal reading failed it, and this is recorded rather than smoothed over. Matching
+  a published, non-return statistic is a construction choice, not result-fishing — no strategy return
+  existed when it was made.
+- **"Four business days before month-end"** = the 4th-from-last business day, the last being −1 (the
+  paper's Figure D.2 axis).
+
+### Construction check — passed (signals only, 2010-06-07 to 2023-03-17)
+
+| | ours | paper (1997–2023) |
+|---|---|---|
+| Threshold AR(1) | 0.65 | 0.61 |
+| Calendar AR(1) | 0.92 | 0.91 |
+| correlation Threshold–Calendar | 0.63 | 0.605 |
+
+The correlation was not used to calibrate and moved closer under the chosen reading.
+
+### Outcome injection — passed (§60)
+
+Real post-2023 weights, real ES noise with its alignment destroyed, Sharpe 0.5 planted (the prior
+mean): **recovered 0.52 at n = 908**, SD of the estimate **0.49**, P(estimate > 0) **86%**. The SD is the
+standard error the posterior will use.
+
+### Registry changes made to admit it
+
+- The ID and catalog patterns accept `Z`.
+- **`SINGLE_MARKET_INSTRUMENTS = {MES}`**: an entry that claims no two-instrument confirmation
+  (`stage4_reachable: false`) may name MES as its mechanism's primary instrument. The mechanism is the
+  S&P leg of 60/40 portfolios; naming MNQ would misstate where it holds. MES never counts as Stage 4
+  evidence. Every other entry is checked exactly as before.
+- `schedulable: false` as for W04: the event-rate gate does not apply to a position held most days; the
+  runner refuses to run without the check and the injection.
+
+## 88. Z02 run: the rebalancing effect survives out of sample — confirmed (S6–S8)
+
+**One trial spent: t00768. N 761 → 762.** Report: `reports/z02_trial.md`; full results
+`reports/z02_trial.json` (including the corrected EV and the sizing comparison).
+
+### The test — 2023-03-18 to 2026-09-11, after the paper's sample
+
+| | T | Sharpe gross | Sharpe net |
+|---|---|---|---|
+| **test window** | 908 | +0.66 | **+0.51** |
+| 2010–2023-03-17 (inside the paper's sample; context, not evidence) | 3,312 | +0.68 | +0.37 |
+
+- **Rotation null (500): the real result beats 98.4% of rotations** (mean −0.51, 95th percentile +0.25).
+  The null mean is negative because the signal leans short (equities were mostly "overweight" in a rising
+  market); the strategy earned +0.51 against that lean, not because of it.
+- Outcome injection (before the run): Sharpe 0.5 recovered as 0.52 at this n, SD 0.49.
+- **Posterior Sharpe 0.50 ± 0.28** (prior Normal(0.5, 0.35), test 0.51, SE 0.49).
+
+**By the user's rule (§86–§87): CONFIRM** — the test Sharpe is positive with the published sign, and the
+Tradeify EV at the posterior is positive. **The first rebalancing-effect result on data after its
+publication sample, and the first hypothesis in twelve series to pass its own pre-registered rule.**
+
+### A correction to the decision's EV component, made in the open
+
+The trial's record (t00768) carries an EV at the posterior of +$27. **That figure charged the MES cost
+twice**: the posterior is a Sharpe NET of cost, and the EV code subtracted the cost again. Corrected
+(`z02_trial._prop_ev`), with the same sizing: **+$93 at the posterior** (−$18 at zero edge; +$15 and +$202
+at ±1 SD). The decision does not change; the trial log is append-only and keeps the first figure, and
+this section is the correction.
+
+### Sizing — an economics choice, compared on shape, not on realised returns
+
+The EV simulation imposes the drift, so comparing sizings compares the SHAPE of the returns (variance,
+skew, the consistency rule) and does not re-test the edge. Four rules fixed before the comparison, EV per
+$80 at Sharpe 0 / 0.22 / **0.50** / 0.79:
+
+| sizing | daily $σ | EV |
+|---|---|---|
+| the paper's proportional weights, capped at 5 MES | 369 | −18 / +15 / **+93** / +202 |
+| proportional, capped at 2 | 258 | +25 / +91 / **+226** / +453 |
+| **sign of the signal, 1 MES** | **175** | **+50 / +161 / +410 / +836** (P(pass) 36% at 0.50) |
+| sign of the signal, 2 MES | 350 | +25 / +75 / +173 / +319 |
+
+**One MES in the signal's direction is the best fit for this account by a wide margin**: small, steady
+daily swings sit well inside the trailing floor and the 40% consistency rule, and the edge does the work.
+
+### What is NOT established, stated plainly
+
+1. **The posterior is the PROPORTIONAL construction's Sharpe.** That the sign-only version keeps it is
+   plausible (same direction, same days) but unverified. Checking it on the test window now would be a
+   second look at data already seen. **The check is forward data.**
+2. **908 days is a short test**: the posterior's ±0.28 spans +$161 to +$836 per evaluation for the
+   sign-only sizing.
+3. **Daily bars, not settlement**: entry at 20:00 ET after the UTC close is an approximation of the
+   paper's close-to-close return.
+4. **Publication** (2025) may yet erode it; the test window is mostly before wide circulation.
+
+### A second record correction
+
+t00768's note reads `provenance=external (...)`. That field records who wrote the RECORD (`native` or
+`reconstructed`), and was misused for the hypothesis's source. **The record is native** — written by
+`z02_trial.py` as it ran. The log cannot be edited; `tests/test_trial_logging.py` lists t00768 in a
+documented `MISLABELLED_NATIVE` set, and the runner now writes `provenance=native; source=external`.
+SR\* at N = 762: 0.1367.
+
+### Next
+
+A forward demo of **Z02, sign-only, 1 MES** under Tradeify's rules from 2026-09-12 on: new data, the
+sizing's Sharpe measured as it accrues, the fills and the 20:00 ET entry checked in practice.
+
+## 89. Z02 in the account: the replay is break-even, a sizing error corrected, closed for this account (S8)
+
+**No trial spent; N 762, SR\* 0.1367. One computation record (replay and corrected EV).**
+`reports/z02_replay.json`, `reports/z02_ev_today.json`.
+
+### A correction to §88's account figures
+
+§88's EV used each day's HISTORICAL contract value. A 2010 MES was ~$5.5k of exposure against ~$38k today,
+so the simulated daily swing ($175) was about half of today's ($380), and **+$410 per evaluation was
+overstated.** On today's contract value:
+
+| one MES by the signal's sign, EV per $80 at Sharpe | 0 | 0.20 | **0.41** | 0.50 | 0.78 |
+|---|---|---|---|---|---|
+| | +$25 | +$59 | **+$110** | +$142 | +$258 |
+
+0.41 is the one-MES sizing's own realised net Sharpe in the test window (the paper's proportional sizing:
++0.50; in 2010–2023, +0.20 against +0.58 — the sign-only sizing keeps less of the edge). That realised
+figure is a second look at data already seen, and is reported as description, not confirmation.
+
+### The every-start-date replay (requested by the user; realised returns, real order, today's contract)
+
+| start dates | accounts | P(pass) | payout given pass | EV per $80 |
+|---|---|---|---|---|
+| all, 2010–2025 | 3,920 | 16% | 42% | **−$5** |
+| 2010–2022 | 3,312 | 17% | 45% | +$8 |
+| **2023 on (the test window)** | 608 | 8% | 8% | **−$78** |
+
+Days (2010–2022 starts, trading days): to pass median 41 (mean 47); to fail median 43 (mean 56); from the
+start of an evaluation to the first payout median 84; a funded account that fails does so at a median 43
+days in (22 for 2023 starts).
+
+### What it means
+
+**The rebalancing effect is real out of sample (§88), and it does not carry this account.** A Sharpe of
+~0.4 at one MES's ~$380 daily swing is an expected ~$10 a day; the account's +$3,000 target and $2,000
+trailing floor are reached by noise long before the drift matters. The modelled EV (+$110) and the
+real-order replay (≈ $0) differ in the same direction the Y-series found (§85). **Z02 is closed for this
+account** at the user's decision 2026-10-09; the finding stands. Lesson carried forward: **in this
+account an edge must be large relative to the daily swing on the days it is held — a high Sharpe per
+day in the market — or the barriers decide.**
+
+## 90. Z03 designed: the Treasury end-of-month effect, account-checked before any test (S1, S2)
+
+**Designed, not registered. No trial spent; N 762, SR\* 0.1367.** Draft: `Z_SERIES_CANDIDATES.md` (Z03).
+
+The user asked for another hypothesis on the same path. **Z02's lesson made the criteria sharper**: in
+this account the edge must be large relative to the daily swing **on the days it is held**, so the search
+was for event-concentrated forced flows. Rejected after reading: Hartzmark & Solomon (AER 2025, dividend
+reinvestment; ~6 bps on large payout days — too small, and needs CRSP dates); intraday gamma momentum
+(weakened in the 0DTE era; needs options positioning).
+
+**Chosen: Hartley & Schwarz (2019), the Treasury end-of-month effect** — index-duration extension and
+insurer buying at month-end; 10-year note last-2-days Sharpe 0.87, 10-year futures +0.14% a month
+(1990–2018), nothing at other times. **Specification fixed before any return on our data**: long ZN the
+last 2 business days of each month (the window the paper's figures and tables mostly use — not the
+table's best cell); test window 2019-01-01 to 2026-09-11, after the paper's sample; Z02's decision-rule
+form with prior Normal(0.44, 0.35).
+
+**Account check first, as Z02 taught:** real ZN event-day returns, drift removed, the drift imposed —
+one ZN gives P(pass) 49% and EV +$202 per $80 at the prior (75% and +$760 at the published Sharpe;
+−$22 with no edge), but a median of ~490 trading days to pass; two ZN pass in ~170. The effect's
+concentration fixes Z02's problem; the cost is time.
+
+**Open with the user:** whether Tradeify allows ZN or the micro 10-year; go-ahead for the one trial.
+
+## 91. The user's timeline — a payout within 1–2 months — needs an edge of about Sharpe 5 (S2, S8)
+
+**No trial spent; N 762, SR\* 0.1367. One computation record (m00145).** `reports/z_speed_frontier.json`
+(`reporting/z_speed_frontier.py`). Z03 not run: the user requires passing and a first payout within 1–2
+months, and Z03 (§90) would take ~8–24 months to pass.
+
+### What the requirement implies, computed
+
+Tradeify's confirmed rules, resampled real MNQ 09:30–16:00 sessions (post-2021) with drift removed and an
+edge imposed; a funded account starting the day after the pass, which must clear the $2,000 buffer.
+**P(a first payout within 42 trading days of starting the evaluation):**
+
+| annual Sharpe | 1 MNQ | 2 MNQ | 3 MNQ |
+|---|---|---|---|
+| 0 | 7% | 4% | 2% |
+| 1 | 12% | 6% | 3% |
+| 2 | 20% | 9% | 5% |
+| 3 | 30% | 13% | 6% |
+| 5 | **51%** | 23% | 10% |
+
+(P(pass within 42 days), 1 MNQ: 20% / 27% / 38% / 48% / 66%.)
+
+### What it means
+
+- **A coin-flip chance of a payout within two months needs an annual Sharpe of about 5** at one MNQ.
+  Larger positions make it worse: the trailing floor and the 40% consistency rule punish large days
+  more than they reward them.
+- **Nothing in twelve series approaches that.** The one effect confirmed out of sample (Z02, §88) is
+  ~0.5; the best published, account-tradeable effects found (§86, §90) are ~0.9–1.1 before decay.
+  Daily-horizon Sharpes of ~5 in index futures belong to infrastructure-heavy market-making, not to
+  anything this programme can find or a retail account can run.
+- **At the edges actually available, a 1–2 month payout is a ~7–12% outcome per evaluation** — luck,
+  not strategy.
+
+### What would change the arithmetic
+
+The frontier is set by the account's geometry as much as by the edge: a $3,000 target against a $2,000
+trailing floor that never locks during the evaluation, a 40% consistency rule, and a $2,000 funded buffer.
+Account types with a static or end-of-evaluation-locked floor, a lower target relative to the drawdown, or
+no consistency rule move the frontier; the engine (`y02_tradeify`, `z_speed_frontier`) can price any
+firm's terms in minutes.
+
+## 92. Eleven prop-firm account types priced against the strategies: none makes a 4-month payout likely (S8)
+
+**No trial spent; N 762, SR\* 0.1367. One computation record (firm comparison).** `reports/z_firms.md`
+(`reporting/z_firms.py`). The user relaxed the requirement to **a first payout within 4 months (84
+trading days)** and asked for Tradeify's other account types plus Apex, Lucid, Take Profit Trader, Alpha
+Futures and Topstep.
+
+### Rules — gathered 2026-10-09, third-party summaries, several conflicting
+
+50K accounts: Tradeify Select Daily (the user's confirmed terms), Select Flex, Growth, Lightning; Apex
+EOD; Topstep (standard path); Lucid Flex, Lucid Pro; Take Profit Trader; Alpha Futures Zero, Advanced.
+**None could be confirmed on the firms' own pages** (Tradeify's help centre refused automated access);
+each assumption is written into its spec (`note`) and the report. Sources: Prop Data Lab (Tradeify,
+verified against its help centre 2026-08-26), and guides from QuantVPS, Prop Trading Vibes, Tradecovex,
+Phidias, Tradetanto, LuxAlgo, PropScope and Alpha Futures' own comparison page — listed in the session.
+
+### The engine, checked first
+
+One general engine (floor trailing at end of day or intraday, stopping at the start or never; soft daily
+limits; consistency that raises the target; minimum days; time limits; subscriptions and activation fees;
+payouts by buffer or share of profit, qualifying days, caps and ladders). **It reproduces §82** (Tradeify,
+user's terms, 1 MNQ RTH, no edge: P(pass) 0.189 vs 0.193, two-year EV +$78 vs +$78) — after a bug was
+caught: "uncapped after going live" had been written as an empty value, which numpy turned into NaN and
+which silently blocked every payout after the third. Funded payouts then matched the validated engine
+exactly ($868 each). Run one strategy per process; the first attempts were killed for memory.
+
+### Result — P(a first payout within 84 trading days)
+
+| account | no edge (1 MNQ RTH) | Sharpe 1 (1 MNQ RTH) | MGC London, no edge | Z02, Sharpe 0.41 |
+|---|---|---|---|---|
+| Tradeify Select Daily (user's) | 7% | 12% | 7% | 5% |
+| Tradeify Select Flex | 8% | 15% | 13% | 14% |
+| Topstep | 9% | 17% | 13% | 14% |
+| **Lucid Flex** (close-only drawdown) | **13%** | **21%** | 11% | 14% |
+| Lucid Flex (intraday breach) | 8% | 13% | — | — |
+| all others | 1–7% | 8–15% | 1–11% | 2–8% |
+
+EV per attempt within the 84 days, no edge / Sharpe 1: Lucid Flex +$117 / +$453, Topstep +$79 / +$295,
+Tradeify Select Daily +$89 / +$282; Apex, Alpha, Take Profit Trader, Tradeify Growth and Lightning are
+negative at no edge (fees, time limits, monthly subscriptions, higher buffers).
+
+### What it means
+
+- **No account type makes a payout within 4 months likely.** The best is ~13% at no edge and ~21% with a
+  Sharpe-1 edge — and that best (Lucid Flex) depends on its drawdown being checked at the close only;
+  with intraday breach it falls to 8% / 13%, level with Topstep and Tradeify.
+- **The structure, not the firm, binds:** a ~$3,000 target, a ~$2,000 trailing drawdown and a buffer
+  before payout appear in every firm's 50K account in some form.
+- **Within that, the cheapest accounts with no time limit and no monthly subscription do best**
+  (Tradeify Select Daily at the user's $80, Lucid Flex, Topstep); time limits (Apex), subscriptions (Take
+  Profit Trader, Alpha) and high buffers (Lucid Pro, Growth) do worst.
+- **Strategies:** the Sharpe-1 column is the best published effect found, assumed rather than measured;
+  Z02's confirmed edge (0.41) gives 2–14%.
+
+## 93. The A-series: the account played optimally — a payout within 4 months in ~60% of runs (S8)
+
+**No trial spent; N 762, SR\* 0.1367. No market claim (zero edge throughout). One computation record.**
+`A_SERIES.md`; `reporting/a01_game.py`, `reporting/a02_real.py`; `reports/a01_game.json`,
+`a02_real.json`, `a02_sequential.json`.
+
+The user asked for strategies built around prop-firm rules. Noted first, plainly: most quick prop-firm
+successes are the visible tail of very many attempts — the lottery measured in §91–§92 — and software
+cannot create a market edge. **What had never been tried was optimising the STAKING within the rules.**
+
+### A01 — solved exactly (fair odds)
+
+Daily bracket choice (+W / −L), dynamic programming on Tradeify's evaluation and funded rules. **Max
+P(pass) 30% within ~10 trading days** (vs ~19% passive); funded P(first payout) 48%; whole path P(payout
+within 84 days) 14.5%, EV +$245 per attempt. Three defects found and fixed on the way, each recorded in
+code: odds priced on a stop beyond the floor (gave 41%, above the 40% fair ceiling); a free "wait" action
+that tied with trading once values settled and left 4,602 reachable states idle; orders not netted for
+cost, which left the deciding day $7 short of the target.
+
+### A02 — real MNQ minute paths
+
+Engine checked on fair synthetic paths (26.4% with costs, vs 30% without). On real paths, drift removed:
+2 MNQ — P(pass) 23%, P(payout within 84 days) 8%, EV +$123 per $80; median 7 days to pass, 12 to a
+first payout. **Real intraday behaviour erases most of the single-attempt gain; the speed remains.**
+
+### A03 — back-to-back attempts over 84 trading days
+
+**Solved policy, 2 MNQ, real history replayed from every start date: P(at least one payout) 61%, median
+first payout on day 38, ~10 attempts ($824 in fees), mean net +$675, P(net > 0) 45%** (resampled: 53%,
++$763). Passive 1 MNQ, the same way: 32%, +$84. 3 MNQ replayed: −$51.
+
+### Decisions taken rather than resolved silently
+
+1. **"Wait" is not an action** in the solved game: in a fair game it never raises the objective, and as a
+   tie-break it stranded accounts.
+2. **The evaluation policy is the one solved for P(pass within 21 days); the funded policy maximises
+   expected dollars within 21 days** — applied as stationary tables.
+3. **No market claim**: every path is demeaned; the result is a property of the rules plus real intraday
+   path shape and costs.
+4. **Open, for the user:** whether Tradeify's terms allow this bracket behaviour; real commission; a
+   forward demo of the exact policy before money.
+
+## 94. Route 1 — a portfolio of parallel accounts, payouts reinvested — mostly goes bust (S8)
+
+**No trial spent; N 762, SR\* 0.1367. Zero edge. One computation record.** `reports/a04_portfolio.md`
+(`reporting/a04_portfolio.py`).
+
+The user's point: one account at a time does not scale, and a policy that burns accounts is not a
+business. Recorded first, as the user was told: **with zero edge every funded account eventually dies,
+and its expected lifetime payouts are capped near 90% of the $2,000 cushion (~$1,800) whatever the
+policy** — the martingale identity of §79. So without an edge, scaling can only mean more parallel
+attempts. The user chose that route ("route 1").
+
+### The lanes
+
+The solved policy (A01) on four instrument-sessions, contracts sized to ~2 MNQ New York's daily swing:
+MNQ 09:30–16:00 (2), MNQ 19:00–03:00 (5), MGC 03:00–11:30 (4), MGC 12:00–16:00 (7). Sessions paired by
+date (2016-01-27 to 2026-08-27) and replayed in real order. **Daily correlations between lanes +0.02 to
++0.08** — they diversify. Each alone, back-to-back for 84 days: P(≥1 payout) 36–50%, mean net +$100 to
++$546 (MNQ New York here +$329, below A03's +$675 because this sample includes 2016–2020).
+
+### The portfolio — 12 months, every 5th start date (450), payouts reinvested
+
+| budget, max accounts | busted by month 4 | busted by month 12 | mean net, 12 months | 90th pct bankroll | bankroll above start |
+|---|---|---|---|---|---|
+| $800, 4 | 62% | **69%** | +$2,043 | $11,949 | 28% |
+| $800, 8 | 79% | 84% | +$1,932 | $12,287 | 14% |
+| $1,600, 8 | 59% | **68%** | +$4,230 | $24,375 | 28% |
+| $1,600, 12 | 72% | 78% | +$4,379 | — | 20% |
+
+**A positive average carried by ~3 runs in 10; ~7 in 10 lose the whole budget.** More concurrent
+accounts make it worse.
+
+### Why — the bet's shape
+
+Each attempt risks $80 for a ~8% chance at a payout of roughly $1,000–1,500: long odds, thin edge. The
+Kelly fraction for such a bet is ~2% of bankroll, so each concurrent account wants a reserve of roughly
+$4,000–8,000; the budgets tested bet 5–10× too much, and ruin arrives before the long shots do. At a
+Kelly-safe size the bankroll grows slowly. **Route 1 does not scale into a business at zero edge.**
+
+### What this closes and what it leaves
+
+- Closes: scaling the zero-edge structure by parallel accounts, as an income route.
+- Leaves: the A-series staking solver as a TOOL — the right way to stake any real edge once one exists
+  (route 2), since a modest edge staked the solved way pays far more than the same edge traded passively.
+
+## 95. Route 2's bar: the edge needed for a payout within 4 months; three literature candidates rejected (S1, S2)
+
+**No trial spent; N 762, SR\* 0.1367. One computation record.** `reports/b_event_frontier.json`
+(`reporting/b_event_frontier.py`). The user chose route 2 — find an edge, stake it with the A01 solver.
+
+### Candidates read and rejected before any test
+
+- **End-of-day reversal** (Baltussen, Da & Soebhag 2024): a cross-section of individual stocks, 3–4 bps a
+  day long-short; not an index effect.
+- **Option-expiration week** (Stivers & Sun 2013): S&P 100 stocks against the equal-weighted index, to 2010;
+  index-level ~0.2% a week — about 4 bps a day.
+- **Dash for cash** (Etula et al., RFS 2020): forced pension cash needs at month-end; ~25 bps over T−3..T−1
+  and 48 bps over T−3..T+3 (working-paper figures) — about 7–8 bps a held day against ~100 bps of daily
+  swing.
+
+### The bar, computed (Tradeify Select Daily, user's terms; synthetic held-day returns)
+
+| per-held-day Sharpe × days a month (annual) | P(payout within 84 days) | EV per $80, 84 days |
+|---|---|---|
+| 0.10 × 10 (1.1) | 11% | +$155 |
+| 0.10 × 21 (1.6) | 20% | +$326 |
+| 0.15 × 21 (2.4) | 28% | +$595 |
+| 0.20 × 10 (2.2) | 21% | +$450 |
+| 0.20 × 21 (3.2) | **43%** | +$1,181 |
+| 0.30 × 10 (3.3) | **39%** | +$588 |
+| 0.30 × 21 (4.8) | 72% | +$3,620 |
+
+(Simple sizing, best of four daily swings; the A01 solver would add to these.)
+
+### What it means
+
+- **A coin-flip chance of a payout within 4 months needs an annual Sharpe of ~3**, however the edge is spread
+  across days: concentration helps against the barriers but costs time.
+- **No published, surviving, account-tradeable futures effect found is near 3**; the best are ~1 before
+  decay, and Z02 is ~0.4–0.5 confirmed.
+- **Expected value per attempt rises steeply from Sharpe ~1** (+$155 to +$326 vs +$89 at zero edge), which
+  shrinks the bankroll problem that closed route 1 (§94). **Route 2's realistic target: a portfolio of
+  modest, independently confirmed edges reaching ~1–1.5 combined, staked with the A01 solver.**
+
+## 96. Z03 dropped (ZN not tradable); Z04 — the macro-announcement premium — registered before its trial (S1–S5)
+
+**One registration (Z04). No trial spent yet; N 762, SR\* 0.1367.**
+
+### The user's constraints, 2026-10-09
+
+- **ZN is not supported at the user's firms.** Z03 (Treasury month-end) is dropped. The micro 10-year
+  yield contract is assumed unsupported as well.
+- **A Sharpe of ~0.5 is acceptable for now; the aim is to add independent pieces to a strategy portfolio**
+  (§95's target: several modest confirmed edges, ~1–1.5 combined, staked with A01).
+
+### Candidates rejected before testing (web sources in the session)
+
+- **Turn-of-the-month** (Maberly & Waggoner 2000): disappeared after 1990 in S&P futures; a third-party
+  reconstruction 1990–2026 shows Sharpe ~0.28.
+- **Month-end FX hedge rebalancing at the London fix** (Melvin & Prins 2015): ~14 bps per 10% relative
+  equity outperformance, in one hour, once a month; EUR/USD (the only micro FX pair at Tradeify) not
+  statistically reliable.
+
+### Z04, specified before any return on the event days was computed
+
+Savor & Wilson (2013, 1958–2009): **11.4 bps on FOMC, employment and inflation announcement days vs
+1.1 bps otherwise**; Ai, Bansal & Guo (2023) report it persisting to 2023 (10.68 vs 0.93); its FOMC part was
+low in 2016–2019. A risk premium, not a flow.
+
+- **Calendar built and checked** (`reports/z_macro_calendar.json`): FOMC decision days parsed from the
+  Federal Reserve's own pages (8 a year; 7 in 2020); Employment Situation and CPI release dates from BLS
+  archive pages read through a page reader (BLS refuses direct downloads) — **checked mechanically**: 12 a
+  year each, every non-Friday jobs report a known exception (2013 and 2025 shutdowns, July 4 weeks, a 2026
+  delay), the missing months the 2025 shutdown. ~31 event days a year.
+- **Position:** long MES on each event date's UTC-day bar (20:00 ET the evening before to the 16:55 exit).
+- **Test window 2010-01-01 to 2026-09-11** — after the original sample, but NOT wholly independent: the
+  2023 extension covered most of it.
+- **Decision (the Z rule, extended before the run):** confirm only if (1) event-day mean > other-day mean
+  (Welch t > 1.645 — the paper's claim, so a rising market alone cannot pass), (2) net Sharpe > 0, (3)
+  Tradeify EV at the posterior > 0 with 1 MES; prior Normal(0.25, 0.35).
+- **Outcome injection passed:** Sharpe 0.25 planted on the 506 event days, recovered 0.24 (SD 0.24);
+  P(estimate > 0) 84%.
+
+## 97. Z04 run and retired: no announcement premium in ES since 2010 (S6–S8)
+
+**One trial spent: t00769. N 762 → 763.** `reports/z04_trial.md`.
+
+| 2010-06-07 → 2026-09-11 | value |
+|---|---|
+| mean ES return, 506 event days | **+3.4 bps** |
+| mean ES return, other days | +5.7 bps |
+| Welch t (needed > 1.645) | **−0.43** |
+| strategy net Sharpe (gross) | +0.04 (+0.16) |
+| calendar-shift control: share at or above the real | 0.67 |
+| posterior Sharpe | 0.11 ± 0.20 |
+| Tradeify EV at the posterior, 1 MES, 2 years | −$17 (zero edge −$27) |
+
+**Rejected on every condition.** Event days earned LESS than other days. The injection had shown 84% power
+for a Sharpe of 0.25 at this n, so this is an informative null for the effect size sought — not a
+statement about the pre-2010 premium, and not independent of the UTC-day bar approximation (§74).
+
+**For the portfolio search:** a published risk premium reported to persist to 2023 in broad-market
+studies does not appear in S&P futures, this way, since 2010. Two Z tests: Z02 confirmed (~0.4–0.5),
+Z04 rejected.
+
+## 98. Four more candidates screened out before testing; the Goldman roll needs a tradability ruling (S1, S2)
+
+**No trial spent; N 763, SR\* 0.1367.** Literature only (sources in the session).
+
+| candidate | published | after publication | verdict |
+|---|---|---|---|
+| Buyback blackout windows (MES/MNQ) | industry commentary | State Street 1994–2018: no significant negative return; 10b5-1 plans keep buying | **rejected** |
+| Oil predicts stocks with a lag (Driesprong, Jacobsen & Maat, JFE 2008) | 12 of 18 markets | a 2026 study of 44 markets: "present only up to the global financial crisis and has largely disappeared ever since" | **rejected** |
+| Gold autumn effect (Sept, Nov; 1980–2010) | in-sample only | no post-2010 test; a recent study finds commodity seasonals do not beat buy-and-hold out of sample; 2 months a year | **rejected** |
+| **Goldman roll front-running** (Mou 2011) | **Sharpe up to 4.39, 2000–Mar 2010**; index funds roll on business days 5–9 | mixed: traders roll early/late (Irwin, Sanders & Yan); a CFTC study finds small roll-day effects | **open — needs a ruling** |
+
+**The Goldman roll is the strongest candidate found in route 2**: a forced flow on a published schedule,
+and testable after its sample on the purchased data (every CL expiry from 2010, including CME's own
+calendar-spread instruments). **But the trade is a calendar spread — long one CL expiry, short the next —
+which may count as hedging under the user's firm's rules.** No test until the user rules on it.
+
+## 99. Goldman roll out (a spread is long and short at once); Z05 — gold overnight/day — registered (S1–S5)
+
+**One registration (Z05). No trial spent yet; N 763, SR\* 0.1367.**
+
+**User's ruling, 2026-10-09:** the firm allows anything that is never long and short at the same time.
+**The Goldman roll (§98) is therefore out** — a calendar spread is long one expiry and short another at once.
+An outright version is not viable: the roll moves the gap between expiries by a fraction of a percent over
+several days, against crude's ~2% daily swing.
+
+**Z05**, from Blose, Gondhalekar & Kort (2018, J. Econ. & Finance): COMEX gold earns significantly positive
+returns overnight and significantly negative returns in the day session, in up and down markets, 1985–2012.
+The paper's tables could not be read (Springer and ResearchGate refuse automated access), so the
+specification follows the stated claim and **the prior, Normal(0.25, 0.35), is an assumption**.
+- **Position:** 1 MGC long 18:00–08:20 ET, short 08:20–13:30 ET (the COMEX day session), long 13:30–16:55,
+  flat 16:55–18:00 — sequential, never simultaneous. Three round trips a day at $3.32.
+- **Test window 2013-01-01 to 2026-08-27**, after the paper's sample; MGC minute data, complete sessions.
+- **Confirm only if** overnight minus day > 0 (Welch t > 1.645) with the published signs, net Sharpe > 0,
+  and Tradeify EV at the posterior > 0 with 1 MGC.
+- **Outcome injection:** the first version used a permutation, which leaves the sample mean and SD
+  unchanged and so reported zero uncertainty — corrected to a bootstrap: Sharpe 0.25 planted, 0.25
+  recovered, SD 0.30, P(estimate > 0) 80%, n = 2,736 sessions.
+- Registry: MGC admitted as a single-market primary alongside MES (§87's rule).
+
+## 100. Z05 run: confirmed under the rule, marginally — and possibly gold's rally (S6–S8)
+
+**One trial spent: t00770. N 763 → 764.** `reports/z05_trial.md`.
+
+| 2013-01-02 → 2026-08-27, 2,736 sessions | value |
+|---|---|
+| mean overnight / New York day return | +2.9 / −0.7 bps |
+| Welch t, overnight − day (needed > 1.645) | **+1.82** |
+| net Sharpe, three round trips a day (gross) | **+0.22** (+0.56) |
+| long-overnight leg alone / short-day leg alone | +0.30 / **0.00** |
+| by period: 2013–16 / 2017–20 / 2021–26 | −0.20 / −0.06 / **+0.52** |
+| posterior Sharpe | 0.24 ± 0.23 |
+| Tradeify EV at the posterior, 1 MGC, 2 years | +$47 (zero edge +$5) |
+
+**CONFIRMED under the user's rule (§86), marginally.** Three reasons to discount it:
+1. **The short New York leg earns nothing**; the result is the long-overnight leg, net of three round trips.
+2. **It appears only in 2021–2026**, the period of gold's large rally; a long position held ~18 hours a day
+   collects much of any drift, and the overnight−day test only partly separates drift from the published
+   asymmetry.
+3. **t = 1.82** against a 1.645 bar.
+
+**Not done, deliberately:** switching to "long overnight only" after seeing the legs would be fitting the
+result; it would need a forward test of its own. **Portfolio so far:** Z02 (~0.4–0.5, MES) and Z05 (~0.24,
+MGC) — about 0.5 combined if independent.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —

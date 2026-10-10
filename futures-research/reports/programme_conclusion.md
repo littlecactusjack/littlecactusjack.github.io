@@ -550,7 +550,7 @@ grid, both need trade-level data.
 
 | log | N | covers | SR\* | chain |
 |---|---|---|---|---|
-| `futures-research/trials.jsonl` | **761** | F 576, L 180, N 3, P 1, Q 0, W 1 | **0.1368** | verifies |
+| `futures-research/trials.jsonl` | **764** | F 576, L 180, N 3, P 1, Q 0, W 1, Z 3 | **0.1367** | verifies |
 | `r-series-research/trials.jsonl` | **10** | R01 9, R02 1 | never binding | verifies |
 
 Controls, firing-rate measurements and computations (F14, L10, R06, the Q09 drawdown arithmetic) are
@@ -571,7 +571,10 @@ stay in the registry, and their trials stay in N.
 | **V01** (single) | **1** | **1** | **0** | **0** |
 | **W** | **5** | **1** | **1** | **0** |
 | **X** | **7** | **0** | **0** | **0** |
-| **total** | **96** | **38** | **771** | **0** |
+| **Y** | **7** | **0** | **0** | **0** |
+| **Z** | **5** | **3** | **3** | **0** |
+| **A** | **3** | **0** | **0** | **0** |
+| **total** | **111** | **41** | **774** | **0** |
 
 "Drafted" counts candidates written up as hypotheses in a series document. The R-series also named an
 R05 direction that was never drafted as a hypothesis, and it is not counted.
@@ -627,3 +630,52 @@ excludes the euro, 10-year and copper micros on cost, and post-2021 the seven ma
 effective months against 404 needed to see a 0.2 monthly Sharpe at the SR\* bar (185 on the cost
 survivors). A null at this horizon could rule out only effects two to three times the literature's
 per-market TSMOM. `decisions.md` §77.
+
+**The blocked-entry reconciliation was recorded 2026-10-09.** Every event-count block — the eight
+registry entries blocked on event count, R03 and F12 — was re-derived under current conventions: counts
+per cell and measured, the withdrawn L05 count, effective n, and the post-2021 half. **No gap narrowed.**
+Two entries carried superseded numbers, and both corrections widen the gap. F01's "4,125 events" was a
+pre-§22 declared ceiling; measured, its best cell is 3,523 (MNQ) and 3,449 (MGC) and its worst 66 and
+115, which is 5.6× and 1.63× short at the best cell, up from 4.8× and 1.4×. L05's block rested on a
+count of a condition that fires on every session, withdrawn in §45, and its 0.79× — the closest any
+recorded count came to a floor — belonged to that withdrawn condition; its status is now `excluded`, as
+L11's is. **V01's 1.15× at the 180-minute proxy is the narrowest live figure and is not a candidate**:
+it is a ceiling count with every reopen firing and no threshold applied, and at its own 60-minute
+horizon it is 2.25× short, and 4.9× short on the post-2021 half (all three with the Sunday reopens V01's
+wording excludes; as defined, 1.49×, 2.92× and 6.2×). **The §65 caveat applies to the source
+reconciliation**, which ran on Sonnet at the user's instruction and recomputed from the record rather than
+measuring; the F01 counts are the §22 measurement carried forward. `decisions.md` §78.
+
+**The Y row was added 2026-10-09** — an eleventh series that stops searching the market and measures
+the account instead. On 2,638 real MNQ sessions with drift removed, **one $80 evaluation is worth about
++$60 to +$127 at zero edge**, positive in every window and both eras, because the firm absorbs losses
+beyond the fee; a martingale argument puts the structural value near +$82 and says sizing cannot move it
+much. It is a lottery with positive expectation — ten evaluations finish net positive 26% of the time —
+and it rests on account rules not yet supplied. Nothing registered; no trial. `decisions.md` §79.
+Under Tradeify's daily-account rules (§80) it stays positive at **+$93 to +$145 per evaluation** with
+one MNQ during regular hours, the 40% evaluation consistency rule being what sets that size.
+With the rules confirmed (§81: intraday breach fails, daily payouts, a $1,250 cap until live) it is
+**+$85 to +$125 per evaluation**, and ten evaluations finish net positive about half the time.
+**Corrected (§82):** Tradeify's evaluation floor keeps trailing past $52,000, which lowers this to
+**+$62 to +$78 per evaluation** (pass rate 18–19%; ten evaluations net positive 40% of the time).
+Across sessions, directions and gold (§83) the choice of window mostly picks noise; two policies hold in
+both eras — **MNQ 09:30–16:00 long and MGC London 03:00–11:30 long, about +$70 to +$80 each.**
+**Replayed through real history in order (§85), that value shrinks and widens:** drift removed, +$1 (MNQ)
+and +$44 (MGC) per evaluation, and anywhere from −$61 to +$162 once real clustering is kept. The
+structure's value is best read as roughly $0–80 per $80 fee, with uncertainty as large as the estimate.
+
+**The Z row was added 2026-10-09** — a twelfth series on a different basis: take evidence from outside,
+not from searching this data. Published calendar and event anomalies were checked and found to decay
+after publication; the lead candidate is **front-running institutional rebalancing (Harvey, Mazzoleni &
+Melone 2025: Sharpe ~1 over 1997–2023, a forced counterparty, no post-publication record yet)**, to be
+replicated exactly and tested on the 3.5 years after its sample ends. Designed; awaiting the user's
+ruling on its decision rule. `decisions.md` §86.
+
+**Z02 was run 2026-10-09 (trial t00768) and confirmed under the user's rule** — the first hypothesis in
+twelve series to pass its own pre-registered test. On 3.5 years after the paper's sample, the MES leg of
+the rebalancing signal earned a net Sharpe of +0.51, beating 98.4% of its rotation null; the posterior is
+0.50 ± 0.28. In the Tradeify account, one MES in the signal's direction is worth about **+$410 per $80
+evaluation** at the posterior — subject to verifying that sizing on forward data. Not promoted: the
+programme's promotion bar is SR\*, which this rule replaced. `decisions.md` §87–§88.
+**In the account it does not pay (§89):** on today's contract size and replayed from every start date in
+real order, one MES by the signal is about break-even. Closed for the account; the finding stands.

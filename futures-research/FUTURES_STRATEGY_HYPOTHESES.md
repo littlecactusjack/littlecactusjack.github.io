@@ -565,3 +565,32 @@ prop-evaluation EV at that Sharpe. Prior 0.7–1.2, from the papers, labelled op
 
 **Result (decisions.md §76):** post-2021 net Sharpe −0.42 against 1.31; gross 0.31. Daily re-entry on
 the lowest-volatility micros costs 0.73 of Sharpe. Retired on an informative null.
+
+---
+
+## Z02 — Front-Running Rebalancers, Equity Leg  *(REGISTERED)*
+
+Harvey, Mazzoleni & Melone (NBER w33554): pensions and balanced funds rebalance 60/40 portfolios on
+calendar dates and thresholds, predictably; next-day equity returns 17 bps lower when equities are
+overweight; the published long/short strategy Sharpe ~1.1 over 1997–2023. Replicated to the letter, the
+S&P leg alone on MES (the long/short spread counts as hedging in the account), and tested **only on
+2023-03-18 onward**, after the paper's sample. One trial; decision rule ruled by the user (§86).
+
+`hypotheses.yaml` (Z02) · `Z_SERIES_CANDIDATES.md` · `decisions.md` §86–§87
+
+---
+
+## Z04 — Macro-Announcement Premium on MES  *(RETIRED — t00769, no premium in 2010–2026)*
+
+Savor & Wilson (2013): stocks earn ~11 bps on FOMC, jobs and CPI days against ~1 bp otherwise — a risk
+premium reported to persist to 2023. Long MES on those days only, tested 2010–2026 (after the original
+sample); confirmed only if event days beat other days, the net Sharpe is positive and the Tradeify EV at
+the posterior is positive. One trial. `hypotheses.yaml` (Z04) · `decisions.md` §96–§97
+
+---
+
+## Z05 — Gold: Long Overnight, Short the New York Day  *(CONFIRMED, marginally — t00770)*
+
+Blose, Gondhalekar & Kort (2018): COMEX gold earns positive returns overnight and negative returns in the
+day session (1985–2012). 1 MGC long 18:00–08:20, short 08:20–13:30, long 13:30–16:55 ET; tested 2013–2026.
+One trial. `hypotheses.yaml` (Z05) · `decisions.md` §99–§100

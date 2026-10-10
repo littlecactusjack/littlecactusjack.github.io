@@ -580,6 +580,103 @@ marginal; M6E, micro 10Y, MHG excluded (fees partly unverified; broker charge as
 pooled effective n 255 (185 on cost survivors) vs SR\* floor 404 at 0.2 monthly Sharpe. X07 not
 blocked on data. **Nothing is scheduled.**
 
+**BLOCKED-ENTRY RECONCILIATION, 2026-10-09 (§78) — no gap narrowed.** Two superseded numbers corrected,
+both widening the gap: F01 (4,125 → best cell 3,523 / 3,449, worst 66 / 115) and L05 (count withdrawn by
+§45; **status `excluded`, was `blocked_insufficient_events`**, L11's precedent; pinned set in the
+registry test updated). V01's 1.15× (180m proxy, Sunday reopens included) is the narrowest live figure and
+a ceiling, not a candidate. Source reconciliation ran on Sonnet at the user's instruction (§65 caveat).
+**Nothing is scheduled.**
+
+**Y-SERIES, 2026-10-09 — DESIGNED, NOT REGISTERED (§79).** The account's payoff structure, not a market
+edge. Y01 on real MNQ paths, drift removed: zero-edge EV +$5 to +$127 per $80 evaluation (RTH 2 MNQ
++$119 / +$127 pre/post-2021; +$77 under an imposed Sharpe −0.3). Structural value ≈ +$82 (martingale
+bound). Very skewed: 10 evaluations net positive 26%, 40 evaluations 59%. **Blocking: Y02, the firm's
+full rulebook** (consistency rules, payout caps, time limits, floor timing). Then Y05, a forward demo
+test. **Nothing is scheduled.**
+
+**Y02, 2026-10-09 (§80): Tradeify daily accounts modelled.** Zero-edge EV still positive. The 40% eval
+consistency rule binds hardest on large positions, so the policy is **RTH 09:30–16:00, 1 MNQ, long:
++$93–$145 per $80** (both eras, every payout frequency), +$53 under an imposed Sharpe −0.3. Open with the
+user: payout frequency, when the account goes live, whether an intraday dip below the EOD floor fails
+(the gentler reading gives +$208). **Next: Y05, a forward demo test.**
+
+**Tradeify rules confirmed, 2026-10-09 (§81).** Intraday breach fails; daily payouts, $1,250 cap until
+live (3 payouts on one account / 10 total); fee $80. **RTH, 1 MNQ, long: +$85 / +$125 per $80
+(2015–20 / post-2021)**, +$69 at an imposed Sharpe −0.3; 10 evaluations net positive 46%, 40 76%.
+**Next: Y05, forward demo test. Nothing else is scheduled.**
+
+**CORRECTION, 2026-10-09 (§82): Tradeify's evaluation floor never locks** (funded does, at $50,000).
+§81's figures superseded: **RTH, 1 MNQ, long: +$62 / +$78 per $80 (2015–20 / post-2021)**, +$45 at an
+imposed Sharpe −0.3; pass 18–19%; 10 evaluations net positive 40%, 40 67%. **Next: Y05.**
+
+**Y03, 2026-10-09 (§83): sessions, direction, MGC.** Window choice is mostly noise (MNQ Asia long
++$97 → +$17). **Two stable policies: MNQ 09:30–16:00 long (+$67 / +$82) and MGC London 03:00–11:30 long
+(+$68 / +$70).** Shorts no better; shorter windows no better. **Next: Y05 forward demo test.**
+
+**Y04, 2026-10-09 (§84):** both policies on ONE account: +$65 / +$46 per $80, worse than each alone (MNQ
++$71 / +$82, MGC +$45 / +$74 on the same paired dates). **Separate accounts per instrument.**
+
+**Y05 historical replay, 2026-10-09 (§85).** Every start date, real order: drift removed MNQ **+$1**, MGC
+**+$44** per $80 (actual history +$119 / +$115, bull markets included, descriptive only). Block bootstrap:
+−$61 to +$162 depending on era and run length. **The resampled ±$5 understated real uncertainty by ~10×.**
+Zero-edge value now stated as roughly $0–80 per evaluation, uncertain by as much; spread evaluations over
+time. Forward demo test still needed.
+
+**Y-series set aside by the user, 2026-10-09:** the structure value is too small for income.
+
+**Z-SERIES, 2026-10-09 — DESIGNED, NOT REGISTERED (§86).** Evidence from outside, tested after the
+authors' sample. Z01: front-running rebalancers (Harvey, Mazzoleni & Melone 2025; Sharpe ~1.1 in
+1997–2023, skew +5.2), long/short ES–ZN; Z02 the MES leg alone. Test window 2023-03-18 to 2026-09-11.
+**Open, for the user:** the decision rule (proposed: post-2023 Sharpe > 0 with the published sign, and
+positive prop EV at the posterior), Tradeify's rule on long-equity/short-bond, optional ES/ZN 1-hour data.
+
+**Z02 CONFIRMED, 2026-10-09 (§87–§88), trial t00768; N 762.** Rulings: rule accepted; long/short is
+hedging, so Z01 not run; daily bars. Construction calibrated to the paper's published signal AR(1) before
+any return. **Test 2023-03-18 → 2026-09-11: net Sharpe +0.51, beats 98.4% of rotations; posterior
+0.50 ± 0.28.** Tradeify EV (cost double-count corrected): +$93 per $80 with the paper's sizing; **one MES
+by the signal's sign: +$410** (unverified Sharpe for that sizing). **Next: forward demo of Z02, sign-only,
+1 MES.**
+
+**Z02 CLOSED FOR THE ACCOUNT (§89).** +$410 corrected to +$110 (today's MES ~$38k, ~$380/day); every-start
+replay in real order ≈ break-even (−$5; 2023 starts −$78). Effect real, too small against the account's
+barriers. Lesson: need high Sharpe per day in the market. **Searching for the next Z candidate.**
+
+**Z03 DESIGNED (§90): Treasury end-of-month (Hartley & Schwarz 2019).** Long ZN the last 2 business days
+of each month; test 2019-01 → 2026-09, after the paper's sample. Account check before testing: 1 ZN at the
+prior P(pass) 49%, EV +$202 (~490 days to pass); 2 ZN ~170 days. **Open: Tradeify product permission; go-ahead.**
+
+**Z03 NOT RUN — the user needs a payout within 1–2 months (§91).** Computed: a 50% chance of a payout
+within 42 trading days needs an annual Sharpe of ~5 (1 MNQ); at Sharpe 1, 12%; at no edge, 7%. Nothing
+available approaches it. The account's geometry, not only the edge, sets the frontier.
+
+**Firms compared (§92), 4-month payout window.** 11 account types × 4 strategies. Best P(payout ≤ 84 days):
+Lucid Flex 13% (no edge) / 21% (Sharpe 1) — but only if its drawdown is checked at the close; intraday
+8% / 13%, level with Topstep (9% / 17%) and Tradeify Select Daily (7% / 12%). No firm makes it likely.
+
+**A-SERIES, 2026-10-09 (§93): the account played optimally.** Staking solved by DP on Tradeify's rules,
+executed on real MNQ paths with drift removed. Single attempt (2 MNQ): pass 23%, EV +$123, resolves in
+1–2 weeks. **Back-to-back for 4 months, real history replayed: P(≥1 payout) 61%, mean net +$675 after
+~$824 fees, P(net > 0) 45%** (passive: 32%, +$84). **Next: confirm Tradeify permits it; forward demo.**
+
+**Route 1 closed (§94):** parallel accounts with payouts reinvested go bust in 68–84% of runs within 12
+months (mean net positive, carried by ~3 in 10). Kelly needs ~$4–8k reserve per concurrent account.
+Zero edge cannot scale. **Open: route 2 — find an edge large on the days it is held; stake it with A01.**
+
+**Route 2's bar (§95):** a coin-flip payout within 4 months needs annual Sharpe ~3; nothing published and
+surviving is near it. EV per attempt rises steeply from Sharpe ~1 (+$155–326). Target: a portfolio of modest
+confirmed edges (~1–1.5 combined), staked with A01. Rejected: end-of-day reversal, OpEx week, dash for cash.
+
+**Z03 dropped (ZN not tradable). Z04 run and RETIRED (§96–§97), t00769, N 763:** no announcement premium in
+ES 2010–2026 (+3.4 vs +5.7 bps, t −0.43). Portfolio so far: Z02 only (~0.4–0.5). Search continues.
+
+**Screened out (§98):** buyback blackouts, oil→stocks lag, gold autumn effect. **Open: the Goldman roll
+(Mou 2011, Sharpe ≤4.39 to 2010) — a CL calendar spread; needs the user's ruling on whether spreads count
+as hedging.**
+
+**Goldman roll out (a spread is long and short at once). Z05 run (§99–§100), t00770, N 764: gold long
+overnight / short NY day CONFIRMED marginally** (net Sharpe +0.22, t 1.82; only 2021–26 positive; short leg
+earns nothing). Portfolio: Z02 + Z05 ≈ 0.5 combined. Search continues.
+
 
 **Latest, 2026-09-13 (after P03):** N = **760**, SR\* **0.1368**. P03 retired at S7 (§58); the
 P-series closed with zero promotions. **Q-series S1 reviewed in §59, nothing registered:**
