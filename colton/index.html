@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colton Futures Research</title>
+<meta name="description" content="Live view of a pre-registered MNQ/MGC intraday futures research programme: every trial, every hypothesis, nothing promoted.">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #fcfcfb; --surface: #ffffff; --border: #e4e3de;
+  --text: #0b0b0b; --text-2: #52514e; --muted: #7a7974;
+  --grid: #ecebe7; --series-1: #2a78d6; --ref: #e34948;
+  --good: #008300; --bad: #c53030; --chip: #f0efec;
+  --series-2: #eb6834; --pos: #2a78d6; --neg: #e34948;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #121211; --surface: #1a1a19; --border: #2e2e2b;
+    --text: #ffffff; --text-2: #c3c2b7; --muted: #8f8e86;
+    --grid: #2a2a27; --series-1: #3987e5; --ref: #e66767;
+    --good: #4cb04c; --bad: #e66767; --chip: #2a2a27;
+    --series-2: #d95926; --pos: #3987e5; --neg: #e66767;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211; --surface: #1a1a19; --border: #2e2e2b;
+  --text: #ffffff; --text-2: #c3c2b7; --muted: #8f8e86;
+  --grid: #2a2a27; --series-1: #3987e5; --ref: #e66767;
+  --good: #4cb04c; --bad: #e66767; --chip: #2a2a27;
+  --series-2: #d95926; --pos: #3987e5; --neg: #e66767;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { font-size: 28px; line-height: 1.2; margin: 0 0 8px; }
+h2 { font-size: 18px; margin: 40px 0 12px; }
+p { margin: 0 0 12px; }
+a { color: var(--series-1); }
+.lede { color: var(--text-2); max-width: 70ch; }
+.status { font-size: 13px; color: var(--muted); margin: 12px 0 0; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); margin-right: 6px; }
+.dot.ok { background: var(--good); } .dot.bad { background: var(--bad); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 24px; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.tile .v { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tile .k { font-size: 13px; color: var(--text-2); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.grid2 { display: grid; grid-template-columns: 3fr 2fr; gap: 12px; }
+@media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+.card h3 { font-size: 15px; margin: 0 0 2px; }
+.card .sub { font-size: 13px; color: var(--text-2); margin-bottom: 8px; }
+svg text { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.tip { position: fixed; pointer-events: none; background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15); display: none; z-index: 10; }
+.findings { padding-left: 20px; margin: 0; } .findings li { margin-bottom: 8px; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.filters button { font: inherit; font-size: 13px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-2); cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { color: var(--text-2); font-weight: 600; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.chip { display: inline-block; padding: 1px 8px; border-radius: 999px; background: var(--chip); font-size: 12px; white-space: nowrap; }
+.reason { color: var(--text-2); max-width: 56ch; }
+details summary { cursor: pointer; }
+.hist-day { margin: 28px 0 14px; font-size: 13px; color: var(--muted); text-align: center; font-weight: 600; }
+.chat { display: flex; flex-direction: column; gap: 8px; }
+.msg { max-width: min(640px, 82%); padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
+.msg .who { display: block; font-size: 11px; font-weight: 600; letter-spacing: .02em; margin-bottom: 2px; opacity: .75; }
+.msg.you { align-self: flex-end; background: var(--text); color: var(--bg); border-bottom-right-radius: 4px; }
+.msg.claude { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; margin-bottom: 10px; }
+ul.feed { list-style: none; padding: 0; margin: 0; }
+ul.feed li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+ul.feed .when { color: var(--muted); font-size: 12px; }
+code { font-size: 13px; }
+nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 0 0 24px; }
+nav.tabs a { padding: 10px 14px; color: var(--text-2); text-decoration: none; font-weight: 600; font-size: 14px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; }
+nav.tabs .brand { align-self: center; font-weight: 700; font-size: 16px; letter-spacing: -.01em; margin-right: 12px; color: var(--text); }
+.dec .num { color: var(--muted); font-weight: 600; margin-right: 6px; }
+.dec h3 { font-size: 15px; margin: 0 0 6px; }
+.dec .sum { color: var(--text-2); font-size: 14px; }
+.dec { margin-bottom: 10px; }
+.dec .meta { color: var(--muted); font-size: 12px; margin-top: 8px; }
+#decSearch { font: inherit; font-size: 14px; width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); margin-bottom: 12px; }
+nav.tabs a[aria-selected="true"] { color: var(--text); border-bottom-color: var(--text); }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-2); margin-bottom: 6px; }
+.legend i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+td.ev { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.ev small { color: var(--text-2); }
+footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <nav class="tabs" role="tablist">
+    <span class="brand">colton</span>
+    <a href="#ledger" role="tab" data-tab="ledger">Research ledger</a>
+    <a href="#decisions" role="tab" data-tab="decisions">Decision log</a>
+  </nav>
+  <section id="tab-ledger" role="tabpanel">
+  <h1>Futures Research Ledger</h1>
+  <p class="lede">A pre-registered search for an intraday edge in MNQ (Micro Nasdaq-100) and MGC (Micro Gold)
+    futures under prop-account rules. Every test is logged to a hash-chained file <em>before</em> it runs,
+    and nothing is ever deleted. This page reads those files straight from Colton's repository each time it loads.</p>
+  <div class="status" id="status"><span><span class="dot"></span>Loading ledger…</span></div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <h2>Verdict</h2>
+  <div class="card">
+    <p id="headline" class="lede"></p>
+    <p><strong>No edge accessible at this cost structure and account size was found in intraday, calendar or
+      non-price futures signals, across six independently designed series.</strong></p>
+    <ul class="findings">
+      <li><strong>Cost binds.</strong> A round trip on MNQ costs 0.48 bps. The largest effect measured anywhere was +0.452 bps
+        (NQ/ES relative value), so no trade frequency or size can make it pay.</li>
+      <li><strong>Sample binds.</strong> Once-a-session mechanisms give about 4,000 events against about 19,722 needed to detect them.</li>
+      <li><strong>Account rules bind.</strong> Flat by 17:00 ET and no correlated long/short ruled out overnight holds and the
+        strongest unexplored idea (a cross-sectional book).</li>
+      <li><strong>Reopening needs</strong> new information (order-flow or book data), different account permissions,
+        lower cost, or years of new sessions, not a seventh series on the same 1-minute bars.</li>
+    </ul>
+    <p style="margin-top:12px"><a href="https://github.com/coltontr419-droid/futures-research/blob/master/reports/programme_conclusion.md">Read the full terminal report →</a></p>
+  </div>
+
+  <h2>Trials against the luck bar</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Sharpe ratio of every trial</h3>
+      <div class="sub" id="histSub">Distribution of logged trial Sharpes; the red line is SR*, what the best of N worthless strategies would reach by chance.</div>
+      <div id="hist"></div>
+    </div>
+    <div class="card">
+      <h3>Trials spent by series</h3>
+      <div class="sub">Each trial counts toward N, whether it was kept, superseded or withdrawn.</div>
+      <div id="bars"></div>
+    </div>
+  </div>
+
+  <h2>Hypothesis registry</h2>
+  <div class="card">
+    <div class="filters" id="filters"></div>
+    <div class="tablewrap"><table id="registry">
+      <thead><tr><th>ID</th><th>Hypothesis</th><th>Status</th><th>Stopped at</th><th class="num">Trials</th><th>Why</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </div>
+
+  <h2>Latest activity</h2>
+  <div class="card"><ul class="feed" id="feed"><li>Loading commits…</li></ul></div>
+
+  </section>
+
+  <section id="tab-decisions" role="tabpanel" hidden>
+  <h1>Decision Log</h1>
+  <p class="lede">Every decision in the programme, newest first, from <code>reports/decisions.md</code>. The log is never
+    rewritten: corrections are added as new sections.</p>
+  <div class="status" id="decStatus"><span><span class="dot"></span>Loading…</span></div>
+  <input id="decSearch" type="search" placeholder="Filter by word, series or hypothesis (e.g. Z05, gold, Topstep)" aria-label="Filter decisions">
+  <div id="decList"></div>
+  </section>
+
+  <footer>
+    Research and code by <a href="https://github.com/coltontr419-droid/futures-research">coltontr419-droid</a>. Data is read live
+    from that repository on every load, falling back to the daily-synced mirror on
+    <a href="../">littlecactusjack.github.io</a>.
+  </footer>
+</main>
+<div class="tip" id="tip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+<script>
+const BASE = 'https://raw.githubusercontent.com/coltontr419-droid/futures-research/master/';
+const MIRROR = '../futures-research/'; // daily-synced copy, used if GitHub's raw host fails
+const REPO = 'coltontr419-droid/futures-research';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = (x, d = 0) => Number(x).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
+const SERIES = { F: 'F · published anomalies', L: 'L · price levels', N: 'N · levels revisited', P: 'P · non-price', Q: 'Q · event portfolio', R: 'R · relative value', W: 'W · daily horizons' };
+
+let source = 'GitHub';
+async function get(path) {
+  for (const [base, name] of [[BASE, 'GitHub'], [MIRROR, 'mirror']]) {
+    try {
+      const r = await fetch(base + path + '?t=' + Date.now(), { cache: 'no-store' });
+      if (r.ok) { if (name === 'mirror') source = 'mirror'; return r.text(); }
+    } catch (e) { /* try the next source */ }
+  }
+  throw new Error(path + ': not reachable');
+}
+
+// Re-serializes one JSON line the way futuresres.stats.trials.canonical does:
+// json.dumps(sort_keys=True, separators=(",", ":")) with ASCII escaping. Number tokens are
+// copied verbatim, because JS would print Python's 2.0 as 2 and 1e-05 as 0.00001.
+function canonical(src) {
+  let i = 0;
+  const ws = () => { while (/\s/.test(src[i])) i++; };
+  const pyStr = (s) => JSON.stringify(s).replace(/[\u007f-￿]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+  function str() { const j = i++; while (src[i] !== '"') i += src[i] === '\\' ? 2 : 1; i++; return JSON.parse(src.slice(j, i)); }
+  function val() {
+    ws();
+    const c = src[i];
+    if (c === '{') {
+      i++; const kv = [];
+      ws(); if (src[i] === '}') { i++; return '{}'; }
+      for (;;) { ws(); const k = str(); ws(); i++; kv.push([k, val()]); ws(); if (src[i++] === '}') break; }
+      kv.sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
+      return '{' + kv.map(([k, v]) => pyStr(k) + ':' + v).join(',') + '}';
+    }
+    if (c === '[') {
+      i++; const xs = [];
+      ws(); if (src[i] === ']') { i++; return '[]'; }
+      for (;;) { xs.push(val()); ws(); if (src[i++] === ']') break; }
+      return '[' + xs.join(',') + ']';
+    }
+    if (c === '"') return pyStr(str());
+    const m = /^(-?\d+(\.\d+)?([eE][+-]?\d+)?|true|false|null)/.exec(src.slice(i));
+    i += m[0].length; return m[0];
+  }
+  return val();
+}
+
+// Mirrors TrialLog.verify_chain: each prev_hash is SHA-256 of the previous record's canonical form.
+async function verifyChain(text) {
+  const lines = text.split('\n').filter(l => l.trim());
+  let expected = '';
+  const enc = new TextEncoder();
+  for (let i = 0; i < lines.length; i++) {
+    const rec = JSON.parse(lines[i]);
+    if (rec.prev_hash !== expected) return { ok: false, n: lines.length, at: i, id: rec.trial_id };
+    const buf = await crypto.subtle.digest('SHA-256', enc.encode(canonical(lines[i])));
+    expected = [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  return { ok: true, n: lines.length };
+}
+
+// Inverse normal CDF (Acklam), accurate to ~1e-9.
+function ppf(p) {
+  const a = [-39.69683028665376, 220.9460984245205, -275.9285104469687, 138.357751867269, -30.66479806614716, 2.506628277459239];
+  const b = [-54.47609879822406, 161.5858368580409, -155.6989798598866, 66.80131188771972, -13.28068155288572];
+  const c = [-0.007784894002430293, -0.3223964580411365, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783];
+  const d = [0.007784695709041462, 0.3224671290700398, 2.445134137142996, 3.754408661907416];
+  const pl = 0.02425;
+  if (p < pl) { const q = Math.sqrt(-2 * Math.log(p)); return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  if (p > 1 - pl) { const q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  const q = p - 0.5, r = q * q;
+  return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+}
+// Mirrors futuresres.stats.dsr.expected_max_sharpe, with sample variance (ddof=1) as catalog_status uses.
+function srStar(n, sharpes) {
+  if (n < 2 || sharpes.length < 2) return 0;
+  const m = sharpes.reduce((s, x) => s + x, 0) / sharpes.length;
+  const v = sharpes.reduce((s, x) => s + (x - m) ** 2, 0) / (sharpes.length - 1);
+  const g = 0.5772156649015329;
+  return Math.sqrt(v) * ((1 - g) * ppf(1 - 1 / n) + g * ppf(1 - 1 / (n * Math.E)));
+}
+
+const tip = $('tip');
+function showTip(e, html) { tip.innerHTML = html; tip.style.display = 'block';
+  const x = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8); tip.style.left = x + 'px'; tip.style.top = (e.clientY + 12) + 'px'; }
+function hideTip() { tip.style.display = 'none'; }
+function bindTips(root) {
+  root.querySelectorAll('[data-tip]').forEach(el => {
+    el.addEventListener('mousemove', e => showTip(e, el.dataset.tip));
+    el.addEventListener('mouseleave', hideTip);
+  });
+}
+
+function histogram(sharpes, star) {
+  const W = 560, H = 240, m = { l: 36, r: 12, t: 12, b: 28 };
+  const bw = 0.01, lo = Math.floor(Math.min(...sharpes, star) / 0.05) * 0.05, hi = Math.ceil(Math.max(...sharpes, star) / 0.05 + 1e-9) * 0.05, nb = Math.round((hi - lo) / bw);
+  const bins = Array(nb).fill(0);
+    for (const s of sharpes) { const i = Math.floor((s - lo) / bw); bins[Math.min(nb - 1, Math.max(0, i))]++; }
+  const ymax = Math.max(...bins) * 1.1;
+  const x = v => m.l + (v - lo) / (hi - lo) * (W - m.l - m.r);
+  const y = v => H - m.b - v / ymax * (H - m.t - m.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Histogram of ${sharpes.length} trial Sharpe ratios with SR* at ${star.toFixed(3)}">`;
+  const step = Math.pow(10, Math.floor(Math.log10(ymax / 2)));
+  const yStep = ymax / step > 8 ? step * 2 : step;
+  for (let t = 0; t <= ymax; t += yStep) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${m.l - 6}" y="${y(t) + 4}" text-anchor="end">${t}</text>`;
+  for (let t = lo; t <= hi + 1e-9; t += 0.05) s += `<text x="${x(t)}" y="${H - 8}" text-anchor="middle">${t.toFixed(2)}</text>`;
+  bins.forEach((c, i) => {
+    if (!c) return;
+    const x0 = x(lo + i * bw) + 1, w = x(lo + (i + 1) * bw) - x(lo + i * bw) - 2, h = H - m.b - y(c);
+    const r = Math.min(3, w / 2, h);
+    const a = (lo + i * bw).toFixed(2), b2 = (lo + (i + 1) * bw).toFixed(2);
+    s += `<path d="M${x0},${H - m.b} v${-(h - r)} q0,${-r} ${r},${-r} h${w - 2 * r} q${r},0 ${r},${r} v${h - r} z" fill="var(--series-1)"/>`;
+    s += `<rect x="${x0 - 1}" y="${m.t}" width="${w + 2}" height="${H - m.t - m.b}" fill="transparent" data-tip="Sharpe ${a} to ${b2}<br><b>${c}</b> trials"/>`;
+  });
+  s += `<line x1="${x(star)}" x2="${x(star)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--ref)" stroke-width="2" stroke-dasharray="4 3"/>`;
+  s += `<text x="${x(star) + 6}" y="${m.t + 12}" style="fill:var(--text)">SR* ${star.toFixed(4)}</text>`;
+  s += `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--border)"/></svg>`;
+  $('hist').innerHTML = s;
+  const above = sharpes.filter(v => v > star).length;
+  $('histSub').innerHTML = `${fmt(sharpes.length)} trials report a Sharpe. The red line is SR*, what the best of N worthless strategies would reach by chance. <b>${above}</b> of them clear it.`;
+  bindTips($('hist'));
+}
+
+function bars(counts) {
+  const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const max = Math.max(...rows.map(r => r[1]));
+  const W = 400, rowH = 34, H = rows.length * rowH + 4, lw = 150;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Trials by series">`;
+  rows.forEach(([k, v], i) => {
+    const y0 = i * rowH + 6, w = Math.max(2, (v / max) * (W - lw - 50));
+    s += `<text x="0" y="${y0 + 15}" style="fill:var(--text-2);font-size:12px">${esc(SERIES[k] || k)}</text>`;
+    s += `<rect x="${lw}" y="${y0 + 2}" width="${w}" height="18" rx="3" fill="var(--series-1)" data-tip="${esc(SERIES[k] || k)}<br><b>${v}</b> trials"/>`;
+    s += `<text x="${lw + w + 6}" y="${y0 + 15}" style="fill:var(--text);font-size:12px">${v}</text>`;
+  });
+  $('bars').innerHTML = s + '</svg>';
+  bindTips($('bars'));
+}
+
+const STATUS_LABEL = {
+  retired: 'retired', excluded: 'excluded', untested: 'untested',
+  blocked_insufficient_events: 'blocked: too few events', stage1_inconclusive: 'inconclusive',
+  stage1_uninformative: 'uninformative', stage1_passed: 'stage 1 passed', dead: 'dead', promoted: 'promoted'
+};
+let registry = [], trialCount = {}, filter = 'all';
+function renderRegistry() {
+  const rows = registry.filter(h => filter === 'all' || h.status === filter);
+  $('registry').querySelector('tbody').innerHTML = rows.map(h => {
+    const why = (h.stopped_at_reason || h.retired_reason || h.excluded_reason || h.blocked_reason || '').trim().replace(/\s+/g, ' ');
+    const short = why.length > 180 ? `<details><summary>${esc(why.slice(0, 160))}…</summary>${esc(why.slice(160))}</details>` : esc(why);
+    return `<tr><td><b>${esc(h.id)}</b></td><td>${esc(String(h.name).replace(/_/g, ' '))}</td>
+      <td><span class="chip">${esc(STATUS_LABEL[h.status] || h.status)}</span></td><td>${esc(h.stopped_at || '')}</td>
+      <td class="num">${trialCount[h.id] || 0}</td><td class="reason">${short}</td></tr>`;
+  }).join('') || '<tr><td colspan="6">No hypotheses with this status.</td></tr>';
+}
+function renderFilters() {
+  const counts = {};
+  registry.forEach(h => counts[h.status] = (counts[h.status] || 0) + 1);
+  const opts = [['all', `All ${registry.length}`], ...Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, `${STATUS_LABEL[k] || k} ${v}`])];
+  $('filters').innerHTML = opts.map(([k, l]) => `<button data-k="${esc(k)}" aria-pressed="${k === filter}">${esc(l)}</button>`).join('');
+  $('filters').querySelectorAll('button').forEach(b => b.onclick = () => { filter = b.dataset.k; renderFilters(); renderRegistry(); });
+}
+
+async function feed() {
+  try {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=8`);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const commits = await r.json();
+    $('feed').innerHTML = commits.map(c => `<li><a href="${esc(c.html_url)}">${esc(c.commit.message.split('\n')[0])}</a><br>
+      <span class="when">${esc(c.commit.author.name)} · ${new Date(c.commit.author.date).toLocaleString()}</span></li>`).join('');
+  } catch (e) {
+    $('feed').innerHTML = `<li>Could not load commits (${esc(e.message)}). <a href="https://github.com/${REPO}/commits/master">View on GitHub</a></li>`;
+  }
+}
+
+async function load() {
+  const [trialsText, measText, yamlText, report] = await Promise.all([get('trials.jsonl'), get('measurements.jsonl'), get('hypotheses.yaml'), get('reports/programme_conclusion.md').catch(() => '')]);
+  // The report's opening paragraph is its running scoreboard; show it as written.
+  const head = (report.split(/\n\s*\n/)[1] || '').replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
+  $('headline').textContent = head;
+  const trials = trialsText.split('\n').filter(l => l.trim()).map(l => JSON.parse(l));
+  const nMeas = measText.split('\n').filter(l => l.trim()).length;
+  registry = jsyaml.load(yamlText, { json: true }) || []; // json: duplicate keys resolve last-wins, as PyYAML does
+  trialCount = {};
+  const bySeries = {};
+  trials.forEach(t => { trialCount[t.hypothesis_id] = (trialCount[t.hypothesis_id] || 0) + 1; const k = t.hypothesis_id[0]; bySeries[k] = (bySeries[k] || 0) + 1; });
+  const sharpes = trials.map(t => t.sharpe).filter(v => typeof v === 'number' && isFinite(v));
+  const N = trials.length, star = srStar(N, sharpes);
+  const promoted = registry.filter(h => h.status === 'promoted').length;
+  const last = trials.reduce((a, t) => t.timestamp > a ? t.timestamp : a, '');
+  const span = trials.reduce(([a, b], t) => [t.date_range[0] < a ? t.date_range[0] : a, t.date_range[1] > b ? t.date_range[1] : b], ['9999', '0000']);
+
+  $('tiles').innerHTML = [
+    [fmt(N), 'trials logged (N)'], [star.toFixed(4), 'SR*, the luck bar at N'],
+    [registry.length, 'hypotheses registered'], [fmt(nMeas), 'measurements (not trials)'],
+    [promoted, 'promoted'], ['0.48 bps', 'MNQ round-trip cost']
+  ].map(([v, k]) => `<div class="tile"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+
+  histogram(sharpes, star);
+  bars(bySeries);
+  renderFilters(); renderRegistry();
+
+  const [c1, c2] = await Promise.all([verifyChain(trialsText), verifyChain(measText)]);
+  const chip = (c, name) => c.ok ? `<span><span class="dot ok"></span>${name}: ${fmt(c.n)} records, hash chain intact</span>`
+    : `<span><span class="dot bad"></span>${name}: chain BROKEN at record ${c.at} (${esc(c.id)})</span>`;
+  $('status').innerHTML = chip(c1, 'trials.jsonl') + chip(c2, 'measurements.jsonl') +
+    `<span>Data used: ${span[0]} to ${span[1]} (~${((new Date(span[1]) - new Date(span[0])) / 3.15576e10).toFixed(1)} yr of 1-minute bars, per the trial records)</span>` +
+    `<span>Last trial ${new Date(last).toLocaleDateString()} · read from ${source === 'GitHub' ? 'Colton\'s GitHub' : 'the daily mirror'} · fetched ${new Date().toLocaleTimeString()}</span>`;
+}
+
+async function loadDecisions() {
+  const md = await get('reports/decisions.md');
+  const parts = md.split(/^## (\d+)\. (.+)$/m);
+  const items = [];
+  for (let k = 1; k + 2 < parts.length + 1; k += 3) {
+    const body = (parts[k + 2] || '').trim();
+    const clean = t => t.replace(/\*\*|`/g, '').replace(/\\\*/g, '*').replace(/\s+/g, ' ').trim();
+    const paras = body.split(/\n\s*\n/).map(p => p.trim()).filter(p => p && !p.startsWith('|') && !p.startsWith('#') && !p.startsWith('```'));
+    // most sections open with a bookkeeping line (trials spent, N, SR*); show it small, summarise with the next
+    const isMeta = p => p.length < 260 && /trials? spent|no trial|registration|\bN \d/i.test(p);
+    const meta = paras.length > 1 && isMeta(paras[0]) ? clean(paras[0]) : '';
+    const first = clean((meta ? paras[1] : paras[0]) || '');
+    items.push({ n: +parts[k], title: clean(parts[k + 1]), meta, first, text: (parts[k + 1] + ' ' + body).toLowerCase() });
+  }
+  items.sort((a, b) => b.n - a.n);
+  const render = q => {
+    const shown = q ? items.filter(x => x.text.includes(q.toLowerCase())) : items;
+    $('decList').innerHTML = shown.map(x => {
+      const p = x.first.length > 360 ? `<details><summary>${esc(x.first.slice(0, 320))}…</summary>${esc(x.first.slice(320))}</details>` : esc(x.first);
+      return `<div class="card dec"><h3><span class="num">§${x.n}</span>${esc(x.title)}</h3><div class="sum">${p}</div>${x.meta ? `<div class="meta">${esc(x.meta)}</div>` : ''}</div>`;
+    }).join('') || '<p>No decisions match.</p>';
+    $('decStatus').innerHTML = `<span>${shown.length} of ${items.length} decisions · read from ${source} · fetched ${new Date().toLocaleTimeString()}</span>`;
+  };
+  $('decSearch').oninput = e => render(e.target.value.trim());
+  render('');
+}
+
+const TABS = ['ledger', 'decisions'];
+function showTab() {
+  const h = location.hash.slice(1), t = TABS.includes(h) ? h : 'ledger';
+  document.querySelectorAll('nav.tabs a').forEach(a => a.setAttribute('aria-selected', a.dataset.tab === t));
+  TABS.forEach(k => $('tab-' + k).hidden = k !== t);
+}
+window.addEventListener('hashchange', showTab);
+showTab();
+loadDecisions().catch(e => { $('decList').innerHTML = `<p>Could not load the decision log (${esc(e.message)}).</p>`; });
+
+load().catch(e => { $('status').innerHTML = `<span><span class="dot bad"></span>Failed to load ledger: ${esc(e.message)}</span>`; });
+feed();
+setInterval(() => load().catch(() => {}), 5 * 60 * 1000);
+</script>
+</body>
+</html>
