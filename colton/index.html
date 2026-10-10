@@ -83,7 +83,10 @@ code { font-size: 13px; }
 nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 0 0 24px; }
 nav.tabs a { padding: 10px 14px; color: var(--text-2); text-decoration: none; font-weight: 600; font-size: 14px;
   border-bottom: 2px solid transparent; margin-bottom: -1px; }
-nav.tabs .brand { align-self: center; font-weight: 700; font-size: 16px; letter-spacing: -.01em; margin-right: 12px; color: var(--text); }
+.brand { position: absolute; top: 14px; left: 11px; transform: rotate(-7deg); transform-origin: left top;
+  font: 500 13px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  color: var(--muted); letter-spacing: .04em; user-select: none; }
+.brand::before { content: "~/"; opacity: .55; }
 .dec .num { color: var(--muted); font-weight: 600; margin-right: 6px; }
 .dec h3 { font-size: 15px; margin: 0 0 6px; }
 .dec .sum { color: var(--text-2); font-size: 14px; }
@@ -99,9 +102,9 @@ footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
 </style>
 </head>
 <body>
+<span class="brand" aria-label="colton">colton</span>
 <main>
   <nav class="tabs" role="tablist">
-    <span class="brand">colton</span>
     <a href="#ledger" role="tab" data-tab="ledger">Research ledger</a>
     <a href="#decisions" role="tab" data-tab="decisions">Decision log</a>
   </nav>
