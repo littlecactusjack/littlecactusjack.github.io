@@ -679,3 +679,47 @@ evaluation** at the posterior — subject to verifying that sizing on forward da
 programme's promotion bar is SR\*, which this rule replaced. `decisions.md` §87–§88.
 **In the account it does not pay (§89):** on today's contract size and replayed from every start date in
 real order, one MES by the signal is about break-even. Closed for the account; the finding stands.
+
+**Option 2 screen (§103, 2026-10-10):** looking for edges of several bps a held day, the two strongest
+remaining literature candidates failed before any trial — intraday momentum on size (~1 bp a day gross
+on MNQ/MGC inside its own published sample), the pre-holiday effect on post-publication survival. N unchanged at 764.
+
+**Staking size (§105, 2026-10-10):** the zero-edge solved policy at 4 MNQ instead of 2 raises the 4-month payout
+chance to ~65–78% and mean net to +$1,000–1,500 on two independent histories (replay and block bootstrap).
+Volatility-scaled size adds nothing. The demo forward test runs 4 MNQ.
+
+**Gold account (§106):** the same staking on 8 MGC (London, long) gives 48–64% / +$700–1,350 over 4 months on two
+histories, nearly uncorrelated (+0.06) with the MNQ account — a second, near-independent attempt.
+
+**Stop fills and unseen data (§108):** with stops filled at the stop price (the user's execution) the plans are better
+than A07/A08 reported — 4 MNQ 65–79% / +$1,140–1,830, 8 MGC 74–77% / +$2,030–2,420 over 4 months. Six weeks after
+the data (2026-08-28 → 10-09) both plans landed at the historical median for that length.
+
+**Z06 (§110, t00771):** the 12-month trend sign does not predict the plans' intraday windows (MNQ −0.17, MGC −0.25;
+always-long +0.35 / +0.13). Retired; the plans stay always-long.
+
+**Z07 (§111, t00772):** index-level reversal (Baltussen, van Bekkum & Da 2019) as the MNQ direction: +0.09 vs always-long
++0.35, faded after 2020. Retired.
+
+**Two accounts together (§112):** 4 MNQ + 8 MGC from the same date: a payout within 4 months from 93–97% of start
+dates, mean net +$3,400–4,400, P(net > 0) 72–79%, worst −$2,600 (zero edge, real order).
+
+**Size-aware policy (§113):** re-solving over contract size with measured odds fails on both products and both
+directions (worse even in sample). The fixed, risk-matched size with the fair-coin policy remains the plan.
+
+**Three accounts (§116):** adding crude (from owned daily bars, approximate) gives a payout within 4 months from ~99% of
+start dates and 2 of 3 streams paying on average; P(net > 0) 78–81%. Five funded accounts per firm caps scale near five
+streams; more firms add slots.
+
+**Z08 (§117, t00773):** CFTC hedger flow (Kang, Rouwenhorst & Tang 2020) sets gold's weekly direction — confirmed under
+the rule (+0.42 vs always-long +0.36) but marginal and era-unstable; crude rejected. Adopted for the gold account.
+
+**Strict rule (§119):** from 2026-10-10 a direction edge must beat always-long at t > 1.645 and its own shifted-signal
+placebo at the 95th percentile. Under it Z08's gold result fails (t +0.15); Z08 is retired and §118's portfolio gain is
+withdrawn. The portfolio stands at its zero-edge figures.
+
+**Z09 (§120, t00774):** the outright version of the Goldman roll (short crude on GSCI roll days) is rejected under the strict
+rule — the effect held to 2020 and reversed after 2021.
+
+**Z10 (§122, t00775):** the gotobi effect, tested free on USD/JPY spot in the account-tradable window, came in at half its
+published size and has faded to zero since 2024. Ten strict-rule market-tests, none passing.

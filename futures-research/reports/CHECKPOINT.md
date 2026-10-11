@@ -677,6 +677,88 @@ as hedging.**
 overnight / short NY day CONFIRMED marginally** (net Sharpe +0.22, t 1.82; only 2021–26 positive; short leg
 earns nothing). Portfolio: Z02 + Z05 ≈ 0.5 combined. Search continues.
 
+**Edge portfolio in the account (§101): worse than zero-edge solved staking.** Z02 + Z05 replayed 2013–2026:
+4-month P(payout) 15%, net −$230 (A03: 61%, +$675). Z02's one-MES version is +0.06 over the full period.
+Weak edges can't move the solver's bracket odds. **Search continues; the bar is now A03.**
+
+**A05 (§102): real-odds re-solve fails** — learned on 2015–20 (57% of brackets end at the close), tested
+2021–26: 43%, −$8 vs A01's 61%, +$675. Fair-odds policy is the robust one; A03 remains the bar.
+
+**Option 2 (§103): two candidates screened out, no trial.** Intraday momentum (Baltussen et al. 2021) is ~1 bp/day
+gross on MNQ and MGC inside the paper's own sample (m00152); pre-holiday has no large-cap effect after 1990
+(Ko & Yang 2024). No surviving effect of several bps/held day found; demo forward test of A03 is the alternative.
+
+**A06 (§104): demo forward test of A03 starts; search continues alongside.** Daily ticket:
+`python -m futuresres.reporting.a06_playbook eval --balance B --peak P --best D`; tables in reports/a06_playbook_*.csv.
+Judge the demo on execution vs replay, not P&L (P(net>0) is 45% even if it works).
+
+**A07 (§105): run the demo at 4 MNQ, not 2.** 4 beats 2 on both histories (2021–26, 2015–20), replay and block
+bootstrap: ~65–78% P(payout in 4 months), +$1,000–1,500 mean net vs 35–61%, +$95–675. Vol scaling adds nothing.
+m00153 superseded by m00154. Playbook default now 4.
+
+**A08 (§106): a second demo account on gold — 8 MGC, London 03:00–11:30 ET long.** 48–64% P(payout in 4 months),
++$700–1,350 across both histories; correlation with the MNQ account +0.06. `a06_playbook --product MGC`.
+
+**A09 (§107): fills within ~$10 (user) change little;** at $20 MNQ drops to 56–63%. Gold holds 03:00–11:30 ET (AM),
+never through the 17:00–18:00 break.
+
+**A10 (§108): unseen data 08-28→10-09 + stop-price fills.** With fills at the stop (the user's execution) the 4-month
+results rise: 4 MNQ 65–79% / +$1,140–1,830; 8 MGC 74–77% / +$2,030–2,420. Forward 6 weeks: MNQ −$160 (in funded),
+MGC −$560 — both at the historical median for that length. New data in data/{raw,parquet,continuous}_update.
+
+**A11 (§109): new edge bar.** A directional tilt of annual Sharpe ≥ ~0.25 on the traded window adds +$100–600 per
+4 months (most on gold); 0.5 adds +$260–1,450. Screen against THAT, not §95's Sharpe-3 bar.
+
+**Z06 (§110), t00771, N 765: trend sign as bracket direction REJECTED on both** (MNQ −0.17, MGC −0.25 vs always-long
++0.35 / +0.13). Plans stay always-long.
+
+**Z07 (§111), t00772, N 766: index reversal (MAC(5)) as MNQ direction REJECTED** (+0.09 vs always-long +0.35;
+faded to −0.15 in 2021–26). Screen queue for in-window edges near dry; plans run always-long.
+
+**A12 (§112): both accounts together:** P(≥1 payout in 4 months) 93–97%, median first payout ~22–25 trading days,
+mean net +$3,400–4,400, P(net>0) 72–79%, 10th pct −$1,000 to −$1,400, worst −$2,600.
+
+**A13 (§113): size-aware solver rejected** (24–46% vs fixed 70–79%, worse even in sample). Fixed 4 MNQ / 8 MGC stay.
+Stuck-at-floor replay defect fixed; no recorded result changed.
+
+**§114 scaling:** k parallel MNQ+MGC pairs scale mean net linearly (+$34–43k for 10 pairs / 4 months) but NOT the
+odds (P(net>0) stays 72–83%; worst −$24k at 10). Breadth across uncorrelated markets is the lever. Open: funded-account cap.
+
+**§115:** 5 funded accounts max; copying allowed. Crude ≈ uncorrelated with MNQ/gold → third market. Hourly candles +
+OHLC rule within ~10–15% of 1-minute → order ohlcv-1h CL.v.0, NG.v.0 (minute data quoted $549–668, too expensive).
+
+**A15 (§116): crude (10 MCL, full session, from owned daily bars) is a weak but independent third account.** Three
+accounts: P(≥1 payout) 99%, 2 of 3 streams pay, mean net +$3.7–4.9k, P(net>0) 78–81%. 5-funded cap ⇒ ~5 streams max;
+more firms = more slots.
+
+**Z08 (§117), t00773, N 767: COT hedger flow — GOLD CONFIRMED (marginal, era-unstable), crude rejected.** Gold account now
+takes the weekly COT side: `python -m futuresres.signals.z08 --direction` → `a06_playbook --product MGC --side ...`.
+
+**A16 (§118): portfolio now** (MNQ long + MGC COT-directed + MCL long): mean net +$4.8–5.4k / 4 months, P(net>0) 85–87%,
+10th pct −$0.5–0.8k, worst −$2.4–3.1k, fees ~$2.5–3.0k.
+
+**§119 STRICT Z RULE (user, 2026-10-10):** a direction signal confirms only with t > 1.645 vs always-long, ≥ 95th pct of a
+shifted-signal placebo, posterior > 0, reported against the running test count. **Z08 gold fails (t +0.15) → retired; gold
+back to always-long; §118's gain WITHDRAWN.** Portfolio = §116 zero-edge: +$3.7–4.9k / 4 months, P(net>0) 78–81%.
+
+**§120:** Z02 as MNQ direction — placebo 99–100th but t +0.32/+0.72 → not adopted (descriptive). **Z09 (t00774, N 768):
+short crude on GSCI roll days REJECTED** (t −0.20; worked to 2020, reversed 2021–26).
+
+**§121: power screen** (`z_strict.power`) before any registration — needs ~5–10 bps/day on signal days. Screened out:
+dash for cash (power 8%), EDHEC rebalancing (= Z02), gold ETF flows (thesis only), post-OpEx weakness (practitioner only).
+
+**Z10 (§122, t00775, N 769): gotobi (free USD/JPY spot) REJECTED** — net +0.49 bps, t 0.67; faded to ~0 by 2024.
+Ten Z market-tests, none passing the strict rule.
+
+**§123: Discord demo bot** in `bot/` (README has deploy steps for the DigitalOcean droplet). Tickets at 02:55 / 09:25 /
+17:55 ET, `!eod` bookkeeping, `demo_log.csv`. Bot tickets == playbook on 3,000 states (tests/test_bot_ticket.py).
+
+**§124: user can only act ~9 PM ET.** All-at-9PM plan is weaker (P(net>0) 64–67% vs 78–81%, p10 ~−$2–3k). Prefer
+current windows via time-triggered orders if the platform allows. OPEN: which platform.
+
+**§125: manual trading; bot posts ONE alert at 17:30 ET** (crude 18:00 tonight, gold 03:00 + MNQ 09:30 tomorrow) and
+shadow-tracks every ticket on free Yahoo 1-minute data (validated: 8/8 outcomes match Databento). Tradovate platform.
+
 
 **Latest, 2026-09-13 (after P03):** N = **760**, SR\* **0.1368**. P03 retired at S7 (§58); the
 P-series closed with zero promotions. **Q-series S1 reviewed in §59, nothing registered:**

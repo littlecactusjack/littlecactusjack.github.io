@@ -4152,3 +4152,359 @@
   s6_control: >
     The two legs reported separately (long-overnight only, short-day only) and the result by period
     (2013-16, 2017-20, 2021-26).
+- id: Z06
+  name: trend_sign_sets_bracket_direction
+  mechanism: >
+    Time-series momentum (Moskowitz, Ooi & Pedersen 2012, Journal of Financial Economics): the sign of an
+    instrument's past 12-month excess return predicts its next month's return, in every one of 58 futures,
+    1985-2009; replicated over a century (Hurst, Ooi & Pedersen 2017) and in live trend funds since. THE
+    COUNTERPARTY is slow-moving capital - hedgers and allocators trading on schedules against persistent
+    moves. A FOLLOW-ON TO W04 (decisions.md 72-76), which held the same signal at a daily horizon inside a
+    trend-plus-carry portfolio and failed on costs and its Sharpe-1.31 bar; here the signal only sets the
+    DIRECTION of the staking plans' daily bracket, whose costs are paid either way (decisions.md 109).
+  condition: >
+    At each month end, sign of the trailing 12-month held return (data/daily_bars.py, roll-correct, NQ and
+    GC), applied to every session dated in the next month: long (+1) or short (-1) the plan's window - MNQ
+    09:30-16:00 ET, MGC 03:00-11:30 ET (the two demo plans, decisions.md 106). Window return from 1-minute
+    bars, real drift (not removed), complete sessions only. No free parameters (12 months, monthly, as published).
+  horizon_minutes: [390, 510]
+  hold_hours: [6.5, 8.5]
+  registered: 2026-10-10
+  status: retired
+  retired: 2026-10-10
+  retired_reason: >
+    Trial t00771 (decisions.md 110), REJECTED on both products. Sign x window Sharpe: MNQ -0.17 (2015-11 to
+    2026-08; always-long +0.35), MGC -0.25 (2011-07 to 2026-08; always-long +0.13). Sessions in short-signal
+    months ROSE in both windows (MNQ +14.8 bps, MGC +2.9 bps). Posterior MNQ +0.02 +/- 0.22, MGC -0.03 +/- 0.21.
+    The trend sign does not predict these intraday windows; the plans stay always-long.
+  outcome_injection:
+    test: src/futuresres/signals/z06_trial.py
+    injected_bps: 0.2         # UNITS: annualised Sharpe of sign x window return, not bps (per product)
+    sought_bps: 0.2
+    n_injection: 2638         # MNQ; MGC 2,846 (both in the report)
+    n_run: 2638
+    recovered: true
+    report: reports/z06_injection.json
+  schedulable: false
+  schedulable_note: >
+    Not event-rate gated (a position every session); the runner refuses to run without its outcome injection.
+    Registered before any Z06 return was computed. W04 never reported its trend sleeve per market or gross.
+  test_order: null
+  registered_test_order: 28
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: No free parameters - lookback 12 months, monthly rebalance, as published. ONE TRIAL, both products.
+  session: Globex
+  symbols: [MNQ, MGC]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: MGC
+    rationale: >
+      The effect is documented per instrument across equity-index and precious-metal futures; MNQ and MGC are
+      the two plans' instruments. Each product is decided on its own; no two-instrument confirmation is claimed.
+  stage4_reachable: false
+  stage4_reason: Per-instrument decisions for the two staking plans; the test window is after the paper's sample.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2021-01-01', decisive: full}
+  test_window: {start: '2011-07-01', end: '2026-08-27', reason: 'after the paper sample (1985-2009); 12 months of daily data needed first'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: >
+      Prior Normal(0.2, 0.3) per product - the published per-instrument gross Sharpes are shown only as a chart
+      (Fig. 2, all positive, 0 to ~1.2, typical ~0.4); half of the typical value, an ASSUMPTION.
+  decision_rule:
+    rule: >
+      Per product, CONFIRM only if (1) the annualised Sharpe of sign x window return > 0 (the published claim);
+      (2) the mean of sign x window return exceeds the mean of the window return - the signal must beat the
+      plans' current always-long; (3) the posterior Sharpe > 0, which by A11 (decisions.md 109, monotone in S)
+      means the plan's EV at the posterior exceeds its zero-edge EV.
+  outcome_injection_required: Done before the run - reports/z06_injection.json.
+  s6_control: >
+    Always-long Sharpe in the same window; the share of short months; the result by period (2011-15, 2016-20,
+    2021-26).
+- id: Z07
+  name: index_reversal_sets_mnq_bracket_direction
+  mechanism: >
+    Index-level negative serial dependence (Baltussen, van Bekkum & Da 2019, Journal of Financial Economics
+    132(1)): across 20 indexes, daily index returns turned from positively to significantly negatively
+    autocorrelated after ~1999 as index products grew; trading against MAC(5) earned Sharpe 0.67 on the S&P 500
+    after March 1999 (Nasdaq 100 MAC(5) after 1999: -0.111, t -3.84), sample to 2016-12-31. THE COUNTERPARTY is
+    index-product arbitrage: price pressure in the basket from futures/ETF flows that reverses.
+  condition: >
+    For each MNQ session t: S = 4 r1 + 3 r2 + 2 r3 + r4, the paper's MAC(5) weights on the four most recent
+    roll-correct daily NQ returns dated BEFORE t (data/daily_bars.py; a bar dated t-1 closes 00:00 UTC, before
+    09:30 ET on t). Direction of the plan's 09:30-16:00 ET window: SHORT if S > 0, LONG if S <= 0 (against the
+    recent move). Real window returns (drift kept), complete sessions only. No free parameters.
+  horizon_minutes: [390]
+  hold_hours: [6.5]
+  registered: 2026-10-10
+  status: retired
+  retired: 2026-10-10
+  retired_reason: >
+    Trial t00772 (decisions.md 111), REJECTED: direction x window Sharpe +0.09 against always-long +0.35 (2017-01
+    to 2026-08, 2,366 sessions); short-signal sessions still rose (+1.58 bps vs +3.88 on long sessions), so
+    shorting them costs the drift. Faded: 2017-20 +0.46, 2021-26 -0.15. Close-to-close, the paper's basis, +0.25
+    (published 0.67). Posterior +0.21 +/- 0.22.
+  outcome_injection:
+    test: src/futuresres/signals/z07_trial.py
+    injected_bps: 0.3         # UNITS: annualised Sharpe of direction x window return, not bps
+    sought_bps: 0.3
+    n_injection: 2366
+    n_run: 2366
+    recovered: true
+    report: reports/z07_injection.json
+  schedulable: false
+  schedulable_note: >
+    Not event-rate gated (a position every session); the runner refuses to run without its outcome injection.
+    Registered before any Z07 return was computed.
+  test_order: null
+  registered_test_order: 29
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: No free parameters - the paper's MAC(5) weights, sign only. ONE TRIAL.
+  session: Globex
+  symbols: [MNQ]
+  mechanism_instruments:
+    primary: MNQ
+    secondary: null
+    rationale: >
+      The effect is documented for equity indexes including the Nasdaq 100; MNQ is the plan's instrument. Gold is
+      not an equity index and is not tested.
+  stage4_reachable: false
+  stage4_reason: One index; the test window is after the paper's sample.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2021-01-01', decisive: full}
+  test_window: {start: '2017-01-01', end: '2026-08-27', reason: 'after the paper sample (to 2016-12-31)'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: >
+      Prior Normal(0.3, 0.3): the published S&P 500 Sharpe 0.67 (close-to-close, continuous weights), roughly
+      halved; a sign-only rule on the 09:30-16:00 window misses any reversal that happens overnight. An ASSUMPTION.
+  decision_rule:
+    rule: >
+      CONFIRM only if (1) Sharpe of direction x window return > 0; (2) its mean exceeds the always-long window
+      mean (it must beat the plan's current direction); (3) posterior > 0 (=> plan EV at posterior > zero-edge EV
+      by A11, decisions.md 109).
+  outcome_injection_required: Done before the run - reports/z07_injection.json.
+  s6_control: >
+    Always-long Sharpe in the same window; share of short sessions; window mean on short sessions; result by
+    period (2017-20, 2021-26); the same rule on the close-to-close daily return, for comparison with the paper.
+- id: Z08
+  name: hedger_flow_sets_commodity_bracket_direction
+  mechanism: >
+    Liquidity provision in commodity futures (Kang, Rouwenhorst & Tang 2020, Journal of Finance 75(1)): weekly
+    changes in positions are driven by impatient speculators, and commercial hedgers supply the liquidity; prices
+    rise in the weeks after hedgers BUY and fall after they sell (a typical change moves next week's expected return
+    by ~0.17%, t 4-5 in both halves of 1994-2014; 26 commodities incl. gold and crude). THE COUNTERPARTY is the
+    speculator paying for immediacy.
+  condition: >
+    CFTC legacy COT, commercials: Q = weekly change in net long / previous open interest (data/cot.py). Positions
+    as of Tuesday, released Friday; the five sessions of the following week take sign(Q): long if hedgers bought,
+    short if they sold. Applied to each staking plan's window: crude the full session (owned roll-correct daily CL
+    bars, as decisions.md 116), gold the London window 03:00-11:30 ET (MGC 1-minute, real returns). No free parameters.
+  horizon_minutes: [1375, 510]
+  hold_hours: [22.916666666666668, 8.5]
+  registered: 2026-10-10
+  status: retired
+  retired: 2026-10-10
+  retired_reason: >
+    Trial t00773 (decisions.md 117) confirmed gold under the then-current Z rule (Sharpe +0.42 vs always-long
+    +0.36, posterior +0.36) and rejected crude. Re-read under the STRICT Z rule adopted before any further
+    candidate (decisions.md 119): gold's per-session advantage over always-long has t +0.15 (needs 1.645) and sits
+    at the 89th percentile of its shifted-signal placebo (needs 95) - its Sharpe was gold's drift, not the signal.
+    Not a confirmed edge; the gold account returns to always-long.
+  outcome_injection:
+    test: src/futuresres/signals/z08_trial.py
+    injected_bps: 0.3         # UNITS: annualised Sharpe of sign x window return, not bps (per product)
+    sought_bps: 0.3
+    n_injection: 2578         # MGC; MCL 2,864 (both in the report)
+    n_run: 2578
+    recovered: true
+    report: reports/z08_injection.json
+  schedulable: false
+  schedulable_note: >
+    Not event-rate gated; the runner refuses to run without its outcome injection. Registered after a size screen
+    INSIDE the paper's sample only (2010-06 to 2014-11; crude +0.70, gold +0.24 on daily bars, decisions.md 117);
+    no post-2014 Z08 return computed before registration.
+  test_order: null
+  registered_test_order: 30
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: No free parameters - the paper's Q and its one-week horizon, sign only. ONE TRIAL, both products.
+  session: Globex
+  symbols: [MCL, MGC]
+  mechanism_instruments:
+    primary: MGC
+    secondary: MCL
+    rationale: >
+      The effect is documented per commodity, gold and crude included; MGC and MCL are the staking plans'
+      instruments. Each product is decided on its own; no two-instrument confirmation is claimed.
+  stage4_reachable: false
+  stage4_reason: Per-commodity decisions for the staking plans; the test window is after the paper's sample.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2021-01-01', decisive: full}
+  test_window: {start: '2015-01-01', end: '2026-08-27', reason: 'after the paper sample (1994-01 to 2014-11)'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: >
+      Prior Normal(0.3, 0.3) per product, an ASSUMPTION: the paper's effect is a cross-sectional slope; the
+      in-sample screen on our data (crude +0.70, gold +0.24, 2010-06 to 2014-11) roughly halved and pooled.
+  decision_rule:
+    rule: >
+      Per product, CONFIRM only if (1) the annualised Sharpe of sign x window return > 0; (2) its mean exceeds the
+      always-long window mean; (3) the posterior > 0 (=> plan EV at posterior > zero-edge EV, decisions.md 109).
+  outcome_injection_required: Done before the run - reports/z08_injection.json.
+  s6_control: >
+    Always-long in the same window; the long-signal and short-signal session means; by period (2015-20, 2021-26);
+    for gold, the same rule on the full-session daily GC return (not decisive).
+- id: Z09
+  name: index_roll_selling_shorts_crude_on_roll_days
+  mechanism: >
+    Commodity index roll pressure (Mou 2011, "Limits to Arbitrage and Commodity Index Investment: Front-Running the
+    Goldman Roll"): funds tracking the S&P GSCI roll their crude position out of the next-to-expire contract on the
+    5th-9th business days of each month; the predictable selling depresses that contract (published as a calendar
+    spread, Sharpe up to 4.39, 2000 to March 2010). THE COUNTERPARTY is the index fund, forced to sell on a
+    published schedule. The spread is not tradable in this account (decisions.md 99); this tests the OUTRIGHT.
+  condition: >
+    Crude plan (10 MCL, full session; owned roll-correct daily CL bars, decisions.md 116): SHORT on the 5th-9th
+    trading days of each month, LONG otherwise. Construction check before any return (decisions.md 120): on
+    99.5% of roll days the volume-front contract the series holds is the one the GSCI sells (100% in every year
+    except 2020, 92%). No free parameters.
+  horizon_minutes: [1375]
+  hold_hours: [22.916666666666668]
+  registered: 2026-10-10
+  status: retired
+  retired: 2026-10-10
+  retired_reason: >
+    Trial t00774 (decisions.md 120), REJECTED under the strict rule: roll days +1.59 bps vs other days +2.33 (2010-06
+    to 2026-08, 970 roll sessions); t(beats always-long) -0.20, placebo 52.5th pct. By period the effect held then
+    reversed: roll days -15.8 / -20.9 bps in 2010-15 / 2016-20 (t +1.66, +1.28) but +38.2 bps in 2021-26 (t -2.63) -
+    the pattern of a crowded, front-run effect. No shifted-window variant is run after seeing this.
+  outcome_injection:
+    test: src/futuresres/signals/z09_trial.py
+    injected_bps: 0.2         # UNITS: annualised Sharpe of sign x session return, not bps
+    sought_bps: 0.2
+    n_injection: 3993
+    n_run: 3993
+    recovered: true
+    report: reports/z09_injection.json
+  schedulable: false
+  schedulable_note: >
+    Not event-rate gated (~5 short sessions a month); the runner refuses to run without its outcome injection.
+    Registered before any Z09 return was computed; all owned data (2010-06 on) postdates the paper's sample.
+  test_order: null
+  registered_test_order: 31
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: No free parameters - the GSCI's published roll days. ONE TRIAL. Decided by the STRICT Z rule (decisions.md 119).
+  session: Globex
+  symbols: [MCL]
+  mechanism_instruments:
+    primary: MCL
+    secondary: null
+    rationale: >
+      The roll pressure is documented in NYMEX WTI crude; MCL is the crude plan's instrument (1/10 CL). No second
+      instrument is claimed.
+  stage4_reachable: false
+  stage4_reason: One market, one published calendar; the test window is after the paper's sample.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2021-01-01', decisive: full}
+  test_window: {start: '2010-06-01', end: '2026-08-27', reason: 'after the paper sample (2000 to March 2010)'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: >
+      Prior Normal(0.2, 0.3), an ASSUMPTION: the published figure is for the spread, not the outright, and later
+      work reports traders rolling early (decisions.md 98).
+  decision_rule:
+    rule: >
+      The STRICT Z rule (decisions.md 119, signals/z_strict.py): CONFIRM only if (1) the per-session advantage
+      over always-long has one-sided t > 1.645; (2) it exceeds the 95th percentile of the same statistic with the
+      roll calendar circularly shifted; (3) posterior > 0, reported beside a zero-mean prior; (4) reported against
+      the running count of Z market-tests (9 with this one).
+  outcome_injection_required: Done before the run - reports/z09_injection.json.
+  s6_control: >
+    Mean return on roll days vs other days; by period (2010-15, 2016-20, 2021-26); the effect on days 5-9 one by one.
+- id: Z10
+  name: gotobi_importer_dollar_buying_before_tokyo_fix
+  mechanism: >
+    The gotobi effect (Suzuki group, arXiv 2301.13204, sample 2018-2020, building on their earlier study; the Tokyo
+    fixing itself: Ito & Yamada 2017, Journal of International Economics): Japanese importers settle on days divisible
+    by five ("goto-barai") at the 9:55 JST TTM fix, and banks pre-buy the dollars, so USD/JPY rises toward 9:55 on
+    gotobi days. THE COUNTERPARTY is the importer paying a business-custom schedule regardless of price.
+  condition: >
+    Long USD/JPY (= short 6J yen futures) from the 18:00 ET CME Globex reopen to the 9:55 JST fix (19:55 or 20:55 ET)
+    on gotobi days - the 5th/10th/15th/20th/25th/30th, or the last business day before a weekend one - Tuesday to
+    Friday JST (the paper's rule). The paper's own window (03:00 JST) holds through the 17:00-18:00 ET CME break,
+    which the account forbids; the tradable part is fixed here before any post-2020 return. Measured on free USD/JPY
+    spot 1-minute bars (HistData; data/fx.py), net of 1.0 bp a round trip for 6J (tick + commission).
+  horizon_minutes: [175]
+  hold_hours: [1.9166666666666667, 2.9166666666666665]
+  registered: 2026-10-10
+  status: retired
+  retired: 2026-10-10
+  retired_reason: >
+    Trial t00775 (decisions.md 122), REJECTED under the strict rule: 316 gotobi events 2021-01 to 2026-09, 18:00 ET ->
+    9:55 JST gross +1.49 bps, net +0.49 (SD 13.0), t +0.67; placebo 92.8th pct (random sets) / 50th (shifted
+    calendar). Fading: 2021-23 net +0.87, 2024-26 +0.10. Half the in-sample size, then gone - a widely known effect
+    competed away.
+  outcome_injection:
+    test: src/futuresres/signals/z10_trial.py
+    injected_bps: 0.8
+    sought_bps: 0.8
+    n_injection: 316
+    n_run: 316
+    recovered: true
+    report: reports/z10_injection.json
+  schedulable: false
+  schedulable_note: >
+    ~70 events a year; the runner refuses to run without its outcome injection. Registered after a size screen INSIDE
+    the paper's sample only (2018-2020: tradable window +2.67 bps, SD 12.4, t 2.88; paper's window +2.68, t 1.91) and
+    on 2016-17 (before it: -0.94 bps, t -0.56); no 2021-2026 return computed before registration.
+  test_order: null
+  registered_test_order: 32
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: No free parameters - the paper's calendar and fix time; the entry is the account's first allowed minute. ONE TRIAL.
+  session: Globex
+  symbols: [6J]
+  mechanism_instruments:
+    primary: 6J
+    secondary: null
+    rationale: >
+      6J (CME yen futures, USD per JPY) is tradable in the user's account; the test uses USD/JPY spot, which 6J mirrors
+      inversely. One market; no second-instrument confirmation is claimed.
+  stage4_reachable: false
+  stage4_reason: One currency pair, one published calendar; the test window is after the paper's sample.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2024-01-01', decisive: full}
+  test_window: {start: '2021-01-01', end: '2026-09-30', reason: 'after the paper sample (2018-2020)'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: >
+      Prior on the net mean per event Normal(+0.8 bp, 1.0 bp): the in-sample tradable-window gross +2.67 bps, halved,
+      less the 1.0 bp cost; an ASSUMPTION.
+  decision_rule:
+    rule: >
+      The STRICT Z rule adapted to a standalone trade (benchmark: not trading): CONFIRM only if (1) the net mean per
+      gotobi event has one-sided t > 1.645; (2) it exceeds the 95th percentile of the same statistic on the
+      gotobi calendar shifted by 1-4 business days and on random same-size sets of non-gotobi Tue-Fri days; (3) the
+      posterior mean > 0, reported beside a zero-mean prior; (4) reported against the running count (10 Z market-tests).
+  outcome_injection_required: Done before the run - reports/z10_injection.json.
+  s6_control: >
+    Gross and net; non-gotobi days in the same window; the paper's full 03:00 JST window (not tradable; descriptive);
+    by period (2021-23, 2024-26).

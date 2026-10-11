@@ -7014,6 +7014,768 @@ specification follows the stated claim and **the prior, Normal(0.25, 0.35), is a
 result; it would need a forward test of its own. **Portfolio so far:** Z02 (~0.4–0.5, MES) and Z05 (~0.24,
 MGC) — about 0.5 combined if independent.
 
+## 101. The edge portfolio (Z02 + Z05) in the account: worse than zero-edge solved staking (S8)
+
+**No trial spent; N 764, SR\* 0.1367. One computation record.** `reports/zp_portfolio.md`
+(`reporting/zp_portfolio.py`). Realised returns, real order — descriptive, partly a second look.
+
+Z02 (1 MES by the rebalancing signal's sign) + Z05 (1 MGC, gold long overnight / short the NY day) in one
+Tradeify account (different products; never long and short in one), 2,736 days 2013–2026; the day's worst
+point counted as the sum of both legs' worst points (conservative).
+
+| strategy | realised Sharpe | 4 months back-to-back: P(≥1 payout) | mean net | P(net > 0) |
+|---|---|---|---|---|
+| Z02 + Z05, 1 unit | +0.21 | 15% | −$230 | 8% |
+| Z02 + Z05, 2 units | +0.21 | 13% | −$832 | 6% |
+| Z05 alone, 1 MGC | +0.22 | 18% | +$191 | 17% |
+| Z02 alone, 1 MES | +0.06 | 3% | −$193 | 2% |
+| **A03, zero-edge solved staking, 2 MNQ** | 0 | **61%** | **+$675** | 45% |
+
+**Two findings.**
+1. **The edges are weaker over the full period than in their tests**: Z02's one-MES version earns +0.06 over
+   2013–2026 (its +0.41 was the 2023–2026 test window; 2013–2023 lies inside the paper's sample).
+2. **In this account, staking dominates a weak edge**: passive daily holding of ~0.2-Sharpe edges loses to
+   the zero-edge solved policy. A 0.2–0.4 Sharpe edge shifts a ~±1% daily bracket's odds by a fraction of a
+   percent, so weak edges add almost nothing to the solver either.
+
+**Verdict (the user's own condition): not good enough — keep searching.** What a candidate must now beat is
+not zero but A03: it needs an edge large enough to move the solver's bracket odds, i.e. several bps a day
+on MNQ/MES/MGC, consistently, after costs.
+
+## 102. A05: re-solving the staking with real bracket odds makes it worse (S8)
+
+**No trial spent; N 764, SR\* 0.1367. Zero edge. One computation record.** `reports/a05_empirical.json`
+(`reporting/a05_empirical.py`).
+
+A01 priced every bracket as a fair coin. A05 measured each bracket's real NET outcome distribution (2 MNQ,
+09:30–16:00, cost netted as in A02) on **2015-11 to 2020-12** sessions (drift removed), re-solved both games
+with those distributions (on a reduced 21-bracket menu; A01 keeps its full grid), and ran A03's test on
+**2021–2026**, the same real-history back-to-back replay:
+
+| 84 trading days, 2021–2026 replay | A01 fair-odds policy | A05 real-odds policy |
+|---|---|---|
+| P(≥1 payout) | **61%** | 43% |
+| mean net | **+$675** | −$8 |
+| P(net > 0) | 45% | 38% |
+
+**Why:** in the training years, a +$1,200 / −$1,000 bracket on 2 MNQ hit its target 17% of the time, its
+stop 26%, and **ended at the close with neither 57% of the time** — calmer markets relative to today's
+contract value. The learned policy fitted that regime and transferred badly. **The fair-odds policy
+assumes no regime and is the more robust one.** A vol-normalised version (sizing contracts to a constant
+daily swing) might transfer, but it is a further refinement on a single historical regime split, and is not
+pursued now. A03 stands as the bar.
+
+## 103. Option 2 — edges big enough to move the solver: two screened out on size or survival (S1, S2)
+
+**No trial spent; N 764, SR\* 0.1367. One computation record (m00152).** `reports/z_screen_intramom.json`
+(`reporting/z_screen_intramom.py`). The user approved option 2 after §102: look only for edges of **several
+bps per held day**, reliably, on MNQ / MES / MGC, and screen on size before spending a trial.
+
+### Market intraday momentum (Baltussen, Da, Lammers & Martens, JFE 2021)
+
+The return from the previous close to 30 minutes before today's close (r_ROD) predicts the last half hour,
+across 60+ futures, 1974–May 2020; the stated mechanism is forced hedging by short-gamma option dealers and
+leveraged ETFs. Published: NQ β 6.36 (t 7.97), R² 4.1%; the equity 1/N timing strategy earns 6.86% a year at
+Sharpe 1.73 — **~2.7 bps a day, gross, for a diversified portfolio**; no costs (the authors say it may not be
+exploitable after costs except at a tick). Already marginal against the bar, so the size was measured **on
+our data inside the paper's own sample** (to 2020-04-30; the script asserts nothing later is read, so the
+2020-05 → 2026 test window stays clean):
+
+| paper's sample, our data | days | corr(r_ROD, r_LH) | timing, gross bps/day (t) | gross Sharpe | net $/day, 1 contract | net Sharpe |
+|---|---|---|---|---|---|---|
+| MNQ (NQ), last half hour 15:30–16:00 | 1,841 | +0.09 | **+1.1** (1.55) | +0.57 | −0.88 | −0.34 |
+| MGC (gold), last half hour 13:00–13:30 | 897 | +0.20 | **+1.2** (2.03) | +1.07 | −1.61 | −0.98 |
+
+(Days whose signal spans a contract roll, or missing a bar at either time, are dropped.) **About 1 bp a day
+before costs, inside the sample that made the claim** — real for gold, but a dollar or two a day on today's
+contract, eaten by the round trip. **Rejected on size; no registration, no trial.** A test on 2020-05 →
+2026 would be well powered for the published size but cannot reach the bar even if the effect survived.
+
+### Pre-holiday effect (Ariel 1990; Lakonishok & Smidt 1988)
+
+Large per held day in the original samples (~20–30 bps on the day before a US market holiday, ~9 days a
+year). **The one peer-reviewed post-publication test** (Ko & Yang, *Critical Finance Review* 2024, 1983–2019)
+finds it **now exists only among small firms; for large firms the difference became insignificant,
+especially after 1990.** Supportive recent sources are a short conference sample and a practitioner blog
+(~0.15% over three days since 2005). **Rejected on survival; no trial.**
+
+### Where option 2 stands
+
+The bar (§95) is a combined annual Sharpe of ~3 for a coin-flip payout within 4 months, or several bps a held
+day for the A01 solver's brackets to move. Every candidate read across §95–§103 is either ≲1–1.5 bps a
+held day before decay or failed its post-publication record; the two that passed tests (Z02 ~0.5, Z05
+~0.2) do not move the account (§101). **No published, surviving, account-tradeable effect of the required
+size has been found.** The search can continue, but the expected yield per candidate is now low; the
+alternative on the table is a demo forward test of the A01/A03 solved policy, which is the bar.
+
+## 104. A06: the solved policy as a daily ticket for the demo forward test; the search continues alongside (S8)
+
+**No trial spent; N 764.** `reporting/a06_playbook.py`; lookup tables `reports/a06_playbook_{eval,funded}.csv`;
+log template `reports/a06_demo_log.csv`. The user will run A03 on a demo account and wants the edge search to
+continue meanwhile rather than wait four months on it.
+
+**The ticket is A03's replay rule, nothing added:** at 09:30 ET buy 2 MNQ at market; one OCO bracket on the
+fill — take-profit +W, stop −L (net dollars; the order offsets add the $4.64 round trip, as A02); close at
+16:00 ET if neither fills. W and L come from the 21-day-horizon A01 policy at yesterday's end-of-day state
+(evaluation: balance, EOD peak, best day; funded: balance, peak, payouts), with the stop capped one dollar
+above the floor — the same rounding and cap as `a02_real.sequential`. Examples: a fresh evaluation is
++$1,200 / −$1,000 (301.25 / 248.75 points); a fresh funded account +$3,000 / −$1,000.
+
+**What the demo can and cannot show.** The policy has zero edge; its value is the rules' asymmetry. One
+four-month run is one draw from a distribution in which **P(net > 0) is 45% even if everything works**
+(A03), so the demo's P&L cannot confirm or refute it. What the demo *can* check, day by day, is the
+assumptions the replay makes: fills at the 09:30 open, the bracket executing at its prices, stop slippage on
+gaps, the firm marking the floor and consistency rule as modelled, and costs. Judge the demo on those, by
+comparing each logged day against the replay's outcome for that day's bars, not on whether it pays out.
+
+## 105. A07: volatility-scaled size does not help; 4 MNQ beats A03's 2 on both histories — the demo runs 4 (S8)
+
+**No trial spent; N 764. Zero edge. Computation record m00154** (`reports/a07_volscaled.json`,
+`reporting/a07_volscaled.py`). **m00153 is superseded:** its `--log` re-read the JSON left by the first,
+vol-only run instead of the full grid (the log is append-only; the record stays, this note corrects it).
+
+A05 showed the fixed 2-MNQ bracket behaves differently by regime (in calm years most brackets end at the
+close). A07 tested a rule fixed before the run — contracts = clip(round(2 × σ_ref / σ̂₂₀), 1, 15) on a
+trailing 20-session σ̂ — and, as controls, the same A01 policy at **fixed** sizes 1–8 MNQ. Two independent
+histories (2021–26, A03's; 2015–20, A05's; drift removed within each, today's contract value), each by
+in-order replay from every start date and by a 21-session block bootstrap (new `a02_real` mode `block`,
+2 × 6,000 paths). 84 trading days of back-to-back $80 attempts.
+
+| P(≥1 payout) / mean net | 2021–26 replay | 2021–26 block | 2015–20 replay | 2015–20 block |
+|---|---|---|---|---|
+| fixed 2 (A03) | 61% / +$675 | 55% / +$509 | 35% / +$180 | 40% / +$95 |
+| fixed 3 | 53% / −$51 | 54% / +$234 | 56% / +$269 | 55% / +$624 |
+| **fixed 4** | **72% / +$1,053** | **69% / +$1,043** | **78% / +$1,527** | **65% / +$1,324** |
+| fixed 5 | 74% / +$1,416 | 67% / +$1,111 | 46% / +$389 | 56% / +$525 |
+| fixed 6 | 83% / +$1,905 | 73% / +$1,390 | 58% / −$9 | 61% / +$401 |
+| fixed 8 | 48% / +$150 | 54% / +$261 | 65% / +$432 | 67% / +$527 |
+
+- **Vol scaling: no reliable gain** over a fixed size of the same average (2021–26 levels 0.75–2.0: 49–93%,
+  non-monotone; 2015–20: 46–71%). The 93% at 1.5× is a spike between 72% and 74%. Dropped.
+- **Size: 4 MNQ beats 2 MNQ on every measure in all four tests**, and is the only size near the top in both
+  histories. 2 MNQ was A03's choice against 3 on one history (§93), where 3 happens to be a dip.
+  Mechanism, plausibly: at 2 MNQ many days end at the close with neither level hit, so the account moves
+  less like the solver's fair coin; at 4 the brackets resolve. The response is not smooth (3 and 8 dip) and
+  4 was picked by looking — mild selection, partly answered by its holding in both histories and both
+  methods. **Effective samples are small** (~16 independent 84-day windows per history).
+- **The demo runs 4 MNQ** (`a06_playbook` default; tables regenerated). Typical tickets: evaluation start
+  +$1,200 / −$1,000 = +151.25 / −123.75 points; funded +$3,000 / −$1,000.
+
+**Two literature leads screened out, no trial:** a gold trend preprint (arXiv 2511.08571: Sharpe 2.88, 43%
+a year at 15% volatility with a 0.52% maximum drawdown — internally inconsistent, spot gold, signal not
+specifiable) and the same-half-hour periodicity (Heston, Korajczyk & Sadka 2010; a cross-sectional stock
+effect with no index-futures evidence).
+
+**Memory note:** the 2.7 GB machine now has ~1 GB free with the editor open; loading the full NQ minute
+series was OOM-killed. `a07_volscaled` streams each era to a subset file and caches the paths under
+`data/cache` (gitignored); results matched the earlier full-series load exactly (sessions, σ).
+
+## 106. A08: the same staking on gold — 8 MGC London long, a second, near-independent account (S8)
+
+**No trial spent; N 764. Zero edge. Computation record m00155** (`reports/a08_gold.json`,
+`reporting/a08_gold.py`). The A01 policy on **MGC, London 03:00–11:30 ET, long — the gold cell fixed in Y03
+(§83) before any of this**, at fixed sizes 2–15; A07's tests (2011–20 and 2021–26 histories, drift removed
+within each, today's contract value; in-order replay and 21-session block bootstrap; 84 trading days of
+back-to-back $80 attempts). One MGC's daily window swing: $362 (2011–20), $386 (2021–26).
+
+| P(≥1 payout) / mean net | 2011–20 replay | 2011–20 block | 2021–26 replay | 2021–26 block |
+|---|---|---|---|---|
+| 2 MGC | 17% / +$46 | 22% / +$13 | 35% / −$66 | 33% / +$64 |
+| 4 | 40% / −$112 | 47% / +$313 | 60% / +$858 | 51% / +$575 |
+| 6 | 52% / +$433 | 60% / +$586 | 62% / +$1,594 | 58% / +$1,073 |
+| **8** | **60% / +$1,352** | **64% / +$1,353** | **48% / +$1,299** | **54% / +$692** |
+| 10 | 78% / +$2,710 | 74% / +$2,395 | 48% / +$829 | 49% / +$521 |
+| 12 | 77% / +$3,274 | 77% / +$2,892 | 55% / +$571 | 53% / +$394 |
+| 15 | 77% / +$2,591 | 77% / +$2,467 | 55% / +$265 | 55% / +$129 |
+
+- **The best size differs by era** (10–12 in 2011–20, 6 in 2021–26), so the best cell is not taken.
+  **8 MGC is chosen by matching risk, not by its row:** its daily $ swing (~$3,100) is close to 4 MNQ's
+  (~$2,800). Across both products the plan does best when the position's daily swing is roughly 2.5–4× the
+  $1,000 stop — enough for brackets to resolve rather than end at the close (an observation from two
+  products' grids, not a fitted rule).
+- **Correlation of daily results with the MNQ account: +0.06 (2021–26) and +0.06 (2011–20).** Two accounts
+  are close to independent attempts.
+- Playbook: `a06_playbook ... --product MGC` (8 MGC, buy at 03:00 ET, flat at 11:30 ET); tables
+  `reports/a06_playbook_{eval,funded}_mgc.csv`. The 03:00 entry needs a time-triggered order.
+
+## 107. A09: both demo plans survive the user's slippage; neither holds through the 17:00–18:00 break (S8)
+
+**No trial spent; N 764. Computation record m00156** (`reports/a09_slippage.json`, `reporting/a09_slippage.py`).
+
+**Hours, confirmed against the user's rule** (no position held through the 17:00–18:00 ET daily close): the
+MNQ plan holds 09:30–16:00 ET; the gold plan **03:00–11:30 ET (3 AM to 11:30 AM;** London window = minutes
+540–1050 after the 18:00 open). Both open and close inside one trading day.
+
+**Slippage.** The user reports fills within ~$10 a trade. Added to commissions per day's trade (the
+same $ on take, stop and close outcomes):
+
+| P(payout in 4 months) / mean net | slip $0 | slip $10 | slip $20 |
+|---|---|---|---|
+| 4 MNQ, 2021–26 (replay · block) | 72% +$1,053 · 69% +$1,043 | 80% +$1,230 · 66% +$879 | 63% +$308 · 61% +$487 |
+| 4 MNQ, 2015–20 | 78% +$1,527 · 65% +$1,324 | 76% +$1,267 · 63% +$1,107 | 56% +$478 · 56% +$739 |
+| 8 MGC, 2021–26 | 48% +$1,299 · 54% +$692 | 51% +$1,076 · 55% +$790 | 43% +$653 · 54% +$578 |
+| 8 MGC, 2011–20 | 60% +$1,352 · 64% +$1,353 | 68% +$1,800 · 69% +$1,411 | 63% +$1,730 · 64% +$1,366 |
+
+At **$10 a trade the plans are essentially unchanged** (block-bootstrap net −$160 to +$100; in-order replays
+move both ways, which is path noise). At $20, MNQ falls to 56–63% and +$300–740; gold holds. With fills
+confirmed, the demo's execution purpose is largely answered; what remains is the firm's rule enforcement.
+
+## 108. A10: six weeks of unseen data, and the stop-fill assumption corrected — both plans better than reported (S8)
+
+**No trial spent; N 764. Computation records m00157 (forward, first run; superseded), m00158 (84-day, stop
+fills) and m00159 (forward, final).** `reports/a10_forward.{json,md}`, `reports/a10_levelfill_84d.json`
+(`reporting/a10_forward.py`, `reporting/a10_levelfill.py`).
+
+**New data.** Batch `GLBX-20261010-3KALFURKDJ` (GLBX.MDP3, ohlcv-1m, `MNQ.FUT` + `MGC.FUT`, parent,
+2026-08-28 → 2026-10-10 UTC exclusive, CSV/zstd, the original job's settings; NQ not needed after 2019),
+fetched over FTP and verified against its manifest (47 files): 16 outright contracts, 28 spreads discarded.
+Parsed to `data/parquet_update`, rolled by `roll.py`'s rule to `data/continuous_update` (MNQ U6→Z6 on
+2026-09-15, that session dropped; MGC Z6 throughout); the 2026-08-28 session, split by the two purchases at
+00:00 UTC, completed from the existing series (same contract, 120 + 1,260 = 1,380 bars). The canonical
+`data/` series are untouched. (`parse.py` overwrote `reports/batch_contents.md`; restored from git.)
+
+**The stop-fill assumption.** A02–A09 filled a stop at the LOW of the first minute bar touching it. On
+tight stops at 09:30 that doubled the loss (planned −$200, booked −$221 to −$485 in the forward log). The
+user reports fills within ~$10, so `a02_real.STOP_FILL = "level"` (fill at the stop price) is added; the
+default stays `bar_low` so every earlier record reproduces.
+
+**84 days, stop-price fills** (P(payout) / mean net; replay · block):
+
+| | 2021–26 | 2015–20 (MNQ) / 2011–20 (MGC) |
+|---|---|---|
+| 4 MNQ, bar-low (A07) | 72% +$1,053 · 69% +$1,043 | 78% +$1,527 · 65% +$1,324 |
+| **4 MNQ, stop price** | **79% +$1,143 · 71% +$1,317** | **72% +$1,833 · 65% +$1,685** |
+| 5 MNQ, stop price | 77% +$1,940 · 76% +$1,998 | 69% +$2,358 · 71% +$1,759 |
+| 8 MGC, bar-low (A08) | 48% +$1,299 · 54% +$692 | 60% +$1,352 · 64% +$1,353 |
+| **8 MGC, stop price** | **77% +$2,210 · 76% +$2,031** | **74% +$2,396 · 76% +$2,419** |
+
+Under realistic fills the size curves are smoother (part of A07/A08's noise was the fill artifact) and **8 MGC
+is strong in both eras**. 5 MNQ edges 4 in both eras; the playbook stays at 4 (no re-selection on a further
+look) — noted as the option.
+
+**Forward, 2026-08-28 → 2026-10-09, real prices and drift, stop-price fills:** 4 MNQ — 2 evaluations bought,
+one passed-free run to a funded account (ends funded at $49,288), no payout yet, net −$160; 8 MGC — 7
+evaluations, one passed (funded failed in 3 days), net −$560. **Both sit at the historical median for a
+29–31-session stretch** (MNQ −$320, MGC −$400; P(net > 0) at that length 29% / 38%). Six weeks can neither
+confirm nor refute a plan whose value shows over four months.
+
+## 109. A11: the edge bar for the staking plans — Sharpe 0.25–0.5 on the window's direction now pays (S2, S8)
+
+**No trial spent; N 764. Computation record m00160** (`reports/a11_edge_bar.json`, `reporting/a11_edge_bar.py`).
+Route 2's bar (§95) asked an edge to win the account on its own: annual Sharpe ~3. The plans now earn from the
+account's structure (§105–§108), so an edge only has to **tilt each day's bracket** — pick its direction, or
+make the long side likelier. Planted as a drift of S/√252 × σ_window per session on the drift-free paths,
+stops filling at the stop price, 84 trading days (P(payout) / mean net, block bootstrap; replay similar):
+
+| annual Sharpe on the window | 4 MNQ 2021–26 | 4 MNQ 2015–20 | 8 MGC 2021–26 | 8 MGC 2011–20 |
+|---|---|---|---|---|
+| 0 | 71% +$1,317 | 65% +$1,685 | 76% +$2,031 | 76% +$2,419 |
+| 0.25 | 72% +$1,475 | 65% +$1,789 | 80% +$2,556 | 81% +$2,872 |
+| 0.5 | 73% +$1,574 | 70% +$1,966 | 81% +$3,251 | 81% +$3,196 |
+| 1.0 | 78% +$1,935 | 76% +$2,651 | 83% +$3,708 | 85% +$4,078 |
+| 2.0 | 82% +$2,816 | 85% +$4,493 | 90% +$5,439 | 91% +$6,994 |
+
+**The new screening bar: a directional effect of annual Sharpe ≥ ~0.25 on the traded window (≈1.5 bps a
+day), surviving after publication, is worth +$100–600 per 4 months — most on gold.** Candidates rejected in
+§95–§103 only for SIZE (not for decay) are reopened against it; those rejected for not surviving publication
+stay out. The window matters: an effect must act inside 09:30–16:00 (MNQ) or 03:00–11:30 ET (MGC).
+
+## 110. Z06 registered — the 12-month trend sign as the bracket's direction; a follow-on to W04 (S1–S5)
+
+**No trial spent at registration; N 764.** Screening against §109's bar: the only candidate with strong
+post-publication evidence that acts inside the plans' windows and fits a direction tilt is **time-series
+momentum** (Moskowitz, Ooi & Pedersen 2012: sign of the past 12-month return, all 58 futures, 1985–2009;
+replicated over a century and in live trend funds). **It is not new to the programme:** W04 (§72–§76) held
+the same signal daily in a trend-plus-carry book and failed — mostly on cost (round trips 0.5–4.7% of a day's
+SD) against a Sharpe-1.31 bar, with the trend sleeve −0.60 net post-2021; W04 never reported the trend sleeve
+gross or per market. Here the sign only sets a bracket the plans pay for anyway, so cost does not enter,
+and the question W04 did not answer is asked: does the sign predict the DIRECTION of these windows?
+
+**Fixed before any return** (`hypotheses.yaml` Z06; `signals/z06.py`, `signals/z06_trial.py`): sign of the
+roll-correct held return over the 12 calendar months ending at each month end (NQ, GC daily bars), applied to
+every session of the next month (no leakage: the month-end bar closes 00:00 UTC, before any later window
+opens); windows MNQ 09:30–16:00 and MGC 03:00–11:30 ET; real window returns; sessions 2011-07 → 2026-08-27
+(MNQ's complete sessions begin 2015-11-20). Per product, CONFIRM only if (1) Sharpe(sign × r) > 0, (2)
+mean(sign × r) > mean(r) — it must beat the plans' current always-long — and (3) posterior > 0. Prior
+Normal(0.2, 0.3), an assumption (the paper charts per-instrument Sharpes, 0 to ~1.2). One trial, both products.
+
+**Outcome injection** (`reports/z06_injection.json`): Sharpe 0.2 planted by bootstrap, recovered 0.197 (MNQ,
+2,638 sessions, SD 0.31) and 0.201 (MGC, 2,846, SD 0.30); P(estimate > 0) 72% / 74%.
+
+### Z06 run: rejected on both products — the plans stay always-long (S6–S8)
+
+**One trial spent: t00771. N 764 → 765.** `reports/z06_trial.{json,md}`.
+
+| | MNQ 09:30–16:00 (2015-11 → 2026-08) | MGC 03:00–11:30 (2011-07 → 2026-08) |
+|---|---|---|
+| sessions; share short | 2,638; 12% | 2,846; 34% |
+| **Sharpe, sign × window** (needs > 0) | **−0.17** | **−0.25** |
+| Sharpe, always long | +0.35 | +0.13 |
+| window mean on short-signal sessions | **+14.8 bps** | +2.9 bps |
+| posterior | +0.02 ± 0.22 | −0.03 ± 0.21 |
+| by period, signal / long | 2016–20 −0.15 / +0.44; 2021–26 −0.16 / +0.32 | 2011–15 −0.86 / −1.16; 2016–20 −0.18 / +0.68; 2021–26 −0.14 / +0.11 |
+
+**REJECTED on both:** conditions (1) and (2) fail for each, (3) also for MGC. The months the trend said "short"
+were UP in both windows; in every period the signal trails always-long except gold's 2011–15 bear market,
+where both were negative. Z06 retired.
+
+**A by-product, descriptive:** with real drift, always-long earned Sharpe +0.35 in the MNQ window (2.5 bps a
+session) and +0.13 in the MGC window over these years. The zero-edge backtests remove it; by §109's table a
+realised drift of this size adds roughly +$100–300 per 4 months to MNQ. It is the equity premium inside the
+window, not an edge to count on.
+
+## 111. Z07 registered — index-level reversal (MAC(5)) as the MNQ bracket's direction (S1–S5)
+
+**No trial spent at registration; N 765.** Baltussen, van Bekkum & Da (2019, JFE 132(1)): across 20 indexes,
+daily index returns turned negatively autocorrelated after ~1999 as index futures and ETFs grew — a forced
+flow (index arbitrage price pressure that reverses). Trading against MAC(5) earned Sharpe 0.67 on the S&P 500
+after March 1999; Nasdaq 100 MAC(5) after 1999 −0.111 (t −3.84); sample to 2016-12-31. Not previously in the
+registry (F02/Q01 condition on the overnight gap, a different and intraday signal).
+
+**Fixed before any return** (`hypotheses.yaml` Z07; `signals/z07.py`, `signals/z07_trial.py`): S = 4r1 + 3r2 +
+2r3 + r4 on the four roll-correct NQ daily returns dated before the session; SHORT the 09:30–16:00 window if
+S > 0, LONG otherwise; real window returns; sessions 2017-01-01 → 2026-08-27. CONFIRM only if (1) Sharpe > 0,
+(2) it beats always-long, (3) posterior > 0. Prior Normal(0.3, 0.3), an assumption. **A named risk:** the paper
+measures close-to-close; a reversal that happens overnight or at the open is not in the 09:30–16:00 window. The
+same rule on the close-to-close return is reported beside it (not decisive).
+
+**Outcome injection** (`reports/z07_injection.json`): 0.3 planted, recovered 0.305 (SD 0.34, 2,366 sessions);
+P(estimate > 0) 81%.
+
+### Z07 run: rejected — the reversal leans the right way but does not beat always-long (S6–S8)
+
+**One trial spent: t00772. N 765 → 766.** `reports/z07_trial.{json,md}`.
+
+| 2017-01 → 2026-08, 2,366 sessions | |
+|---|---|
+| **Sharpe, direction × 09:30–16:00** (needs > 0) | **+0.09** |
+| Sharpe, always long (must beat) | +0.35 |
+| window mean: long sessions / short sessions (59% short) | +3.88 / **+1.58 bps** |
+| by period, signal / long | 2017–20 +0.46 / +0.39; 2021–26 **−0.15** / +0.32 |
+| same rule, close-to-close (the paper's basis; not decisive) | +0.25 (published 0.67 to 2016) |
+| posterior | +0.21 ± 0.22 |
+
+**REJECTED** on condition (2). The ranking is right — windows after down weeks rose more than after up weeks —
+but even the "short" sessions rose, so shorting them gives up the drift; and the effect faded after 2020.
+**Not done, deliberately:** a "long or flat" variant (skip instead of short) would be a new specification chosen
+after seeing these numbers; it is not run. Z07 retired.
+
+**Where the screen stands.** Against §109's bar, the two strongest documented candidates acting inside the
+windows (trend, index reversal) failed against always-long; the remaining literature is either decayed, outside
+the windows, cross-sectional, or second looks at Z02/Z05's already-used test data. The plans run always-long.
+
+## 112. A12: the two accounts together — a payout within 4 months from 93–97% of start dates (S8)
+
+**No trial spent; N 766. Zero edge (drift removed). Computation record m00161** (`reports/a12_joint.json`,
+`reporting/a12_joint.py`; `a02_real.sequential` gains an opt-in `per_trader` output, default unchanged).
+4 MNQ (09:30–16:00) and 8 MGC (03:00–11:30 ET) started on the same date, each run back-to-back through real
+history in order for 84 trading days, stops at the stop price; paired on common start dates.
+
+| 84 trading days, both accounts | 2021-01 → 2026-04 starts (1,276) | 2016-01 → 2020-08 starts (1,056) |
+|---|---|---|
+| P(at least one payout) — measured | **97%** | **93%** |
+| — if independent (§106's estimate) | 95% | 93% |
+| P(both pay out) | 59% | 54% |
+| median trading days to the first payout | 25 | 22 |
+| mean net / median net | +$3,356 / +$2,787 | +$4,361 / +$1,945 |
+| P(net > 0) | 79% | 72% |
+| net 10th / 90th percentile; worst start | −$1,020 / +$8,256; −$2,560 | −$1,440 / +$13,105; −$2,160 |
+| mean fees | $2,105 | $1,768 |
+| correlation of the two accounts' net | −0.18 | +0.26 |
+
+**The independence estimate held.** With both accounts the chance of no payout in four months is 3–7%; a bad
+four months costs ~$1,000–1,500 at the 10th percentile and ~$2,600 at worst. Caveats as before: start dates
+overlap heavily (~16 independent windows per history), the edge is zero, and the real drift (§110: MNQ window
++0.35) is not counted.
+
+## 113. A13: size as part of the policy fails everywhere; a stuck-account defect found and fixed (S8)
+
+**No trial spent; N 766. Computation record m00162** (`reports/a13_size_policy.json`,
+`reporting/a13_size_policy.py`).
+
+**Design, fixed before running:** the staking game re-solved over (take, stop, contracts) — MNQ 2–6, MGC 4–12;
+W ∈ {1,2,3,4,6,8,10,12,15,20,30}, L ∈ {2,4,5,6,8,10} ($100) — with each action's net outcome distribution
+measured on real sessions (stops at the stop price), learned on one history and tested on the other in both
+directions; adopted only if it beats the fixed-size fair-odds policy on mean net AND P(payout) in both.
+
+| learned → tested (84 days, replay) | fixed size, fair odds | size-aware | size-aware, in sample |
+|---|---|---|---|
+| MNQ 2015–20 → 2021–26 | 79% +$1,148 | 44% +$934 | 56% +$1,011 |
+| MNQ 2021–26 → 2015–20 | 70% +$1,627 | 46% +$339 | 55% +$937 |
+| MGC 2011–20 → 2021–26 | 77% +$2,016 | 24% −$81 | 55% +$2,225 |
+| MGC 2021–26 → 2011–20 | 73% +$2,392 | 42% +$325 | 52% +$943 |
+
+**Not adopted on either product.** It is worse even in sample, so the fault is the approach, not only the regime:
+as in A05 (§102), outcome tables measured from 1-minute bars mislead the solver — a tight bracket whose levels
+are both touched inside one fast minute is booked as a stop (W=1/L=2 at 4 MNQ: take 53% vs ~64% fair), so it
+avoids the small end-game brackets the fair-odds policy depends on. **The fair-coin policy at a fixed,
+risk-matched size (4 MNQ, 8 MGC) stays.**
+
+**A defect found on the way, and its reach.** With stops filling exactly at their price, a stop capped one dollar
+above the floor leaves the account at floor + $1 — a state the A13 solver gives no action, so its replay held
+the account untraded for ever (no fail, no new evaluation). Fixed in `a02_real.sequential` and A13 (an
+untradable account is finished and replaced, the playbook's rule, §108) and in `a10_forward.walk`. **Reach:
+none on recorded results** — A03 reproduces exactly (60.6%, +$674.7), and A10b, A11 and A12 rerun to
+byte-identical reports (the fair-odds policy always has an action); A10's forward log changes only in labels
+(five "FAILED on a $9–27 trade" days become "FINISHED at the floor", same outcomes and nets).
+
+## 114. Scaling: parallel streams on one market multiply the bet, not the odds — breadth is the lever (S8)
+
+**No trial spent; N 766. Computation record m00163** (`reports/a12_joint.json` → `parallel_pairs`;
+`a12_joint.scale`). The user needs more than one payout in four months; Tradeify does not limit evaluation
+purchases. k parallel pairs (1 MNQ + 1 MGC stream each), pair i started i trading days after the first, each
+run back-to-back in real order for 84 trading days; the sum over pairs, from every first start date:
+
+| k pairs | fees | mean net | P(net > 0) | 10th pct | worst |
+|---|---|---|---|---|---|
+| 1 | $1.8–2.1k | +$3.4–4.4k | 72–80% | −$1.0–1.4k | −$2.6k |
+| 5 | $8.8–10.5k | +$16.8–21.7k | 74–82% | −$4.9–6.6k | −$12.6k |
+| 10 | $17.7–21.0k | +$33.7–43.1k | 75–82% | −$8.9–11.3k | −$23.7k |
+| 20 | $35.4–42.0k | +$67.7–85.1k | 75–83% | −$14.2–17.4k | −$45.2k |
+
+(ranges: 2021–26 and 2016–20 histories.) **Expected net scales linearly; the odds do not move.** Streams on the
+same market trade the same days with similar brackets, so they win and lose together: k pairs is one bet k
+times larger, and the worst case grows with it. **Breadth — the same staking on markets that do not move
+together (MNQ–MGC daily correlation +0.06) — is what raises P(net > 0).** Candidate micros (each needs 1-minute
+data and its own window check, as gold had): MCL, MHG, M6E, SIL, M2K (partly correlated with MNQ). Open with
+the user: Tradeify's cap on simultaneous FUNDED accounts, and whether copying one plan across accounts is allowed.
+
+## 115. Breadth on a budget: crude is the third market; hourly candles are enough with the OHLC rule (S2, S8)
+
+**No trial spent; N 766.** The user can hold 5 funded Tradeify accounts at once and may copy one plan across
+accounts; the tradable list is broad (CME equity, FX, energy, metals, grains, livestock; Eurex). Minute data for
+six candidates was quoted at $668, and for two continuous series still $549 — too expensive.
+
+**Correlations from data already owned** (`data/raw_daily`, roll-correct daily returns, 2021–26 / 2016–20):
+crude vs Nasdaq **+0.04** / +0.23, vs gold **+0.06** / +0.01; copper +0.35 / +0.43 against Nasdaq / gold
+(2021–26); the euro +0.41 against gold. **Crude is the clear third account** (one CL ≈ $2,500 daily SD, so ~2 CL
+or 15–20 MCL); copper and the euro add little; natural gas (not in the file) is the likely fourth.
+
+**Hourly candles, tested on MNQ and MGC** (`reporting/a14_coarse_bars.py`): minute paths rebuilt as 30-minute
+and 1-hour candles. A plain tie rule spans $500–$5,000 of mean net (pessimistic vs optimistic) — unusable. With
+the **OHLC path rule** (open nearer the high → high first; open = previous bar's close):
+
+| mean net, block bootstrap | 1-minute | 30-minute | 1-hour |
+|---|---|---|---|
+| MNQ 2021–26 / 2015–20 | +$1,317 / +$1,685 | +$1,116 / +$1,508 | +$1,422 / +$1,523 |
+| MGC 2021–26 / 2011–20 | +$2,031 / +$2,419 | +$1,870 / +$2,112 | +$1,819 / +$2,074 |
+
+**Hourly is within ~10–15% of the minute answer, slightly conservative in 3 of 4** — enough to decide whether a
+market works and at what size. Databento has 1-hour but no 30-minute schema. Proposed order: `ohlcv-1h`,
+`CL.v.0` and `NG.v.0`, continuous symbology, 2010-06-06 → 2026-10-10.
+
+## 116. A15: crude from owned daily bars — a weak but independent third account; the 5-funded cap bounds scale (S8)
+
+**No trial spent; N 766. Computation record m00164** (`reports/a15_crude.json`, `reporting/a15_crude.py`).
+Hourly crude data still cost >$100 (Databento's per-GB price for 1h exceeds 1m's), so crude is built from the
+**owned** ohlcv-1d file: one bar per session, the OHLC path rule for a bar touching both levels, window the whole
+session (18:00→16:55, permitted). **Checked first** on MNQ and MGC full sessions against 1-minute paths: one bar a
+day lands within ~±30% on mean net and ~5 points on P(payout) (hourly ~10–15%) — a go/no-go tool, not a precise one.
+Further approximation: UTC-day bars, not exact sessions (0.97, §74).
+
+**Crude alone** (P(payout) / mean net, replay; 2016–20 · 2021–26): 5 MCL 18% −$235 · 26% −$11; **10 MCL 55% +$545 ·
+45% +$397**; 15 MCL 61% +$1,105 · 50% +$487; 20 MCL 74% +$1,188 · 50% +$518; 30 MCL 81% +$3,513 · 60% +$775.
+The size was fixed by the risk-matching rule before looking (one MCL's daily SD ≈ $250 → 10 MCL ≈ 4 MNQ's $2,800).
+Larger looks better in both histories, but that is seen after the fact and within the method's error; not adopted.
+
+**Three accounts together** (4 MNQ RTH + 8 MGC London + 10 MCL session; same start dates, real order, 84 days):
+
+| | 2016-01 → 2020-08 (997 starts) | 2021-01 → 2026-04 (1,214) |
+|---|---|---|
+| P(at least one payout) | 98.6% | 99.9% |
+| streams with a payout, mean | 2.0 of 3 | 2.0 of 3 |
+| mean / median net | +$4,910 / +$3,491 | +$3,739 / +$2,977 |
+| P(net > 0) — three markets (two) | **81%** (72%) | **78%** (79%) |
+| 10th percentile / worst | −$1,000 / −$3,360 | −$1,300 / −$3,120 |
+| fees | $2,539 | $3,001 |
+| net correlations MNQ–MGC, MNQ–CL, MGC–CL | +0.25, −0.12, −0.31 | −0.17, −0.02, −0.19 |
+
+**What scale is available.** Each stream holds at most one funded account, and the user's firm allows five funded
+at once — so parallel copies (§114) are capped too: **about five streams in total**. At zero edge that bounds the
+plan near five streams × ~$1–2k per four months. Raising it needs a real edge (none found), funded accounts that
+survive to uncapped "live" payouts (the policy already maximises this), or **more firms**: each firm has its own
+cap, and §92 priced eleven account types — the same staking, re-solved per firm's rules, multiplies the slots.
+
+## 117. Z08 registered — commercial hedgers' weekly flow (CFTC COT) as the commodity brackets' direction (S1–S5)
+
+**No trial spent at registration; N 766.** The user stays with Tradeify and wants a real edge (#3). Lesson of
+Z06/Z07: on MNQ a signal must beat a drift-earning long; on gold and crude the long earns little, and §109 shows
+gold gains most per unit of edge — so the search turns to commodity direction. Not previously tested (the
+X-series cites hedging pressure only as trend/carry's mechanism).
+
+**Source:** Kang, Rouwenhorst & Tang (2020, JF 75(1)), 26 commodities incl. gold and crude, 1994-01 → 2014-11:
+weekly position changes are driven by impatient speculators; commercials supply liquidity, and prices rise the
+week after hedgers BUY (a typical change moves next week's expected return ~0.17%; t 4–5 in both halves). A 2023
+retest (Maréchal, J. Futures Markets 43(5)) exists; its findings could not be read.
+
+**Size screen inside the paper's sample only** (2010-06 → 2014-11, owned daily bars; COT legacy files from the
+CFTC, free, `data/cot/`): crude Sharpe **+0.70** (always-long +0.04; +7.6 bps after hedger buying, −6.5 after
+selling); gold +0.24 (always-long −0.06). MGC minute sessions are sparse before 2016 (56–86 a year), so gold's
+screen used daily GC.
+
+**Fixed before any post-2014 return** (`hypotheses.yaml` Z08; `data/cot.py`, `signals/z08.py`,
+`signals/z08_trial.py`): Q = weekly change in commercial net long / previous open interest; the five sessions
+of the week after the Friday release take sign(Q). Crude: the full session (daily CL bars, the window of §116);
+gold: London 03:00–11:30 (MGC minute, real returns). 2015-01-01 → 2026-08-27. Per product, CONFIRM only if
+Sharpe > 0, it beats always-long, and posterior > 0. Prior Normal(0.3, 0.3), an assumption.
+
+**Outcome injection** (`reports/z08_injection.json`): 0.3 planted, recovered 0.301 for both (crude 2,864
+sessions, SD 0.29; gold 2,578, SD 0.30); P(estimate > 0) 84%.
+
+### Z08 run: gold confirmed, marginally and unstably; crude rejected (S6–S8)
+
+**One trial spent: t00773. N 766 → 767.** `reports/z08_trial.{json,md}`.
+
+| 2015 → 2026-08 | MGC, London 03:00–11:30 (2,578 sessions) | MCL, session (2,864) |
+|---|---|---|
+| **Sharpe, hedger-flow sign × window** | **+0.42** | +0.17 |
+| Sharpe, always long (must beat) | +0.36 | +0.23 |
+| mean after hedger buying / selling | +3.77 / −0.30 bps | +6.79 / +1.14 bps |
+| by period, signal / long | 2015–20 −0.08 / +0.74; 2021–26 **+0.79** / +0.09 | 2015–20 +0.03 / −0.13; 2021–26 +0.36 / +0.71 |
+| posterior | +0.36 ± 0.21 | +0.23 ± 0.21 |
+| decision | **CONFIRM** | REJECT (condition 2) |
+
+**Gold is confirmed under the user's rule but should be read as marginal:** it beats always-long by 0.3 bps a
+session overall, the two eras disagree in sign, and the full-session daily check (not decisive) does not beat
+always-long (+0.39 vs +0.59). Its value to the plan, by §109, is of order +$500–900 per four months at the
+posterior against a zero-drift long — and roughly nothing against a gold that keeps rallying. **Crude repeats
+Z06/Z07's pattern:** the ranking is right, but the "sell" weeks still rose, so shorting them gives up the drift.
+
+**Adopted:** the gold account takes the weekly COT direction — `python -m futuresres.signals.z08 --direction`
+(refreshes this year's CFTC file; prints the side for the coming week) then `a06_playbook --product MGC --side
+long|short` (a mirrored bracket; the policy is symmetric at zero edge). Crude and MNQ stay long. First reading:
+positions of 2026-10-06 (released 10-09), commercials +1.58% of open interest → long gold, sessions 10-12 → 10-16.
+
+## 118. A16: the portfolio with gold's COT direction — P(net > 0) 85–87%, bad case roughly halved (S8)
+
+**No trial spent; N 767.** `reporting/a16_portfolio.py` (prints; figures here). Three Tradeify accounts — 4 MNQ
+09:30–16:00 long, 8 MGC London with Z08's weekly direction, 10 MCL session long — with gold's edge planted at Z08's
+**posterior** Sharpe 0.36 (as A11; not the in-sample result), real order, stops at the stop price, 84 days:
+
+| 2021–26 / 2016–20 | gold always long, zero edge | **gold with COT direction (posterior 0.36)** |
+|---|---|---|
+| gold alone: P(payout) / mean net | 77% +$2,210 / 76% +$2,662 | **81% +$3,261 / 88% +$3,182** |
+| three accounts: P(≥1 payout) | 99.9% / 98.6% | 99.9% / 100% |
+| streams paying, mean | 2.01 / 2.02 | 2.05 / 2.14 |
+| paid out / fees | $6,740 / $3,001 · $7,449 / $2,539 | $7,755 / $2,966 · $7,932 / $2,502 |
+| mean / median net | +$3,739 / +$2,977 · +$4,910 / +$3,491 | **+$4,789 / +$4,240 · +$5,431 / +$4,119** |
+| P(net > 0) | 78% / 81% | **87% / 85%** |
+| 10th percentile / worst | −$1,300 / −$3,120 · −$1,000 / −$3,360 | **−$470 / −$3,120 · −$785 / −$2,364** |
+
+The gain is +$520–1,050 per four months on the mean and, more usefully, a bad four months roughly halved.
+Caveats: the edge is Z08's marginal, era-unstable confirmation (§117); MCL rests on one-bar-a-day estimates (±30%);
+the starts overlap (~16 independent windows per history).
+
+## 119. The strict Z rule, adopted before any further candidate; Z08's gold result does not survive it (S2, S8)
+
+**No trial spent; N 767.** `signals/z_strict.py`, `reports/z_strict_review.json` (descriptive re-reading of used
+test data — no new trial). The user asked whether the Z-series ran "as vigorously as before". It did not: the Z
+rule (§86) confirms on test-window Sharpe > 0 and a positive posterior — a bar a null signal clears roughly a
+quarter to half the time — with no multiple-testing deflation (it replaced SR\*), few placebo nulls and no
+second-instrument confirmation. **At the user's direction, from here on a direction signal confirms for a market
+only if ALL hold:** (1) it beats the plan's current always-long with one-sided **t > 1.645** on the per-session
+difference d = s·r − r; (2) mean(d) exceeds the **95th percentile** of the same statistic with the signal circularly
+shifted (≥ 20 sessions, every 5th); (3) posterior > 0 under the registered prior, reported beside a zero-mean
+prior; (4) the result is reported against the running count of Z market-tests (8 so far; 0.4 chance passes
+expected at 5%).
+
+**Z06–Z08 re-read under it:**
+
+| test | t, beats long (> 1.645) | placebo pct (≥ 95) | Sharpe | posterior: registered / zero prior | strict |
+|---|---|---|---|---|---|
+| Z06 MNQ | -1.98 | 0 | -0.17 | +0.02 / -0.08 | no |
+| Z06 MGC | -1.22 | 14 | -0.25 | -0.03 / -0.13 | no |
+| Z07 MNQ | -0.60 | 68 | +0.09 | +0.20 / +0.04 | no |
+| Z08 MCL | -0.14 | 68 | +0.17 | +0.24 / +0.09 | no |
+| Z08 MGC | +0.15 | 89 | +0.42 | +0.36 / +0.20 | no |
+
+**Z08's gold "confirmation" does not survive:** its +0.42 was gold's drift (always-long +0.36), not the signal —
+the advantage over always-long has t +0.15. **Z08 retired; the gold account returns to always-long** (playbook
+default; the weekly `--direction` step is dropped). **§118's improvement is withdrawn**: it planted Z08's posterior
+as an edge over a zero-drift long, which the evidence does not support. **The portfolio stands at its zero-edge
+figures (§116): +$3.7–4.9k mean net per four months, P(net > 0) 78–81%.** Z02 (98.4% of its rotation null) is the
+one prior confirmation of placebo strength; Z05 (Welch t 1.82, 2021–26 only) predates the rule and is not used.
+
+## 120. Searching under the strict rule: Z02 as MNQ direction (descriptive); Z09 — index roll selling — registered (S1–S5)
+
+**No trial spent at registration; N 767.** Recent literature on daily predictability of crude and gold is thin and
+mostly negative (oil predictability largely an averaging artefact — Conlon, Cotter & Eyiah-Donkor; gold: weak
+or preprint-only); nothing new for index futures beyond intraday momentum (§103).
+
+**Z02 as the MNQ bracket's direction — descriptive, a second look, no trial.** The one programme result of placebo
+strength. Its sign set the 09:30–16:00 direction (long when the weight is ≥ 0): in the paper's sample (2015-11 →
+2023-03) Sharpe +0.57 vs always-long +0.40, placebo 100th pct, **t(beats long) +0.32**; in Z02's own test window
+(2023-03 → 2026-08, already used) +0.83 vs +0.25, placebo 99th, **t +0.72**. Its timing is real against shifted
+versions, but it is short 75–79% of days against an equity drift, so its advantage over always-long is too noisy
+to pass the strict rule. Not adopted.
+
+**Z09 registered** (`hypotheses.yaml` Z09; `signals/z09.py`, `signals/z09_trial.py`). Mou (2011): GSCI funds sell
+the next-to-expire crude contract on the 5th–9th business days; set aside in §98–§99 only as a SPREAD. The outright
+is allowed: the crude plan shorts on trading days 5–9 and is long otherwise. **Construction check before any
+return:** on 99.5% of roll days the volume-front contract our daily series holds is the one the GSCI sells (100%
+every year but 2020's 92%). All owned data (2010-06 on) postdates the paper. Strict rule; prior Normal(0.2, 0.3), an
+assumption. `tests/test_registry_consistency.py`: MCL added to the single-market primaries (crude is a plan
+instrument since §116).
+
+**Outcome injection** (`reports/z09_injection.json`): the first run FAILED — the plant had the wrong sign (roll days
+higher); caught by recovery (−0.04 for +0.2) and fixed to e = noise + s·μ. Rerun: 0.2 planted, recovered 0.208
+(SD 0.24, 3,993 sessions). **Power under the strict rule at the prior's size is only 10%** (P(Sharpe > 0) 79%): this
+test can confirm a large roll effect, not a small one — recorded before the run.
+
+### Z09 run: rejected — the roll effect held to 2020 and reversed after (S6–S8)
+
+**One trial spent: t00774. N 767 → 768.** `reports/z09_trial.{json,md}`. Strict rule, 9th Z market-test (0.45 chance
+passes expected at 5%).
+
+| 2010-06 → 2026-08 (3,993 sessions; 970 on roll days) | |
+|---|---|
+| crude, roll days (5th–9th) / other days | +1.59 / +2.33 bps |
+| **t, advantage over always-long** (> 1.645) | **−0.20** |
+| **placebo percentile** (≥ 95) | **52.5** |
+| posterior (registered / zero prior) | +0.13 / +0.05 |
+| by period, roll / other bps (t) | 2010–15 −15.8 / −2.4 (+1.66); 2016–20 −20.9 / +7.9 (+1.28); 2021–26 **+38.2** / +2.1 (**−2.63**) |
+
+**REJECTED.** The roll pressure was visible through 2020 — near the bar in each half-decade — and reversed sharply
+after 2021, the signature of an effect that has been front-run. No shifted-window variant is run after seeing this.
+
+## 121. A power screen before registering, and four more candidates screened out under the strict rule (S1, S2)
+
+**No trial spent; N 768.** `signals/z_strict.power` — the strict rule's chance of passing condition (1) if a
+candidate's published effect is exactly right (the placebo and posterior can only lower it). Run on the plans'
+own scales (MNQ 09:30–16:00: always-long +2.5 bps, SD ~120 bps, ~2,600 sessions; gold: SD ~100 bps, ~2,500):
+
+| case | expected t | power |
+|---|---|---|
+| MNQ short on 1/4 of days averaging −1.3 bps | 0.28 | 8% |
+| ... averaging −10 bps | 2.08 | 66% |
+| ... averaging −20 bps | 4.11 | ~100% |
+| gold 50/50 signal at ±3 bps | 1.06 | 28% |
+| gold 50/50 signal at ±5 bps | 1.76 | 55% |
+
+**A candidate is registered only if its published effect gives meaningful power** — in practice ~5–10 bps a day or
+more on the days it acts. This keeps trials off candidates that cannot pass even if the paper is right.
+
+**Screened out:**
+- **Dash for cash** (Etula, Rinne, Suominen & Vaittinen, RFS 33(1) 2020; working paper 1980–2014): institutions sell
+  T−8..T−4 before the last month-end settlement day (T = last trading day; the window would shift with the US move to
+  T+2 in 2017 and T+1 in 2024). The selling window earns −3.4% annualised on the S&P (−1.3 bps a day) against +28.6%
+  over T−3..T+3: as MNQ's short days, **power 8%**. Out on size.
+- **Rebalancing pressure** (EDHEC-hosted SSRN 5122748: −17 bps next day when funds are overweight equities): the same
+  work as Z02 (§120 covers Z02 as MNQ direction).
+- **Gold ETF flow pressure:** only a thesis (short-lag VAR, reversing at 3–5 days); no peer-reviewed effect to fix.
+- **Post-options-expiration weakness ("vanna/charm"):** practitioner commentary only; the peer-reviewed findings are
+  expiration-week strength (Johnson & So 2013) and pinning (Ni, Pearson & Poteshman 2005).
+
+## 122. Z10 registered — gotobi importers' dollar buying into the Tokyo fix, on free spot data (S1–S5)
+
+**No trial spent at registration; N 768.** The user chose to keep screening (option 1), then asked for yen data. The
+Databento portal refused every yen request (continuous symbology "no data"; parent symbology not found in the UI),
+so the test uses **free USD/JPY spot 1-minute bars** (HistData.com, 2016-01 → 2026-09, `data/fx_histdata/`, gitignored;
+`data/fx.py` keeps only the three minutes needed, one file at a time). 6J futures mirror the spot rate inversely.
+
+**Source and mechanism:** arXiv 2301.13204 (Suzuki group; 2018–2020, building on their earlier study) — USD/JPY rises
+into the 9:55 JST TTM fix on days divisible by five, as banks pre-buy dollars for importers' "goto-barai" settlements;
+the Tokyo fixing is studied in Ito & Yamada (2017, J. International Economics). **Evidence is thinner than the
+programme's usual** (a 4-page preprint), and the preprint itself says the effect is widely known.
+
+**The account constraint fixes the window:** the paper enters at 03:00 JST (13:00–14:00 ET), which holds through the
+17:00–18:00 ET CME break the account forbids. The tradable part — the 18:00 ET reopen to 9:55 JST — is fixed here.
+
+**Screen inside the paper's sample only** (and before it): 2018–20, the paper's window +2.68 bps (SD 18.9, t 1.91, win
+63%; 181 events vs the paper's 185); **the tradable window +2.67 bps (SD 12.4, t 2.88, win 64%)**; non-gotobi days −1.1
+to −1.6. **2016–17: −0.94 bps (t −0.56)** — absent before the paper's sample; a warning recorded before the run.
+Dollar scale: one 6J ≈ $84k notional, so +2.7 bps ≈ $22 gross, ~$14 after the 1 bp cost; at 3 contracts ~$40 per event,
+~70 events a year — a small, high-consistency add-on, not a new engine.
+
+**Fixed before any 2021–2026 return** (`hypotheses.yaml` Z10; `signals/z10.py`, `signals/z10_trial.py`): long USD/JPY
+18:00 ET → 9:55 JST on gotobi days (the 5th…30th or the last business day before a weekend one; Tue–Fri JST),
+net of 1.0 bp; 2021-01-01 → 2026-09-30. **The strict rule for a standalone trade:** net mean t > 1.645; at or above the
+95th percentile of BOTH the calendar shifted ±1–4 business days and random same-size non-gotobi sets; posterior > 0
+(prior Normal(+0.8 bp, 1.0), an assumption); reported as the 10th Z market-test. 6J added to the registry's
+single-market primaries.
+
+**Outcome injection** (`reports/z10_injection.json`): +0.8 bp planted, recovered 0.81 (SD 0.84, 316 events); **power of the
+strict t at the prior's size 24.5%** (roughly 70% if the full in-sample size holds).
+
+### Z10 run: rejected — half the in-sample size, then gone (S6–S8)
+
+**One trial spent: t00775. N 768 → 769.** `reports/z10_trial.{json,md}`. 10th Z market-test.
+
+| 2021-01 → 2026-09, 316 gotobi events, 18:00 ET → 9:55 JST | |
+|---|---|
+| gross / net mean (SD) | +1.49 / **+0.49 bps** (13.0) |
+| **t, net** (> 1.645) | **+0.67** |
+| placebo: random non-gotobi sets / calendar shifted ±1–4 days (≥ 95) | 92.8th / 50th |
+| net, 2021–23 / 2024–26 | +0.87 (t 0.88) / **+0.10** (t 0.09) |
+| non-gotobi days, same window; the paper's 03:00 JST window (not tradable) | +0.56; +2.15 bps gross |
+
+**REJECTED.** The effect came in at about half its 2018–20 size and has been near zero since 2024: a well-known flow
+anomaly competed away, as Z09's roll was. Data cost: nothing (free spot data).
+
+**Ten Z market-tests under the strict rule (Z02–Z10), none passing it.** The pattern across Z04, Z06–Z10: published
+effects are either too small for the strict bar at our sample sizes (§121's power screen) or front-run after
+publication (Z09, Z10). Z02 alone has placebo-strength timing, and it cannot beat an always-long equity plan.
+
+## 123. A Discord bot for the demo: scheduled tickets, account bookkeeping, the demo log (S8)
+
+**No trial spent; N 769.** `bot/` (`futures_bot.py`, `ticket.py`, `accounts.py`, `policy.json`, systemd unit, README);
+`a06_playbook export` writes `bot/policy.json`; `tests/test_bot_ticket.py`. The user wants callouts in Discord from a
+DigitalOcean droplet already running another bot, without keeping the laptop on.
+
+- **Light by design:** the solved policy is exported once (271 KB JSON) and `ticket.py` reproduces
+  `a06_playbook.ticket` in plain Python — no numpy or solver on the droplet; `discord.py` only; systemd caps it at 200 MB.
+- **Checked:** the bot's ticket equals the playbook's on 3,000 random states (eval and funded, all three products,
+  stops near the floor, finished accounts); the bookkeeping (pass with the 40% rule, funded lock and payout cap, floor
+  breach, new evaluation) is unit-tested.
+- **Schedule (New York time):** MGC 02:55 Mon–Fri, MNQ 09:25 Mon–Fri, MCL 17:55 Sun–Thu, end-of-day reminder 17:05.
+  The user reports closing balances with `!eod`; payouts, new evaluations and corrections by command; every event is
+  appended to `demo_log.csv` for the backtest comparison.
+- **Not automated:** orders are still placed by hand (automated execution needs the firm's permission first).
+
+## 124. A 9 PM schedule: entering everything at 9 PM ET is clearly weaker than the current windows (S8)
+
+**No trial spent; N 769.** Scratch computations (`a01`/`a02`/`a08`/`a12`/`a15` machinery; figures here). The user's work
+schedule allows notifications only around 9 PM ET. Two routes: keep the windows and pre-place time-triggered orders
+(platform-dependent), or move every entry to 9 PM ET, held to 16:55 the next day (bracket or flatten).
+
+**The 9 PM window (21:00 → 16:55), zero edge, stops at the stop price, risk-matched sizes** (swing ≈ $2.8–3.1k → 3 MNQ,
+6 MGC; crude unchanged, its daily-bar estimate already covers the session):
+
+| 84 days, block bootstrap (replay similar) | current window | 9 PM entry |
+|---|---|---|
+| MNQ, 2021–26 / 2015–20 | 4 MNQ 71% +$1,317 / 65% +$1,685 | 3 MNQ 62% +$1,471 / 50% +$468 |
+| MGC, 2021–26 / 2011–20 | 8 MGC 76% +$2,031 / 76% +$2,419 | 6 MGC 68% +$1,998 / 64% +$1,847 |
+
+| three accounts together | current (2021–26 · 2016–20) | all at 9 PM |
+|---|---|---|
+| P(≥1 payout) | 99.9% · 98.6% | 89.0% · 86.4% |
+| mean / median net | +$3,739 / +$2,977 · +$4,910 / +$3,491 | +$4,158 / +$2,983 · +$2,422 / +$1,599 |
+| P(net > 0) | 78% · 81% | **67% · 64%** |
+| 10th percentile / worst | −$1,300 / −$3,120 · −$1,000 / −$3,360 | **−$2,960 / −$3,520 · −$2,160 / −$3,440** |
+
+**Weaker, chiefly in the tail:** P(net > 0) falls ~13–17 points and the 10th percentile roughly doubles — plausibly
+because three long windows sharing the same overnight move are more correlated than the current staggered ones.
+Preferred: keep the current windows with time-triggered entries and exits, if the user's platform supports them;
+otherwise the 9 PM plan at these figures. Awaiting the user's platform.
+
+## 125. The bot on the user's schedule: one 17:30 ET alert, manual trading, every ticket shadow-tracked (S8)
+
+**No trial spent; N 769.** `bot/schedule.py`, `bot/shadow.py`, `bot/futures_bot.py` rewritten; tests extended. Tradovate has
+no scheduled market entry and TradingView only SENDS webhooks (a bridge with Tradovate access would be needed to place
+orders); the user chose manual trading with one alert at 17:30 ET, which lets crude keep its 18:00 entry (§116) — an
+interim move of crude to 21:00 was reverted before anything used it.
+
+- **The 17:30 alert (Sun–Thu):** results of finished tickets; any closing balance not yet recorded (a balance sent later
+  reissues that ticket); then crude 18:00 tonight → 16:55, gold 03:00 → 11:30 and MNQ 09:30 → 16:00 tomorrow. Friday:
+  results only. The alert date is persisted, so a restart cannot post twice.
+- **Shadow tracking:** every ticket, traded or not, is simulated after its window on free Yahoo 1-minute bars (NQ=F,
+  GC=F, CL=F) by the backtests' rules (entry at the entry minute's open; take/stop at their prices; a minute touching
+  both = stop; else the exit-time close; commissions) and appended to `shadow_log.csv`; `!took` / `!skipped` mark it.
+  **Validated** against the programme's Databento data for 2026-10-06..09: all 8 MNQ and MGC outcomes identical (take,
+  stop, time exit), P&L equal but for one tick on a time exit, entry prices within 1–3 ticks.
+- Tests: the schedule's windows (a Sunday alert yields MCL Sun 18:00 → Mon 16:55, MGC Mon 03:00 → 11:30, MNQ Mon
+  09:30 → 16:00), tracking with a fake feed, results reported once, Friday without tickets.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —

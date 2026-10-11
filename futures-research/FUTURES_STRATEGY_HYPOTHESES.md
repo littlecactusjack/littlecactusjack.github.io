@@ -594,3 +594,36 @@ the posterior is positive. One trial. `hypotheses.yaml` (Z04) · `decisions.md` 
 Blose, Gondhalekar & Kort (2018): COMEX gold earns positive returns overnight and negative returns in the
 day session (1985–2012). 1 MGC long 18:00–08:20, short 08:20–13:30, long 13:30–16:55 ET; tested 2013–2026.
 One trial. `hypotheses.yaml` (Z05) · `decisions.md` §99–§100
+
+## Z06 — Trend Sign Sets the Bracket's Direction  *(RETIRED — t00771, worse than always-long on both)*
+
+Moskowitz, Ooi & Pedersen (2012): the sign of the past 12-month return predicts the next month, in every
+one of 58 futures (1985–2009). A follow-on to W04: here the sign only chooses the daily bracket's direction
+in the two staking plans (MNQ 09:30–16:00, MGC 03:00–11:30 ET), whose costs are paid either way. Tested
+2011-07 → 2026-08; must also beat always-long. One trial. `hypotheses.yaml` (Z06) · `decisions.md` §110
+
+## Z07 — Index Reversal Sets the MNQ Bracket's Direction  *(RETIRED — t00772, does not beat always-long)*
+
+Baltussen, van Bekkum & Da (2019): daily index returns turned negatively autocorrelated after ~1999 as index
+products grew (Sharpe 0.67 against MAC(5) on the S&P 500, to 2016). The sign of the MAC(5)-weighted last four
+days sets the MNQ 09:30–16:00 bracket's direction (against the move); must beat always-long. Tested 2017–2026.
+One trial. `hypotheses.yaml` (Z07) · `decisions.md` §111
+
+## Z08 — Hedger Flow Sets the Commodity Brackets' Direction  *(RETIRED — t00773; gold fails the strict rule, §119)*
+
+Kang, Rouwenhorst & Tang (2020): commodity prices rise the week after commercial hedgers buy and fall after they
+sell — hedgers provide liquidity to impatient speculators (1994–2014). The sign of last week's commercial net
+change (CFTC COT) sets the direction of the crude (full session) and gold (London) brackets for the next week.
+Tested 2015–2026; must beat always-long. One trial. `hypotheses.yaml` (Z08) · `decisions.md` §117
+
+## Z09 — Index Roll Selling: Short Crude on Roll Days  *(RETIRED — t00774; worked to 2020, reversed after)*
+
+Mou (2011): GSCI index funds sell the next-to-expire crude contract on business days 5–9 every month. The
+crude plan goes short on those days and long otherwise — the outright, since the spread is not allowed. Tested
+2010-06 → 2026-08 under the strict rule. One trial. `hypotheses.yaml` (Z09) · `decisions.md` §120
+
+## Z10 — Gotobi: Importers' Dollar Buying Before the Tokyo Fix  *(RETIRED — t00775; halved, then gone by 2024)*
+
+Japanese importers settle on days divisible by five at the 9:55 JST fix; banks pre-buy dollars, so USD/JPY rises into
+9:55 (arXiv 2301.13204, 2018–2020). Long USD/JPY (short 6J) from the 18:00 ET reopen to the fix on gotobi days,
+net of 1 bp. Tested 2021–2026 on free spot data under the strict rule. One trial. `hypotheses.yaml` (Z10) · `decisions.md` §122

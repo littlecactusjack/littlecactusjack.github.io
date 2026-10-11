@@ -43,12 +43,19 @@ def _bracket_day(h, l, c, W, L):
     out = c[:, -1].copy()
     stop = (tl < big) & (tl <= tw)
     take = (tw < big) & ~stop
-    out[stop] = np.minimum(-L, l[rows, np.minimum(tl, T - 1)])[stop]   # gap-through fills at the bar low
+    if STOP_FILL == "bar_low":
+        out[stop] = np.minimum(-L, l[rows, np.minimum(tl, T - 1)])[stop]   # gap-through fills at the bar low
+    else:
+        out[stop] = -L[stop]
     out[take] = W[take]
     return out, stop, take
 
 
 _PATHS = {}
+#: how a stop fills. "bar_low" (the default, used A02-A09): at the low of the first minute bar that touches it -
+#: conservative, and for tight stops on fast bars it can double the loss. "level": at the stop price (a stop
+#: order in normal conditions; the user reports fills within ~$10, decisions.md 108).
+STOP_FILL = "bar_low"
 
 
 def run(contracts: int = 5, accounts: int = 8000, seed: int = 93) -> dict:
@@ -160,10 +167,11 @@ if __name__ == "__main__":
 
 
 def sequential(contracts: int = 2, mode: str = "iid", traders: int = 6000, window: int = HORIZON,
-               seed: int = 94, fee: float = 80.0, passive: bool = False) -> dict:
+               seed: int = 94, fee: float = 80.0, passive: bool = False, per_trader: bool = False) -> dict:
     """Back-to-back attempts within `window` trading days: one account at a time; a failed evaluation or
     funded account is replaced by a new $80 evaluation the next day. mode 'iid' resamples real sessions;
-    'replay' walks real sessions IN ORDER from every start date (window must fit). Policy as in run()."""
+    'replay' walks real sessions IN ORDER from every start date (window must fit); 'block' strings together
+    21-session blocks of real sessions in order from random starts (regimes kept, many more paths). Policy as in run()."""
     warnings.filterwarnings("ignore")
     import io, contextlib
     if "eval" not in g.POLICY:
@@ -185,11 +193,14 @@ def sequential(contracts: int = 2, mode: str = "iid", traders: int = 6000, windo
         A = len(starts)
     else:
         A = traders
+    BLOCK = 21                                    # mode 'block': real sessions in order, 21-day blocks at random starts
     phase = np.zeros(A, int)                      # 0 eval, 1 funded
     eq = np.full(A, START); pk = eq.copy(); best = np.zeros(A); npay = np.zeros(A, int)
     fees = np.full(A, fee); paid = np.zeros(A); first = np.full(A, -1); attempts = np.ones(A, int)
     for d in range(window):
-        idx = (starts + d) if mode == "replay" else rng.integers(0, S, A)
+        if mode == "block" and d % BLOCK == 0:
+            bstart = rng.integers(0, S - BLOCK, A)
+        idx = (starts + d) if mode == "replay" else (bstart + d % BLOCK) if mode == "block" else rng.integers(0, S, A)
         ev = phase == 0
         fu = ~ev
         b_e = np.clip(np.rint((eq - START) / 100).astype(int), g.B_MIN, g.B_MAX)
@@ -206,11 +217,15 @@ def sequential(contracts: int = 2, mode: str = "iid", traders: int = 6000, windo
         floor = np.where(ev, pk - 2000, np.where(pk >= START + 2000, START, pk - 2000))
         L = np.minimum(L, np.maximum(eq - floor - 1, 1))
         trade = a > 0
+        # an account the policy cannot trade (it sits within a $100 unit of its floor - an invalid solver state,
+        # reached when a capped stop fills exactly at its price) is FINISHED and replaced by a new evaluation,
+        # as the playbook says (decisions.md 113). Before this, with STOP_FILL "level" it sat untraded for ever.
+        finished = ~trade & ~np.asarray(passive, bool)
         pnl, _, _ = _bracket_day(h[idx], l[idx], c[idx], np.where(trade, W + cost, 1e12),
                                  np.where(trade, np.maximum(L - cost, 1.0), 1e12))
         pnl = np.where(trade, pnl - cost, 0.0)
         ne = eq + pnl
-        br = ne <= floor
+        br = (ne <= floor) | finished
         eq = ne; pk = np.maximum(pk, ne)
         best = np.where(ev, np.maximum(best, pnl), best)
         prof = eq - START
@@ -237,4 +252,6 @@ def sequential(contracts: int = 2, mode: str = "iid", traders: int = 6000, windo
             "mean_attempts": float(attempts.mean()), "mean_fees": float(fees.mean()),
             "mean_paid": float(paid.mean()), "mean_net": float(net.mean()),
             "p_net_positive": float((net > 0).mean()),
-            "net_p10_p50_p90": [float(x) for x in np.quantile(net, [0.1, 0.5, 0.9])]}
+            "net_p10_p50_p90": [float(x) for x in np.quantile(net, [0.1, 0.5, 0.9])],
+            **({"each": {"start": (starts if mode == "replay" else np.arange(A)), "net": net, "first_payout_day": first,
+                         "fees": fees, "paid": paid}} if per_trader else {})}
