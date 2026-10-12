@@ -723,3 +723,16 @@ rule — the effect held to 2020 and reversed after 2021.
 
 **Z10 (§122, t00775):** the gotobi effect, tested free on USD/JPY spot in the account-tradable window, came in at half its
 published size and has faded to zero since 2024. Ten strict-rule market-tests, none passing.
+
+**Z11 (§127, t00776):** month-end FX hedge rebalancing at the London fix (EUR/USD), strong in the paper's era, has been absent
+since 2013. Eleven strict-rule market-tests, none passing.
+
+**Z12 (§128, t00777):** EUR/USD's time-of-day pattern (Breedon & Ranaldo 2013) survives gross but not costs, and reversed after
+2017. Twelve strict-rule tests, none passing; the literature route is exhausted for the user's markets.
+
+**D-series (§129–130):** the first data-derived hypotheses under a sealed discovery/validation split. The one tradable
+candidate (silver into the London fix) persisted out of sample but at 40% of its size — too small after costs. Thirteen
+strict-rule tests, none passing.
+
+**D-series family 2 (§132–134):** windows around fixings, opens and closes; the one carried cell (AUD/USD into the Tokyo fix at
+month-end) did not recur on sealed data. Fourteen Z+D tests, none confirmed.

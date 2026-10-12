@@ -1,0 +1,54 @@
+{
+ "hypothesis": "Z11",
+ "window": [
+  "2013-01-31",
+  "2026-09-30"
+ ],
+ "events": 158,
+ "gross_bps": 0.8340724429903901,
+ "net_bps": -0.16592755700961004,
+ "sd_bps": 22.828299963076354,
+ "t_net": -0.09095683970662202,
+ "win_rate_net": 0.4936708860759494,
+ "slope_bps_per_pct": 0.10134950108869026,
+ "placebo_pre_days_pct": 60.0,
+ "pre_day_net_means": [
+  0.7242780962463956,
+  0.6614251024867283,
+  -2.1100040635527195,
+  -0.3074682907300043,
+  -0.5412706679273352
+ ],
+ "placebo_perm_pct": 63.3,
+ "posterior_bps": {
+  "registered_prior": 0.6887046415157693,
+  "zero_prior": -0.12113593424202762
+ },
+ "eras": {
+  "2013-19": {
+   "events": 84,
+   "net_bps": 0.09982936614939623,
+   "t": 0.0472085422862763
+  },
+  "2020-26": {
+   "events": 74,
+   "net_bps": -0.46759757789280576,
+   "t": -0.15164579457335134
+  }
+ },
+ "conditions": {
+  "t_gt_1.645": false,
+  "placebo_ge_95": false,
+  "posterior_gt_0": true
+ },
+ "z_market_tests": 11,
+ "decision": "REJECT",
+ "injection": {
+  "n_events": 158,
+  "sought_net_bps": 3.0,
+  "mean_estimate": 2.9933092385116953,
+  "sd_estimate_bps": 1.2473748463580787,
+  "power_strict_t": 0.79,
+  "recovered": true
+ }
+}

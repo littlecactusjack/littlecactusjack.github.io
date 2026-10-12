@@ -7776,6 +7776,540 @@ interim move of crude to 21:00 was reverted before anything used it.
 - Tests: the schedule's windows (a Sunday alert yields MCL Sun 18:00 → Mon 16:55, MGC Mon 03:00 → 11:30, MNQ Mon
   09:30 → 16:00), tracking with a fake feed, results reported once, Friday without tickets.
 
+## 126. A18: the demo checker — and the six unseen weeks already match the backtest's outcome mix (S8)
+
+**No trial spent; N 769.** `reporting/a18_demo_check.py`. The bot is deployed on the user's droplet (34 MB, systemd,
+clock synced) and the demo starts 2026-10-11. For every finished ticket in the bot's shadow log the checker computes,
+on 2021–26 history (A07/A08 paths, drift removed, stops at the stop price, a minute touching both = stop; crude by the
+one-bar approximation), the probability that THAT bracket ends in a take, a stop or a time exit and its expected net
+P&L; it then compares the live counts (chi-square, three cells) and P&L (z against the summed expectation), and with
+`demo_log.csv` measures the execution gap on traded tickets (closing-balance change vs shadow P&L).
+
+**First run, on the forward check's 55 MNQ and MGC tickets (2026-08-28 → 10-09, data no backtest had seen):**
+observed take / stop / time exit **26 / 27 / 2 against 23.9 / 29.0 / 2.1 expected** (chi-square 0.32, p ≈ 0.85); shadow P&L
+−$4,177 against −$1,543 ± $7,015 (z −0.38). The live outcome mix is what history predicts.
+
+## 127. Z11 registered — month-end FX hedge rebalancing at the London 4 p.m. fix (EUR/USD), on free data (S1–S5)
+
+**No trial spent at registration; N 769.** The user asked to keep searching and, when the literature runs out, to build
+hypotheses from data. This one is from the literature: Melvin & Prins (2015, Journal of Financial Markets 22; 10
+currencies, 2004-04 to 2012-12) — international equity managers reset currency hedges at the month-end WM/Reuters 4 p.m.
+fix, so a country's equity outperformance over the month predicts its currency's fall in the hour before the fix
+(panel slope −0.0142: 10% → 14 bps; R² 0.03). A forced, scheduled flow, like Z02's.
+
+**Data, free** (HistData 1-minute; `data/fx_fix.py`, one file at a time): EUR/USD and GBP/USD spot; S&P 500, FTSE 100 and
+DAX index CFDs (the DAX stands in for the Eurozone market; HistData's Euro Stoxx 50 stops in 2019).
+
+**Screen inside the paper's sample only** (2010-11 → 2012-12, 26 month-ends each): **EUR/USD +11.09 bps per event, t +3.19,
+win 81%** (slope +1.90 bps per 1% of S&P − DAX, the predicted sign); **GBP/USD −5.68 bps, t −1.41, win 31%** — the wrong
+sign; GBP is dropped and not tested (recorded; it counts against the strict rule's running total).
+
+**Fixed before any 2013–2026 return** (`hypotheses.yaml` Z11; `signals/z11.py`, `signals/z11_trial.py`): on the last weekday
+of each month, 15:00 → 16:00 London (10:00–11:00 ET most of the year), long EUR/USD (6E) if the S&P 500 beat the DAX from
+the first to the second-last trading day, short otherwise; net of 1.0 bp; 2013-01 → 2026-09. Strict rule: net t > 1.645;
+at or above the 95th percentile of BOTH the same signed trade on the 5 weekdays before month-end and the signal permuted
+across months; posterior > 0 (prior Normal(+3, 3) bps, an assumption, shaded for the 2015 fix reform); 11th Z test.
+
+**Outcome injection** (`reports/z11_injection.json`): +3 bps planted, recovered 3.03 (SD 1.16, 158 events); power of the
+strict t at that size 82%.
+
+### Z11 run: rejected — strong in 2010–12, gone since 2013 (S6–S8)
+
+**One trial spent: t00776. N 769 → 770.** `reports/z11_trial.{json,md}`. 11th Z market-test; power 82% at the prior's size.
+
+| 2013-01 → 2026-09, 158 month-ends | |
+|---|---|
+| gross / net per event (SD) | **−0.92 / −1.92 bps** (17.9) |
+| t, net (> 1.645) | −1.34 |
+| slope on S&P − DAX | +0.05 bps per 1% (in-sample 2010–12: +1.90) |
+| placebos: 5 weekdays before / permuted signal (≥ 95) | 20th / 30th pct |
+| 2013–19 / 2020–26 net | −0.19 / −3.88 bps |
+
+**REJECTED.** The hedging-channel effect was clear in the paper's years and our 2010–12 slice and has been absent since —
+published in 2013 (working paper), and the WM/Reuters fix window was widened from one minute to five in February 2015.
+Data cost: nothing.
+
+## 128. Z12 registered — the euro weakens in European hours and strengthens in US hours (S1–S5)
+
+**No trial spent at registration; N 770.** One more documented FX effect before building our own hypotheses, chosen
+because it acts every day (≈ 4,200 observations, not ≈ 160): Breedon & Ranaldo (2013, JMCB; EBS 1997-01 → 2007-06; also
+Cornett et al. 1995, Ranaldo 2009) — currencies depreciate in their own trading hours, as local participants are net buyers
+of foreign currency then; for EUR/USD a simple short-in-European-hours / long-in-US-hours strategy earned **after-cost
+Sharpe ratios of 1.3 (morning short) and 0.9 (afternoon long)**. Sessions per their Table 1: Europe 07:00–15:00 London,
+US 08:00–16:00 New York.
+
+**Fixed before any return** (`hypotheses.yaml` Z12; `signals/z12.py`, `signals/z12_trial.py`; `data/fx_fix.hourly_utc`,
+102,744 hourly EUR/USD prices 2010–2026): every New York weekday, SHORT 07:00 London → 08:00 New York, LONG 08:00 → 16:00
+New York — the paper's "open-to-open / open-to-close" read without the 08:00–10:00 overlap (the account cannot be long and
+short at once; a READING fixed in advance); 0.8 bp per leg; 2010-01-04 → 2026-09-30 (entirely after the paper). No
+in-sample screen is possible (the free data starts in 2010). Strict rule: daily net t > 1.645; at or above the 95th
+percentile of the same schedule shifted by each of the other 23 hours; posterior > 0 (prior annual net Sharpe
+Normal(0.6, 0.4), an assumption); 12th Z test.
+
+**Outcome injection** (`reports/z12_injection.json`): net Sharpe 0.6 planted, recovered 0.599 (SD 0.24, 4,231 days); power of
+the strict t 80%.
+
+### Z12 run: rejected — real gross, eaten by costs, decayed after 2017 (S6–S8)
+
+**One trial spent: t00777. N 770 → 771.** `reports/z12_trial.{json,md}`. 12th Z market-test; power 80%.
+
+| 2010-01 → 2026-09, 4,231 weekdays | |
+|---|---|
+| morning short / afternoon long, gross | +1.26 / +0.40 bps |
+| day net of 1.6 bps (SD) | **+0.06 bps** (47.6) |
+| t / annual net Sharpe | **+0.09** / +0.02 |
+| placebo: schedule shifted by each other hour | 87th pct |
+| 2010–17 / 2018–26 net (Sharpe) | +1.40 (+0.41) / **−1.18 (−0.45)** |
+
+**REJECTED.** The direction the paper found still shows gross, but two round trips a day absorb it, and it has reversed
+since 2018.
+
+**Twelve strict-rule market-tests (Z02–Z12), none passing.** Every forced-flow and calendar effect tested since §86 was
+stronger in its paper's years than after: the shared failure is publication and arbitrage, not the tests. The literature
+route is now exhausted for the user's markets; the next step is hypotheses of our own on untouched data (§129).
+
+## 129. The D-series protocol: hypotheses of our own, discovered on 2010–17, validated once on sealed 2018–26 (S1)
+
+**No trial spent; N 771. Written and committed BEFORE any discovery scan.** The literature route is exhausted for the
+user's markets (§128: twelve strict-rule tests, none passing). At the user's direction, hypotheses are now generated from
+data. The programme's earlier data-driven series (F, L, N, P, Q; ~760 trials) found nothing, and the common failure of
+data-driven search is testing ideas on the data that suggested them. This protocol prevents that:
+
+1. **Universe — markets this programme has not examined**, free HistData 1-minute, each tradable in the user's account:
+   GBP/USD (6B), AUD/USD (6A), USD/CAD (6C), USD/CHF (6S), DAX (FDAX), Nikkei 225 (NKD), silver (SI). Excluded: EUR/USD
+   and USD/JPY (seen in Z10–Z12), and the S&P/Nasdaq/gold/crude futures this programme has searched since 2026-08.
+2. **Discovery window 2010-01-01 → 2017-12-31 only.** The discovery code asserts that no row after 2017-12-31 is read.
+3. **Two pattern families, fixed now:** (D-a) each UTC hour of the day, mean 1-hour return over all weekdays — 7 × 24 = 168
+   tests; (D-b) each UTC hour on each weekday — 7 × 24 × 5 = 840 tests. 1,008 in all.
+4. **Selection:** two-sided |t| > 4.1 (Bonferroni, 0.05 / 1,008) AND |mean| > 2 × the instrument's round-trip cost (FX
+   0.8 bp; DAX and Nikkei 1.0 bp; silver 1.5 bp). **At most 5 candidates carried forward**, by |t|; a D-b candidate inside a
+   carried D-a hour of the same instrument is dropped as a duplicate.
+5. **Validation window 2018-01-01 → 2026-09-30, sealed until each candidate is registered.** One trial per candidate,
+   STRICT rule for a standalone trade: net one-sided t > 1.645 in the discovered direction; at or above the 95th percentile of
+   the same instrument's other 23 hours (D-a) or other hour-weekday cells (D-b); posterior > 0 with prior = the discovery
+   mean halved; reported against the running count (Z and D market-tests together).
+6. **If nothing passes selection, nothing is carried forward**, and that is the result.
+
+## 130. D-series discovery (2010–17): seven cells pass, four carried, three dropped as untradable; D01 registered (S1–S5)
+
+**No trial spent at registration; N 771.** `reporting/d_discovery.py`, `reports/d_discovery.json`. Seven markets (GBP/USD,
+AUD/USD, USD/CAD, USD/CHF, DAX, Nikkei, silver; free HistData, whole-hour prices), 2010-01 → 2017-12 only (asserted).
+**912 testable cells** (of 1,008: cells with fewer than 30 hours — closed index hours — drop out); **7 pass**
+|t| > 4.1 and |mean| > 2 × cost; the protocol carries four:
+
+| carried | discovery mean (SD), t |
+|---|---|
+| USD/CHF 21:00–22:00 UTC, all weekdays | −1.90 bps (10.8), −7.88 |
+| **silver 11:00–12:00 UTC, all weekdays** | **−5.53 bps (33.7), −7.27** |
+| AUD/USD 22:00–23:00 UTC, all weekdays | −1.62 bps (9.7), −6.56 |
+| USD/CAD 22:00–23:00 UTC, Thursdays | +1.63 bps (5.6), +5.52 |
+
+**Three dropped before any validation data was read — untradable, and probably not real.** 21:00–23:00 UTC is 17:00–19:00
+New York (16:00–18:00 in winter): it covers CME's 17:00–18:00 ET daily break, when 6S / 6A / 6C do not trade and the account
+may not hold, and it is the FX rollover, when spreads widen sharply. HistData's quotes are BID prices, so a spread blow-out
+reads as a fall in the bid and its normalisation as a rise — the signs found (negative into rollover, positive out of it)
+fit that artefact. **The protocol (§129) should have excluded the CME break window; it is added to it now** for any later
+D-series scan. The decision used no 2018–2026 data.
+
+**D01 registered** (`hypotheses.yaml` D01; `signals/d01.py`): short silver (SI) 11:00 → 12:00 UTC every weekday — the hour
+ending at the 12:00 London silver fix in both summer and winter (an electronic auction since August 2014; the fix-dip
+pattern is documented for the manipulation era); net of 1.5 bp (2.0 bp reported: SI's tick is ~1.7 bp). Validation 2018-01 →
+2026-09, sealed until now; strict rule against silver's other 23 hours; prior Normal(+1.3, 1.5) bps net; 13th Z+D test.
+The registry gains the D series and SI (`tests/test_registry_consistency.py`).
+
+**Outcome injection** (`reports/d01_injection.json`, noise from silver's other hours only): +1.3 bps planted, recovered 1.34
+(SD 0.94, 2,169 events); power of the strict t 39% at the prior's size, near 100% at the discovery size.
+
+### D01 validation: rejected — the hour is still unusual, but too small after costs and fading (S6–S8)
+
+**One trial spent: t00778. N 771 → 772.** `reports/d01_trial.{json,md}`. 13th Z+D market-test; power 39% at the prior's size.
+
+| sealed 2018-01 → 2026-09, 2,169 weekdays | |
+|---|---|
+| short 11:00 → 12:00 UTC, gross (SD) | **+2.25 bps** (36.8) — discovery −5.53 for the long, i.e. +5.53 for the short |
+| net at 1.5 bp / at 2.0 bp (t) | **+0.75 (t +0.95)** / +0.25 (t +0.32) |
+| placebo: silver's other hours | **95th pct** (passes) |
+| 2018–21 / 2022–26 net (t) | +2.04 (+1.91) / −0.38 (−0.33) |
+
+**REJECTED** on condition (1). Unlike every Z test, the pattern itself survived out of sample — the hour into the London silver
+fix is still silver's weakest — but at ~40% of its discovery size it does not cover SI's costs, and it was near zero after
+2021. The D-series scan produced one genuine, out-of-sample-persistent pattern; it is not tradable at a profit.
+
+**Running total: thirteen strict-rule market-tests (Z02–Z12, D01), none passing.** With the user's markets and the free data
+examined, the next lever is the account structure itself: the user has asked about forex prop firms, whose static drawdowns
+may be worth several times Tradeify's per attempt at zero edge (to be priced, §131).
+
+## 131. Forex prop firms considered and set aside by the user — evaluation fees too high (S2)
+
+**No trial spent; N 772.** The user asked whether forex prop firms (FTMO, FundedNext, Alpha Capital, The5ers, FundingPips, E8
+Markets) are worth pursuing. Third-party rule summaries were gathered for all six and FundedNext's official help centre was
+read (Stellar 2-Step $100k: $549.99 fee refunded with the first payout; 8% / 5% targets, ≥ 5 trading days per phase; 5% daily
+loss on the initial balance, raised by the day's profits; **10% static maximum loss**; funded: ≤ 3% risk at any time, first
+payout after 21 days then every 14, 80% split, news profits counted at 40%; "account rolling", "breaching several accounts in a
+short span" and "one-sided betting" treated as gambling). The static 10% cushion would let a funded account pay up to ~$8,000
+at zero edge (vs ~$1,800 at Tradeify), but the plan would have to change (≤ 3% risk a day, one account at a time, mixed
+direction). **The user declined: evaluation fees of ~$500 are too high; stay with Tradeify.** Not to be re-proposed unless the
+user raises it.
+
+## 132. D-series family 2 protocol: 30-minute windows around fixings, opens and closes (S1)
+
+**No trial spent; N 772. Written and committed BEFORE the scan.** The user asked for a second discovery family. Lesson of
+§130: the only pattern that persisted out of sample (silver into the London fix, 95th-percentile placebo in 2018–26) sat on a
+SCHEDULED flow. Family 2 therefore scans the 30 minutes before and after each scheduled fixing, open or close in the same
+seven markets — a small, mechanism-led family, so the multiple-testing bar is lower and moderate effects can pass.
+
+1. **Windows (local time; 30 minutes before the event, then 30 minutes after):**
+   - GBP/USD, AUD/USD, USD/CAD, USD/CHF: the WM/Reuters 16:00 London fix; the Tokyo 09:55 JST fix (window ends / starts at 09:55);
+     USD/CAD also the Bank of Canada 16:30 New York rate. (26 windows: 4 × 2 × 2 + 1 × 2 + DST-robust local definitions.)
+   - Silver (XAG/USD): COMEX settlement 13:25 New York, before and after; the London fix 12:00 London AFTER only (the
+     before-window is D01's, already validated). (3 windows)
+   - DAX: Xetra open 09:00 Frankfurt (after); US open 15:30 Frankfurt (after); Xetra closing auction 17:30 Frankfurt (before,
+     after). (4 windows)
+   - Nikkei: Tokyo open 09:00 JST (after); morning close 11:30 JST (before); afternoon open 12:30 JST (after); close 15:00 JST
+     (before) — the 2010–17 schedule. (4 windows)
+2. **Two day-sets per window:** all weekdays; the last weekday of the month. Total ≈ 2 × 29 = 58 tests (the exact count is
+   reported; cells under 30 observations drop out).
+3. **Discovery 2010-01 → 2017-12 only** (asserted). **Selection:** two-sided |t| > Bonferroni at 0.05 over the tests run (≈ 3.2
+   for 58) AND |mean| > 2 × cost (FX 0.8 bp; DAX, Nikkei 1.0; silver 1.5). At most 5 carried, by |t|; a month-end cell is a
+   duplicate if its all-weekday cell is carried.
+4. **Exclusion (added after §130):** any window overlapping 17:00–18:00 New York (the CME break) is not scanned.
+5. **Validation 2018-01 → 2026-09, sealed until registration;** one trial each; the strict rule for a standalone trade (net t >
+   1.645 in the discovered direction; ≥ 95th percentile of the same instrument's other family-2 windows of the same day-set;
+   posterior > 0 with prior = discovery mean halved less cost); reported against the running count.
+
+## 133. Amendment before the family-2 scan (user): no multiple-testing cut in discovery; a watchlist tier for forward testing (S1)
+
+**No trial spent; N 772. Committed BEFORE the scan.** The user directs that candidates not be discarded for failing a
+multiple-testing penalty: "I want to know if something works ... then we can forward test to see if it's still viable." §132
+is amended:
+
+1. **Discovery selection:** two-sided |t| > 1.96 (uncorrected) AND |mean| > 2 × cost. **All** passing cells are carried (a
+   month-end cell remains a duplicate of a carried all-weekday cell). The number of tests run and carried is reported, so the
+   expected count of chance passes (~5% of tests) is visible beside the result.
+2. **Validation unchanged:** one trial per candidate on the sealed 2018-01 → 2026-09 window.
+3. **Three outcomes:** **CONFIRM** — the strict rule (§119/§132) holds; **WATCHLIST** — the strict rule fails but the net mean
+   in validation is > 0 in the discovered direction; **REJECT** — net mean ≤ 0. Watchlist items are forward-tested live by the
+   demo bot (shadow-tracked, no capital) until they either meet the strict rule on the combined out-of-sample record or fade.
+   Only CONFIRM counts as an edge for the plan and its projections; the strict rule itself is not relaxed.
+
+## 134. D-series family 2 discovery: one cell beats twice its cost; D02 registered (S1–S5)
+
+**No trial spent at registration; N 772.** `reporting/d2_discovery.py`, `reports/d2_discovery.json`; price marks at :00/:25/:30/:55
+(`data/fx_fix.quarter_marks`). **56 tests on 2010–17** (no window touched the CME break); about 2.8 would clear |t| > 1.96 by
+chance and **6 did**; **one also beats 2 × cost and is carried (amendment §133: no multiple-testing cut):**
+
+| cell (2010–17) | mean (SD), t, n |
+|---|---|
+| **AUD/USD, 30 min before the 09:55 JST Tokyo fix, month-end** | **+2.88 bps (8.3), +3.25, 88** — carried |
+| USD/CHF, 30 min before the Tokyo fix, all weekdays | +0.52 (5.8), +3.92 — below 2 × cost (0.8 bp) |
+| USD/CAD, 30 min after the Bank of Canada 16:30 rate | −0.51 (7.5), −3.01 — below cost |
+| GBP/USD, before the Tokyo fix, month-end | +1.24 (4.0), +2.89 — below 2 × cost |
+| USD/CAD, before the Tokyo fix | +0.30 (4.6), +2.65 — below cost |
+| USD/CHF, before the WM/R 16:00 fix | −0.79 (13.7), −2.62 — below 2 × cost |
+
+The Tokyo-fix pre-window is where most of the signal sits (four of six), consistent with the dollar-buying flow behind
+the gotobi effect (Z10) — but mostly too small for CME futures costs.
+
+**D02 registered** (`hypotheses.yaml` D02, `signals/d02.py`): long AUD/USD (6A) 09:25 → 09:55 JST on the month's last weekday
+(20:25 / 19:25 New York the evening before), net of 0.8 bp; sealed validation 2018-01 → 2026-09; CONFIRM / WATCHLIST / REJECT
+per §133; prior Normal(+0.64, 1.0) bp; 14th Z+D test. 6A added to the registry's single-market primaries.
+**Injection** (`reports/d02_injection.json`): +0.64 bp planted, recovered 0.63 (SD 0.88, 100 month-ends); power of the strict t
+22% at the prior's size.
+
+### D02 validation: REJECT — the discovery did not recur (S6–S8)
+
+**One trial spent: t00779. N 772 → 773.** `reports/d02_trial.{json,md}`.
+
+| sealed 2018-01 → 2026-09, 100 month-ends | |
+|---|---|
+| long AUD/USD 09:25 → 09:55 JST, gross / net (SD) | **−0.33 / −1.13 bps** (8.2) |
+| t / placebo (other month-end windows) | −1.38 / 0th pct |
+| 2018–21 / 2022–26 net | +0.01 / −2.06 bps |
+
+**REJECT tier** (net ≤ 0; nothing to forward-test). The one cell family 2 carried was a chance pass of the uncorrected scan —
+the outcome the expected-chance-pass count (2.8 of 56) warned of, and the reason every carried cell still gets the sealed
+check. Fourteen Z+D market-tests, none confirmed; the watchlist is empty.
+
+## 135. A19: planning further ahead makes the plan worse — the cost-blind solver buys tiny stops (S8)
+
+**No trial spent; N 773. Computation record (A19)** (`reports/a19_horizon.json`, `reporting/a19_horizon.py`). The user approved
+re-solving the policy for lifetime value (a zero-edge funded account can be worth up to its cushion). Evaluation solved for
+P(pass within He days), funded for E[payouts within Hf days]; He ∈ {21, 42, 84}, Hf ∈ {21, 63, 126, 252}; 4 MNQ + 8 MGC, drift
+removed, stops at the stop price; block-bootstrap mean net, MNQ + MGC:
+
+| He / Hf | 84 days: 2021–26 / 2015–20 | 252 days: 2021–26 / 2015–20 |
+|---|---|---|
+| **21 / 21 (the plan)** | **+$3,346 / +$4,035** | **+$11,079 / +$13,131** |
+| 42 / 21 | +$1,739 / +$2,625 | +$5,646 / +$8,473 |
+| 21 / 63 | +$312 / +$408 | +$1,152 / +$1,461 |
+| 21 / 126–252 | −$722 / −$499 | −$1,829 / −$1,086 |
+| 84 / any | −$420 to −$439 / −$270 to −$385 | about −$1,100 / −$630 to −$940 |
+
+**Why:** the A01 solver prices every bracket as a fair coin and ignores commissions. Planning further ahead raises the value of
+surviving, so it chooses tight stops — funded +$3,000 / −$200 instead of +$3,000 / −$1,000; evaluation +$600 / −$200 instead of
++$1,200 / −$1,000. On real paths a $200 stop on 4 MNQ is a few ticks wide, resolves within minutes (often against, under the
+one-minute both-touched rule) and pays commissions every day: 84-day P(payout) falls from 70–77% to 12–15% (Hf 252) and to
+0–1% (He 84). The 21-day horizon is what keeps the solver away from brackets that only work on paper; it stays.
+**Next (A20):** the long horizons again with a menu restricted to stops ≥ $500, where costs and tick noise are small.
+
+## 136. A20: stops of at least $500 improve the plan slightly in both histories; longer horizons still lose — adopted (S8)
+
+**No trial spent; N 773. Computation record m00166** (`reports/a20_menu.json`, `reporting/a20_menu.py`). Block-bootstrap mean
+net, MNQ + MGC, stops at the stop price:
+
+| menu, He / Hf | 84 days: 2021–26 / 2015–20 | 252 days | 84-day P(payout) MNQ / MGC, 2021–26 · 2015–20 |
+|---|---|---|---|
+| full (A01), 21 / 21 | +$3,346 / +$4,035 | +$11,079 / +$13,131 | 70% / 77% · 64% / 76% |
+| **stops ≥ $500, 21 / 21** | **+$3,412 / +$4,191** | **+$11,297 / +$13,830** | **71% / 77% · 68% / 77%** |
+| stops ≥ $500, 21 / 63 | +$1,079 / +$1,039 | +$3,866 / +$3,732 | 71% / 77% · 68% / 77% |
+| stops ≥ $500, 21 / 126 | +$20 / +$131 | +$709 / +$1,024 | 32–40% |
+| stops ≥ $500, 42 / 21 | +$2,296 / +$2,918 | +$7,860 / +$9,791 | 57% / 57–67% |
+| stops ≥ $500, 42 / 63 | +$523 / +$848 | +$2,273 / +$3,184 | 57% / 57–67% |
+
+Crude (10 MCL, one-bar approximation), full → restricted: replay 45% +$397 → 52% +$820 (2021–26), 55% +$545 → 49% +$418
+(2016–20); block +$254 → +$295, +$649 → +$684 — neutral to slightly better.
+
+- **Removing stops under $500 helps in both histories** (+2–4%: +$66–156 per four months, +$218–699 a year; MNQ's 2015–20
+  P(payout) 64% → 68%). The tight brackets were losing to tick noise, the one-minute both-touched rule and commissions.
+- **Longer horizons still lose** even without tight stops: the funded policy planned over 63+ days plays for survival and
+  withdraws far less within any realistic window. The 21-day horizon stays.
+- **Adopted for the live plan only:** `a06_playbook.PLAN_L_SET = (5, 6, 8, 10)`; the solver's default menu (A01's) is unchanged so
+  every earlier record reproduces. `bot/policy.json` re-exported; tables regenerated; `tests/test_bot_ticket.py` passes. Example
+  end-game ticket (MNQ eval at $52,700, best day $1,100): +$300 / −$500 (was +$100 / −$200-type). The droplet needs the new
+  `policy.json` (copy and restart).
+
+## 137. A21: Nikkei (1 NKD) and DAX (2 FDXM) fill the two unused funded slots — five accounts, ends ahead 85–96% (S8)
+
+**No trial spent; N 773.** `reporting/a21_more_accounts.py`; `reports/a21_{market}.json`, `a21_corr.json`, `a21_portfolio.json`. The user
+chose to improve what works rather than search for new edges; Tradeify allows 5 funded accounts and the plan used 3. Candidates with
+free HistData 1-minute data, windows fixed in advance from each main session: DAX (FDXM, €5/pt) Xetra 09:00–17:30 Frankfurt; Nikkei
+(NKD, $5/pt) 09:00–15:00 Tokyo; EUR/GBP/AUD/JPY (6E/6B/6A/6J) 08:00–16:00 London; silver (SI) COMEX 08:25–13:25 New York. Zero edge,
+drift removed per era, today's contract values, stops at the stop price, the live policy (stops ≥ $500, §136); assumed ≤ 3 full-size
+contracts and round trips FDXM/NKD $4, FX/SI $4.5 (estimates). Bid-quote CFD/spot data — an approximation of the futures.
+
+**Alone, at the risk-matched size (daily swing ≈ $2,900; 84 days, replay · block, P(payout) and mean net):**
+
+| market (size) | 2010–20 | 2021–26 | daily correlation with MNQ / MGC / MCL (2021–26) |
+|---|---|---|---|
+| **Nikkei, 1 NKD** (swing $2.9–3.5k) | 71% +$1,117 · 80% +$2,020 | 75% +$1,855 · 79% +$2,135 | **+0.01 / +0.01 / +0.03** |
+| **DAX, 2 FDXM** ($2.4–2.8k) | 75% +$1,724 · 74% +$1,888 | 85% +$3,621 · 79% +$3,023 | +0.19 / +0.16 / −0.05 |
+| silver, 1 SI ($3.7–4.6k, cannot go smaller) | 75% +$2,058 · 75% +$2,388 | 86% +$2,605 · 81% +$2,394 | +0.14 / **+0.58** / +0.07 |
+| euro, 3 6E (undersized, $1.4–1.8k) | 66% +$2,236 · 72% +$2,024 | 75% +$1,657 · 71% +$1,626 | +0.05 / +0.32 / −0.05 |
+| pound / aussie / yen, 3 (undersized, < $1.1k) | 27–43% | 35–51% | gold +0.29–0.40 |
+
+**Portfolio (joint replay on common start dates; 3 = MNQ 4, MGC 8, MCL 10):**
+
+| per four months | 3 accounts | + NKD | + NKD + DAX | + NKD + DAX, extra slippage (NKD +$25, DAX +$10 a trade) |
+|---|---|---|---|---|
+| 2021–26 mean / median | +$4,712 / +$3,224 | +$6,785 / +$6,200 | **+$10,475 / +$9,422** | +$10,034 / +$9,013 |
+| 2021–26 P(net > 0); 10th pct | 80%; −$1,060 | 90%; +$25 | **96%; +$1,374** | 96%; +$1,194 |
+| 2010–20 mean / median | +$5,363 / +$4,346 | +$6,115 / +$5,212 | **+$6,833 / +$5,831** | +$6,392 / +$5,482 |
+| 2010–20 P(net > 0); 10th pct | 80%; −$899 | 79%; −$1,895 | **87%; −$1,505** | 85%; −$1,880 |
+| fees | $2.6–3.0k | $3.7–4.1k | $4.7–5.1k | |
+
+**Recommended: add Nikkei (1 NKD, 09:00–15:00 Tokyo = 20:00–02:00 New York) and DAX (2 FDXM, 09:00–17:30 Frankfurt = 03:00–11:30
+New York) as accounts 4 and 5** — Nikkei is uncorrelated with everything; DAX nearly so. Silver duplicates gold; the FX contracts are
+too small within a 3-contract cap. Open with the user before the bot is changed: that their Tradeify account type permits NKD and FDXM
+and how FDXM counts against the contract cap; the extra $2.1k of evaluation fees per four months.
+
+## 138. Nikkei and DAX added to the demo — forward test first; evaluations bought only if it comes back positive (S8)
+
+**No trial spent; N 773.** The user confirmed: Tradeify permits NKD and FDXM; the per-account cap is taken as 3 minis / 30 micros
+(Tradeify states no separate rule for them); the two extra evaluations will be bought **only if the forward test is positive**.
+
+- **Playbook** (`a06_playbook.PRODUCTS`): NKD 1 contract, $5 a point, tick 5, rt $4, 09:00–15:00 Tokyo; FDXM 2 contracts, €5 a point at
+  EUR/USD 1.12 ($5.60), tick 1, rt $4, 09:00–17:30 Frankfurt. Fresh-evaluation tickets: NKD +240 / −200 points, FDXM +108 / −89 points
+  (≈ +$1,200 / −$1,000 net). `bot/policy.json` re-exported.
+- **Bot:** windows defined in each exchange's own time zone and converted per date (NKD 20:00 → 02:00 New York in summer, 19:00 →
+  01:00 in winter; FDXM 03:00 → 11:30, shifting an hour in the weeks when Europe and the US change clocks on different dates); the
+  17:30 alert now carries five tickets (MCL, NKD, MGC, FDXM, MNQ). Shadow tracking from Yahoo: NKD=F; FDXM on the DAX index (^GDAXI,
+  Xetra hours). Bookkeeping for five accounts; an existing three-account `state.json` is kept and the two new accounts start fresh.
+- **Demo checker** (A18): expected outcome rates for NKD and FDXM from A21's 2021–26 paths.
+- Tests: tickets equal the playbook on 3,000 random states over all five products; the schedule's NKD/FDXM windows; state migration.
+
+## 139. The bot shows ticks and posts a weekly check against the backtest (S8)
+
+**No trial spent; N 773.** At the user's request, while the demo runs: (1) every ticket shows its take and stop in **ticks** beside
+points (TradingView's bracket fields take ticks; tick sizes MNQ 0.25, MGC 0.10, MCL 0.01, NKD 5, FDXM 1); (2) the Friday 17:30 alert
+carries a **weekly check** — the week's shadow-tracked outcomes (take / stop / time exit) and P&L against the backtest's expectation
+for the same brackets, flagged UNUSUAL if |z| ≥ 2 on P&L or the outcome mix's chi-square ≥ 6. Expectations are precomputed from
+2021–26 paths for every bracket the live policy can choose (W_SET × the plan's stop menu, 76 per product) into `bot/expected.json`
+(`a18_demo_check --export-expected`), so the droplet needs no history; a stop capped near the floor maps to the nearest menu
+bracket. Tests extended. Deployed to the droplet with the user's go-ahead.
+
+## 140. Accounts 4–5 re-checked on real prices — a clock bug in all HistData work, fixed; soybeans is the sixth market (S8)
+
+**No trial spent; N 773.** `reporting/a22_more_markets.py`; `reports/a22_*.json`; A21 re-run (`reports/a21_*.json` overwritten
+with corrected values). At the user's request: re-check the NKD/DAX backtest, then look for a sixth and seventh market.
+
+**A clock bug, found by the re-check.** HistData's ASCII M1 timestamps are **New York local time with daylight saving**, not
+"EST without DST (UTC−5)" as `data/fx.py`, `data/fx_fix.py` and A21 assumed — so every HistData window ran **one hour late from
+March to November**. Shown three ways: A21's Nikkei proxy vs real NKD futures (window-return correlation 0.996 in US summer only
+when shifted an hour; 0.994 in winter unshifted); HistData S&P (spxusd) vs Databento NQ 1-minute returns, 2024 (summer 0.895 at
+−60 min, 0.012 at 0; winter 0.894 at 0); silver (xagusd) vs Databento MGC (0.708 / 0.010; 0.673 at 0 in winter). All three
+loaders now read the stamps as America/New_York; caches built the old way are in `data/cache/stale_utc5/`.
+**Affected and not re-run: Z10 (gotobi), Z11 (month-end fix), Z12 (EUR time of day), D01 (silver fix), D02 (AUD Tokyo fix) —
+trials t00775–t00779 — and both D-series discovery scans (§130, §134).** Their windows were an hour off for ~8 months a year;
+their REJECT verdicts are unsafe until re-run. Records stay as written (append-only).
+
+**Accounts 4–5, corrected** (A21 re-run; 84 days; replay):
+
+| | 2010–20 old → corrected | 2021–26 old → corrected |
+|---|---|---|
+| 1 NKD alone | 71% +$1,117 → 67% +$1,189 | 75% +$1,855 → 74% +$2,763 |
+| 2 FDXM alone | 75% +$1,724 → 73% +$2,072 | 85% +$3,621 → 83% +$1,879 |
+| five accounts: mean / P(net > 0) / 10th pct | +$6,833 / 87% / −$1,505 → **+$8,109 / 84% / −$654** | +$10,475 / 96% / +$1,374 → **+$9,448 / 94% / +$1,300** |
+
+**Real prices.** Yahoo hourly bars (NKD=F, 2024-05 → 2026-09; the official DAX index ^GDAXI for DAX — Yahoo has no Eurex
+futures), same dates, both as hourly bars with the OHLC path rule. Corrected proxy vs real: NKD correlation 0.98, SD ratio ~0.99,
+range ~0.97; 1 NKD replay +$3,600 real vs +$3,008 proxy (block +$2,586 / +$2,445). DAX correlation 0.94 (the index opens on a
+Xetra auction with stale prints; the CFD, like FDXM, trades before 09:00), +$3,906 index vs +$2,023 proxy — the proxy is the
+closer and more conservative guide for FDXM. NKD window volume: median ~1,250 contracts. **Accounts 4–5 stand.** `bot/expected.json`
+regenerated (NKD/FDXM outcome rates move ≤ 5 points; MNQ/MGC/MCL unchanged) — not yet deployed.
+
+**Sixth and seventh market.** Candidates fixed before any result, each market's whole session: natural gas (MNG), platinum (PL),
+copper (MHG), corn/soybeans/wheat (ZC/ZS/ZW), live cattle/lean hogs (LE/HE), bitcoin (MBT, not on Tradeify's stated list). Free
+Yahoo data: hourly ~730 days for all; daily since 2010 only where Yahoo's daily bar matched the hourly-built session (NG, BTC,
+grains), copper from the owned Databento file. **Yahoo's continuous hourly series interleaves two contract months around rolls**
+(corn June 2024, hogs Sept–Oct 2025 and March 2026, swings of 4–25%); sessions with an internal open/close jump > 0.8% or a
+one-hour move > max(5%, 15× the median) are dropped (NG 32, PL 12, HG 20, ZC 63, ZS 33, ZW 68, LE 34, HE 112, BTC 21 of ~560; the
+rule also drops a few real extremes, e.g. copper 2025-07-30). Sizes by the daily-swing rule ($2,900) within 3 full / 30 micro:
+27 MNG, 1 PL, 10 MHG, 3 ZC/ZS/ZW/LE/HE (corn and hogs reach only ~$1k), 13 MBT.
+
+Alone (replay P(payout), mean net; 2024–26 hourly · 2010–20 · 2021–26): **ZS 83% +$5,299 · 68% +$3,324 · 74% +$2,891**; LE 88%
++$3,367 (hourly only); NG 84% +$2,025 · 48% +$900 · 75% +$1,364; BTC 73% +$1,429 · 71% +$3,483 (2017–20) · 54% +$1,496; HG 48%
+−$509 · 39% +$493 · 66% +$1,594; PL 60% +$606; ZW 42% +$2,194 · 59% +$3,161 · 56% +$858; HE 52% +$1,077; ZC 37% +$271.
+Correlation with the five live accounts ≤ 0.2 for NG, ZS, LE, HE; copper +0.26–0.38 (Nasdaq, gold), platinum +0.44 (gold), bitcoin
++0.31 (Nasdaq); the grains +0.4–0.6 with each other.
+
+**Portfolio** (joint replay, common start dates, one run without bitcoin — `a22_portfolio.json`; with bitcoin in
+`a22_portfolio_with_btc.json`; per four months, mean / P(net > 0) / 10th pct):
+
+| | 2024–26 hourly (229 starts) | 2016–20 (669) | 2021–26 (1,019) |
+|---|---|---|---|
+| five live | +$8,329 / 99% / +$1,380 | +$8,117 / 84% / −$679 | +$9,446 / 94% / +$1,300 |
+| **+ soybeans (6)** | **+$14,327 / 100% / +$3,773** | **+$9,524 / 87% / −$968** | **+$12,586 / 96% / +$2,768** |
+| + natural gas (6) | +$9,673 / 94% / +$547 | +$9,095 / 93% / +$1,280 | +$10,860 / 96% / +$1,376 |
+| + cattle (6) | +$10,437 / 100% / +$1,403 | — | — |
+| + soybeans + natural gas (7) | +$15,671 / 100% / +$5,685 | +$10,503 / 94% / +$1,322 | +$14,000 / 97% / +$3,873 |
+| + soybeans + cattle (7) | +$16,436 / 100% / +$5,014 | — | — |
+| soybeans in place of crude (5) | +$12,593 / 100% / +$3,688 | +$9,119 / 86% / −$408 | +$11,495 / 97% / +$2,778 |
+
+**Stress — stops filled at the bar's extreme** (an upper bound on gap slippage; soybeans and cattle pause overnight / trade one
+session): ZS hourly +$5,299 → +$2,586, daily +$3,324 → −$320 and +$2,891 → −$162; LE hourly +$3,367 → +$2,794; NG hourly
++$2,025 → −$292. On daily bars the bound is extreme (a whole day's low as the fill); on hourly bars soybeans and cattle keep most
+of their result and natural gas does not. Soybeans bar-to-bar gaps > 0.25%: 2.8% of hours.
+
+**Reading.** Soybeans (3 ZS) is the best sixth market in all three histories and the best swap for crude if the plan stays at
+five accounts; natural gas (27 MNG) is the better-tested seventh (long history, the best 10th percentile in 2016–20), cattle (3 LE)
+the stronger one on two years of data only. All on free Yahoo bars (hourly within ~10–15%, daily ~30% of the minute answer) —
+a go/no-go, not a forecast. **Open with the user:** Tradeify's 5-funded cap (a sixth or seventh account needs it lifted — or a
+swap); shadow-tracking ZS and NG/LE in the bot before buying anything; deploying the regenerated `expected.json`; re-running
+Z10–Z12, D01–D02 and the D-series scans on the corrected clock.
+
+## 141. Soybeans added to the demo bot as a sixth ticket (S8)
+
+**No trial spent; N 773.** The user: "since it's a demo just add soybeans to the bot." 3 ZS, the whole CBOT session — enter at the
+19:00 Chicago open (20:00 New York), flat by 13:15 Chicago (14:15 New York; the close is 13:20); prices in cents a bushel, $50 a
+cent, tick ¼ cent ($12.50), round trip $4.50 (estimate). Fresh-evaluation ticket: +8.00 / −6.50 cents = 32 / 26 ticks (≈ +$1,200 /
+−$1,000 net). Playbook (`a06_playbook.PRODUCTS["ZS"]`), `bot/policy.json` and `bot/expected.json` re-exported (ZS expectations
+from A22's cleaned 2024–26 hourly sessions — coarser than the minute-based products); bot: accounts, schedule (Chicago clock),
+shadow tracking on Yahoo `ZS=F` (checked on the 2026-10-08 session: 964 minute bars, bracket resolved). The corrected
+`expected.json` of §140 was deployed 2026-10-11 and this change 2026-10-12, with the user's go-ahead; previous files kept in
+`/opt/futures-bot/backup-2026-10-12/`. Demo only — under Tradeify's 5-funded cap a soybean account would replace one of the five.
+Caveat: Yahoo's continuous series can mix two contract months near a roll (§140), so a shadow result there may be wrong.
+
+## 142. The five HistData tests re-run on the corrected clock — Z12 confirms but fails the post-2021 gate; discovery re-scanned (S1–S8)
+
+**Five trials spent: t00780–t00784, each written through `TrialLog.supersede` naming t00775–t00779. N 773 → 778.** Each module's
+own `--inject` then `--run`, code unchanged; only the loaders' clock changed (§140). Old reports kept in the session scratch.
+
+| test (old → new) | net | t | placebo pct | posterior > 0 | decision |
+|---|---|---|---|---|---|
+| Z10 gotobi, 18:00 ET → 09:55 JST | +0.49 → +0.46 bps | +0.67 → +0.54 | 93 / 50 → 39 / 50 | yes → yes | REJECT → REJECT |
+| Z11 month-end EUR/USD London fix | −1.92 → −0.17 bps | −1.34 → −0.09 | 30 → 63 | no → yes | REJECT → REJECT |
+| **Z12 EUR/USD short Europe, long US** | **+0.06 → +1.46 bps/day** | **+0.09 → +2.00** | **87 → 100** | yes → yes | **REJECT → CONFIRM** |
+| D01 silver short 11:00–12:00 UTC (sealed 2018–26) | +0.75 → −2.23 bps | +0.95 → −2.52 | 95 → 26 | yes → no | REJECT → REJECT |
+| D02 AUD long into the Tokyo fix, month-end (sealed) | −1.13 → −4.72 bps | −1.38 → −2.75 | 0 → 0 | no → no | REJECT → REJECT |
+
+**Z12 confirms on its registered statistic and window (2010–26; injection power 79%) — and fails S8, the post-2021 gate.**
+By period, net bps a day (t, annual Sharpe): 2010–17 +2.72 (+2.31, 0.81); 2018–20 +0.28 (+0.20, 0.11); **2021–26 +0.28 (+0.25,
+0.10)**; morning leg alone 2021–26 +0.40 (Sharpe 0.25), afternoon −0.12. By year the edge lives in 2012–2017 (Sharpe +1.0 to +3.0)
+and is flat since 2018. The strength after the paper (2013) and the fade since 2018 are both in the data; the registered test
+pools them. **Not adopted** (S8; and 6E at ≤ 3 contracts carries ~$60 a day of edge). Net > 0 out of sample, so it goes to the
+**watchlist** (§133), the programme's first entry there; a forward test would read the 2026–27 days as they come.
+
+**D01 and D02 now point the other way on sealed data** (silver rises 11:00–12:00 UTC, t −2.52 for the short; AUD falls into the
+Tokyo fix at month-end, t −2.75 for the long). Reversed signs found on sealed data are not hypotheses — recorded, not acted on.
+
+**Discovery re-scanned on 2010–17 with the corrected clock** (`reports/d_discovery.json`, `d2_discovery.json`; rules unchanged).
+Family 1 (|t| > 4.1, 926 tests): carried USD/CHF 20:00 UTC Fridays (t −6.07), USD/CHF 21:00 UTC Fridays (−4.47; inside the CME
+break — excluded under §130's amendment), silver 10:00 UTC all weekdays (−4.22; replaces the 11:00 UTC cell D01 was built on, old
+t −7.27). Family 2 (|t| > 1.96 and 2× cost, 58 tests, ~2.9 by chance): **8 carried, was 1** — GBP/USD into the 16:00 London fix at
+month-end (+2.84), DAX after the Xetra open at month-end (−2.64), Nikkei into the Tokyo morning close (−2.60), AUD/USD into the Tokyo
+fix at month-end (+2.57, D02's cell), AUD/USD after the London fix at month-end (−2.41), USD/CHF after the London fix at month-end
+(+2.34), AUD/USD into the London fix at month-end (+2.04), DAX after the Xetra close at month-end (+1.97). **None registered yet —
+open with the user** (each would be one validation trial on the sealed 2018–26 window; the Friday USD/CHF cell sits in the
+Friday-close bid-spread pattern §130 described). The trial log's chain verifies (778 records).
+
+## 143. D03–D11 registered — the nine cells of the corrected-clock re-scan, each to be validated once (S1–S5)
+
+**No trial spent at registration; N 778. Committed BEFORE any validation data is read.** The user: "test those 9." From §142's
+re-scan, the cells carried that were never validated (D02's cell was; USD/CHF 21:00 UTC Fridays is excluded as inside the CME
+break, §130). One module, `signals/d_cells.py`; `hypotheses.yaml` D03–D11; catalog sections; 6S, 6B, FDXM, NKD added to the
+registry's single-market primaries.
+
+| id | cell (discovery 2010–17: mean, t, n) | trade | prior net (bp) |
+|---|---|---|---|
+| D03 | USD/CHF 20:00–21:00 UTC, Fridays (−2.88, −6.07, 403) | short USD/CHF (long 6S) | N(+0.64, 1.0) |
+| D04 | silver 10:00–11:00 UTC, all weekdays (−3.14, −4.22, 1,949) | short SI | N(+0.07, 1.5) |
+| D05 | GBP/USD 30 min into the 16:00 London fix, month-end (+5.63, +2.84, 96) | long 6B | N(+2.02, 1.0) |
+| D06 | DAX 30 min after the Xetra open, month-end (−8.71, −2.64, 79) | short FDXM | N(+3.36, 1.0) |
+| D07 | Nikkei 30 min into the Tokyo morning close, all weekdays (−2.35, −2.60, 1,153) | short NKD | N(+0.18, 1.0) |
+| D08 | AUD/USD 30 min after the London fix, month-end (−3.45, −2.41, 96) | short 6A | N(+0.93, 1.0) |
+| D09 | USD/CHF 30 min after the London fix, month-end (+3.18, +2.34, 96) | long USD/CHF (short 6S) | N(+0.79, 1.0) |
+| D10 | AUD/USD 30 min into the London fix, month-end (+4.23, +2.04, 96) | long 6A | N(+1.32, 1.0) |
+| D11 | DAX 30 min after the Xetra closing auction, month-end (+4.25, +1.97, 78) | long FDXM | N(+1.13, 1.0) |
+
+**Fixed now:** direction = the discovery sign; costs as the scans (FX 0.8, DAX/Nikkei 1.0, silver 1.5 bp); prior mean per §132
+(discovery mean halved less cost), prior SD max(1.0, cost) — the rule D01 (1.5) and D02 (1.0) used without stating it; placebo =
+the same trade in the instrument's other cells of its family and day-set; tiers per §133; Z and D market-tests 15–23; outcome
+injection from the placebo cells' demeaned returns (family 1) or the same window on all weekdays (family 2), the runner refusing
+without it. Caveats on record before the run: D03 sits in the Friday-close bid-spread pattern §130 described; D04's prior is
+nearly zero (the discovery mean is barely twice the cost); D05–D11 come from an uncorrected scan where ~2.9 of 58 cells pass by
+chance and 8 did; D08 and D10 are one pair's before/after windows on the same days.
+
+## 144. D03–D11 validated: one artefact, five watchlist cells, three rejects — still no tradable edge (S6–S8)
+
+**Nine trials spent: t00785–t00793. N 778 → 787.** `reports/d0{3..9}_trial.*`, `d10_trial.*`, `d11_trial.*`; injections all
+recovered (power of the strict t at the prior's size 7–52%). The trial log's chain verifies (787 records).
+
+| id, trial | cell | events | net bps | t | placebo pct | 2018–21 / 2022–26 net | tier |
+|---|---|---|---|---|---|---|---|
+| D03 t00785 | USD/CHF falls in the last New York hour on Fridays (20:00-21:00 UTC) | 401 | +1.81 | +5.12 | 95 | +1.70 / +1.90 | **INVALIDATED (quote artefact)** |
+| D04 t00786 | silver falls 10:00-11:00 UTC | 2171 | +0.43 | +0.56 | 91 | +1.21 / -0.25 | **WATCHLIST** |
+| D05 t00787 | GBP rises into the London 4 pm fix at month-end | 102 | +1.54 | +0.69 | 100 | -2.20 / +4.61 | **WATCHLIST** |
+| D06 t00788 | DAX falls in the first half hour of Xetra at month-end | 100 | -5.42 | -1.88 | 0 | -7.38 / -3.88 | **REJECT** |
+| D07 t00789 | Nikkei falls into the Tokyo morning close | 2161 | -1.00 | -2.35 | 33 | -0.68 / -1.26 | **REJECT** |
+| D08 t00790 | AUD falls after the London 4 pm fix at month-end | 97 | +2.33 | +1.68 | 67 | +2.36 / +2.30 | **WATCHLIST** |
+| D09 t00791 | USD/CHF rises after the London 4 pm fix at month-end | 97 | +2.03 | +1.44 | 100 | +3.19 / +1.03 | **WATCHLIST** |
+| D10 t00792 | AUD rises into the London 4 pm fix at month-end | 99 | +0.11 | +0.06 | 67 | -3.49 / +3.24 | **WATCHLIST** |
+| D11 t00793 | DAX rises after the Xetra closing auction at month-end | 94 | -1.45 | -0.60 | 67 | -4.84 / +1.53 | **REJECT** |
+
+**D03 passes the strict rule as registered (t +5.12, both halves t +3.63) and is not real.** Checked after the run, as §143 said
+it would need: on HistData the drop lives only in the last hour before the weekend close, 16:00–17:00 New York, in both seasons
+(US summer, 20:00 UTC: −4.20 bps, t −9.4; winter, 21:00 UTC: −4.63, t −8.4) and is absent the hour before (+0.14). On **CME 6S
+futures trades** (Yahoo 6S=F hourly, 117 Fridays 2024–26) the same hour is **−0.06 bps, t −0.10**; on a quote feed (CHF=X) it is
+−4.41, t −8.6. The bid falls as the spread widens into the close — §130's artefact, now shown on traded prices. Recorded as
+INVALIDATED; not adopted and not watchlisted. Lesson for the protocol: any cell adjacent to a market close is checked against
+traded futures prices before validation.
+
+**Watchlist** (§133; with Z12, §142): D04, D05, D08, D09, D10. None is tradable as it stands: net 0.1–2.3 bps a trade, 12 events a
+year for the month-end cells. Years of forward data the strict t would need at the validated size (one-sided 1.645, same SD):
+D04 ~75, D05 ~48, D08 ~8, D09 ~11, D10 ~7122. A forward test in the bot would not decide any of them within the user's
+horizon; recommended instead: re-read them from free data once a year. **Rejected:** D06, D07, D11. Running count: 23 Z and D
+market-tests; 0 tradable confirmations.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —

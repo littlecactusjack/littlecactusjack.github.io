@@ -4508,3 +4508,800 @@
   s6_control: >
     Gross and net; non-gotobi days in the same window; the paper's full 03:00 JST window (not tradable; descriptive);
     by period (2021-23, 2024-26).
+- id: Z11
+  name: month_end_fx_hedge_rebalancing_at_the_london_fix
+  mechanism: >
+    The hedging channel at the month-end London 4 p.m. WM/Reuters fix (Melvin & Prins 2015, Journal of Financial
+    Markets 22; 10 currencies, 2004-04 to 2012-12): international equity managers reset currency hedges at the
+    month-end fix, so a country's equity outperformance over the month predicts its currency's depreciation in the hour
+    before the fix (panel slope -0.0142: 10% -> 14 bps). THE COUNTERPARTY is the passive hedger resetting on a schedule.
+  condition: >
+    EUR/USD (6E): on the last weekday of each month, from 15:00 to 16:00 London time, LONG EUR/USD if the S&P 500
+    outperformed the DAX month to date (first to second-last trading day, close to close), SHORT otherwise; net of
+    1.0 bp. Free HistData 1-minute bars (data/fx_fix.py): EUR/USD spot, S&P 500 and DAX index CFDs (the DAX stands in
+    for the Eurozone market; HistData's Euro Stoxx ends in 2019). GBP/USD failed the in-sample screen (wrong sign) and
+    is not tested.
+  horizon_minutes: [60]
+  hold_hours: [1.0]
+  registered: 2026-10-11
+  status: retired
+  retired: 2026-10-11
+  retired_reason: >
+    Trial t00776 (decisions.md 127), REJECTED under the strict rule: 158 month-ends 2013-01 to 2026-09, EUR/USD 15:00-16:00
+    London signed by S&P - DAX: gross -0.92 bps, net -1.92 (SD 17.9), t -1.34; slope +0.05 bps per 1%; placebos 20th / 30th
+    pct; 2013-19 -0.19, 2020-26 -3.88. Strong in 2010-12 (+11.1 bps), absent since - after the paper and the 2015 fix reform.
+  outcome_injection:
+    test: src/futuresres/signals/z11_trial.py
+    injected_bps: 3.0
+    sought_bps: 3.0
+    n_injection: 158
+    n_run: 158
+    recovered: true
+    report: reports/z11_injection.json
+  schedulable: false
+  schedulable_note: >
+    12 events a year; the runner refuses to run without its outcome injection. Registered after a screen INSIDE the
+    paper's sample only (2010-11 to 2012-12, 26 events): EUR/USD +11.09 bps, t +3.19, win 81%; GBP/USD -5.68 bps,
+    t -1.41 (dropped). No 2013-2026 return computed before registration.
+  test_order: null
+  registered_test_order: 33
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: No free parameters - the paper's window and signal; the DAX substitution fixed before testing. ONE TRIAL.
+  session: Globex
+  symbols: [6E]
+  mechanism_instruments:
+    primary: 6E
+    secondary: null
+    rationale: >
+      6E (CME euro futures) is tradable in the user's account; the test uses EUR/USD spot, which 6E tracks. One pair;
+      no second-instrument confirmation is claimed (GBP failed its screen).
+  stage4_reachable: false
+  stage4_reason: One currency pair; the test window is after the paper's sample.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2020-01-01', decisive: full}
+  test_window: {start: '2013-01-01', end: '2026-09-30', reason: 'after the paper sample (2004-04 to 2012-12)'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: >
+      Prior on the net mean per event Normal(+3 bps, 3 bps): the in-sample +11.1 bps, roughly halved, less the 1 bp cost,
+      shaded down for the 2015 fix reform (window widened to five minutes); an ASSUMPTION.
+  decision_rule:
+    rule: >
+      The STRICT Z rule for a standalone trade: CONFIRM only if (1) the net mean per event has one-sided t > 1.645;
+      (2) it is at or above the 95th percentile of BOTH placebos - the same signed trade on each of the 5 weekdays
+      before month-end, and the month's signal randomly permuted across months; (3) the posterior > 0, reported beside a
+      zero-mean prior; (4) reported against the running count (11 Z market-tests).
+  outcome_injection_required: Done before the run - reports/z11_injection.json.
+  s6_control: >
+    Gross and net; by period (2013-19, 2020-26); the slope on the relative equity return; the paper's hour on non-month-end
+    days.
+- id: Z12
+  name: eur_weakens_in_european_hours_strengthens_in_us_hours
+  mechanism: >
+    Time-of-day FX returns (Breedon & Ranaldo 2013, Journal of Money, Credit and Banking; EBS data 1997-2007; also Cornett
+    et al. 1995, Ranaldo 2009): currencies tend to depreciate in their own trading hours and appreciate in the counter
+    currency's, because local participants are net buyers of foreign currency in their own hours (order flow). For
+    EUR/USD a simple strategy - short EUR in European hours, long in US hours - earned after-cost Sharpe ratios of 1.3 and
+    0.9 for the two legs. THE COUNTERPARTY is the local customer flow intermediated across sessions.
+  condition: >
+    EUR/USD (6E), every New York weekday: SHORT from 07:00 London (the European open) to 08:00 New York (the US open),
+    then LONG from 08:00 to 16:00 New York - the paper's open-to-open / open-to-close strategy read without overlap
+    (the account cannot be long and short at once; READING fixed before any data was examined). Net of 0.8 bp per leg's
+    round trip. Free HistData EUR/USD spot, hourly prices (data/fx_fix.hourly_utc).
+  horizon_minutes: [480]
+  hold_hours: [6.0, 8.0]
+  registered: 2026-10-11
+  status: retired
+  retired: 2026-10-11
+  outcome_tier: WATCHLIST
+  retired_reason: >
+    Trial t00777 (decisions.md 128), REJECTED under the strict rule: 4,231 weekdays 2010-2026; morning short +1.26 bps
+    gross, afternoon long +0.40; net of 1.6 bps a day +0.06 (SD 47.6), t +0.09, annual net Sharpe +0.02; placebo 87th pct.
+    The pattern survives gross but costs absorb it, and it decayed: 2010-17 net +1.40 (Sharpe 0.41), 2018-26 -1.18 (-0.45).
+    Corrected-clock re-run t00782 (decisions.md 142) supersedes t00777: CONFIRM on the registered 2010-2026 statistic (net +1.46 bps/day, t +2.00, placebo 100th pct) but fails the post-2021 gate (2021-26 net +0.28, t +0.25, Sharpe 0.10; the edge sits in 2012-17). Not adopted; watchlist.
+  outcome_injection:
+    test: src/futuresres/signals/z12_trial.py
+    injected_bps: 0.6         # UNITS: annual net Sharpe, not bps
+    sought_bps: 0.6
+    n_injection: 4231
+    n_run: 4231
+    recovered: true
+    report: reports/z12_injection.json
+  schedulable: false
+  schedulable_note: >
+    ~250 events a year; the runner refuses to run without its outcome injection. No in-sample screen is possible (the
+    paper's sample is 1997-2007; the free data starts in 2010) - registered on the published size, before any return
+    was computed.
+  test_order: null
+  registered_test_order: 34
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: No free parameters - the paper's session table; the non-overlapping reading fixed in advance. ONE TRIAL.
+  session: Globex
+  symbols: [6E]
+  mechanism_instruments:
+    primary: 6E
+    secondary: null
+    rationale: >
+      6E (CME euro futures) is tradable in the user's account; the test uses EUR/USD spot, which 6E tracks. The paper
+      found the strategy profitable after costs only for EUR/USD; no second pair is claimed.
+  stage4_reachable: false
+  stage4_reason: One currency pair; the whole test window is after the paper's sample.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2018-01-01', decisive: full}
+  test_window: {start: '2010-01-04', end: '2026-09-30', reason: 'after the paper sample (1997-2007)'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: >
+      Prior on the annual net Sharpe of the two-leg day Normal(0.6, 0.4): the published legs (1.3, 0.9 after costs) roughly
+      halved for decay since publication; an ASSUMPTION.
+  decision_rule:
+    rule: >
+      The STRICT Z rule for a standalone trade: CONFIRM only if (1) the daily net P&L has one-sided t > 1.645; (2) the real
+      schedule's mean is at or above the 95th percentile of the same two-leg schedule shifted by each of the other 23
+      whole hours (UTC); (3) the posterior > 0, reported beside a zero-mean prior; (4) reported against the running count
+      (12 Z market-tests).
+  outcome_injection_required: Done before the run - reports/z12_injection.json.
+  s6_control: >
+    Each leg separately; gross and net; by period (2010-17, 2018-26); the shifted-schedule placebo means.
+- id: D01
+  name: silver_falls_into_the_london_fix
+  mechanism: >
+    DATA-DERIVED (D-series, decisions.md 129-130): discovered in the 2010-2017 scan of 912 hour-of-day cells on markets
+    this programme had not examined - silver's 1-hour return from 11:00 to 12:00 UTC averaged -5.53 bps (SD 33.7,
+    t -7.27, n 1,965). That hour ends at 12:00 London in summer and winter alike - the London silver fix (an electronic
+    auction since August 2014). A price dip into a benchmark fixing is documented for the manipulation era of the
+    precious-metal fixes; whether it outlived the 2014 reform is the question. THE COUNTERPARTY would be fix-bound
+    sellers and the dealers who pre-position against them.
+  condition: >
+    Every weekday, SHORT silver (SI) from 11:00 to 12:00 UTC (whole-hour prices from free HistData XAG/USD spot
+    1-minute, bid quotes); net of 1.5 bp (the protocol's cost; 2.0 bp reported as a sensitivity, SI's tick being ~1.7 bp).
+    11:00 UTC is 07:00 New York in summer, 06:00 in winter - inside the CME session.
+  horizon_minutes: [60]
+  hold_hours: [1.0]
+  registered: 2026-10-11
+  status: retired
+  retired: 2026-10-11
+  outcome_tier: REJECT
+  retired_reason: >
+    Trial t00778 (decisions.md 130), REJECTED under the strict rule on the sealed 2018-2026 window: 2,169 weekdays; the
+    11:00-12:00 UTC silver short gross +2.25 bps (SD 36.8), net +0.75 at 1.5 bp (t +0.95), +0.25 at 2.0 bp; placebo 95th pct
+    (the hour is still silver's most negative); 2018-21 net +2.04 (t 1.91), 2022-26 -0.38. About 40% of the discovery size
+    (-5.53 bps, t -7.27), and fading.
+    Corrected-clock re-run t00783 (decisions.md 142) supersedes t00778: net -2.23 bps, t -2.52, placebo 26th pct - REJECT.
+  outcome_injection:
+    test: src/futuresres/signals/d01.py
+    injected_bps: 1.3
+    sought_bps: 1.3
+    n_injection: 2169
+    n_run: 2169
+    recovered: true
+    report: reports/d01_injection.json
+  schedulable: false
+  schedulable_note: >
+    ~250 events a year; the runner refuses to run without its outcome injection; the validation window 2018-2026 was
+    sealed until this registration (d_discovery asserts discovery read nothing after 2017-12-31).
+  test_order: null
+  registered_test_order: 35
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Selected from 912 discovery cells (Bonferroni |t| > 4.1); no free parameter in validation. ONE TRIAL.
+  session: Globex
+  symbols: [SI]
+  mechanism_instruments:
+    primary: SI
+    secondary: null
+    rationale: >
+      COMEX silver (SI) is tradable in the user's account; the discovery and validation use XAG/USD spot, which SI tracks.
+      One market; no second instrument claimed.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: >
+      Prior on the net mean per event Normal(+1.3 bps, 1.5): the discovery's 5.53 bps halved, less the 1.5 bp cost.
+  decision_rule:
+    rule: >
+      STRICT rule, standalone (decisions.md 129): CONFIRM only if (1) the net mean of the short has one-sided t > 1.645;
+      (2) it is at or above the 95th percentile of the same short on silver's other 23 hours; (3) posterior > 0, beside a
+      zero-mean prior; (4) reported against the running count (13 Z and D market-tests).
+  outcome_injection_required: Done before the run - reports/d01_injection.json.
+  s6_control: >
+    Gross, net at 1.5 and at 2.0 bp; by period (2018-21, 2022-26); the same hour in gold (XAU) not run (not in the universe).
+- id: D02
+  name: aud_rises_into_the_tokyo_fix_at_month_end
+  mechanism: >
+    DATA-DERIVED (D-series family 2, decisions.md 132-134): in the 2010-2017 scan of 56 windows around scheduled fixings,
+    opens and closes, AUD/USD's 30 minutes before the 09:55 JST Tokyo fix on the month's last weekday averaged +2.88 bps
+    (SD 8.3, t +3.25, n 88) - the only cell beating twice its cost. Plausible flow: month-end settlement of Japanese
+    and regional AUD purchases priced at the Tokyo TTM fix. THE COUNTERPARTY would be fix-bound customer flow.
+  condition: >
+    On the last weekday (Tokyo date) of each month, LONG AUD/USD (6A) from 09:25 to 09:55 JST (20:25 or 19:25 New York the
+    evening before); free HistData AUD/USD spot 1-minute; net of 0.8 bp.
+  horizon_minutes: [30]
+  hold_hours: [0.5]
+  registered: 2026-10-11
+  status: retired
+  retired: 2026-10-11
+  outcome_tier: REJECT
+  retired_reason: >
+    Trial t00779 (decisions.md 134), REJECT tier (net mean <= 0) on the sealed 2018-2026 window: 100 month-ends, long AUD/USD
+    09:25-09:55 JST gross -0.33 bps (SD 8.2), net -1.13, t -1.38; placebo 0th pct; 2018-21 +0.01, 2022-26 -2.06. The
+    discovery's +2.88 bps (t 3.25, n 88) did not recur - a chance pass of the uncorrected scan.
+    Corrected-clock re-run t00784 (decisions.md 142) supersedes t00779: net -4.72 bps, t -2.75, placebo 0th pct - REJECT.
+  outcome_injection:
+    test: src/futuresres/signals/d02.py
+    injected_bps: 0.64
+    sought_bps: 0.64
+    n_injection: 100
+    n_run: 100
+    recovered: true
+    report: reports/d02_injection.json
+  schedulable: false
+  schedulable_note: >
+    12 events a year; the runner refuses to run without its outcome injection; validation 2018-2026 sealed until now.
+  test_order: null
+  registered_test_order: 36
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Selected from 56 family-2 cells (uncorrected |t| > 1.96 and > 2x cost, decisions.md 133). ONE TRIAL.
+  session: Globex
+  symbols: [6A]
+  mechanism_instruments:
+    primary: 6A
+    secondary: null
+    rationale: >
+      6A (CME Australian dollar futures) is tradable in the user's account; the test uses AUD/USD spot, which 6A tracks.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: Prior on the net mean per event Normal(+0.64 bp, 1.0) - the discovery mean halved less the 0.8 bp cost.
+  decision_rule:
+    rule: >
+      Strict rule, standalone (decisions.md 119, 132): CONFIRM if the net mean has one-sided t > 1.645, it is at or above the
+      95th percentile of AUD/USD's other family-2 windows on month-end days, and the posterior > 0; else WATCHLIST if the
+      net mean > 0 (forward-tested by the bot, decisions.md 133); else REJECT.
+  outcome_injection_required: Done before the run - reports/d02_injection.json.
+  s6_control: Gross and net; by period (2018-21, 2022-26); the same window on all weekdays.
+- id: D03
+  name: usdchf_falls_in_the_last_new_york_hour_on_fridays_2000_2100_utc
+  mechanism: >
+    DATA-DERIVED (D-series re-scan on the corrected HistData clock, decisions.md 142-143): in the 2010-2017 scan of
+    hour-of-day cells (family 1, |t| > 4.1), this cell averaged -2.88 bps (t -6.07, n 403). Plausible flow:
+    Friday-close position squaring in USD/CHF before the weekend; HistData bid quotes also carry the Friday-close spread widening (decisions.md 130), which the validation cannot separate. THE COUNTERPARTY would be that flow's originators. Carried by the scan, not predicted.
+  condition: >
+    Fridays, 20:00-21:00 UTC: SHORT USDCHF (traded as 6S); free HistData 1-minute bid quotes, New York time with DST;
+    net of 0.8 bp.
+  horizon_minutes: [60]
+  hold_hours: [1.0]
+  registered: 2026-10-12
+  status: retired
+  retired: 2026-10-12
+  outcome_tier: INVALIDATED
+  retired_reason: >
+    Trial t00785 (decisions.md 144), CONFIRM on the registered statistic, INVALIDATED as a quote artefact, sealed 2018-2026: 401 events; short gross +2.61 bps (SD 7.1), net +1.81, t +5.12; placebo 95th pct; 2018-21 +1.70, 2022-26 +1.90. The effect lives only in the last hour before the weekend close (16:00-17:00 New York: -4.20 bps t -9.4 in US summer at 20:00 UTC, -4.63 t -8.4 in winter at 21:00 UTC; the hour before it +0.14) and is absent on CME 6S futures trades (Yahoo 6S=F, 117 Fridays 2024-26: -0.06 bps, t -0.10) while present on quote feeds (CHF=X -4.41, t -8.6): the bid falling as the spread widens into the close. Not tradable; not adopted, not watchlisted.
+  outcome_injection_required: Before the run - reports/d03_injection.json (src/futuresres/signals/d_cells.py).
+  outcome_injection:
+    test: src/futuresres/signals/d_cells.py
+    injected_bps: 0.638
+    sought_bps: 0.638
+    n_injection: 401
+    n_run: 401
+    recovered: true
+    report: reports/d03_injection.json
+  schedulable: false
+  schedulable_note: >
+    Validated once on the sealed 2018-2026 window; the runner refuses to run without its outcome injection.
+  test_order: null
+  registered_test_order: 37
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Carried by the corrected-clock discovery re-scan (decisions.md 142); no free parameter in validation. ONE TRIAL.
+  session: Globex
+  symbols: [6S]
+  mechanism_instruments:
+    primary: 6S
+    secondary: null
+    rationale: >
+      6S is tradable in the user's account; the test uses the free spot / CFD series it tracks. One market.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: Prior on the net mean per event Normal(+0.64 bp, 1.0) - the discovery mean halved less the 0.8 bp cost; SD max(1.0, cost).
+  decision_rule:
+    rule: >
+      Strict rule, standalone (decisions.md 119, 132, 143): CONFIRM if the net mean has one-sided t > 1.645, it is at or
+      above the 95th percentile of the same trade in the pair's other UTC hours on Fridays, and the posterior > 0; else WATCHLIST if the net mean > 0 (forward-tested,
+      decisions.md 133); else REJECT. Z and D market-test number 15.
+  s6_control: Gross and net; by period (2018-21, 2022-26); the placebo cells' net means.
+- id: D04
+  name: silver_falls_1000_1100_utc
+  mechanism: >
+    DATA-DERIVED (D-series re-scan on the corrected HistData clock, decisions.md 142-143): in the 2010-2017 scan of
+    hour-of-day cells (family 1, |t| > 4.1), this cell averaged -3.14 bps (t -4.22, n 1949). Plausible flow:
+    European-morning selling in silver ahead of the 12:00 London fix in summer months. THE COUNTERPARTY would be that flow's originators. Carried by the scan, not predicted.
+  condition: >
+    every weekday, 10:00-11:00 UTC: SHORT XAGUSD (traded as SI); free HistData 1-minute bid quotes, New York time with DST;
+    net of 1.5 bp.
+  horizon_minutes: [60]
+  hold_hours: [1.0]
+  registered: 2026-10-12
+  status: retired
+  retired: 2026-10-12
+  outcome_tier: WATCHLIST
+  retired_reason: >
+    Trial t00786 (decisions.md 144), WATCHLIST (net > 0, strict rule failed; forward-test candidate, decisions.md 133), sealed 2018-2026: 2171 events; short gross +1.93 bps (SD 36.1), net +0.43, t +0.56; placebo 91th pct; 2018-21 +1.21, 2022-26 -0.25.
+  outcome_injection_required: Before the run - reports/d04_injection.json (src/futuresres/signals/d_cells.py).
+  outcome_injection:
+    test: src/futuresres/signals/d_cells.py
+    injected_bps: 0.071
+    sought_bps: 0.071
+    n_injection: 2171
+    n_run: 2171
+    recovered: true
+    report: reports/d04_injection.json
+  schedulable: false
+  schedulable_note: >
+    Validated once on the sealed 2018-2026 window; the runner refuses to run without its outcome injection.
+  test_order: null
+  registered_test_order: 38
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Carried by the corrected-clock discovery re-scan (decisions.md 142); no free parameter in validation. ONE TRIAL.
+  session: Globex
+  symbols: [SI]
+  mechanism_instruments:
+    primary: SI
+    secondary: null
+    rationale: >
+      SI is tradable in the user's account; the test uses the free spot / CFD series it tracks. One market.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: Prior on the net mean per event Normal(+0.07 bp, 1.5) - the discovery mean halved less the 1.5 bp cost; SD max(1.0, cost).
+  decision_rule:
+    rule: >
+      Strict rule, standalone (decisions.md 119, 132, 143): CONFIRM if the net mean has one-sided t > 1.645, it is at or
+      above the 95th percentile of the same trade in the pair's other UTC hours, and the posterior > 0; else WATCHLIST if the net mean > 0 (forward-tested,
+      decisions.md 133); else REJECT. Z and D market-test number 16.
+  s6_control: Gross and net; by period (2018-21, 2022-26); the placebo cells' net means.
+- id: D05
+  name: gbp_rises_into_the_london_4_pm_fix_at_month_end
+  mechanism: >
+    DATA-DERIVED (D-series re-scan on the corrected HistData clock, decisions.md 142-143): in the 2010-2017 scan of
+    30-minute windows around fixings, opens and closes (family 2, |t| > 1.96 and > 2x cost), this cell averaged +5.63 bps (t +2.84, n 96). Plausible flow:
+    month-end WM/R 16:00 fix demand for sterling from portfolio rebalancing and hedging. THE COUNTERPARTY would be that flow's originators. Carried by the scan, not predicted.
+  condition: >
+    the last weekday of each month, the 30 minutes before the WM/R 16:00 London fix: LONG GBPUSD (traded as 6B); free HistData 1-minute bid quotes, New York time with DST;
+    net of 0.8 bp.
+  horizon_minutes: [30]
+  hold_hours: [0.5]
+  registered: 2026-10-12
+  status: retired
+  retired: 2026-10-12
+  outcome_tier: WATCHLIST
+  retired_reason: >
+    Trial t00787 (decisions.md 144), WATCHLIST (net > 0, strict rule failed; forward-test candidate, decisions.md 133), sealed 2018-2026: 102 events; long gross +2.34 bps (SD 22.5), net +1.54, t +0.69; placebo 100th pct; 2018-21 -2.20, 2022-26 +4.61.
+  outcome_injection_required: Before the run - reports/d05_injection.json (src/futuresres/signals/d_cells.py).
+  outcome_injection:
+    test: src/futuresres/signals/d_cells.py
+    injected_bps: 2.016
+    sought_bps: 2.016
+    n_injection: 102
+    n_run: 102
+    recovered: true
+    report: reports/d05_injection.json
+  schedulable: false
+  schedulable_note: >
+    Validated once on the sealed 2018-2026 window; the runner refuses to run without its outcome injection.
+  test_order: null
+  registered_test_order: 39
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Carried by the corrected-clock discovery re-scan (decisions.md 142); no free parameter in validation. ONE TRIAL.
+  session: Globex
+  symbols: [6B]
+  mechanism_instruments:
+    primary: 6B
+    secondary: null
+    rationale: >
+      6B is tradable in the user's account; the test uses the free spot / CFD series it tracks. One market.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: Prior on the net mean per event Normal(+2.02 bp, 1.0) - the discovery mean halved less the 0.8 bp cost; SD max(1.0, cost).
+  decision_rule:
+    rule: >
+      Strict rule, standalone (decisions.md 119, 132, 143): CONFIRM if the net mean has one-sided t > 1.645, it is at or
+      above the 95th percentile of the same trade in GBPUSD's other family-2 windows on month-end days, and the posterior > 0; else WATCHLIST if the net mean > 0 (forward-tested,
+      decisions.md 133); else REJECT. Z and D market-test number 17.
+  s6_control: Gross and net; by period (2018-21, 2022-26); the placebo cells' net means.
+- id: D06
+  name: dax_falls_in_the_first_half_hour_of_xetra_at_month_end
+  mechanism: >
+    DATA-DERIVED (D-series re-scan on the corrected HistData clock, decisions.md 142-143): in the 2010-2017 scan of
+    30-minute windows around fixings, opens and closes (family 2, |t| > 1.96 and > 2x cost), this cell averaged -8.71 bps (t -2.64, n 79). Plausible flow:
+    month-end selling into the Xetra open (index and portfolio rebalancing orders). THE COUNTERPARTY would be that flow's originators. Carried by the scan, not predicted.
+  condition: >
+    the last weekday of each month, the 30 minutes after the Xetra open 09:00: SHORT GRXEUR (traded as FDXM); free HistData 1-minute bid quotes, New York time with DST;
+    net of 1.0 bp.
+  horizon_minutes: [30]
+  hold_hours: [0.5]
+  registered: 2026-10-12
+  status: retired
+  retired: 2026-10-12
+  outcome_tier: REJECT
+  retired_reason: >
+    Trial t00788 (decisions.md 144), REJECT (net mean <= 0), sealed 2018-2026: 100 events; short gross -4.42 bps (SD 28.9), net -5.42, t -1.88; placebo 0th pct; 2018-21 -7.38, 2022-26 -3.88.
+  outcome_injection_required: Before the run - reports/d06_injection.json (src/futuresres/signals/d_cells.py).
+  outcome_injection:
+    test: src/futuresres/signals/d_cells.py
+    injected_bps: 3.356
+    sought_bps: 3.356
+    n_injection: 100
+    n_run: 100
+    recovered: true
+    report: reports/d06_injection.json
+  schedulable: false
+  schedulable_note: >
+    Validated once on the sealed 2018-2026 window; the runner refuses to run without its outcome injection.
+  test_order: null
+  registered_test_order: 40
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Carried by the corrected-clock discovery re-scan (decisions.md 142); no free parameter in validation. ONE TRIAL.
+  session: Globex
+  symbols: [FDXM]
+  mechanism_instruments:
+    primary: FDXM
+    secondary: null
+    rationale: >
+      FDXM is tradable in the user's account; the test uses the free spot / CFD series it tracks. One market.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: Prior on the net mean per event Normal(+3.36 bp, 1.0) - the discovery mean halved less the 1.0 bp cost; SD max(1.0, cost).
+  decision_rule:
+    rule: >
+      Strict rule, standalone (decisions.md 119, 132, 143): CONFIRM if the net mean has one-sided t > 1.645, it is at or
+      above the 95th percentile of the same trade in GRXEUR's other family-2 windows on month-end days, and the posterior > 0; else WATCHLIST if the net mean > 0 (forward-tested,
+      decisions.md 133); else REJECT. Z and D market-test number 18.
+  s6_control: Gross and net; by period (2018-21, 2022-26); the placebo cells' net means.
+- id: D07
+  name: nikkei_falls_into_the_tokyo_morning_close
+  mechanism: >
+    DATA-DERIVED (D-series re-scan on the corrected HistData clock, decisions.md 142-143): in the 2010-2017 scan of
+    30-minute windows around fixings, opens and closes (family 2, |t| > 1.96 and > 2x cost), this cell averaged -2.35 bps (t -2.60, n 1153). Plausible flow:
+    position squaring into the Tokyo lunch break. THE COUNTERPARTY would be that flow's originators. Carried by the scan, not predicted.
+  condition: >
+    every weekday, the 30 minutes before the Tokyo morning close 11:30: SHORT JPXJPY (traded as NKD); free HistData 1-minute bid quotes, New York time with DST;
+    net of 1.0 bp.
+  horizon_minutes: [30]
+  hold_hours: [0.5]
+  registered: 2026-10-12
+  status: retired
+  retired: 2026-10-12
+  outcome_tier: REJECT
+  retired_reason: >
+    Trial t00789 (decisions.md 144), REJECT (net mean <= 0), sealed 2018-2026: 2161 events; short gross -0.00 bps (SD 19.8), net -1.00, t -2.35; placebo 33th pct; 2018-21 -0.68, 2022-26 -1.26.
+  outcome_injection_required: Before the run - reports/d07_injection.json (src/futuresres/signals/d_cells.py).
+  outcome_injection:
+    test: src/futuresres/signals/d_cells.py
+    injected_bps: 0.176
+    sought_bps: 0.176
+    n_injection: 2161
+    n_run: 2161
+    recovered: true
+    report: reports/d07_injection.json
+  schedulable: false
+  schedulable_note: >
+    Validated once on the sealed 2018-2026 window; the runner refuses to run without its outcome injection.
+  test_order: null
+  registered_test_order: 41
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Carried by the corrected-clock discovery re-scan (decisions.md 142); no free parameter in validation. ONE TRIAL.
+  session: Globex
+  symbols: [NKD]
+  mechanism_instruments:
+    primary: NKD
+    secondary: null
+    rationale: >
+      NKD is tradable in the user's account; the test uses the free spot / CFD series it tracks. One market.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: Prior on the net mean per event Normal(+0.18 bp, 1.0) - the discovery mean halved less the 1.0 bp cost; SD max(1.0, cost).
+  decision_rule:
+    rule: >
+      Strict rule, standalone (decisions.md 119, 132, 143): CONFIRM if the net mean has one-sided t > 1.645, it is at or
+      above the 95th percentile of the same trade in JPXJPY's other family-2 windows on all weekdays days, and the posterior > 0; else WATCHLIST if the net mean > 0 (forward-tested,
+      decisions.md 133); else REJECT. Z and D market-test number 19.
+  s6_control: Gross and net; by period (2018-21, 2022-26); the placebo cells' net means.
+- id: D08
+  name: aud_falls_after_the_london_4_pm_fix_at_month_end
+  mechanism: >
+    DATA-DERIVED (D-series re-scan on the corrected HistData clock, decisions.md 142-143): in the 2010-2017 scan of
+    30-minute windows around fixings, opens and closes (family 2, |t| > 1.96 and > 2x cost), this cell averaged -3.45 bps (t -2.41, n 96). Plausible flow:
+    reversal of month-end fix-bound AUD buying once the London fix has printed. THE COUNTERPARTY would be that flow's originators. Carried by the scan, not predicted.
+  condition: >
+    the last weekday of each month, the 30 minutes after the WM/R 16:00 London fix: SHORT AUDUSD (traded as 6A); free HistData 1-minute bid quotes, New York time with DST;
+    net of 0.8 bp.
+  horizon_minutes: [30]
+  hold_hours: [0.5]
+  registered: 2026-10-12
+  status: retired
+  retired: 2026-10-12
+  outcome_tier: WATCHLIST
+  retired_reason: >
+    Trial t00790 (decisions.md 144), WATCHLIST (net > 0, strict rule failed; forward-test candidate, decisions.md 133), sealed 2018-2026: 97 events; short gross +3.13 bps (SD 13.7), net +2.33, t +1.68; placebo 67th pct; 2018-21 +2.36, 2022-26 +2.30.
+  outcome_injection_required: Before the run - reports/d08_injection.json (src/futuresres/signals/d_cells.py).
+  outcome_injection:
+    test: src/futuresres/signals/d_cells.py
+    injected_bps: 0.925
+    sought_bps: 0.925
+    n_injection: 97
+    n_run: 97
+    recovered: true
+    report: reports/d08_injection.json
+  schedulable: false
+  schedulable_note: >
+    Validated once on the sealed 2018-2026 window; the runner refuses to run without its outcome injection.
+  test_order: null
+  registered_test_order: 42
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Carried by the corrected-clock discovery re-scan (decisions.md 142); no free parameter in validation. ONE TRIAL.
+  session: Globex
+  symbols: [6A]
+  mechanism_instruments:
+    primary: 6A
+    secondary: null
+    rationale: >
+      6A is tradable in the user's account; the test uses the free spot / CFD series it tracks. One market.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: Prior on the net mean per event Normal(+0.93 bp, 1.0) - the discovery mean halved less the 0.8 bp cost; SD max(1.0, cost).
+  decision_rule:
+    rule: >
+      Strict rule, standalone (decisions.md 119, 132, 143): CONFIRM if the net mean has one-sided t > 1.645, it is at or
+      above the 95th percentile of the same trade in AUDUSD's other family-2 windows on month-end days, and the posterior > 0; else WATCHLIST if the net mean > 0 (forward-tested,
+      decisions.md 133); else REJECT. Z and D market-test number 20.
+  s6_control: Gross and net; by period (2018-21, 2022-26); the placebo cells' net means.
+- id: D09
+  name: usdchf_rises_after_the_london_4_pm_fix_at_month_end
+  mechanism: >
+    DATA-DERIVED (D-series re-scan on the corrected HistData clock, decisions.md 142-143): in the 2010-2017 scan of
+    30-minute windows around fixings, opens and closes (family 2, |t| > 1.96 and > 2x cost), this cell averaged +3.18 bps (t +2.34, n 96). Plausible flow:
+    reversal of month-end fix-bound USD selling against CHF once the London fix has printed. THE COUNTERPARTY would be that flow's originators. Carried by the scan, not predicted.
+  condition: >
+    the last weekday of each month, the 30 minutes after the WM/R 16:00 London fix: LONG USDCHF (traded as 6S); free HistData 1-minute bid quotes, New York time with DST;
+    net of 0.8 bp.
+  horizon_minutes: [30]
+  hold_hours: [0.5]
+  registered: 2026-10-12
+  status: retired
+  retired: 2026-10-12
+  outcome_tier: WATCHLIST
+  retired_reason: >
+    Trial t00791 (decisions.md 144), WATCHLIST (net > 0, strict rule failed; forward-test candidate, decisions.md 133), sealed 2018-2026: 97 events; long gross +2.83 bps (SD 14.0), net +2.03, t +1.44; placebo 100th pct; 2018-21 +3.19, 2022-26 +1.03.
+  outcome_injection_required: Before the run - reports/d09_injection.json (src/futuresres/signals/d_cells.py).
+  outcome_injection:
+    test: src/futuresres/signals/d_cells.py
+    injected_bps: 0.791
+    sought_bps: 0.791
+    n_injection: 97
+    n_run: 97
+    recovered: true
+    report: reports/d09_injection.json
+  schedulable: false
+  schedulable_note: >
+    Validated once on the sealed 2018-2026 window; the runner refuses to run without its outcome injection.
+  test_order: null
+  registered_test_order: 43
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Carried by the corrected-clock discovery re-scan (decisions.md 142); no free parameter in validation. ONE TRIAL.
+  session: Globex
+  symbols: [6S]
+  mechanism_instruments:
+    primary: 6S
+    secondary: null
+    rationale: >
+      6S is tradable in the user's account; the test uses the free spot / CFD series it tracks. One market.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: Prior on the net mean per event Normal(+0.79 bp, 1.0) - the discovery mean halved less the 0.8 bp cost; SD max(1.0, cost).
+  decision_rule:
+    rule: >
+      Strict rule, standalone (decisions.md 119, 132, 143): CONFIRM if the net mean has one-sided t > 1.645, it is at or
+      above the 95th percentile of the same trade in USDCHF's other family-2 windows on month-end days, and the posterior > 0; else WATCHLIST if the net mean > 0 (forward-tested,
+      decisions.md 133); else REJECT. Z and D market-test number 21.
+  s6_control: Gross and net; by period (2018-21, 2022-26); the placebo cells' net means.
+- id: D10
+  name: aud_rises_into_the_london_4_pm_fix_at_month_end
+  mechanism: >
+    DATA-DERIVED (D-series re-scan on the corrected HistData clock, decisions.md 142-143): in the 2010-2017 scan of
+    30-minute windows around fixings, opens and closes (family 2, |t| > 1.96 and > 2x cost), this cell averaged +4.23 bps (t +2.04, n 96). Plausible flow:
+    month-end WM/R 16:00 fix demand for AUD from portfolio rebalancing and hedging. THE COUNTERPARTY would be that flow's originators. Carried by the scan, not predicted.
+  condition: >
+    the last weekday of each month, the 30 minutes before the WM/R 16:00 London fix: LONG AUDUSD (traded as 6A); free HistData 1-minute bid quotes, New York time with DST;
+    net of 0.8 bp.
+  horizon_minutes: [30]
+  hold_hours: [0.5]
+  registered: 2026-10-12
+  status: retired
+  retired: 2026-10-12
+  outcome_tier: WATCHLIST
+  retired_reason: >
+    Trial t00792 (decisions.md 144), WATCHLIST (net > 0, strict rule failed; forward-test candidate, decisions.md 133), sealed 2018-2026: 99 events; long gross +0.91 bps (SD 19.8), net +0.11, t +0.06; placebo 67th pct; 2018-21 -3.49, 2022-26 +3.24.
+  outcome_injection_required: Before the run - reports/d10_injection.json (src/futuresres/signals/d_cells.py).
+  outcome_injection:
+    test: src/futuresres/signals/d_cells.py
+    injected_bps: 1.316
+    sought_bps: 1.316
+    n_injection: 99
+    n_run: 99
+    recovered: true
+    report: reports/d10_injection.json
+  schedulable: false
+  schedulable_note: >
+    Validated once on the sealed 2018-2026 window; the runner refuses to run without its outcome injection.
+  test_order: null
+  registered_test_order: 44
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Carried by the corrected-clock discovery re-scan (decisions.md 142); no free parameter in validation. ONE TRIAL.
+  session: Globex
+  symbols: [6A]
+  mechanism_instruments:
+    primary: 6A
+    secondary: null
+    rationale: >
+      6A is tradable in the user's account; the test uses the free spot / CFD series it tracks. One market.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: Prior on the net mean per event Normal(+1.32 bp, 1.0) - the discovery mean halved less the 0.8 bp cost; SD max(1.0, cost).
+  decision_rule:
+    rule: >
+      Strict rule, standalone (decisions.md 119, 132, 143): CONFIRM if the net mean has one-sided t > 1.645, it is at or
+      above the 95th percentile of the same trade in AUDUSD's other family-2 windows on month-end days, and the posterior > 0; else WATCHLIST if the net mean > 0 (forward-tested,
+      decisions.md 133); else REJECT. Z and D market-test number 22.
+  s6_control: Gross and net; by period (2018-21, 2022-26); the placebo cells' net means.
+- id: D11
+  name: dax_rises_after_the_xetra_closing_auction_at_month_end
+  mechanism: >
+    DATA-DERIVED (D-series re-scan on the corrected HistData clock, decisions.md 142-143): in the 2010-2017 scan of
+    30-minute windows around fixings, opens and closes (family 2, |t| > 1.96 and > 2x cost), this cell averaged +4.25 bps (t +1.97, n 78). Plausible flow:
+    post-auction rebound after month-end closing-auction selling on Xetra. THE COUNTERPARTY would be that flow's originators. Carried by the scan, not predicted.
+  condition: >
+    the last weekday of each month, the 30 minutes after the Xetra close auction 17:30: LONG GRXEUR (traded as FDXM); free HistData 1-minute bid quotes, New York time with DST;
+    net of 1.0 bp.
+  horizon_minutes: [30]
+  hold_hours: [0.5]
+  registered: 2026-10-12
+  status: retired
+  retired: 2026-10-12
+  outcome_tier: REJECT
+  retired_reason: >
+    Trial t00793 (decisions.md 144), REJECT (net mean <= 0), sealed 2018-2026: 94 events; long gross -0.45 bps (SD 23.6), net -1.45, t -0.60; placebo 67th pct; 2018-21 -4.84, 2022-26 +1.53.
+  outcome_injection_required: Before the run - reports/d11_injection.json (src/futuresres/signals/d_cells.py).
+  outcome_injection:
+    test: src/futuresres/signals/d_cells.py
+    injected_bps: 1.127
+    sought_bps: 1.127
+    n_injection: 94
+    n_run: 94
+    recovered: true
+    report: reports/d11_injection.json
+  schedulable: false
+  schedulable_note: >
+    Validated once on the sealed 2018-2026 window; the runner refuses to run without its outcome injection.
+  test_order: null
+  registered_test_order: 45
+  grade: B
+  tier: B
+  param_cap: 0
+  param_note: Carried by the corrected-clock discovery re-scan (decisions.md 142); no free parameter in validation. ONE TRIAL.
+  session: Globex
+  symbols: [FDXM]
+  mechanism_instruments:
+    primary: FDXM
+    secondary: null
+    rationale: >
+      FDXM is tradable in the user's account; the test uses the free spot / CFD series it tracks. One market.
+  stage4_reachable: false
+  stage4_reason: A data-derived single-market cell; validated once on sealed data.
+  threshold_units: volatility
+  price_range_stated: true
+  era_split_preregistered: true
+  era_split: {break: '2022-01-01', decisive: full}
+  test_window: {start: '2018-01-01', end: '2026-09-30', reason: 'sealed validation window after the 2010-2017 discovery'}
+  prediction:
+    sharpe_prior: [0.0, 0.6]
+    basis: Prior on the net mean per event Normal(+1.13 bp, 1.0) - the discovery mean halved less the 1.0 bp cost; SD max(1.0, cost).
+  decision_rule:
+    rule: >
+      Strict rule, standalone (decisions.md 119, 132, 143): CONFIRM if the net mean has one-sided t > 1.645, it is at or
+      above the 95th percentile of the same trade in GRXEUR's other family-2 windows on month-end days, and the posterior > 0; else WATCHLIST if the net mean > 0 (forward-tested,
+      decisions.md 133); else REJECT. Z and D market-test number 23.
+  s6_control: Gross and net; by period (2018-21, 2022-26); the placebo cells' net means.

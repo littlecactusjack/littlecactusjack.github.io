@@ -759,6 +759,43 @@ current windows via time-triggered orders if the platform allows. OPEN: which pl
 **§125: manual trading; bot posts ONE alert at 17:30 ET** (crude 18:00 tonight, gold 03:00 + MNQ 09:30 tomorrow) and
 shadow-tracks every ticket on free Yahoo 1-minute data (validated: 8/8 outcomes match Databento). Tradovate platform.
 
+**§126: bot DEPLOYED (droplet, 2026-10-11); demo starts.** Checker: `python -m futuresres.reporting.a18_demo_check shadow_log.csv
+demo_log.csv`. On the 55 forward tickets: take/stop/time 26/27/2 vs 23.9/29.0/2.1 expected (p 0.85).
+
+**Z11 (§127, t00776, N 770): month-end FX fix (EUR/USD, free data) REJECTED** — −0.92 bps since 2013 (2010–12: +11).
+Eleven strict-rule market-tests, none passing. Next: own hypotheses on untouched markets (discovery 2010–17 / validation 2018–26).
+
+**Z12 (§128, t00777, N 771): EUR/USD time-of-day REJECTED** — net +0.06 bps/day; 2010–17 Sharpe 0.41, 2018–26 −0.45.
+Twelve strict-rule tests, none passing; literature exhausted for these markets.
+
+**D-series (§129–130):** own hypotheses discovered on 2010–17 (7 untouched markets, 912 cells). 4 carried; 3 FX rollover-hour
+cells dropped as untradable (CME break, bid-quote artefact). **D01 silver into the London fix (t00778, N 772) REJECTED** —
+still silver's weakest hour (placebo 95th) but +0.75 bps net, t 0.95, faded after 2021. 13 strict tests, none passing.
+~~Next: price forex prop firms (FTMO, FundedNext, FundingPips 2-step) with the solver.~~ **§131: user declined forex firms
+(evals ~$500 too expensive) — stay with Tradeify.**
+
+**§132–134: D-series family 2** (fixing/open/close windows; user amendment §133: no multiple-testing cut, watchlist tier).
+56 tests, 1 carried: **D02 AUD into the Tokyo fix at month-end (t00779, N 773) REJECT** — −0.33 bps out of sample.
+14 Z+D tests, none confirmed; watchlist empty.
+
+**A19–A20 (§135–136):** longer planning horizons lose (cost-blind solver buys tiny stops). **Live plan now uses stops ≥ $500**
+(`a06_playbook.PLAN_L_SET`), +2–4% in both histories; bot policy.json re-exported — droplet must copy it and restart.
+
+**A21 (§137): accounts 4 and 5 = Nikkei (1 NKD, 20:00–02:00 ET) and DAX (2 FDXM, 03:00–11:30 ET).** Five accounts: per 4 months
+mean +$6.4–10.5k, ends ahead 85–96%. OPEN: user to confirm Tradeify permits NKD/FDXM + contract cap; then add to bot.
+**§138: NKD + FDXM added to the bot (5 tickets at 17:30); forward test first, evals only if positive.** Deploy pending user OK.
+**§139:** ticks in tickets + Friday weekly check (deployed).
+**§140 (A22): HistData stamps are New York time WITH DST — every HistData window was an hour late Mar–Nov; loaders fixed.**
+Accounts 4–5 hold after the fix (five accounts +$8.1k / +$9.4k per 4 months, ends ahead 84% / 94%); NKD checks out on real
+futures. **Z10–Z12, D01–D02 and the D-series scans used the wrong clock — re-run needed.** Sixth market: **soybeans (3 ZS)**,
+best in all three histories and best swap for crude; seventh: natural gas (27 MNG) or cattle (3 LE). Free Yahoo data only.
+OPEN: Tradeify 5-funded cap; shadow-track ZS/NG/LE; deploy regenerated bot/expected.json (user OK).
+**§141: soybeans (3 ZS, 19:00→13:15 Chicago) added to the demo bot as a sixth ticket; expected.json deployed.** Next: re-run Z10–Z12, D01–D02.
+**§142: re-runs done (t00780–t00784, N 778). Z12 CONFIRMS on 2010–26 but fails S8 (2021–26 Sharpe 0.10) → watchlist, not adopted;
+Z10, Z11, D01, D02 still REJECT. Discovery re-scanned: 9 new carried cells await the user's go-ahead to validate.**
+**§143–§144: D03–D11 validated (t00785–t00793, N 787). D03 CONFIRMS but is a quote artefact (zero on 6S futures) → invalidated.
+Watchlist: Z12, D04, D05, D08, D09, D10 (none tradable; years to decide). Rejected D06, D07, D11. Still 0 tradable edges.**
+
 
 **Latest, 2026-09-13 (after P03):** N = **760**, SR\* **0.1368**. P03 retired at S7 (§58); the
 P-series closed with zero promotions. **Q-series S1 reviewed in §59, nothing registered:**

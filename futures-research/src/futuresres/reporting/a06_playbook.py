@@ -34,12 +34,27 @@ START = 50_000.0
 PRODUCTS = {"MNQ": {"n": 4, "mult": 2.0, "rt": 2.32, "tick": 0.25, "entry": "09:30", "exit": "16:00"},
             "MGC": {"n": 8, "mult": 10.0, "rt": 3.32, "tick": 0.10, "entry": "03:00", "exit": "11:30"},
             # decisions.md 116: 10 MCL, the whole session (enter at the 18:00 ET open, flat by 16:55 ET)
-            "MCL": {"n": 10, "mult": 100.0, "rt": 3.32, "tick": 0.01, "entry": "18:00", "exit": "16:55"}}
+            "MCL": {"n": 10, "mult": 100.0, "rt": 3.32, "tick": 0.01, "entry": "18:00", "exit": "16:55"},
+            # decisions.md 137-138 (A21): accounts 4 and 5, forward-tested on the demo before evaluations are bought.
+            # NKD: $5 a point, tick 5 points; Tokyo session. FDXM: EUR 5 a point (converted at EUR_USD), tick 1; Xetra session.
+            "NKD": {"n": 1, "mult": 5.0, "rt": 4.0, "tick": 5.0, "entry": "09:00", "exit": "15:00", "tz": "Tokyo"},
+            "FDXM": {"n": 2, "mult": 5.0 * 1.12, "rt": 4.0, "tick": 1.0, "entry": "09:00", "exit": "17:30", "tz": "Frankfurt"},
+            # decisions.md 140-141 (A22): soybeans, 3 ZS, the whole CBOT session (19:00 -> flat by 13:15 Chicago); prices in
+            # cents a bushel, $50 a cent, tick 1/4 cent ($12.50). Demo only - no evaluation planned under the 5-funded cap.
+            "ZS": {"n": 3, "mult": 50.0, "rt": 4.5, "tick": 0.25, "entry": "19:00", "exit": "13:15", "tz": "Chicago"}}
+#: the EUR/USD rate behind FDXM's dollar value per point (export time; the bot refreshes it live when it can)
+EUR_USD = 1.12
 CONTRACTS = PRODUCTS["MNQ"]["n"]
+
+
+#: decisions.md 136 (A20): the live plan's stop menu excludes stops under $500 ($100 units) - tight brackets only work in the
+#: cost-free fair-coin model; better in both histories (MNQ+MGC +$70-160 per 4 months). The solver's default is unchanged.
+PLAN_L_SET = (5, 6, 8, 10)
 
 
 def _solve():
     if "eval" not in g.POLICY:
+        g.L_SET = PLAN_L_SET
         with contextlib.redirect_stdout(io.StringIO()), np.errstate(all="ignore"):
             g.solve_all(21, keep_policy_at=21)
             g.solve_funded(21, "dollars", keep_policy_at=21)
@@ -89,10 +104,11 @@ def _print(t: dict) -> None:
         print(f"NO TRADE today (stand aside). Floor ${t['floor']:,.0f}.")
         return
     up, dn = ("+", "-") if t["side"] == "long" else ("-", "+")
-    print(f"{t['entry']} ET: {'BUY' if t['side'] == 'long' else 'SELL'} {t['contracts']} {t['product']} at market, then one OCO bracket on the fill price:\n"
-          f"  take-profit  fill {up} {t['take_points']:.2f} pts   (≈ +${t['take_net']:,.0f} net)\n"
-          f"  stop         fill {dn} {t['stop_points']:.2f} pts   (≈ -${t['stop_net']:,.0f} net)\n"
-          f"{t['exit']} ET: if neither filled, close at market.   Floor today ${t['floor']:,.0f}.")
+    tz = PRODUCTS[t["product"]].get("tz", "ET")
+    print(f"{t['entry']} {tz}: {'BUY' if t['side'] == 'long' else 'SELL'} {t['contracts']} {t['product']} at market, then one OCO bracket on the fill price:\n"
+          f"  take-profit  fill {up} {t['take_points']:.2f} pts = {round(t['take_points'] / PRODUCTS[t['product']]['tick'])} ticks   (≈ +${t['take_net']:,.0f} net)\n"
+          f"  stop         fill {dn} {t['stop_points']:.2f} pts = {round(t['stop_points'] / PRODUCTS[t['product']]['tick'])} ticks   (≈ -${t['stop_net']:,.0f} net)\n"
+          f"{t['exit']} {tz}: if neither filled, close at market.   Floor today ${t['floor']:,.0f}.")
 
 
 def export(path: Path | None = None) -> Path:

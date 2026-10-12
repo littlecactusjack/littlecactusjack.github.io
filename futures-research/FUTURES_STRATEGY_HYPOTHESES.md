@@ -627,3 +627,83 @@ crude plan goes short on those days and long otherwise — the outright, since t
 Japanese importers settle on days divisible by five at the 9:55 JST fix; banks pre-buy dollars, so USD/JPY rises into
 9:55 (arXiv 2301.13204, 2018–2020). Long USD/JPY (short 6J) from the 18:00 ET reopen to the fix on gotobi days,
 net of 1 bp. Tested 2021–2026 on free spot data under the strict rule. One trial. `hypotheses.yaml` (Z10) · `decisions.md` §122
+
+## Z11 — Month-End FX Hedge Rebalancing at the London Fix  *(RETIRED — t00776; gone since 2013)*
+
+Melvin & Prins (2015): international equity managers reset currency hedges at the month-end 4 p.m. London fix, so
+equity outperformance predicts the currency's fall in the hour before it. Long EUR/USD (6E) 15:00→16:00 London on the
+month's last weekday when the S&P beat the DAX, short otherwise. Tested 2013–2026 on free data, strict rule. One trial.
+`hypotheses.yaml` (Z11) · `decisions.md` §127
+
+## Z12 — The Euro Weakens in European Hours, Strengthens in US Hours  *(RETIRED — t00777; costs absorb it, decayed after 2017)*
+
+Breedon & Ranaldo (2013): currencies depreciate in their own trading hours (local participants buy foreign currency).
+EUR/USD short 07:00 London → 08:00 New York, long 08:00 → 16:00 New York, every weekday, net of costs. Tested
+2010–2026 (the paper ends 2007) on free data, strict rule. One trial. `hypotheses.yaml` (Z12) · `decisions.md` §128
+
+## D01 — Silver Falls Into the London Fix  *(RETIRED — t00778; 40% of the discovery size, faded after 2021)*
+
+Data-derived (D-series): the 2010–2017 discovery scan found silver's 11:00–12:00 UTC hour — the hour ending at the
+12:00 London silver fix, summer and winter — averaging −5.5 bps (t −7.3). Short SI in that hour every weekday, net of
+cost; validated once on sealed 2018–2026 data under the strict rule. `hypotheses.yaml` (D01) · `decisions.md` §130
+
+## D02 — AUD Rises Into the Tokyo Fix at Month-End  *(RETIRED — t00779; did not recur out of sample)*
+
+Data-derived (D-series family 2): AUD/USD's 30 minutes before the 09:55 JST Tokyo fix on the month's last weekday averaged
++2.9 bps (t 3.3) in 2010–2017. Long 6A 09:25 → 09:55 JST at month-end, net of cost; validated once on sealed 2018–2026 data
+(confirm / watchlist / reject). `hypotheses.yaml` (D02) · `decisions.md` §134
+
+## D03 — USD/CHF falls in the last New York hour on Fridays (20:00-21:00 UTC)  *(INVALIDATED — t00785; quote artefact at the Friday close)*
+
+Data-derived (D-series re-scan on the corrected clock): Fridays, 20:00-21:00 UTC averaged -2.88 bps (t -6.07) in
+2010–2017. Short 6S, net of cost; validated once on sealed 2018–2026 data (confirm / watchlist / reject).
+`hypotheses.yaml` (D03) · `decisions.md` §143
+
+## D04 — Silver falls 10:00-11:00 UTC  *(WATCHLIST — t00786)*
+
+Data-derived (D-series re-scan on the corrected clock): every weekday, 10:00-11:00 UTC averaged -3.14 bps (t -4.22) in
+2010–2017. Short SI, net of cost; validated once on sealed 2018–2026 data (confirm / watchlist / reject).
+`hypotheses.yaml` (D04) · `decisions.md` §143
+
+## D05 — GBP rises into the London 4 pm fix at month-end  *(WATCHLIST — t00787)*
+
+Data-derived (D-series re-scan on the corrected clock): the last weekday of each month, the 30 minutes before the WM/R 16:00 London fix averaged +5.63 bps (t +2.84) in
+2010–2017. Long 6B, net of cost; validated once on sealed 2018–2026 data (confirm / watchlist / reject).
+`hypotheses.yaml` (D05) · `decisions.md` §143
+
+## D06 — DAX falls in the first half hour of Xetra at month-end  *(REJECT — t00788)*
+
+Data-derived (D-series re-scan on the corrected clock): the last weekday of each month, the 30 minutes after the Xetra open 09:00 averaged -8.71 bps (t -2.64) in
+2010–2017. Short FDXM, net of cost; validated once on sealed 2018–2026 data (confirm / watchlist / reject).
+`hypotheses.yaml` (D06) · `decisions.md` §143
+
+## D07 — Nikkei falls into the Tokyo morning close  *(REJECT — t00789)*
+
+Data-derived (D-series re-scan on the corrected clock): every weekday, the 30 minutes before the Tokyo morning close 11:30 averaged -2.35 bps (t -2.60) in
+2010–2017. Short NKD, net of cost; validated once on sealed 2018–2026 data (confirm / watchlist / reject).
+`hypotheses.yaml` (D07) · `decisions.md` §143
+
+## D08 — AUD falls after the London 4 pm fix at month-end  *(WATCHLIST — t00790)*
+
+Data-derived (D-series re-scan on the corrected clock): the last weekday of each month, the 30 minutes after the WM/R 16:00 London fix averaged -3.45 bps (t -2.41) in
+2010–2017. Short 6A, net of cost; validated once on sealed 2018–2026 data (confirm / watchlist / reject).
+`hypotheses.yaml` (D08) · `decisions.md` §143
+
+## D09 — USD/CHF rises after the London 4 pm fix at month-end  *(WATCHLIST — t00791)*
+
+Data-derived (D-series re-scan on the corrected clock): the last weekday of each month, the 30 minutes after the WM/R 16:00 London fix averaged +3.18 bps (t +2.34) in
+2010–2017. Long 6S, net of cost; validated once on sealed 2018–2026 data (confirm / watchlist / reject).
+`hypotheses.yaml` (D09) · `decisions.md` §143
+
+## D10 — AUD rises into the London 4 pm fix at month-end  *(WATCHLIST — t00792)*
+
+Data-derived (D-series re-scan on the corrected clock): the last weekday of each month, the 30 minutes before the WM/R 16:00 London fix averaged +4.23 bps (t +2.04) in
+2010–2017. Long 6A, net of cost; validated once on sealed 2018–2026 data (confirm / watchlist / reject).
+`hypotheses.yaml` (D10) · `decisions.md` §143
+
+## D11 — DAX rises after the Xetra closing auction at month-end  *(REJECT — t00793)*
+
+Data-derived (D-series re-scan on the corrected clock): the last weekday of each month, the 30 minutes after the Xetra close auction 17:30 averaged +4.25 bps (t +1.97) in
+2010–2017. Long FDXM, net of cost; validated once on sealed 2018–2026 data (confirm / watchlist / reject).
+`hypotheses.yaml` (D11) · `decisions.md` §143
+

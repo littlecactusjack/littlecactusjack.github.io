@@ -22,9 +22,12 @@ from ticket import describe, policy, ticket
 
 ET = ZoneInfo("America/New_York")
 ALERT = (17, 30)
-#: product -> (entry day offset from the alert, entry hh:mm, exit day offset, exit hh:mm)
-WINDOWS = {"MCL": (0, (18, 0), 1, (16, 55)), "MGC": (1, (3, 0), 1, (11, 30)), "MNQ": (1, (9, 30), 1, (16, 0))}
-ORDER = ("MCL", "MGC", "MNQ")                      # by entry time after the alert
+#: product -> (time zone, entry day offset from the alert's New York date, entry hh:mm, exit day offset, exit hh:mm), local time.
+#: NKD and FDXM (decisions.md 138) follow Tokyo and Frankfurt clocks, so their New York times shift with daylight saving.
+WINDOWS = {"MCL": (ET, 0, (18, 0), 1, (16, 55)), "MGC": (ET, 1, (3, 0), 1, (11, 30)), "MNQ": (ET, 1, (9, 30), 1, (16, 0)),
+           "NKD": (ZoneInfo("Asia/Tokyo"), 1, (9, 0), 1, (15, 0)), "FDXM": (ZoneInfo("Europe/Berlin"), 1, (9, 0), 1, (17, 30)),
+           "ZS": (ZoneInfo("America/Chicago"), 0, (19, 0), 1, (13, 15))}    # soybeans, decisions.md 141
+ORDER = ("MCL", "ZS", "NKD", "MGC", "FDXM", "MNQ")   # by entry time after the 17:30 alert
 SHADOW_DELAY = dt.timedelta(minutes=5)
 
 
@@ -46,9 +49,9 @@ class Tickets:
     def issue(self, book: Book, product: str, alert_day: dt.date, now: dt.datetime) -> dict | None:
         """Record (or replace, if still pending) the ticket for `product` from the alert on `alert_day`."""
         a = book.s[product]
-        e_off, (eh, em), x_off, (xh, xm) = WINDOWS[product]
-        entry = dt.datetime.combine(alert_day + dt.timedelta(days=e_off), dt.time(eh, em), ET)
-        exit_ = dt.datetime.combine(alert_day + dt.timedelta(days=x_off), dt.time(xh, xm), ET)
+        tz, e_off, (eh, em), x_off, (xh, xm) = WINDOWS[product]
+        entry = dt.datetime.combine(alert_day + dt.timedelta(days=e_off), dt.time(eh, em), tz).astimezone(ET)
+        exit_ = dt.datetime.combine(alert_day + dt.timedelta(days=x_off), dt.time(xh, xm), tz).astimezone(ET)
         if a["phase"] == "dead":
             tk = {"trade": False, "finished": True, "floor": 0.0}
         else:
@@ -128,6 +131,51 @@ def result_line(r: dict) -> str:
             f"(entry {res['entry']:.2f}){tr}")
 
 
+_EXPECTED: dict | None = None
+
+
+def _expected(product: str, take_net: float, stop_net: float):
+    """Expected (p_take, p_stop, p_time, mean, sd) for a bracket from bot/expected.json (decisions.md 139); a stop capped
+    near the floor maps to the nearest menu stop."""
+    global _EXPECTED
+    if _EXPECTED is None:
+        f = Path(__file__).with_name("expected.json")
+        _EXPECTED = json.loads(f.read_text()) if f.exists() else {}
+    tab = _EXPECTED.get(product, {})
+    if not tab:
+        return None
+    W = int(round(take_net / 100)); L = int(round(stop_net / 100))
+    keys = [k for k in tab if int(k.split(",")[0]) == W] or list(tab)
+    k = min(keys, key=lambda k: (abs(int(k.split(",")[0]) - W), abs(int(k.split(",")[1]) - L)))
+    return tab[k]
+
+
+def weekly_check(tix: Tickets, now: dt.datetime) -> str:
+    """Friday: this week's finished tickets against the backtest's expectation for the same brackets (decisions.md 139)."""
+    import math
+    since = now - dt.timedelta(days=7)
+    rows = [r for r in tix.t if r["status"] == "done" and r["result"]["outcome"] in ("TAKE", "STOP", "TIME EXIT")
+            and dt.datetime.fromisoformat(r["exit"]) > since]
+    if not rows:
+        return "**Weekly check:** no finished tickets this week."
+    obs = {"TAKE": 0, "STOP": 0, "TIME EXIT": 0}; exp = {"TAKE": 0.0, "STOP": 0.0, "TIME EXIT": 0.0}
+    pnl = mu = var = 0.0; matched = 0
+    for r in rows:
+        obs[r["result"]["outcome"]] += 1; pnl += r["result"].get("pnl") or 0.0
+        e = _expected(r["product"], r["ticket"]["take_net"], r["ticket"]["stop_net"])
+        if e:
+            matched += 1
+            exp["TAKE"] += e[0]; exp["STOP"] += e[1]; exp["TIME EXIT"] += e[2]; mu += e[3]; var += e[4] ** 2
+    if not matched:
+        return f"**Weekly check:** {len(rows)} tickets; expected rates unavailable (bot/expected.json missing)."
+    z = (pnl - mu) / math.sqrt(var) if var > 0 else 0.0
+    chi = sum((obs[k] - exp[k]) ** 2 / exp[k] for k in exp if exp[k] > 0.5)
+    flag = "within the normal range" if abs(z) < 2 and chi < 6.0 else "**UNUSUAL - worth a look**"
+    return (f"**Weekly check** ({len(rows)} tickets, shadow-tracked): take / stop / time exit **{obs['TAKE']} / {obs['STOP']} / "
+            f"{obs['TIME EXIT']}** vs expected {exp['TAKE']:.1f} / {exp['STOP']:.1f} / {exp['TIME EXIT']:.1f}; P&L ${pnl:+,.0f} vs "
+            f"expected ${mu:+,.0f} ± ${math.sqrt(var):,.0f} (z {z:+.1f}) - {flag}.")
+
+
 def alert_text(book: Book, tix: Tickets, now: dt.datetime) -> str:
     """The 17:30 post. Issues and records the next tickets (Sun-Thu)."""
     parts = []
@@ -146,6 +194,7 @@ def alert_text(book: Book, tix: Tickets, now: dt.datetime) -> str:
     else:
         if missing:
             parts.append("Closing balance not recorded for " + ", ".join(missing) + ". Send `!eod <PRODUCT> <balance>`.")
+        parts.append(weekly_check(tix, now))
         parts.append("No new tickets - next session opens Sunday 18:00 ET; tickets at Sunday 17:30.")
     return "\n\n".join(parts) if parts else "Nothing to report."
 
