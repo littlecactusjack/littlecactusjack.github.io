@@ -707,3 +707,536 @@ Data-derived (D-series re-scan on the corrected clock): the last weekday of each
 2010–2017. Long FDXM, net of cost; validated once on sealed 2018–2026 data (confirm / watchlist / reject).
 `hypotheses.yaml` (D11) · `decisions.md` §143
 
+## D12 — Nikkei window fades its move from the previous Tokyo close (15:00) to the open (09:00) (all)  *(REJECT — t00794)*
+
+Data-derived (D-series family 3): the Nikkei window (09:00-15:00 Tokyo) traded against its own move from the previous Tokyo close (15:00) to the open (09:00) earned 6.52 bps a day beyond drift
+in 2010–2017 (t 3.10). Sets the plan's bracket direction for that account; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D12) · `decisions.md` §150
+
+## D13 — Gold window follows its move from the previous window's close (11:30 ET) to 03:00 ET (all)  *(WATCHLIST — t00795)*
+
+Data-derived (D-series family 3): the gold window (03:00-11:30 ET) traded in the direction of its own move from the previous window's close (11:30 ET) to 03:00 ET earned 6.10 bps a day beyond drift
+in 2010–2017 (t 2.89). Sets the plan's bracket direction for that account; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D13) · `decisions.md` §150
+
+## D14 — MNQ window fades the previous day's MNQ window (all)  *(WATCHLIST — t00796)*
+
+Data-derived (D-series family 3): the MNQ window (09:30-16:00 ET) traded against the previous day's MNQ window earned 6.15 bps a day beyond drift
+in 2010–2017 (t 2.74). Sets the plan's bracket direction for that account; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D14) · `decisions.md` §150
+
+## D15 — Nikkei window fades its move from the previous Tokyo close (15:00) to the open (09:00) (strong)  *(REJECT — t00797)*
+
+Data-derived (D-series family 3): the Nikkei window (09:00-15:00 Tokyo) traded against its own move from the previous Tokyo close (15:00) to the open (09:00) earned 8.44 bps a day beyond drift
+in 2010–2017 (t 2.51). Sets the plan's bracket direction for that account; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D15) · `decisions.md` §150
+
+## D16 — Gold window follows its move from the previous window's close (11:30 ET) to 03:00 ET (strong)  *(WATCHLIST — t00798)*
+
+Data-derived (D-series family 3): the gold window (03:00-11:30 ET) traded in the direction of its own move from the previous window's close (11:30 ET) to 03:00 ET earned 8.20 bps a day beyond drift
+in 2010–2017 (t 2.46). Sets the plan's bracket direction for that account; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D16) · `decisions.md` §150
+
+## D17 — Crude session fades the same day's gold window (strong)  *(REJECT — t00799)*
+
+Data-derived (D-series family 3): the crude session traded against the same day's gold window earned 17.88 bps a day beyond drift
+in 2010–2017 (t 2.31). Sets the plan's bracket direction for that account; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D17) · `decisions.md` §150
+
+## D18 — Crude session fades the same day's MNQ window (all)  *(REJECT — t00800)*
+
+Data-derived (D-series family 3): the crude session traded against the same day's MNQ window earned 12.54 bps a day beyond drift
+in 2010–2017 (t 2.26). Sets the plan's bracket direction for that account; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D18) · `decisions.md` §150
+
+## D19 — Gold window fades the previous day's gold window (strong)  *(WATCHLIST — t00801)*
+
+Data-derived (D-series family 3): the gold window (03:00-11:30 ET) traded against the previous day's gold window earned 7.95 bps a day beyond drift
+in 2010–2017 (t 2.24). Sets the plan's bracket direction for that account; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D19) · `decisions.md` §150
+
+## D20 — MNQ window fades the previous day's soybean session (strong)  *(REJECT — t00802)*
+
+Data-derived (D-series family 3): the MNQ window (09:30-16:00 ET) traded against the previous day's soybean session earned 6.72 bps a day beyond drift
+in 2010–2017 (t 2.11). Sets the plan's bracket direction for that account; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D20) · `decisions.md` §150
+
+## D21 — Soybean session fades the same day's gold window (all)  *(REJECT — t00803)*
+
+Data-derived (D-series family 3): the soybean session traded against the same day's gold window earned 6.97 bps a day beyond drift
+in 2010–2017 (t 2.01). Sets the plan's bracket direction for that account; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D21) · `decisions.md` §150
+
+## D22 — Gold follows where its overnight session (11:30 -> 03:00 ET) closed within its high-low range (days with |predictor| above its 2010-17 median)  *(WATCHLIST — t00804)*
+
+Data-derived (D-series family 4): gold's 03:00–11:30 ET window traded in that direction earned 7.89 bps a day beyond
+drift in 2010–2017 (t 3.39). Sets the plan's gold bracket direction; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D22) · `decisions.md` §153
+
+## D23 — Gold follows its overnight return (11:30 -> 03:00 ET) (days with overnight volume above its 2010-17 median)  *(WATCHLIST — t00805)*
+
+Data-derived (D-series family 4): gold's 03:00–11:30 ET window traded in that direction earned 7.22 bps a day beyond
+drift in 2010–2017 (t 2.75). Sets the plan's gold bracket direction; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D23) · `decisions.md` §153
+
+## D24 — Gold follows where its overnight session (11:30 -> 03:00 ET) closed within its high-low range (every day)  *(WATCHLIST — t00806)*
+
+Data-derived (D-series family 4): gold's 03:00–11:30 ET window traded in that direction earned 4.60 bps a day beyond
+drift in 2010–2017 (t 2.57). Sets the plan's gold bracket direction; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D24) · `decisions.md` §153
+
+## D25 — Gold follows its last half hour before the window (02:30 -> 03:00 ET) (days with |predictor| above its 2010-17 median)  *(WATCHLIST — t00807)*
+
+Data-derived (D-series family 4): gold's 03:00–11:30 ET window traded in that direction earned 6.68 bps a day beyond
+drift in 2010–2017 (t 2.29). Sets the plan's gold bracket direction; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D25) · `decisions.md` §153
+
+## D26 — Gold follows its overnight return (11:30 -> 03:00 ET) (days the 03:00 price is outside the previous window's high-low range)  *(WATCHLIST — t00808)*
+
+Data-derived (D-series family 4): gold's 03:00–11:30 ET window traded in that direction earned 6.65 bps a day beyond
+drift in 2010–2017 (t 2.28). Sets the plan's gold bracket direction; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D26) · `decisions.md` §153
+
+## D27 — Gold follows its overnight return (11:30 -> 03:00 ET) (days with overnight realised variance above its 2010-17 median)  *(WATCHLIST — t00809)*
+
+Data-derived (D-series family 4): gold's 03:00–11:30 ET window traded in that direction earned 5.53 bps a day beyond
+drift in 2010–2017 (t 2.04). Sets the plan's gold bracket direction; validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D27) · `decisions.md` §153
+
+## D28 — Crude Weaker on Mondays  *(WATCHLIST in form only — t00810; did not recur)*
+
+Data-derived (D-series family 5): the only calendar cell of 72 carried (≈3.6 by chance). Short the plan's crude bracket on
+Mondays; validated once on sealed 2018–2026 data. `hypotheses.yaml` (D28) · `decisions.md` §156
+
+## D29 — DAX Follows Its First 30 Minutes (every day)  *(REJECT — t00811)*
+
+Data-derived (D-series family 6): the rest of the DAX window (09:00-17:30 Frankfurt) traded in the direction of its first 30 minutes earned
+5.98 bps a day beyond drift in 2010–2017 (t 2.64). Validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D29) · `decisions.md` §159
+
+## D30 — NKD Follows Its First 30 Minutes (strong days)  *(WATCHLIST — t00812)*
+
+Data-derived (D-series family 6): the rest of the Nikkei window (09:00-15:00 Tokyo) traded in the direction of its first 30 minutes earned
+6.00 bps a day beyond drift in 2010–2017 (t 2.16). Validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D30) · `decisions.md` §159
+
+## D31 — DAX Follows Its First 30 Minutes (strong days)  *(WATCHLIST — t00813)*
+
+Data-derived (D-series family 6): the rest of the DAX window (09:00-17:30 Frankfurt) traded in the direction of its first 30 minutes earned
+7.67 bps a day beyond drift in 2010–2017 (t 2.11). Validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D31) · `decisions.md` §159
+
+## D32 — XAGUSD London Window Follows Its Own Overnight Move (strong days)  *(CONFIRM — t00814)*
+
+Data-derived (D-series family 7, from the gold finding): XAGUSD from 03:00 to 11:30 New York traded in the direction of its own overnight move (11:30 -> 03:00 New York) earned
+17.40 bps a day beyond drift in 2010–2017 (t 3.60). Validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D32) · `decisions.md` §162
+
+## D33 — XAGUSD London Window Follows Gold's Overnight Move (every day)  *(WATCHLIST — t00815)*
+
+Data-derived (D-series family 7, from the gold finding): XAGUSD from 03:00 to 11:30 New York traded in the direction of gold's overnight move (MGC, 11:30 -> 03:00 New York) earned
+12.37 bps a day beyond drift in 2010–2017 (t 3.34). Validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D33) · `decisions.md` §162
+
+## D34 — XAGUSD London Window Follows Gold's Overnight Move (strong days)  *(WATCHLIST — t00816)*
+
+Data-derived (D-series family 7, from the gold finding): XAGUSD from 03:00 to 11:30 New York traded in the direction of gold's overnight move (MGC, 11:30 -> 03:00 New York) earned
+18.47 bps a day beyond drift in 2010–2017 (t 3.19). Validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D34) · `decisions.md` §162
+
+## D35 — USDCHF London Window Fades Gold's Overnight Move (every day)  *(REJECT — t00817)*
+
+Data-derived (D-series family 7, from the gold finding): USDCHF from 03:00 to 11:30 New York traded against gold's overnight move (MGC, 11:30 -> 03:00 New York) earned
+2.83 bps a day beyond drift in 2010–2017 (t 2.21). Validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D35) · `decisions.md` §162
+
+## D36 — XAGUSD London Window Follows Its Own Overnight Move (every day)  *(WATCHLIST — t00818)*
+
+Data-derived (D-series family 7, from the gold finding): XAGUSD from 03:00 to 11:30 New York traded in the direction of its own overnight move (11:30 -> 03:00 New York) earned
+6.67 bps a day beyond drift in 2010–2017 (t 2.20). Validated once on sealed 2018–2026 data.
+`hypotheses.yaml` (D36) · `decisions.md` §162
+
+## D37 — Gold Fades Its First 15 Minutes After 08:30 Releases  *(REJECT — t00819)*
+
+Data-derived (D-series family 9). `hypotheses.yaml` (D37) · `decisions.md` §169
+
+## D38 — Gold Fades Its First 5 Minutes After 08:30 Releases  *(REJECT — t00820)*
+
+Data-derived (D-series family 9). `hypotheses.yaml` (D38) · `decisions.md` §169
+
+## D39 — ZN Follows the Previous ES Session  *(WATCHLIST — t00821)*
+
+Data-derived (D-series family 10). `hypotheses.yaml` (D39) · `decisions.md` §172
+
+## D40 — HG Fades the Previous NG Session  *(REJECT — t00822)*
+
+Data-derived (D-series family 10). `hypotheses.yaml` (D40) · `decisions.md` §172
+
+## D41 — ZN Fades the Previous 6J Session  *(WATCHLIST — t00823)*
+
+Data-derived (D-series family 10). `hypotheses.yaml` (D41) · `decisions.md` §172
+
+## D42 — NG Follows the Previous SI Session  *(WATCHLIST — t00824)*
+
+Data-derived (D-series family 10). `hypotheses.yaml` (D42) · `decisions.md` §172
+
+## D43 — ZS Follows the Previous ES Session  *(WATCHLIST — t00825)*
+
+Data-derived (D-series family 10). `hypotheses.yaml` (D43) · `decisions.md` §172
+
+## D44 — GC Follows the Previous ZN Session  *(REJECT — t00826)*
+
+Data-derived (D-series family 10). `hypotheses.yaml` (D44) · `decisions.md` §172
+
+## D45 — RTY Fades the Previous ES Session  *(WATCHLIST — t00827)*
+
+Data-derived (D-series family 10). `hypotheses.yaml` (D45) · `decisions.md` §172
+
+## D46 — ZS Long in Apr  *(WATCHLIST — t00828)*
+
+Data-derived (D-series family 11, seasonality). `hypotheses.yaml` (D46) · `decisions.md` §175
+
+## D47 — ZS Long in Oct  *(WATCHLIST — t00829)*
+
+Data-derived (D-series family 11, seasonality). `hypotheses.yaml` (D47) · `decisions.md` §175
+
+## D48 — NG Short in Oct  *(REJECT — t00830)*
+
+Data-derived (D-series family 11, seasonality). `hypotheses.yaml` (D48) · `decisions.md` §175
+
+## D49 — HG Long in Dec  *(WATCHLIST — t00831)*
+
+Data-derived (D-series family 11, seasonality). `hypotheses.yaml` (D49) · `decisions.md` §175
+
+## D50 — ZC Long in Oct  *(WATCHLIST — t00832)*
+
+Data-derived (D-series family 11, seasonality). `hypotheses.yaml` (D50) · `decisions.md` §175
+
+## D51 — CL Long in Apr  *(WATCHLIST — t00833)*
+
+Data-derived (D-series family 11, seasonality). `hypotheses.yaml` (D51) · `decisions.md` §175
+
+## D52 — HG Short in Mar  *(REJECT — t00834)*
+
+Data-derived (D-series family 11, seasonality). `hypotheses.yaml` (D52) · `decisions.md` §175
+
+## D53 — NQ Fades an Extreme Session Over the Next 5  *(REJECT — t00835)*
+
+Data-derived (D-series family 12). `hypotheses.yaml` (D53) · `decisions.md` §178
+
+## D54 — ES Fades an Extreme Session Over the Next 5  *(REJECT — t00836)*
+
+Data-derived (D-series family 12). `hypotheses.yaml` (D54) · `decisions.md` §178
+
+## D55 — ZN Fades an Extreme Session Over the Next 1  *(REJECT — t00837)*
+
+Data-derived (D-series family 12). `hypotheses.yaml` (D55) · `decisions.md` §178
+
+## D56 — MNQ Long the Midnight Hour  *(REJECT — t00838)*
+
+Data-derived (D-series family 14). `hypotheses.yaml` (D56) · `decisions.md` §183
+
+## D57 — DAX Last Half Hour Follows the Day (strong days)  *(WATCHLIST in form — t00839; faded)*
+
+Data-derived (D-series family 16). `hypotheses.yaml` (D57) · `decisions.md` §188
+
+## D58 — Combined Model for NKD_win  *(WATCHLIST — t00840)*
+
+Data-derived (D-series family 19). `hypotheses.yaml` (D58) · `decisions.md` §195
+
+## D59 — Combined Model for DAX_win  *(WATCHLIST — t00841)*
+
+Data-derived (D-series family 19). `hypotheses.yaml` (D59) · `decisions.md` §195
+
+## D60 — Combined Model for MGC_win  *(WATCHLIST — t00842)*
+
+Data-derived (D-series family 19). `hypotheses.yaml` (D60) · `decisions.md` §195
+
+## D61 — Combined Model for MNQ_win  *(REJECT — t00843)*
+
+Data-derived (D-series family 19). `hypotheses.yaml` (D61) · `decisions.md` §195
+
+## D62 — Combined Model for MCL  *(WATCHLIST — t00844)*
+
+Data-derived (D-series family 19). `hypotheses.yaml` (D62) · `decisions.md` §195
+
+## D63 — Combined Model for ZS  *(REJECT — t00845)*
+
+Data-derived (D-series family 19). `hypotheses.yaml` (D63) · `decisions.md` §195
+
+## D64 — 6E Follows a ZN Shock (next session)  *(WATCHLIST — t00846)*
+
+Data-derived (D-series family 24). `hypotheses.yaml` (D64) · `decisions.md` §208
+
+## D65 — 6E Follows a GC Shock (next session)  *(WATCHLIST — t00847)*
+
+Data-derived (D-series family 24). `hypotheses.yaml` (D65) · `decisions.md` §208
+
+## D66 — ZC Fades a CL Shock (next session)  *(CONFIRM — t00848)*
+
+Data-derived (D-series family 24). `hypotheses.yaml` (D66) · `decisions.md` §208
+
+## D67 — GC Follows a ZN Shock (next session)  *(REJECT — t00849)*
+
+Data-derived (D-series family 24). `hypotheses.yaml` (D67) · `decisions.md` §208
+
+## D68 — ES Follows a ZN Shock (next session)  *(CONFIRM — t00850)*
+
+Data-derived (D-series family 24). `hypotheses.yaml` (D68) · `decisions.md` §208
+
+## D69 — ES Follows a GC Shock (next session)  *(WATCHLIST — t00851)*
+
+Data-derived (D-series family 24). `hypotheses.yaml` (D69) · `decisions.md` §208
+
+## D70 — NG Follows a ES Shock (next session)  *(WATCHLIST — t00852)*
+
+Data-derived (D-series family 24). `hypotheses.yaml` (D70) · `decisions.md` §208
+
+## D71 — HG Follows a ZN Shock (next session)  *(WATCHLIST — t00853)*
+
+Data-derived (D-series family 24). `hypotheses.yaml` (D71) · `decisions.md` §208
+
+## D72 — MGC_win Follows a ZN Shock  *(WATCHLIST — t00854)*
+
+Data-derived (D-series family 25). `hypotheses.yaml` (D72) · `decisions.md` §213
+
+## D73 — MGC_win Follows a 6E Shock  *(REJECT — t00855)*
+
+Data-derived (D-series family 25). `hypotheses.yaml` (D73) · `decisions.md` §213
+
+## D74 — DAX_win Fades a 6E Shock  *(WATCHLIST — t00856)*
+
+Data-derived (D-series family 25). `hypotheses.yaml` (D74) · `decisions.md` §213
+
+## D75 — ES Follows a GC Shock (next3)  *(WATCHLIST — t00857)*
+
+Data-derived (D-series family 26). `hypotheses.yaml` (D75) · `decisions.md` §216
+
+## D76 — ZS Fades a ZN Shock (days2-3)  *(WATCHLIST — t00858)*
+
+Data-derived (D-series family 26). `hypotheses.yaml` (D76) · `decisions.md` §216
+
+## D77 — GC Follows a ES Shock (days2-3)  *(REJECT — t00859)*
+
+Data-derived (D-series family 26). `hypotheses.yaml` (D77) · `decisions.md` §216
+
+## D78 — ES Follows a GC Shock (days2-3)  *(WATCHLIST — t00860)*
+
+Data-derived (D-series family 26). `hypotheses.yaml` (D78) · `decisions.md` §216
+
+## D79 — NQ Follows a Volume Shock (next 3)  *(REJECT — t00861)*
+
+Data-derived (D-series family 27). `hypotheses.yaml` (D79) · `decisions.md` §219
+
+## D80 — ZS Fades a Volume Shock (next 1)  *(WATCHLIST — t00862)*
+
+Data-derived (D-series family 27). `hypotheses.yaml` (D80) · `decisions.md` §219
+
+## D81 — ZW Fades a Volume Shock (next 1)  *(WATCHLIST — t00863)*
+
+Data-derived (D-series family 27). `hypotheses.yaml` (D81) · `decisions.md` §219
+
+## D82 — 6E Fades a Yield-Curve Shock  *(REJECT — t00864)*
+
+Data-derived (D-series family 28). `hypotheses.yaml` (D82) · `decisions.md` §222
+
+## D83 — HG Fades a Yield-Curve Shock  *(REJECT — t00865)*
+
+Data-derived (D-series family 28). `hypotheses.yaml` (D83) · `decisions.md` §222
+
+## D84 — 6J Follows a NQ Shock (next session)  *(CONFIRM — t00866)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D84) · `decisions.md` §225
+
+## D85 — 6E Follows a NQ Shock (next session)  *(WATCHLIST — t00867)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D85) · `decisions.md` §225
+
+## D86 — NQ Follows a 6J Shock (next session)  *(REJECT — t00868)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D86) · `decisions.md` §225
+
+## D87 — 6J Follows a ZC Shock (next session)  *(CONFIRM — t00869)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D87) · `decisions.md` §225
+
+## D88 — 6E Follows a RTY Shock (next session)  *(WATCHLIST — t00870)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D88) · `decisions.md` §225
+
+## D89 — 6E Follows a SI Shock (next session)  *(CONFIRM — t00871)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D89) · `decisions.md` §225
+
+## D90 — ES Follows a 6J Shock (next session)  *(REJECT — t00872)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D90) · `decisions.md` §225
+
+## D91 — ZN Follows a NQ Shock (next session)  *(REJECT — t00873)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D91) · `decisions.md` §225
+
+## D92 — 6J Follows a RTY Shock (next session)  *(WATCHLIST — t00874)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D92) · `decisions.md` §225
+
+## D93 — 6E Follows a HG Shock (next session)  *(REJECT — t00875)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D93) · `decisions.md` §225
+
+## D94 — RTY Follows a 6J Shock (next session)  *(REJECT — t00876)*
+
+Data-derived (D-series family 29). `hypotheses.yaml` (D94) · `decisions.md` §225
+
+## D95 — ZW Fades Small Crowding  *(REJECT — t00877)*
+
+Data-derived (D-series family 31). `hypotheses.yaml` (D95) · `decisions.md` §231
+
+## D96 — SI Follows Small Flow  *(REJECT — t00878)*
+
+Data-derived (D-series family 31). `hypotheses.yaml` (D96) · `decisions.md` §231
+
+
+## D97 — Gbp Fades Move Into Fix  *(REJECT — t00879)*
+
+Data-derived (D-series family 41). `hypotheses.yaml` (D97) · `decisions.md` §253
+
+## D98 — Gbp Fades Strong Move Into Fix  *(REJECT — t00880)*
+
+Data-derived (D-series family 41). `hypotheses.yaml` (D98) · `decisions.md` §253
+
+## D99 — Chf Fades Strong Move Into Fix  *(WATCHLIST — t00881)*
+
+Data-derived (D-series family 41). `hypotheses.yaml` (D99) · `decisions.md` §253
+
+## D100 — Mnq Afternoon Follows Morning Unless Trending  *(WATCHLIST — t00882)*
+
+Data-derived (D-series family 49). `hypotheses.yaml` (D100) · `decisions.md` §272
+
+## D101 — Mnq Day Follows Opening Minute  *(WATCHLIST — t00883)*
+
+Data-derived (D-series family 52). `hypotheses.yaml` (D101) · `decisions.md` §279
+
+## D102 — Dax Fades Credit Shock  *(WATCHLIST — t00884)*
+
+Data-derived (D-series family 57). `hypotheses.yaml` (D102) · `decisions.md` §290
+
+## D103 — Gold Fades Real Yield Shock  *(REJECT — t00885)*
+
+Data-derived (D-series family 63). `hypotheses.yaml` (D103) · `decisions.md` §304
+
+## D104 — Yen Recovers After Gotobi Fix  *(WATCHLIST — t00886)*
+
+Data-derived (D-series family 66). `hypotheses.yaml` (D104) · `decisions.md` §311
+
+## D105 — Mnq Fades Bank Shock  *(WATCHLIST — t00887)*
+
+Data-derived (D-series family 76). `hypotheses.yaml` (D105) · `decisions.md` §332
+
+## D106 — Mnq Fades Tech Shock  *(WATCHLIST — t00888)*
+
+Data-derived (D-series family 77). `hypotheses.yaml` (D106) · `decisions.md` §335
+
+## D107 — 6B Follows Zn Shock  *(WATCHLIST — t00883)*
+
+Data-derived (D-series family 83). `hypotheses.yaml` (D107) · `decisions.md` §348
+
+## D108 — 6A Follows Zn Shock  *(REJECT — t00884)*
+
+Data-derived (D-series family 83). `hypotheses.yaml` (D108) · `decisions.md` §348
+
+## D109 — 6S Follows Nq Shock  *(WATCHLIST — t00885)*
+
+Data-derived (D-series family 83). `hypotheses.yaml` (D109) · `decisions.md` §348
+
+## D110 — 6S Follows Gc Shock  *(WATCHLIST — t00886)*
+
+Data-derived (D-series family 83). `hypotheses.yaml` (D110) · `decisions.md` §348
+
+## D111 — 6B Follows Gc Shock  *(WATCHLIST — t00887)*
+
+Data-derived (D-series family 83). `hypotheses.yaml` (D111) · `decisions.md` §348
+
+## D112 — 6S Follows Zn Shock  *(REJECT — t00888)*
+
+Data-derived (D-series family 83). `hypotheses.yaml` (D112) · `decisions.md` §348
+
+## D113 — 6S Follows Es Shock  *(WATCHLIST — t00889)*
+
+Data-derived (D-series family 83). `hypotheses.yaml` (D113) · `decisions.md` §348
+
+## D114 — 6C Follows Zn Shock  *(WATCHLIST — t00890)*
+
+Data-derived (D-series family 83). `hypotheses.yaml` (D114) · `decisions.md` §348
+
+## D115 — Nkd Follows Strong Tokyo Morning  *(REJECT — t00897)*
+
+Data-derived (D-series family 86). `hypotheses.yaml` (D115) · `decisions.md` §355
+
+## D116 — Dollar Bid Into Gotobi Fix  *(WATCHLIST — t00898)*
+
+Data-derived (D-series family 86). `hypotheses.yaml` (D116) · `decisions.md` §355
+
+## D117 — Gold Fades Strong Move Into Settlement  *(REJECT — t00899)*
+
+Data-derived (D-series family 86). `hypotheses.yaml` (D117) · `decisions.md` §355
+
+## D118 — Euro Firms After Ecb Fix  *(WATCHLIST — t00900)*
+
+Data-derived (D-series family 86). `hypotheses.yaml` (D118) · `decisions.md` §355
+
+## D119 — Gold Follows Long Bond Shock  *(REJECT — t00901)*
+
+Data-derived (D-series family 86). `hypotheses.yaml` (D119) · `decisions.md` §355
+
+## D120 — Gold Follows Credit Bond Shock  *(REJECT — t00902)*
+
+Data-derived (D-series family 86). `hypotheses.yaml` (D120) · `decisions.md` §355
+
+## D121 — Dollar Recovers After Monthend Fix  *(WATCHLIST — t00903)*
+
+Data-derived (D-series family 94). `hypotheses.yaml` (D121) · `decisions.md` §374
+
+## D122 — Zs Falls After Real Weakens  *(CONFIRM — t00904)*
+
+Data-derived (D-series family 97). `hypotheses.yaml` (D122) · `decisions.md` §381
+
+## D123 — Zc Falls After Real Weakens  *(WATCHLIST — t00905)*
+
+Data-derived (D-series family 97). `hypotheses.yaml` (D123) · `decisions.md` §381
+
+## D124 — Copper Falls After Peso Weakens  *(WATCHLIST — t00906)*
+
+Data-derived (D-series family 98). `hypotheses.yaml` (D124) · `decisions.md` §385
+
+## D125 — Crude Falls After Colombian Peso Weakens  *(REJECT — t00907)*
+
+Data-derived (D-series family 100). `hypotheses.yaml` (D125) · `decisions.md` §390
+
+## D126 — Crude Falls After Em Currency Stress  *(REJECT — t00908)*
+
+Data-derived (D-series family 103). `hypotheses.yaml` (D126) · `decisions.md` §397
+
+## D127 — 6E Follows Two Year Shock  *(WATCHLIST — t00909)*
+
+Data-derived (D-series family 108). `hypotheses.yaml` (D127) · `decisions.md` §408
+
+## D128 — 6A Follows Two Year Shock  *(REJECT — t00910)*
+
+Data-derived (D-series family 108). `hypotheses.yaml` (D128) · `decisions.md` §408
+
+## D129 — Nkd Follows Vix3M Shock  *(REJECT — t00911)*
+
+Data-derived (D-series family 111). `hypotheses.yaml` (D129) · `decisions.md` §415
+
+## D130 — Mgc Fades Clpx Shock  *(WATCHLIST — t00912)*
+
+Data-derived (D-series family 111). `hypotheses.yaml` (D130) · `decisions.md` §415
+
+## D131 — Mgc Follows 6Sf Shock  *(WATCHLIST — t00913)*
+
+Data-derived (D-series family 111). `hypotheses.yaml` (D131) · `decisions.md` §415
+
+## D132 — Nkd Follows Lqd Shock  *(REJECT — t00914)*
+
+Data-derived (D-series family 111). `hypotheses.yaml` (D132) · `decisions.md` §415

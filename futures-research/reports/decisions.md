@@ -8347,6 +8347,2865 @@ open with the user.
 
 **Decided (user, 2026-10-12):** the add-on costs more than $27 per evaluation — not bought; the plan stays at 40% consistency.
 
+**Corrected 2026-10-13 (§146):** A23's replay summed float32 P&L, so an account landing exactly on the target (e.g. +$600 on a
+$33.20 round trip read as $599.99) failed to pass. Fixed (P&L to the cent; ½-cent tolerance on the target) and re-run: all-50K books
+**+$8,023, 92%** (2016–20, crude) and **+$9,468, 93%, p10 +$1,748** (2021–26, crude); soybean books unchanged; the 100K / 150K books
+unchanged to the dollar. The conclusion stands.
+
+## 146. A24: pricing commissions into the solver does not improve the plan — not adopted; a float-precision bug in A23 fixed (S8)
+
+**No trial spent; N 787.** `reporting/a24_cost_aware.py`, `reports/a24_book.json`. A01 prices a bracket +W / −L (net) as a fair
+coin, L / (W + L); with the round trip c the gross levels are W + c and L − c, so on a fair market P(win) = (L − c) / (W + L).
+A24 adds only that known term (A05's measured odds fitted one regime, §102) and re-tries the longer horizons that the cost-blind
+solver spoiled (§135–136). Variants fixed before any result, one rule for every market; live sizes; 84-day replay from every start.
+
+**Engine fix first.** A24's first pass showed crude far below the live engine (+$242 vs +$820): A23's replay summed float32
+paths, so an evaluation landing exactly on +$3,000 read $2,999.99 and never passed. Fixed (P&L rounded to the cent, ½-cent
+tolerance on target and consistency); A23 and A24 re-run. Against the live engine: MNQ +$1,265.3 vs +$1,265.5, MGC +$2,248 vs
++$2,229, MCL +$834 vs +$820 (payout rate 60% vs 52%: on days within one round trip of the floor A23 retires the account, as the
+playbook and bot do, §113, while the live engine trades on with a $1 stop through its fixed 2.32 cost offset).
+
+| five accounts, per four months (mean / P(net > 0) / 10th pct) | 2016–20, crude | 2016–20, soybeans | 2021–26, crude | 2021–26, soybeans |
+|---|---|---|---|---|
+| **plan (fair coin, 21 / 21)** | **+$8,023 / 92% / +$259** | +$8,907 / 88% / −$752 | **+$9,468 / 93% / +$1,748** | **+$12,499 / 98% / +$3,941** |
+| cost-aware, 21 / 21 | +$8,105 / 85% / −$910 | +$8,648 / 81% / −$1,447 | +$8,219 / 90% / +$17 | +$11,608 / 96% / +$1,847 |
+| cost-aware, 42 / 21 | +$8,708 / 85% / −$1,359 | +$9,902 / 89% / −$369 | +$8,225 / 85% / −$723 | +$10,362 / 95% / +$1,681 |
+| cost-aware, 21 / 63 and 42 / 63 | = 21 / 21 and 42 / 21 (the funded policy does not change) | | | |
+
+By market (2021–26 / 2016–20 mean net, plan → cost-aware): MNQ +$1,265 → +$1,741 / +$1,960 → +$2,050; MGC +$2,248 → +$1,408 /
++$2,075 → +$2,477; MCL +$834 → +$636 / +$678 → +$771; NKD +$2,763 → +$1,694 / +$1,189 → +$1,655; FDXM +$1,879 → +$1,991 /
++$2,071 → +$2,037; ZS +$3,727 → +$3,859 / +$3,024 → +$3,922.
+
+**Reading.** Pricing the commission in shifts brackets slightly and moves single markets by ±$1k either way, with no sign
+that holds across both histories except MNQ's small gain; the books lose P(net > 0) and the 10th percentile in every case, and
+the mean in three of four. Picking the variant per market would be choosing after the fact. **Not adopted; the plan's fair-coin
+solver stays.** With the ≥ $500 stop menu (§136) the commission is already small against the brackets (c / (W + L) ≈ 0.2–1.5%),
+so there was little left to fix — the cost-blind failure of §135 lived in the tiny stops that menu removed.
+
+## 147. The demo review in one command; the bot files `!eod` under the right trading day (S8)
+
+**No trial spent; N 787.** While the demo runs, so the ~2026-10-25 review takes minutes:
+
+- **`python -m futuresres.reporting.a18_demo_check --review`** pulls `shadow_log.csv`, `demo_log.csv`, `state.json` and `tickets.json`
+  from the droplet (read-only; copies in `data/cache/demo/`, gitignored) and prints, and saves as `review_<date>.md`: outcomes and
+  shadow P&L against the backtest for the same brackets (overall and per product, soybeans included); each recorded close against
+  the shadow P&L of the ticket that was running when it was sent (the latest started ticket from `tickets.json`; closes sent
+  while a ticket is still open are skipped until it is tracked; tickets marked skipped are excluded, unmarked ones counted and
+  flagged — `!took` is not always sent); and each account's phase, balance, evaluations bought, passes, payouts and fees.
+- **Bot defect found by the first run.** `!eod` filed a balance under today only after 17:00 New York, else the previous trading
+  day — but the user sends it as each bracket resolves (02:48, 11:21, 16:24), so every close of the first two days was filed a day
+  early (DAX under 2026-10-09) and the 17:30 alert would list balances as missing. Now `schedule.eod_day`: the New York date of
+  the exit of the product's latest started ticket (every ticket of one alert exits on the next alert's date); the old rule only
+  when no ticket has started. Test added. The bot's log now writes New York time with its offset (the droplet runs on UTC; earlier
+  rows are naive UTC, which the checker converts). Help text and README updated. **Deployed 2026-10-13 with the user's go-ahead** (previous files in `/opt/futures-bot/backup-2026-10-13/`).
+
+**First reading (2026-10-13, 9 finished tickets):** take / stop / time exit 2 / 7 / 0 against 3.8 / 4.7 / 0.4 expected (chi-square
+2.4, p ≈ 0.30); shadow P&L −$4,601 against −$261 ± $3,147 (z −1.38) — within normal range at nine tickets. Recorded closes match
+the shadow within $4 (soybeans −$11.50), but are round ±$1,000 / ±$1,200: the demo appears to charge no commission (or balances are
+rounded) — live accounts will pay $2.56–$33 a ticket that the demo does not show.
+
+**How the demo is run (the user, 2026-10-13):** the tickets are NOT placed — the user cannot be at the screen at each entry time —
+the user reads each ticket's take or stop after the fact and records it with `!eod`, without commissions. So the demo is a
+paper forward test of the plan's brackets: the review's "execution" section checks the user's reading against the shadow
+tracker (it agrees within commission and tick rounding), not real fills; slippage and commissions are untested until live.
+
+## 148. A25: holding payouts back does not help — the plan's "take everything allowed, every day" stays (S8)
+
+**No trial spent; N 787.** `reporting/a25_payout_timing.py`; `reports/a25_book.json`; A23's engine gains a `withdraw` option
+("all" reproduces the live engine: MNQ +$1,265.3 vs +$1,265.5). The funded game chooses, at each day's end, to withdraw none, half
+or all of what the rules allow (above $52,000; $1,250 a payout until the third). Variants fixed before any result, one rule for
+every market: the plan (all, funded horizon 21), choose at 21, 63 and 126 days. Six markets, both histories, 84-day replay.
+
+| five accounts, per four months (mean / P(net > 0) / 10th pct) | 2016–20, crude | 2016–20, soybeans | 2021–26, crude | 2021–26, soybeans |
+|---|---|---|---|---|
+| **plan (take all)** | **+$8,023 / 92% / +$259** | **+$8,907 / 88% / −$752** | **+$9,468 / 93% / +$1,748** | **+$12,499 / 98% / +$3,941** |
+| choose, 21 days | +$8,013 / 92% / +$253 | +$8,874 / 88% / −$673 | +$9,592 / 93% / +$1,719 | +$12,632 / 97% / +$3,970 |
+| choose, 63 days | +$8,540 / 94% / +$2,237 | +$8,398 / 94% / +$1,813 | +$8,151 / 93% / +$1,351 | +$9,869 / 96% / +$2,490 |
+| choose, 126 days | −$2,972 / 0% | −$2,751 / 0% | −$3,139 / 0% | −$2,936 / 0% |
+
+- **At the plan's 21-day horizon the choice changes nothing** (±$130): the solver would hold back only in states the replay rarely
+  reaches.
+- **At 63 days it holds back in ~60–85% of payable states** — better in 2016–20 (mean +$517 / −$509; 10th percentile up ~$2k),
+  worse in 2021–26 (−$1,317 / −$2,630). No consistent sign; adopting it would mean choosing a history.
+- **At 126 days it never withdraws before the cap lifts**, so nothing is paid within four months — the solver plays for
+  uncapped payouts later, which a four-month goal cannot use.
+- **Not adopted.** Taking everything allowed every day remains the plan; with no edge, money in the account is only exposed.
+
+## 149. D-series family 3 protocol: the session relay — does a finished window predict the direction of the next one? (S1)
+
+**No trial spent; N 787. Written and committed BEFORE any data is built or scanned.** The user: keep searching; published effects
+are likely gone — find something from what the programme has seen. Everything tested so far was a published effect or a scan of
+clock patterns; the plan itself trades six windows that hand over from Tokyo to Europe to New York. If a window that has fully
+closed predicts the DIRECTION of a later one, the bot can choose long or short for that ticket at no extra cost (one trade a day
+either way) — direction is the one lever the zero-edge plan leaves open. Not covered before: Z06/Z07 used a market's own long
+history (rejected), F08 same-hour MNQ/gold divergence (premise failure), Z05 gold day/night (marginal). Nothing tested the relay.
+
+1. **Windows and returns** (each from the start of the window to its end, the plan's windows; ET unless stated):
+   NKD 09:00–15:00 Tokyo (= 20:00/19:00 → 02:00/01:00 New York); DAX 09:00–17:30 Frankfurt; MGC 03:00–11:30; MNQ 09:30–16:00;
+   MCL the CME session (owned daily bars, roll-correct, bar dated D ≈ 20:00 D−1 → 20:00 D New York — an approximation);
+   ZS the CBOT session (Yahoo daily, open → settlement; §140 checked it against hourly sessions). Plus pre-window moves:
+   NKD Tokyo 15:00 → next 09:00; DAX 17:30 → next 09:00; MGC 11:30 → next 03:00; MNQ 16:00 → next 09:30; and the morning so far at
+   MNQ's entry: DAX and MGC 03:00 → 09:30.
+2. **Sources:** MNQ (NQ/MNQ spliced) and MGC 1-minute Databento TRADES (owned); NKD, DAX free HistData CFD minute bars on the
+   corrected clock (§140) — window opens and closes only, none at a session close where §144's quote artefact lived; prices are the
+   close of the last minute bar before each time; a window or move whose two prices come from different contracts is dropped.
+3. **Tests (40 target × predictor pairs; every predictor has FINISHED before the target's entry):**
+   - NKD (entry 20:00 D): MNQ, DAX, MGC, MCL, ZS windows of D; NKD's own window of D; NKD's pre-window move (to 09:00 Tokyo D+1).
+   - ZS (entry 20:00 D): MNQ, DAX, MGC, MCL windows of D; NKD of D; ZS's own session of D.
+   - MCL (entry 18:00 D): MNQ, DAX, MGC, ZS windows of D; NKD of D; MCL's own session of D.
+   - DAX (entry 03:00 D): NKD of D (closed 02:00); MNQ, MGC, MCL, ZS of D−1; DAX's own window of D−1; DAX's pre-window move.
+   - MGC (entry 03:00 D): NKD of D; MNQ, DAX, MCL, ZS of D−1; MGC's own window of D−1; MGC's pre-window move.
+   - MNQ (entry 09:30 D): NKD of D; DAX and MGC 03:00 → 09:30 of D; MCL, ZS of D−1; MNQ's own window of D−1; MNQ's overnight move.
+   Two forms each: every day (direction = sign of the predictor), and strong days only (|predictor| above its 2010–17 median).
+   **80 tests**; at |t| > 1.96 about 4 pass by chance.
+4. **Discovery 2010-06 → 2017-12 only** (asserted). Statistic: mean of sign(predictor) × target, the target demeaned within the
+   period (directional skill beyond drift), two-sided t. **Carried: every test with |t| > 1.96** (§133: no multiple-testing cut);
+   its sign fixes the rule — momentum (follow the predictor) or reversal (fade it). No cost filter: the direction is chosen for a
+   trade the plan makes anyway.
+5. **Validation 2018-01 → 2026-08, sealed until registration; one trial per carried test.** CONFIRM only if all hold:
+   (a) **against always-long** (§119): the daily difference (rule direction − always long) × the target's RAW return has t > 1.645;
+   (b) placebo: the real rule's mean at or above the 95th percentile of the same rule with the predictor shifted ±2…±11 trading
+   days (20 shifts); (c) posterior > 0, prior Normal(discovery mean / 2, |discovery mean| / 2) on the demeaned statistic;
+   (d) **S8: the demeaned statistic is positive on 2021–2026 alone**; reported against the running count (Z and D market-tests
+   from 24). WATCHLIST if the validation mean (demeaned) > 0 but a condition fails; REJECT otherwise.
+6. **Use, if any confirms:** the direction rule is put into the plan's replay (A23 engine, the confirmed market only) and the
+   effect on P(payout) and net per four months reported before anything changes in the bot.
+7. **Addendum before the scan (data checks, no outcome read):** values more than 15 robust SDs from a series' median are dropped
+   as bad prints (two DAX CFD overnight values, +27,100 and −7,423 bps); the owned NQ minute data is sparse before 2013 (33 days in
+   2010, 72 in 2011, 107 in 2012), so MNQ's discovery sample is ~1,300 days, not ~1,900.
+
+## 150. Family-3 discovery: ten tests carried (≈4 by chance); D12–D21 registered before validation (S1–S5)
+
+**No trial spent at registration; N 787. Committed BEFORE any validation data is read.** `reporting/d3_relay.py` (`--build`,
+`--scan`), `reports/d3_discovery.json`; `signals/d_relay.py`; `hypotheses.yaml` D12–D21; catalog sections; MNQ and ZS added to the
+registry's single-market primaries. 80 tests on 2010-06 → 2017-12 (asserted); |t| > 1.96 expected ~4 by chance; **10 carried**:
+
+| id | target | rule | predictor | form | discovery (bps beyond drift a day) | prior |
+|---|---|---|---|---|---|---|
+| D12 | NKD_win | fade | NKD_pre (same) | all | -6.52, t -3.10, n 1812 | N(+3.26, 3.26) |
+| D13 | MGC_win | follow | MGC_pre (same) | all | +6.10, t +2.89, n 1349 | N(+3.05, 3.05) |
+| D14 | MNQ_win | fade | MNQ_win (prev) | all | -6.15, t -2.74, n 1047 | N(+3.07, 3.07) |
+| D15 | NKD_win | fade | NKD_pre (same) | strong | -8.44, t -2.51, n 906 | N(+4.22, 4.22) |
+| D16 | MGC_win | follow | MGC_pre (same) | strong | +8.20, t +2.46, n 674 | N(+4.10, 4.10) |
+| D17 | MCL | fade | MGC_win (prev) | strong | -17.88, t -2.31, n 653 | N(+8.94, 8.94) |
+| D18 | MCL | fade | MNQ_win (prev) | all | -12.54, t -2.26, n 1234 | N(+6.27, 6.27) |
+| D19 | MGC_win | fade | MGC_win (prev) | strong | -7.95, t -2.24, n 592 | N(+3.97, 3.97) |
+| D20 | MNQ_win | fade | ZS (prev) | strong | -6.72, t -2.11, n 625 | N(+3.36, 3.36) |
+| D21 | ZS | fade | MGC_win (prev) | all | -6.97, t -2.01, n 1337 | N(+3.49, 3.49) |
+
+Seven distinct relationships (D12/D15 and D13/D16 are one pair's every-day and strong-day forms). **Noted before the run:** D12/D15's
+predictor ends at the price the Nikkei window starts from, so a noisy CFD quote at 09:00 Tokyo would make the two look negatively
+related — a fade could be partly measurement; D13/D16 (gold) runs the opposite way to that artefact. Validation per §149, 5;
+Z and D market-tests 24–33.
+
+## 151. D12–D21 validated: no confirmation; gold following its overnight move (D16) passes everything but always-long (S6–S8)
+
+**Ten trials spent: t00794–t00803. N 787 → 797.** Injections all recovered. Z and D market-tests 24–33.
+
+| id, trial | rule | days | beyond drift, bps a day | vs always-long | placebo pct | 2021–26 | tier |
+|---|---|---|---|---|---|---|---|
+| D12 t00794 | NKD_win fades NKD_pre (same, all) | 2153 | -2.24 (t -1.25) | -1.85 (t -0.72) | 5 | -0.02 | **REJECT** |
+| D13 t00795 | MGC_win follows MGC_pre (same, all) | 2139 | +1.17 (t +0.71) | +0.06 (t +0.02) | 85 | +3.15 | **WATCHLIST** |
+| D14 t00796 | MNQ_win fades MNQ_win (prev, all) | 2000 | +2.82 (t +1.09) | +0.51 (t +0.14) | 85 | -0.43 | **WATCHLIST** |
+| D15 t00797 | NKD_win fades NKD_pre (same, strong) | 1099 | -0.33 (t -0.12) | +0.96 (t +0.24) | 40 | +1.98 | **REJECT** |
+| D16 t00798 | MGC_win follows MGC_pre (same, strong) | 962 | +6.27 (t +2.34) | +5.18 (t +1.28) | 100 | +8.91 | **WATCHLIST** |
+| D17 t00799 | MCL fades MGC_win (prev, strong) | 1050 | -11.30 (t -1.27) | -26.91 (t -2.20) | 5 | -10.77 | **REJECT** |
+| D18 t00800 | MCL fades MNQ_win (prev, all) | 1999 | -4.37 (t -0.71) | -18.18 (t -1.98) | 30 | -7.06 | **REJECT** |
+| D19 t00801 | MGC_win fades MGC_win (prev, strong) | 1066 | +2.95 (t +1.18) | +0.87 (t +0.26) | 80 | +2.42 | **WATCHLIST** |
+| D20 t00802 | MNQ_win fades ZS (prev, strong) | 954 | -0.01 (t -0.00) | -3.76 (t -0.65) | 40 | +2.21 | **REJECT** |
+| D21 t00803 | ZS fades MGC_win (prev, all) | 2107 | -2.74 (t -1.09) | -2.86 (t -0.83) | 15 | -3.71 | **REJECT** |
+
+**D16 — gold, follow its own move since the last London window (11:30 → 03:00 ET), on strong days** — is the closest the programme
+has come: beyond drift +6.27 bps a day (t +2.34), placebo 100th percentile, posterior > 0, and **stronger in 2021–26** (+8.91,
+t +2.68). It fails only (a): against always-long it adds +5.18 bps a day (t +1.28), because shorting gold costs its 2018–26 drift
+(2018–20 against always-long −6.21; 2021–26 +10.19). Its every-day form D13 is weaker (+1.17, t 0.71; 2021–26 +3.15). The nearest
+variants of the Nikkei fade (D12, D15) failed outright — the 09:00 CFD-quote concern of §150 is moot.
+
+**Reading.** The relay holds nothing that beats always-long under the strict rule. One candidate is worth watching: D16 on the
+watchlist with D13, D14, D19. D16 is the only one with a placebo at the 100th percentile and a stronger second half; it is also the
+kind of rule (a bracket direction chosen by a move that has already happened) the plan could use at no cost.
+
+## 152. D-series family 4 protocol: the overnight state at the open (MNQ, gold), from traded futures data with volume (S1)
+
+**No trial spent; N 797. Written and committed BEFORE any data is built or scanned.** The user: keep searching. Family 3 used
+window returns only; the owned Databento data also carries **volume and the path** of the hours before each entry, which free
+quote data cannot. Question: does the state of the market just before the plan's entry — where it sits in its overnight range,
+how busy and how volatile the night was, the last half hour, how the previous window ended — predict the window's direction?
+
+1. **Targets:** MNQ 09:30–16:00 and MGC 03:00–11:30 New York (the plan's windows), from 1-minute TRADES (owned; MNQ = NQ/MNQ
+   spliced, sparse before 2013, §149 addendum). A day whose segment spans two contracts is dropped.
+2. **Segments** (New York time; Globex break 17:00–18:00 excluded by the data):
+   - MNQ: overnight = 18:00 (previous day) → 09:30; pre-open = 09:00 → 09:30; previous window = 09:30 → 16:00 of the previous
+     day, its last hour 15:00 → 16:00.
+   - MGC: overnight = 11:30 (previous day) → 03:00; pre-open = 02:30 → 03:00; previous window 03:00 → 11:30, last hour 10:30 → 11:30.
+   For each: return, high, low, last price, volume, realised variance (sum of squared 1-minute log returns).
+3. **Predictors, all known at entry; 12 tests per market, 24 in all:**
+   (1) overnight close location = (last − low) / (high − low) − ½, every day; (2) the same, strong days (|value| above its
+   2010–17 median); (3) overnight return, days with overnight volume above its 2010–17 median (volume as the ratio to the
+   previous 20 days' mean); (4) overnight return, days with overnight realised variance above its median (same ratio form);
+   (5) pre-open return, every day; (6) pre-open return, strong days; (7) pre-open return, days with pre-open volume above median
+   (ratio form); (8) previous window close location, every day; (9) the same, strong days; (10) previous window's last-hour
+   return, every day; (11) the same, strong days; (12) the overnight return on days the entry price lies OUTSIDE the previous
+   window's high–low range (a gap beyond it).
+   ~1.2 of 24 pass |t| > 1.96 by chance. D16 (§151) used gold's 11:30 → 03:00 return on strong days; (3) and (4) condition the
+   same return on volume and variance instead — related, recorded.
+4. **Discovery 2010-06 → 2017-12 only** (asserted); statistic and selection exactly as §149, 4 (sign of the predictor × the
+   target demeaned within the period; carried at |t| > 1.96; follow or fade fixed by the sign).
+5. **Validation exactly as §149, 5** (sealed 2018-01 → 2026-08; one trial each; (a) against always-long t > 1.645, (b) placebo with
+   the predictor shifted ±2…±11 days ≥ 95th pct, (c) posterior > 0 with prior Normal(discovery/2, |discovery|/2), (d) 2021–26
+   > 0; CONFIRM / WATCHLIST / REJECT); Z and D market-tests from 34. Bad-print rule of §149 addendum applies.
+
+## 153. Family-4 discovery: six gold tests carried (≈1.2 by chance), all "follow the overnight move"; D22–D27 registered (S1–S5)
+
+**No trial spent at registration; N 797. Committed BEFORE any validation data is read.** `reporting/d4_overnight.py`,
+`reports/d4_discovery.json`; `signals/d_overnight.py`; `hypotheses.yaml` D22–D27; catalog. 24 tests, 2010-06 → 2017-12; **all six
+carried tests are gold, all follow the overnight move** into the London window; MNQ none (best |t| 1.53).
+
+| id | test | gate | discovery (bps beyond drift a day) | prior |
+|---|---|---|---|---|
+| D22 | ON_loc | strong | +7.89, t +3.39, n 885 | N(+3.95, 3.95) |
+| D23 | ON_ret|vol | ['ON', 'vratio'] | +7.22, t +2.75, n 882 | N(+3.61, 3.61) |
+| D24 | ON_loc | None | +4.60, t +2.57, n 1770 | N(+2.30, 2.30) |
+| D25 | PRE_ret | strong | +6.68, t +2.29, n 777 | N(+3.34, 3.34) |
+| D26 | ON_ret|outside | outside | +6.65, t +2.28, n 757 | N(+3.32, 3.32) |
+| D27 | ON_ret|rv | ['ON', 'rvratio'] | +5.53, t +2.04, n 882 | N(+2.77, 2.77) |
+
+**Recorded before the run:** these six are one phenomenon measured six ways, so their validations are strongly correlated —
+six passes would be one finding, not six. And D16 (§151) already read gold's 11:30 → 03:00 move on 2018–2026; the sealed window is
+not independent of that look. Data: the owned NQ file has full day sessions on only ~72 days of 2011 (an artefact of the original
+pull; overnight complete). Z and D market-tests 34–39.
+
+## 154. D22–D27 validated: all six on the watchlist — gold's overnight continuation is real but smaller than gold's drift (S6–S8)
+
+**Six trials spent: t00804–t00809. N 797 → 803.** Injections all recovered. Z and D market-tests 34–39.
+
+| id, trial | rule | days | beyond drift, bps a day | vs always-long | placebo pct | 2018–20 / 2021–26 | tier |
+|---|---|---|---|---|---|---|---|
+| D22 t00804 | MGC follows ON_loc (strong days) | 1117 | +2.93 (t +1.32) | +0.55 (t +0.17) | 95 | -0.58 / +4.77 | **WATCHLIST** |
+| D23 t00805 | MGC follows ON_ret (ON vratio above median) | 1281 | +1.61 (t +0.71) | +4.21 (t +1.31) | 80 | -3.11 / +4.09 | **WATCHLIST** |
+| D24 t00806 | MGC follows ON_loc (every day) | 2188 | +3.18 (t +1.92) | +1.90 (t +0.77) | 100 | +1.27 / +4.20 | **WATCHLIST** |
+| D25 t00807 | MGC follows PRE_ret (strong days) | 1218 | +0.74 (t +0.30) | -0.88 (t -0.27) | 55 | -5.97 / +3.99 | **WATCHLIST** |
+| D26 t00808 | MGC follows ON_ret (entry outside the previous window's range) | 839 | +4.97 (t +1.84) | +3.79 (t +0.95) | 100 | -1.54 / +8.35 | **WATCHLIST** |
+| D27 t00809 | MGC follows ON_ret (ON rvratio above median) | 1235 | +0.89 (t +0.38) | +2.22 (t +0.64) | 70 | -1.08 / +1.96 | **WATCHLIST** |
+
+**Reading.** Every measurement of the phenomenon is positive beyond drift on the sealed window (+0.7 to +5.0 bps a day), every
+one is positive on 2021–26 alone (+2.0 to +8.4), and three of six place the real rule at the 95th–100th percentile of its
+shifted placebos (D22, D24, D26; D24, every day, t +1.92). With D16 (§151) that is seven correlated looks pointing one way:
+**gold continues its overnight move into the London window.** None beats always-long (best t +1.31): over 2018–26 gold's drift
+(+2.6 bps a day in this window, far more in 2024–26) costs a direction rule its short days. Effect size ~3 bps against a window
+SD of ~77 bps — about $10–15 a day on the plan's 8 MGC. **Not adopted** (the strict rule is not met); watchlisted. The
+watchlist now holds a coherent family (D13, D16, D22–D27); the bot could shadow-track it as a forward test (§133) at no cost.
+
+## 155. D-series family 5 protocol: the calendar — does the day's place in the week, month or year set a window's direction? (S1)
+
+**No trial spent; N 803. Written and committed BEFORE any calendar statistic is computed.** The user: continue. Families 3–4
+asked what the market did before a window; family 5 asks when the window falls. Calendar effects are documented for stock indices
+(close to close); not for the plan's six windows, which include Tokyo traded from New York, the London gold window, crude's and
+soybeans' sessions. Data: the family-3 window returns (§149; owned Databento for MNQ / MGC, corrected HistData for NKD / DAX,
+owned daily bars for MCL, Yahoo daily for ZS), bad-print rule as §149.
+
+1. **Targets:** the six windows, each dated by its New York trading date D as in §149 (NKD by its Tokyo date).
+2. **Calendar cells, from the dates alone** (US trading days = weekdays on which MNQ or MCL has a window; a weekday with
+   neither is a US holiday): (1)–(5) Monday … Friday; (6) the last trading day of the month; (7) the first three trading days
+   of the month; (8) the trading day before a US holiday; (9) the trading day after a US holiday (or after a long weekend);
+   (10) the third Friday of the month (equity options expiry); (11) the Monday–Thursday before it (expiry week);
+   (12) the last five trading days of a quarter. **12 cells × 6 windows = 72 tests**; ~3.6 pass |t| > 1.96 by chance.
+3. **Statistic:** on the cell's days, the target demeaned by its own mean over ALL days in the period (so the cell is measured
+   against the market's ordinary day); a rule trades the cell's days LONG if the mean is positive, SHORT if negative, and
+   leaves the plan unchanged (always long) on other days. Two-sided t; carried at |t| > 1.96 (§133). Discovery 2010-06 → 2017-12.
+4. **Validation exactly as §149, 5** — for a long-cell rule the comparison with always-long is trivially zero, so (a) is read as:
+   the cell's raw mean exceeds the market's raw mean on other days, Welch t > 1.645 (a short-cell rule: the direction rule's
+   daily difference against always-long, t > 1.645, as before); (b) placebo: the same statistic on the same number of randomly
+   drawn days of the same weekday mix, 2,000 draws, real ≥ 95th pct; (c) posterior with prior Normal(discovery/2,
+   |discovery|/2); (d) 2021–26 alone in the discovered direction > 0. Z and D market-tests from 40.
+
+## 156. Family-5 discovery: one cell of 72 (fewer than chance) — the calendar sets no direction; D28 registered (S1–S5)
+
+**No trial spent at registration; N 803. Committed BEFORE validation data is read.** `reporting/d5_calendar.py`,
+`reports/d5_discovery.json`. 72 tests (12 calendar cells × 6 windows), 2010-06 → 2017-12: **one carried against ~3.6 expected by
+chance** — crude's bar dated Monday −23.4 bps against an ordinary day (t −2.33, n 371). Next: MGC Wednesday −8.4 (t −1.82), MCL
+quarter's last 5 days +26.4 (t +1.75), ZS month's last day +28.2 (t +1.74). **As a family the calendar holds nothing for these
+windows** (the scan found fewer passes than chance).
+
+**Addendum to §155, 4 before validation:** for a WEEKDAY cell the "random days of the same weekday mix" placebo is the cell itself;
+(b) becomes: the cell's demeaned mean beats each of the other four weekdays' (D01's other-hours logic). **Flag recorded:** the owned
+crude bar dated Monday runs from Friday's close (`data/daily_bars.py`: Sunday bars dropped), so it includes the weekend gap that the
+plan, entering Sunday 18:00, does not hold — a Monday effect here may not be tradable even if real. D28 registered (Z and D test 40).
+
+## 157. D28 validated: crude's Monday weakness did not recur — the calendar family closes empty (S6–S8)
+
+**One trial spent: t00810. N 803 → 804.** 431 Mondays, 2018-01 → 2026-08: short-Monday +4.10 bps against an
+ordinary day (t +0.28); against always-long t -0.40; Monday does not beat the other weekdays (Tue +15.8, Wed −3.3,
+Thu −16.1, Fri −1.1); 2018–20 +21.42, **2021–26 -5.14**. Fails (a), (b) and (d); WATCHLIST only in
+form (the pooled mean is above zero). The discovery's −23.4 bps (t −2.33) was the scan's chance pass; family 5 found nothing.
+Z and D market-tests: 40.
+
+## 158. D-series family 6 protocol: the opening drive — does a window's first 30 or 60 minutes set the rest of it? (S1)
+
+**No trial spent; N 804. Written and committed BEFORE any data is built.** The user: continue. Families 3–5 asked about information
+before a window; this asks about the window's own start. If its first stretch predicts the remainder, the ticket would enter at
+the end of that stretch in the predicted direction and close at the window's usual end — the same bracket logic, a later start.
+F06 (cash_open_drive_continuation, MNQ, retired) tested a published version for MNQ only; gold's London window, Tokyo and Xetra
+are untested.
+
+1. **Windows with intraday data:** MNQ 09:30–16:00 and MGC 03:00–11:30 New York (owned Databento trades; a move whose two prices
+   are from different contracts is dropped); NKD 09:00–15:00 Tokyo and DAX 09:00–17:30 Frankfurt (corrected HistData CFD minute
+   bars — mid-session prices only; no session close is used except the window's end, as in §149). Crude and soybeans have no
+   minute history here and are not tested.
+2. **Predictor and target:** prices at the window's start, +30, +60 minutes and end (close of the last 1-minute bar before each
+   time). Predictor = start → +k; target = +k → end; k ∈ {30, 60}. Forms: every day; strong days (|predictor| above its 2010–17
+   median). **4 markets × 2 k × 2 forms = 16 tests**; ~0.8 pass |t| > 1.96 by chance.
+3. **Discovery 2010-06 → 2017-12;** statistic, selection and follow / fade exactly as §149, 4 (target demeaned within period).
+4. **Validation exactly as §149, 5** (sealed 2018-01 → 2026-08; one trial each; the always-long baseline is a long position over
+   the same remainder +k → end); Z and D market-tests from 41.
+
+## 159. Family-6 discovery: three carried (≈0.8 by chance) — DAX and Nikkei continue their first half hour; D29–D31 registered (S1–S5)
+
+**No trial spent at registration; N 804. Committed BEFORE validation data is read.** `reporting/d6_drive.py`,
+`reports/d6_discovery.json`; `signals/d_drive.py`. 16 tests, 2010-06 → 2017-12; **3 carried**, all "follow the first 30 minutes",
+in the two non-US windows; MNQ nothing (best |t| 0.75), gold +1.59 at best.
+
+| id | market | predictor | form | discovery (bps beyond drift a day) | prior |
+|---|---|---|---|---|---|
+| D29 | DAX | first 30 min | all | +5.98, t +2.64, n 1797 | N(+2.99, 2.99) |
+| D30 | NKD | first 30 min | strong | +6.00, t +2.16, n 906 | N(+3.00, 3.00) |
+| D31 | DAX | first 30 min | strong | +7.67, t +2.11, n 898 | N(+3.84, 3.84) |
+
+D29 and D31 are one effect (every day / strong days). Data: corrected HistData CFD minute bars, mid-session prices plus the
+window's end as in §149. Z and D market-tests 41–43.
+
+## 160. D29–D31 validated: the opening drive faded after 2020 — no confirmation (S6–S8)
+
+**Three trials spent: t00811–t00813. N 804 → 807.** Z and D market-tests 41–43.
+
+| id, trial | rule | days | beyond drift, bps a day | vs always-long | placebo pct | 2018–20 / 2021–26 | tier |
+|---|---|---|---|---|---|---|---|
+| D29 t00811 | DAX follows its first 30 minutes (every day) | 2154 | -0.20 (t -0.11) | -1.48 (t -0.56) | 20 | +2.25 / -1.55 | **REJECT** |
+| D30 t00812 | NKD follows its first 30 minutes (strong days) | 1256 | +2.61 (t +1.28) | +3.55 (t +1.26) | 95 | +8.12 / +0.17 | **WATCHLIST** |
+| D31 t00813 | DAX follows its first 30 minutes (strong days) | 1023 | +1.19 (t +0.40) | +0.30 (t +0.07) | 35 | +4.16 / -0.44 | **WATCHLIST** |
+
+The opening-drive continuation held in 2018–20 (Nikkei strong days +8.1 bps, t +2.04; DAX +2.3) and is gone in 2021–26 (Nikkei
++0.2, DAX −1.6). D30 keeps a 95th-percentile placebo on the pooled window but fails (a) and stands on its first three years.
+Watchlist for D30 and D31 in form; nothing to adopt.
+
+## 161. D-series family 7 protocol: London continuation beyond gold — silver and the major currencies (S1)
+
+**No trial spent; N 807. Written and committed BEFORE any data is built.** The user: continue. Six families found one
+phenomenon that held in every look and grew stronger after 2021 — gold continues its overnight move (11:30 → 03:00 New York)
+into the London window (03:00 → 11:30) (D16, D22–D27; §151, §154) — and failed only against gold's own drift. **A hypothesis
+generated from the programme's own data:** the same London continuation in markets without gold's drift, where a direction rule
+does not have to beat a rally.
+
+1. **Markets** (free HistData minute bars, corrected clock §140; prices at 11:30 and 03:00 New York only — neither is a session
+   close for these markets; the 17:00 rollover falls inside the predictor's span and is never used as a price): silver XAG/USD
+   (SI / SIL), EUR/USD (6E / M6E), GBP/USD (6B), AUD/USD (6A / M6A), USD/JPY (6J), USD/CHF (6S), USD/CAD (6C). All tradable as CME
+   futures in the account (decisions.md 115).
+2. **Target:** the window 03:00 → 11:30 New York (the plan's gold window). **Predictors:** (i) the market's own overnight move,
+   11:30 (previous day) → 03:00; (ii) gold's overnight move (MGC_pre, owned Databento trades, §149). Forms: every day; strong days
+   (|predictor| above its 2010–17 median). **7 markets × 2 predictors × 2 forms = 28 tests**; ~1.4 pass |t| > 1.96 by chance.
+3. **Discovery 2010-06 → 2017-12;** statistic and selection exactly as §149, 4. **Validation exactly as §149, 5;** Z and D
+   market-tests from 44. Note: families 1–2 (§130, §134) scanned these pairs' hours and fix windows on 2010–17 and validated
+   single cells on 2018–26; the statistic here (a window's direction set by the preceding move) was not computed there.
+
+## 162. Family-7 discovery: silver continues its own and gold's overnight move — five carried (≈1.4 by chance); D32–D36 registered (S1–S5)
+
+**No trial spent at registration; N 807. Committed BEFORE validation data is read.** `reporting/d7_london.py`,
+`reports/d7_discovery.json`; `signals/d_london.py`. 28 tests, 2010-06 → 2017-12; **5 carried, 4 of them silver** — the gold finding
+reappears in silver at two to three times its size relative to the window (silver's window SD ~141 bps):
+
+| id | market | rule | form | discovery (bps beyond drift a day) | prior |
+|---|---|---|---|---|---|
+| D32 | xagusd (SI) | follow own overnight | strong | +17.40, t +3.60, n 977 | N(+8.70, 8.70) |
+| D33 | xagusd (SI) | follow gold overnight | all | +12.37, t +3.34, n 1364 | N(+6.18, 6.18) |
+| D34 | xagusd (SI) | follow gold overnight | strong | +18.47, t +3.19, n 682 | N(+9.23, 9.23) |
+| D35 | usdchf (6S) | fade gold overnight | all | -2.83, t -2.21, n 1363 | N(+1.41, 1.41) |
+| D36 | xagusd (SI) | follow own overnight | all | +6.67, t +2.20, n 1954 | N(+3.34, 3.34) |
+
+The currencies show nothing but USD/CHF fading gold's move (t −2.21). Silver's four tests are one phenomenon; correlated. USD/JPY data
+here start 2016. Z and D market-tests 44–48.
+
+## 163. D32 CONFIRMS: silver's London window follows its own strong overnight move (S6–S8)
+
+**Five trials spent: t00814–t00818. N 807 → 812.** Z and D market-tests 44–48.
+
+| id, trial | rule | days | beyond drift, bps a day | vs always-long | placebo pct | 2018–20 / 2021–26 | tier |
+|---|---|---|---|---|---|---|---|
+| D32 t00814 | xagusd London window follows its own overnight move (strong days) | 1132 | +9.07 (t +1.93) | +14.07 (t +2.06) | 100 | +6.55 / +10.08 | **CONFIRM** |
+| D33 t00815 | xagusd London window follows gold's overnight move (every day) | 2088 | +2.57 (t +0.82) | +3.97 (t +0.87) | 85 | +2.57 / +2.57 | **WATCHLIST** |
+| D34 t00816 | xagusd London window follows gold's overnight move (strong days) | 944 | +11.50 (t +2.27) | +12.27 (t +1.60) | 100 | +6.94 / +13.57 | **WATCHLIST** |
+| D35 t00817 | usdchf London window fades gold's overnight move (every day) | 2083 | -0.12 (t -0.14) | +0.58 (t +0.46) | 40 | -1.65 / +0.72 | **REJECT** |
+| D36 t00818 | xagusd London window follows its own overnight move (every day) | 2181 | +6.63 (t +2.16) | +7.23 (t +1.64) | 100 | +2.38 / +8.96 | **WATCHLIST** |
+
+**D32 meets the strict rule on sealed data** — silver (XAG/USD), 03:00 → 11:30 New York, in the direction of its own move from the
+previous 11:30, on days that move exceeds its 2010–17 median (≈ half of days): against always-long +14.07 bps a day (t +2.06);
+placebo 100th percentile; posterior +8.99; 2018–20 +6.55, **2021–26 +10.08**. Reported against the running count: the 48th Z and D
+market-test, with no multiple-testing cut (the user's rule, §133). Its siblings: D36 (every day) t +1.64 against always-long,
+D34 (gold's move, strong days) t +1.60 — both short of 1.645 by a hair, placebo 100th, stronger after 2021; D33 weaker; USD/CHF
+(D35) rejected.
+
+**Not yet adopted. Before any use:** (1) the validation used free bid quotes — the effect must be checked on traded silver futures
+(D03's lesson, §144); (2) silver is not one of the plan's accounts — its value in the plan (a silver account in place of the
+weakest, at the risk-matched size, the rule on strong days and long otherwise) must be replayed before anything changes.
+
+## 164. D32 checked on real silver futures and replayed in the plan: real, but too small to move the brackets (S8)
+
+**No trial spent; N 812.** `reporting/a26_silver.py`, `reports/a26_silver.json`.
+
+**Real futures.** COMEX silver (Yahoo SI=F hourly, 2024-05 → 2026-10, contract-switch hours dropped; the window ends at 11:00 or
+12:00 as hourly bars allow): the D32 rule earns **+15.9 bps a day beyond drift (t +1.59)** to 11:00 and **+24.0 (t +2.17)** to 12:00;
+against always-long +14.7 (t +0.98) / +19.7 (t +1.18). The free bid-quote series on the same span: +18.5 (t +1.95). Same sign and
+size on traded prices — **not a quote artefact** (contrast D03, §144).
+
+**In the plan** (A23 engine; a silver London-window account, 3 SIL — one SIL $61k, window SD $958, swing $2,874; drift removed so
+only skill beyond drift is credited; the rule short on 23–26% of days, acting on 48–57%):
+
+| 84 days, per account | 2010–20 (rule in sample) | 2021–26 (out of sample) |
+|---|---|---|
+| silver, always long | 60%, +$1,440, P(net > 0) 49% | 80%, **+$1,865**, 71% |
+| silver with D32 | 63%, +$1,574, 53% | 77%, +$1,684, 63% |
+
+| five accounts, per four months | 2010–20 | 2021–26 |
+|---|---|---|
+| 5 live (crude) | +$8,023, 92% | +$9,468, 93% |
+| silver always long for crude | **+$9,563, 91%** | **+$10,375, 96%** |
+| silver with D32 for crude | +$8,361, 87% | +$10,179, 94% |
+| 5 with soybeans for crude (§140) | +$8,907, 88% | +$12,499, 98% |
+
+**Reading.** D32 adds ~9–14 bps a day on the days it acts — about $15–20 a day on 3 SIL — against brackets of ±$1,000–1,200 that
+resolve within hours. The bracket's take-or-stop is decided by the path, the rule predicts the window's end-to-end drift, and at this
+size the drift does not move the hit rates (Z02's lesson, §89: an edge must be large against the daily swing on the days it is
+held). **D32 stands as a confirmed edge; it is not adopted into the plan.** Side finding: silver's London window, always long, beat
+crude as the fifth account in both histories (+$0.9–1.5k per four months), but its window correlates +0.77–0.81 with gold's, and
+soybeans in crude's place remains the better swap in 2021–26.
+
+## 165. A27: D32 as a standalone strategy cannot carry a Tradeify account — what "standalone" has to mean here (S8)
+
+**No trial spent; N 812.** `reporting/a27_standalone.py`, `reports/a27_standalone.json`; A23's replay gains `skip` (days the
+strategy sits out: no cost, no breach) and `fixed` (net brackets every traded day; defaults reproduce the live engine). The user:
+standalone strategies count too, not only overlays on the plan. D32 on its own 50K Daily account, 3 SIL, 84-day replay:
+
+| 2021–26 (out of sample), drift removed / real | P(payout) | mean net | P(net > 0) |
+|---|---|---|---|
+| S1 D32 days only, the plan's solver brackets | 53% / 53% | +$1,551 / +$1,625 | 53% |
+| S2 D32 days only, hold to 11:30, stop $1,000 | 1% / 1% | −$917 / −$921 | 1% |
+| S3 D32 days only, hold to 11:30, stop $600 | 5% / 4% | −$435 / −$462 | 4–5% |
+| B same days ALWAYS LONG, hold, stop $1,000 | 5% / 5% | −$697 / −$711 | 5% |
+| S4 every day, D36's direction, hold, $1,000 | 12% / 12% | −$1,283 / −$1,288 | 6% |
+
+(2010–20: the same pattern; S1 +$1,018 / +$871.) Holding the window to capture the drift fails the evaluation over and over —
+a position swinging ±$2,900 a day meets the $2,000 trailing floor long before a +$3,000 target; the rule improves the hold variants
+only marginally over the no-skill baseline (B). Only the staking brackets (S1) make the account pay, and they do so at the
+zero-edge plan's rate.
+
+**What "standalone" has to mean in this account.** §91: a payout within one to two months needs a strategy Sharpe of ~5 a year; D32
+is ~0.7–1 (about 0.06–0.09 standard deviations per traded day). A strategy carries a Tradeify account on its own only if its edge
+per day is large against its own daily swing — which, at ~one trade a day, means a Sharpe several times anything this programme
+has measured. Sharpe grows with the square root of the number of independent trades, so a standalone search should look for
+**many small, independent trades a day** (intraday, minute-level, owned trade data), each with a modest edge — not one daily hold.
+
+## 166. D-series family 8 protocol: short-horizon reactions to large intraday moves — many trades a day, for standalone use (S1)
+
+**No trial spent; N 812. Written and committed BEFORE any data is built.** §165: a standalone strategy needs many independent
+trades a day, each with an edge after costs. The programme's one robust finding is CONTINUATION after information arrives
+(gold and silver into London); this family asks the same at minutes: after an unusually large move, does the market continue or
+reverse over the next minutes, and does it depend on volume?
+
+1. **Data:** owned Databento 1-minute TRADES, MNQ (NQ/MNQ spliced) and MGC; a return is used only if its bars are of one contract
+   and consecutive in time. Discovery **2013-01 → 2017-12** (MNQ's day sessions are complete from 2013, §153); validation
+   **2018-01 → 2026-08**, sealed.
+2. **Sessions:** MNQ day 09:30–16:00 and night 18:00–09:30; MGC London 03:00–11:30 and Asia 18:00–03:00 (New York time).
+3. **Event at a minute's close t:** |r_k(t)| > 2 σ_k, where r_k is the k-minute return (k ∈ {5, 15, 30}) and σ_k the standard
+   deviation of k-minute returns in the same session over the previous 20 sessions. **Volume condition:** the k minutes' volume
+   relative to the mean k-minute volume of the same session over the previous 20 sessions — high (> 1) or low (≤ 1).
+4. **Trade:** enter at t's close in the direction of the move (follow) or against it (fade), exit after h ∈ {5, 15, 30} minutes or at
+   the session's end if sooner; **no overlap** (events during an open trade are ignored). Cost per round trip: MNQ $2.32 + one tick
+   ($0.50) = 1.41 points; MGC $3.32 + one tick ($1.00) = 0.432 points.
+5. **Tests:** 2 markets × 2 sessions × 3 k × 2 volume conditions × 3 h = **72**; ~3.6 pass by chance. Statistic: net points per
+   trade, follow direction (a fade is its negative before costs — computed separately, net of costs, so each test is follow OR fade
+   by the sign of the GROSS follow mean); t from day-clustered sums. **Carried:** |t| > 1.96 AND net mean > 0 after costs.
+6. **Validation (one trial each):** CONFIRM if (a) net mean per trade > 0 with day-clustered t > 1.645; (b) placebo: real net mean
+   at or above the 95th percentile of 1,000 draws of the same number of trades entered at random minutes of the same sessions, same
+   h and direction rule (direction = the random minute's own k-move sign); (c) posterior > 0, prior Normal(discovery/2,
+   |discovery|/2); (d) 2021–26 alone > 0. WATCHLIST if net > 0 otherwise; REJECT. Any CONFIRM is then replayed as its own 50K
+   Daily account (A27's engine) before it counts as usable.
+
+## 167. Family-8 discovery: no short-horizon reaction beats its costs — 0 of 72 carried (S1)
+
+**No trial spent; N 812.** `reporting/d8_intraday.py` (minute grids per session, 2010–2026, cached), `reports/d8_discovery.json`.
+72 tests, 2013-01 → 2017-12: **none carried** (|t| > 1.96 with net > 0 after costs). The largest gross effects are reversals after
+LOW-volume moves in gold — 0.2–0.37 points before costs against 0.432 points a round trip — and every MNQ cell loses about its
+cost (e.g. after a 5-minute 2σ move on high volume, 10,421 trades, net −1.37 points, t −23). **At one-minute resolution, price
+and volume reactions in MNQ and gold are smaller than a tick plus commission;** a many-trades-a-day standalone strategy would need
+information this data does not carry (the order book, order flow). Nothing to validate; no trial spent.
+
+## 168. D-series family 9 protocol: drift after scheduled releases — does the first reaction predict the rest of the day? (S1)
+
+**No trial spent; N 812. Written and committed BEFORE any event or return is computed.** §165–167: a standalone strategy needs
+moves that are large on the days it trades; minute reactions on ordinary days are below costs. The largest information events
+in these markets are scheduled: US releases at 08:30 New York (CPI, payrolls, PPI, retail sales, claims) and Fed decisions at
+14:00. Question: does the first 5 or 15 minutes after the release predict the move over the rest of the session?
+
+1. **Data:** the family-8 minute grids (owned Databento trades): MNQ night (to 09:30) and day (09:30–16:00); MGC London
+   (03:00–11:30). Discovery **2013-01 → 2017-12**; validation **2018-01 → 2026-08**, sealed.
+2. **Release days, from the data alone:** an 08:30 day is one whose 08:30–08:35 volume exceeds 3× the median volume of those
+   five minutes over the previous 20 sessions — in MNQ for the MNQ tests, in MGC for the MGC tests. A 14:00 day: MNQ's 14:00–14:05
+   volume over 3× its 20-session median. (Detected, not looked up; recorded counts are reported.)
+3. **Tests:** predictor = the move from the release minute to +k, k ∈ {5, 15}; target = +k → session end — MNQ 08:30: to 16:00
+   (night and day grids joined; one contract required); MGC 08:30: to 11:30; MNQ 14:00: to 16:00. Forms: every release day; strong
+   (|predictor| above its 2013–17 median). **3 event types × 2 k × 2 forms = 12 tests**; ~0.6 pass by chance.
+4. **Statistic and selection:** sign(predictor) × target in points, demeaned within period; follow / fade by sign; carried at
+   |t| > 1.96 AND the rule's mean minus a round-trip cost (MNQ 1.41 pts, MGC 0.432 pts) > 0.
+5. **Validation (one trial each):** CONFIRM if (a) the rule's net mean per trade (after cost) > 0, t > 1.645; (b) placebo: real
+   at or above the 95th percentile of the same rule on 1,000 random draws of non-release days at the same clock times; (c) posterior
+   > 0, prior Normal(discovery/2, |discovery|/2); (d) 2021–26 alone > 0. Any CONFIRM is then replayed as its own 50K Daily
+   account (A27 engine) before it counts as usable. Z and D market-tests from 49.
+
+## 169. Family-9 discovery: gold fades its first reaction to 08:30 releases — two carried (≈0.6 by chance); D37–D38 registered (S1–S5)
+
+**No trial spent at registration; N 812. Committed BEFORE validation data is read.** `reporting/d9_events.py`,
+`reports/d9_discovery.json`; `signals/d_events.py`. **Bug found and fixed before any result was used:** the family-8 grids numbered
+contracts separately in each session file, so the MNQ 08:30 test (night and day grids joined) saw false contract changes and kept 18
+of 187 release days; contracts are now coded year × 12 + month in every grid (`d8_intraday.build`), grids rebuilt, scan re-run
+(family 8's single-grid tests are unaffected). Release days detected 2013–17: MNQ 08:30 189, MGC 08:30 239, MNQ 14:00 107.
+
+| id | event | predictor | form | rule | discovery | prior |
+|---|---|---|---|---|---|---|
+| D37 | MGC 08:30 | first 15 min | all | fade | -0.93 pts, t -2.07, n 239; net +0.50 | N(+0.46, 0.46) |
+| D38 | MGC 08:30 | first 5 min | all | fade | -0.97 pts, t -1.99, n 239; net +0.54 | N(+0.49, 0.49) |
+
+MNQ shows nothing at 08:30 or 14:00 (best t +1.18). D37 and D38 are one effect. Economics are thin: ~0.5 points net a trade is
+~$40 on 8 MGC, ~48 release days a year. Z and D market-tests 49–50.
+
+## 170. D37–D38 validated: gold's release-day fade did not recur — rejected (S6–S8)
+
+**Two trials spent: t00819–t00820. N 812 → 814.** Z and D market-tests 49–50.
+
+| id, trial | rule | release days | net pts a trade (t) | placebo pct | 2018–20 / 2021–26 | tier |
+|---|---|---|---|---|---|---|
+| D37 t00819 | MGC 08:30: MGC fades its first 15 minutes to the session end (every release day) | 278 | -0.27 (t -0.37) | 56 | -1.26 / +0.35 | **REJECT** |
+| D38 t00820 | MGC 08:30: MGC fades its first 5 minutes to the session end (every release day) | 278 | -0.76 (t -0.98) | 48 | -1.63 / -0.22 | **REJECT** |
+
+The discovery's fade (t −2.07 / −1.99, ~0.5 points net) was a chance pass; on 2018–26 the rule loses after costs and sits mid-pack
+among random non-release days. Family 9 is empty.
+
+## 171. D-series family 10 protocol: the cross-market daily universe — does yesterday's session in one market set today's direction in another? (S1)
+
+**No trial spent; N 814. Written and committed BEFORE any data is fetched.** The user: continue; and a strategy that keeps an
+account for a few months and pays out before it fails is a win — the 84-day back-to-back replay (payouts minus every fee, failed
+accounts replaced) already measures exactly that. Family 3 tested hand-offs between the plan's six windows; this widens the net
+to 14 CME futures, every pair.
+
+1. **Universe** (Yahoo daily bars, 2010 → 2026; the session's open → settlement return within one bar, so a roll never enters):
+   ES, NQ (indices); GC, SI, HG (metals); CL, NG (energy); ZN (10-year notes); 6E, 6J (currencies); ZC, ZS, ZW (grains); and RTY.
+   Every Globex session closes before the next one opens, so the predictor (the previous trading day's session) has finished.
+   Bad prints: the §149 15-robust-SD rule per series. Yahoo daily bars for some metals are day-session bars (§140); a session is
+   whatever Yahoo's bar spans, used consistently as both predictor and target.
+2. **Tests:** every ordered pair (target ≠ predictor): **14 × 13 = 182**, every day (no strong form — the family is wide);
+   ~9 pass |t| > 1.96 by chance. Statistic as §149, 4 (sign of the predictor × the target demeaned within the period; follow or fade
+   by the sign); **carried at |t| > 1.96**. Discovery 2010-01 → 2017-12.
+3. **Validation exactly as §149, 5** (sealed 2018-01 → 2026-08; against always-long t > 1.645; placebo with the predictor shifted
+   ±2…±11 days ≥ 95th pct; posterior > 0; 2021–26 > 0). Any CONFIRM is replayed as its own 50K Daily account (one-bar paths,
+   §116) before it counts. Z and D market-tests from 51.
+
+## 172. Family-10 discovery: 7 of 182 pairs carried — fewer than chance (~9); D39–D45 registered anyway, per protocol (S1–S5)
+
+**No trial spent at registration; N 814. Committed BEFORE validation data is read.** `reporting/d10_universe.py`,
+`reports/d10_discovery.json`; `signals/d_universe.py`. 182 ordered pairs, 2010-01 → 2017-12; **7 carried against ~9.1 expected by
+chance** — as a family the daily cross-market universe shows no excess signal. Validated per §171 regardless:
+
+| id | target | rule | previous session of | discovery (bps beyond drift a day) | prior |
+|---|---|---|---|---|---|
+| D39 | ZN | follow | ES | +2.09, t +3.04, n 1935 | N(+1.04, 1.04) |
+| D40 | HG | fade | NG | -7.35, t -2.84, n 1937 | N(+3.68, 3.68) |
+| D41 | ZN | fade | 6J | -1.65, t -2.41, n 1935 | N(+0.83, 0.83) |
+| D42 | NG | follow | SI | +10.71, t +2.24, n 1936 | N(+5.36, 5.36) |
+| D43 | ZS | follow | ES | +5.77, t +2.01, n 1937 | N(+2.89, 2.89) |
+| D44 | GC | follow | ZN | +3.98, t +1.99, n 1935 | N(+1.99, 1.99) |
+| D45 | RTY | fade | ES | -11.72, t -1.98, n 119 | N(+5.86, 5.86) |
+
+RTY's Yahoo history starts in 2017 (D45: 119 discovery days). Z and D market-tests 51–57.
+
+## 173. D39–D45 validated: no confirmation; the Russell fading the S&P (D45) is the one strong out-of-sample pattern (S6–S8)
+
+**Seven trials spent: t00821–t00827. N 814 → 821.** Z and D market-tests 51–57.
+
+| id, trial | rule | days | beyond drift, bps a day | vs always-long | placebo pct | 2018–20 / 2021–26 | tier |
+|---|---|---|---|---|---|---|---|
+| D39 t00821 | ZN follows the previous session of ES | 2098 | +0.93 (t +1.25) | +1.51 (t +1.40) | 75 | +1.25 / +0.76 | **WATCHLIST** |
+| D40 t00822 | HG fades the previous session of NG | 2096 | -1.11 (t -0.43) | -5.20 (t -1.40) | 45 | +1.49 / -2.50 | **REJECT** |
+| D41 t00823 | ZN fades the previous session of 6J | 2099 | +0.92 (t +1.24) | +1.46 (t +1.46) | 100 | +0.63 / +1.07 | **WATCHLIST** |
+| D42 t00824 | NG follows the previous session of SI | 2092 | +2.19 (t +0.31) | +7.64 (t +0.73) | 50 | -1.29 / +4.04 | **WATCHLIST** |
+| D43 t00825 | ZS follows the previous session of ES | 2096 | +1.29 (t +0.51) | +0.42 (t +0.12) | 85 | -1.67 / +2.86 | **WATCHLIST** |
+| D44 t00826 | GC follows the previous session of ZN | 2097 | -1.98 (t -0.92) | -3.44 (t -1.11) | 20 | +2.41 / -4.31 | **REJECT** |
+| D45 t00827 | RTY fades the previous session of ES | 2098 | +7.34 (t +2.26) | +0.14 (t +0.03) | 100 | +3.64 / +9.31 | **WATCHLIST** |
+
+As the discovery count predicted (fewer passes than chance), most did not hold. **D45** — RTY's session against the previous S&P
+session — is the exception: +7.34 bps a day beyond drift (t +2.26), placebo 100th percentile, stronger in 2021–26 (+9.31); it fails
+only against always-long (t +0.03), because shorting the Russell after S&P up-days costs its drift. Its discovery sample was 119
+days (RTY's Yahoo history from 2017), so the 2018–26 result is most of the evidence. D41 (10-year notes fading the yen) holds a
+100th-percentile placebo at +0.9 bps — too small to matter. Watchlist for D39, D41, D42, D43, D45.
+
+## 174. D-series family 11 protocol: commodity seasonality — standalone, daily round trips, net of each market's cost (S1)
+
+**No trial spent; N 821. Written and committed BEFORE any monthly statistic is computed.** The user: keep searching on the data
+we have (a year of order-book data, $369, waits until the props pay); standalone strategies count, and an account that pays a few
+times before failing is a win. Commodities carry seasonal supply and demand (heating, driving, planting, harvest); this family
+asks whether any market drifts reliably in a calendar month — **as a standalone strategy**, so judged against not trading.
+
+1. **Markets and data:** CL, NG, ZC, ZS, ZW, GC, SI, HG — Yahoo daily bars (fetched, §140, §171), each session's open → settlement
+   return (one bar, one contract; the account must be flat 17:00–18:00, so a strategy is a daily round trip). Bad prints: §149 rule.
+2. **Cost per day (round trip at the account's tradable size, bps of notional):** CL (full) 0.7, NG (full) 1.4, ZC 1.9, ZS 0.7,
+   ZW 1.4, GC via MGC 0.8, SI via SIL 0.5, HG via MHG 2.0.
+3. **Tests:** market × calendar month = **96**; ~4.8 pass by chance. Statistic: the mean RAW session return on that month's days
+   (standalone: drift counts), t over days. **Carried:** |t| > 1.96 AND |mean| > the day's cost. Direction = the sign.
+   Discovery 2010-01 → 2017-12.
+4. **Validation (one trial each), sealed 2018-01 → 2026-08:** CONFIRM if (a) the rule's net mean per day (direction × return −
+   cost) > 0 with t > 1.645 — **against not trading**; (b) placebo: real ≥ 95th percentile of 1,000 draws of the same number of
+   the market's days from OTHER months, same direction and cost; (c) posterior > 0, prior Normal(discovery/2, |discovery|/2);
+   (d) 2021–26 alone > 0. WATCHLIST if net > 0 otherwise; REJECT. A CONFIRM is replayed as its own 50K Daily account (one-bar
+   paths, trading only that month, payouts before failure counted) before it counts as usable. Z and D market-tests from 58.
+
+## 175. Family-11 discovery: seven seasonal cells (≈4.8 by chance) with 15–35 bps a session net; D46–D52 registered (S1–S5)
+
+**No trial spent at registration; N 821. Committed BEFORE validation data is read.** `reporting/d11_season.py`,
+`reports/d11_discovery.json`; `signals/d_season.py`. 96 tests, 2010-01 → 2017-12; **7 carried** — per-session effects several
+times larger than any earlier family (standalone, drift counted, net of cost):
+
+| id | market | month | direction | discovery (bps a session) | prior |
+|---|---|---|---|---|---|
+| D46 | ZS | Apr | long | +23.12, t +2.85, n 165; net +22.42 | N(+11.56, 11.56) |
+| D47 | ZS | Oct | long | +24.01, t +2.34, n 173; net +23.31 | N(+12.01, 12.01) |
+| D48 | NG | Oct | short | -36.54, t -2.25, n 173; net +35.14 | N(+18.27, 18.27) |
+| D49 | HG | Dec | long | +19.32, t +2.23, n 169; net +17.32 | N(+9.66, 9.66) |
+| D50 | ZC | Oct | long | +26.47, t +2.14, n 173; net +24.57 | N(+13.23, 13.23) |
+| D51 | CL | Apr | long | +28.97, t +2.10, n 165; net +28.27 | N(+14.49, 14.49) |
+| D52 | HG | Mar | short | -17.44, t -1.98, n 176; net +15.44 | N(+8.72, 8.72) |
+
+Each cell rests on ~8 Octobers / Aprils (~20 sessions each); a cell can be one or two big years — the by-year breakdown is part
+of the validation report. Z and D market-tests 58–64.
+
+## 176. D46–D52 validated: no confirmation; long grains in October is the near-miss (S6–S8)
+
+**Seven trials spent: t00828–t00834. N 821 → 828.** Z and D market-tests 58–64. Standalone, net of cost, against not trading:
+
+| id, trial | rule | sessions | net bps a session (t) | placebo pct | 2018–20 / 2021–26 | years positive | tier |
+|---|---|---|---|---|---|---|---|
+| D46 t00828 | ZS long every session in Apr | 187 | +0.46 (t +0.06) | 58 | -13.46 / +7.53 | 5 of 9 | **WATCHLIST** |
+| D47 t00829 | ZS long every session in Oct | 178 | +9.35 (t +1.35) | 92 | +8.90 / +9.63 | 7 of 8 | **WATCHLIST** |
+| D48 t00830 | NG short every session in Oct | 178 | -0.46 (t -0.02) | 40 | -53.68 / +32.43 | 3 of 8 | **REJECT** |
+| D49 t00831 | HG long every session in Dec | 168 | +1.93 (t +0.22) | 52 | +3.10 / +1.25 | 4 of 8 | **WATCHLIST** |
+| D50 t00832 | ZC long every session in Oct | 178 | +13.51 (t +1.64) | 90 | +18.19 / +10.62 | 7 of 8 | **WATCHLIST** |
+| D51 t00833 | CL long every session in Apr | 185 | +0.13 (t +0.00) | 55 | +26.87 / -13.02 | 5 of 9 | **WATCHLIST** |
+| D52 t00834 | HG short every session in Mar | 196 | -6.85 (t -0.65) | 43 | +8.39 / -14.23 | 5 of 9 | **REJECT** |
+
+**D50 — corn long every October session** — is the near-miss: +13.5 bps a session net (t +1.64 against 1.645), positive in 7 of 8
+Octobers, both halves positive (+18.2, +10.6); placebo 90th percentile (needs 95). D47 (soybeans, October) +9.4, 6 of 8 years.
+Both are the harvest-low pattern (grains bottom near harvest and recover). The other cells were driven by a few years (natural
+gas October: −118 to +98 by year; soybeans April and copper December lost their sign after 2021). Watchlist: D46, D47, D49,
+D50, D51. A month-long effect gives ~20 sessions a year — Octobers of 2026–27 are the forward test.
+
+## 177. D-series family 12 protocol: after an extreme session — follow-through or reversal over the next 1–5 sessions (S1)
+
+**No trial spent; N 828. Written and committed BEFORE any event is computed.** The user: continue; no deploy; **no strategy that
+works only part of the year** (seasonal cells §176 are not candidates for use). Large moves occur in every month; this family
+asks whether the session after an unusually large move — or the next three or five — continues or reverses it, as a
+standalone strategy.
+
+1. **Universe and data:** the 14 futures of §171 (Yahoo daily, open → settlement, one contract; daily round trips — the account
+   is flat 17:00–18:00); bad-print rule as §149.
+2. **Event:** a session whose return exceeds 2 σ in absolute value, σ the SD of the market's previous 60 session returns.
+   **Trade:** the next h sessions, h ∈ {1, 3, 5}, each open → settlement, in the event's direction (follow) or against it (fade);
+   events inside an open trade are ignored (no overlap). **Cost a session (bps, the account's tradable contract):** ES (MES) 0.9,
+   NQ (MNQ) 0.5, RTY (M2K) 2.0, GC (MGC) 0.8, SI (SIL) 0.5, HG (MHG) 2.0, CL 0.7, NG 1.4, ZN 0.4, 6E 0.3, 6J 0.5, ZC 1.9, ZS 0.7,
+   ZW 1.4. **Tests: 14 × 3 = 42**; ~2.1 pass by chance.
+3. **Discovery 2010-01 → 2017-12:** statistic = the trade's net return (sum over its h sessions, minus h costs), follow or fade by
+   the sign of the gross follow mean; t over events. **Carried:** |t| > 1.96 AND net mean > 0.
+4. **Validation (one trial each), sealed 2018-01 → 2026-08:** CONFIRM if (a) net mean per trade > 0, t > 1.645 (against not
+   trading); (b) placebo: real ≥ 95th percentile of 1,000 draws of the same number of trades started on random non-event
+   sessions, direction from that session's own sign; (c) posterior > 0, prior Normal(discovery/2, |discovery|/2); (d) 2021–26
+   > 0. A CONFIRM is replayed as its own 50K Daily account before it counts. Z and D market-tests from 65.
+
+## 178. Family-12 discovery: equity indices reverse extreme sessions over the next week — three carried (≈2.1 by chance); D53–D55 registered (S1–S5)
+
+**No trial spent at registration; N 828. Committed BEFORE validation data is read.** `reporting/d12_extreme.py`,
+`reports/d12_discovery.json`; `signals/d_extreme.py`. 42 tests, 2010-01 → 2017-12; 3 carried:
+
+| id | market | rule | horizon | trades | discovery | prior |
+|---|---|---|---|---|---|---|
+| D53 | NQ | fade | next 5 | 86 | +68.04 net, t +2.78 | N(+34.02, 34.02) |
+| D54 | ES | fade | next 5 | 72 | +60.78 net, t +2.63 | N(+30.39, 30.39) |
+| D55 | ZN | fade | next 1 | 94 | +7.99 net, t +2.21 | N(+3.99, 3.99) |
+
+D53 and D54 are one effect (Nasdaq and S&P correlate ~0.9). A multi-session trade is a run of daily round trips (flat each
+evening, as the account requires). Z and D market-tests 65–67.
+
+## 179. D53–D55 validated: the reversal after extreme index sessions did not survive — family 12 empty (S6–S8)
+
+**Three trials spent: t00835–t00837. N 828 → 831.** Z and D market-tests 65–67.
+
+| id, trial | rule | trades | net bps a trade (t) | placebo pct | 2018–20 / 2021–26 | tier |
+|---|---|---|---|---|---|---|
+| D53 t00835 | NQ fades a 2-sigma session over the next 5 | 92 | -23.25 (t -0.72) | 30 | -50.77 / -9.26 | **REJECT** |
+| D54 t00836 | ES fades a 2-sigma session over the next 5 | 86 | -18.84 (t -0.47) | 35 | -35.83 / -9.26 | **REJECT** |
+| D55 t00837 | ZN fades a 2-sigma session over the next 1 | 118 | -1.15 (t -0.28) | 37 | +10.46 / -7.34 | **REJECT** |
+
+The 2010–17 "buy the extreme, sell the extreme" week (+68 / +61 bps net) reversed sign on 2018–26 in both halves. Nothing to adopt.
+
+## 180. D-series family 13 protocol: volatility regimes — recent-period discovery (2018–22), sealed 2023 → 2026-08 (S1)
+
+**No trial spent; N 831. Written and committed BEFORE any regime statistic is computed.** §179 note: nearly everything found on
+2010–17 weakened or flipped on 2018–26 — the markets the user will trade behave like the recent years, not the early 2010s. The
+user approved (2026-10-13) a change of design for NEW questions: **discovery 2018-01 → 2022-12; validation 2023-01 → 2026-08,
+sealed**. Disclosed: the family-3/4 validations (§151, §154) read these windows' 2018–26 returns for unconditioned statistics; the
+regime-conditioned statistic here was not computed.
+
+1. **Windows and predictors** (family-3 series, §149, bad-print rule): NKD, DAX, MGC, MNQ windows — predictors their own previous
+   window and their own pre-window move (NKD 15:00 → 09:00 Tokyo, DAX 17:30 → 09:00, MGC 11:30 → 03:00, MNQ 16:00 → 09:30); MCL and
+   ZS sessions — predictor their own previous session. **10 predictor pairs.**
+2. **Regime, from the target's own past only:** σ20 = SD of its previous 20 window returns; HIGH if σ20 is above the median of
+   σ20 over its previous 250 sessions, else LOW. **10 pairs × 2 regimes = 20 tests**; ~1 pass |t| > 1.96 by chance.
+3. **Discovery statistic** as §149, 4 (sign of the predictor × the target demeaned within the period), within the regime's days;
+   follow or fade by the sign; carried at |t| > 1.96.
+4. **Validation (one trial each), sealed:** CONFIRM if (a) **against not trading**: direction × raw return − the account's cost a
+   day (bps: MNQ 0.5, MGC 0.8, MCL 5.4 — ten micros, NKD 0.2, DAX 0.3, ZS 0.7) has mean > 0 with t > 1.645 (against always-long
+   reported beside it); (b) placebo, predictor shifted ±2…±11 days, ≥ 95th pct; (c) posterior > 0, prior Normal(discovery/2,
+   |discovery|/2); (d) S8 has no separate half here — the sealed window IS the recent period; (d) becomes: positive in at least 3 of
+   the 4 calendar years 2023–2026. WATCHLIST if net > 0 otherwise; REJECT. Z and D market-tests from 68.
+
+## 181. Family-13 discovery: no volatility-regime pattern — 0 of 20 carried (S1)
+
+**No trial spent; N 831.** `reporting/d13_regime.py`, `reports/d13_discovery.json`. 20 tests on 2018-01 → 2022-12; **none carried**
+(best: gold's window FADING its pre-window move in high-volatility stretches, −4.9 bps, t −1.66 — the opposite of the 2010–17
+continuation, §154). Conditioning the six windows' hand-offs on recent volatility finds nothing; family 13 is empty.
+
+## 182. D-series family 14 protocol: hour-of-day drift on traded MNQ and gold, recent-period design (S1)
+
+**No trial spent; N 831. Written and committed BEFORE any hourly statistic is computed.** The user approved this order
+(2026-10-13). Families 1–2 scanned hours on free FX / CFD quotes; this scans the plan's two traded-data markets, with §180's
+recent-period design (discovery 2018-01 → 2022-12; validation 2023-01 → 2026-08, sealed).
+
+1. **Data:** the family-8 minute grids (owned Databento trades; contract-consistent, §169): MNQ day 09:30–16:00 and night
+   18:00–09:30; MGC London 03:00–11:30 and Asia 18:00–03:00 (New York). **Cells:** each clock hour of each session starting on the
+   hour or the session start (the last may be shorter): MNQ day 7, MNQ night 16, MGC London 9, MGC Asia 9 = **41 tests**, every
+   weekday; ~2 pass by chance. Return = close at the hour's end ÷ close at its start (one contract) − 1.
+2. **Standalone, net of cost a round trip** (bps, one contract): MNQ 0.56 ($2.32 + one tick on ~$50k), MGC 1.0 ($3.32 + one tick on
+   ~$42k). **Carried:** |t| > 1.96 AND |mean| > cost; direction = the sign.
+3. **Validation (one trial each), sealed:** CONFIRM if (a) net mean > 0 against not trading, t > 1.645; (b) placebo: real ≥ 95th
+   percentile of the same session's other hours (net, same direction); (c) posterior > 0, prior Normal(discovery/2,
+   |discovery|/2); (d) positive in at least 3 of the 4 years 2023–2026. WATCHLIST if net > 0; REJECT. Z and D market-tests from 68.
+
+## 183. Family-14 discovery: one hour of 41 (≈2 by chance) — MNQ long 00:00 → 01:00; D56 registered (S1–S5)
+
+**No trial spent at registration; N 831. Committed BEFORE validation data is read.** `reporting/d14_hours.py`,
+`reports/d14_discovery.json`; `signals/d_hours.py`. 41 hours on 2018-01 → 2022-12: **1 carried** — MNQ 00:00 → 01:00 New York,
++1.13 bps gross (t +2.59, n 1272) against a 0.56 bps round trip; next MGC 19:00 +0.81 (t +2.29, below its 1.0 bps
+cost). Fewer passes than chance — the hours of traded MNQ and gold carry no excess drift. Even if real, +0.57 bps net is ~$11 a night on
+4 MNQ. Z and D market-test 68.
+
+## 184. D56 validated: the midnight MNQ hour reversed — rejected; family 14 empty (S6–S8)
+
+**One trial spent: t00838. N 831 → 832.** 932 nights, 2023-01 → 2026-08: net -1.28 bps (t -3.52), the worst of the
+night session's 16 hours, negative in every year. The 2018–22 drift was the scan's chance pass. Z and D market-test 68.
+
+## 185. D-series family 15 protocol: MNQ ↔ gold lead-lag over 15–60 minutes, recent-period design (S1)
+
+**No trial spent; N 832. Written and committed BEFORE any lead-lag statistic is computed.** The user approved this order
+(2026-10-13); recent-period design (§180): discovery 2018-01 → 2022-12; validation 2023-01 → 2026-08, sealed. Many trades a day
+— the standalone route of §165.
+
+1. **Data:** the family-8 minute grids (owned trades, contract-consistent). **Overlaps** (New York clock, same dated day):
+   A 18:00 → 03:00 (MNQ night × MGC Asia); B 03:00 → 09:30 (MNQ night × MGC London); C 09:30 → 11:30 (MNQ day × MGC London).
+2. **Trades:** at every k-minute mark t inside an overlap (t = start + j·k, j ≥ 1, t + k ≤ end), k ∈ {15, 30, 60}: leader's
+   return over (t − k, t]; the follower is traded over (t, t + k] in the leader's direction (follow) or against it (fade);
+   non-overlapping by construction. Leader → follower both ways (MNQ → MGC, MGC → MNQ). Forms: every mark; strong marks
+   (|leader return| above its 2018–22 median for that overlap and k). **3 overlaps × 2 directions × 3 k × 2 forms = 36 tests**;
+   ~1.8 by chance. Net of a round trip (bps): MNQ 0.56, MGC 1.0. Statistic: net bps a trade, follow or fade by the gross sign;
+   t clustered by day. **Carried:** |t| > 1.96 AND net > 0.
+3. **Validation (one trial each), sealed:** CONFIRM if (a) net > 0 against not trading, t > 1.645; (b) placebo: the same rule with
+   the leader's return taken from a random OTHER day at the same clock time, 1,000 draws, real ≥ 95th pct; (c) posterior > 0,
+   prior Normal(discovery/2, |discovery|/2); (d) positive in ≥ 3 of the 4 years 2023–2026. WATCHLIST if net > 0; REJECT.
+   Z and D market-tests from 69.
+
+## 186. Family-15 discovery: no MNQ ↔ gold lead-lag survives costs — 0 of 36 carried (S1)
+
+**No trial spent; N 832.** `reporting/d15_leadlag.py`, `reports/d15_discovery.json`. 36 tests on 2018-01 → 2022-12 (1–34 trades
+a day): **none carried.** Gross effects are within ±0.2 bps a trade almost everywhere (the largest, gold leading MNQ over 60
+minutes on strong marks, +1.5 bps gross on 622 trades, t +0.43 net) against round trips of 0.56–1.0 bps. Cross-market
+information between the plan's two traded-data markets is priced within minutes. Family 15 is empty; with families 13–14,
+the three recent-period families (§180–§186) found nothing.
+
+## 187. D-series family 16 protocol: intraday momentum into the window's close (S1)
+
+**No trial spent; N 832. Written and committed BEFORE any statistic is computed.** The user: keep searching while the demo runs.
+The published "market intraday momentum" (first half hour predicts the last, US index) was registered as F01 and blocked before it
+ran; it was never measured here, and not on gold, Tokyo or Xetra. Recent-period design (§180): discovery 2018-01 → 2022-12;
+validation 2023-01 → 2026-08, sealed.
+
+1. **Windows and data:** MNQ 09:30–16:00 and MGC 03:00–11:30 (owned trades, family-8 grids, contract-consistent); NKD 09:00–15:00
+   Tokyo and DAX 09:00–17:30 Frankfurt (corrected HistData CFD minute bars; prices at the window's start, +30 minutes, end − 30
+   minutes and end — the window's end is the only session-boundary price used, as §149).
+2. **Target:** the window's last 30 minutes. **Predictors:** (i) the first 30 minutes; (ii) the window from start to end − 30
+   minutes. Forms: every day; strong days (|predictor| above its 2018–22 median). **4 × 2 × 2 = 16 tests**; ~0.8 by chance.
+3. **Standalone, net of a round trip** (bps: MNQ 0.56, MGC 1.0, NKD 0.4, DAX 0.5). Statistic: sign(predictor) × target, follow /
+   fade by the gross sign, net of cost; t over days. **Carried:** |t| > 1.96 AND net > 0.
+4. **Validation as §185, 3** (sealed; (a) net > 0 against not trading t > 1.645; (b) placebo, the predictor from a random other
+   day, 1,000 draws, ≥ 95th pct; (c) posterior > 0; (d) positive in ≥ 3 of 4 years 2023–26). Z and D market-tests from 69.
+
+## 188. Family-16 discovery: DAX's last half hour follows the day — one of 16 (≈0.8 by chance); D57 registered (S1–S5)
+
+**No trial spent at registration; N 832. Committed BEFORE validation data is read.** `reporting/d16_close.py`,
+`reports/d16_discovery.json`; `signals/d_close.py`. 16 tests on 2018-01 → 2022-12: **1 carried** — DAX, strong days, last 30 minutes
+in the direction of 09:00 → 17:00: net +2.35 bps (t +2.24, n 639). MNQ shows the same sign just below the bar
+(every day +2.04 net, t +1.84; strong +3.37, t +1.79); gold and Nikkei nothing; the first half hour predicts nothing anywhere. Z and D 69.
+
+## 189. D57 validated: DAX close momentum faded to zero in 2023–26 (S6–S8)
+
+**One trial spent: t00839. N 832 → 833.** 369 strong days, 2023-01 → 2026-08: net +0.01 bps (t +0.01); placebo
+75th percentile; positive in 2 of 4 years. WATCHLIST only because the mean is a hair above zero. Family 16 holds nothing.
+
+## 190. D-series family 17 protocol: relative-value states — does a stretched pair set the next session's direction? (S1)
+
+**No trial spent; N 833. Written and committed BEFORE any statistic is computed.** The user: keep searching alongside the demo.
+Recent-period design (§180): discovery 2018-01 → 2022-12; validation 2023-01 → 2026-08, sealed. One leg traded at a time (no
+spread position — opposite positions across products count as hedging in this account, §90).
+
+1. **Pairs (Yahoo daily, §171):** GC/SI, HG/GC, ES/ZN, NQ/ES, CL/NG, ZS/ZC. Each market's ROLL-FREE log index = the cumulative sum
+   of its session returns (open → settlement); the pair's state z = (index_A − index_B − its mean over the previous 60 sessions) ÷
+   its SD over those sessions, known before the next session opens.
+2. **Trade:** the next session of leg A or leg B. On days with |z| > 1.5, A is traded in the direction of −sign(z) (reversion)
+   or +sign(z) (continuation) — and B the opposite way — the sign fixed by discovery. Forms: |z| > 1.5; |z| > 2.5.
+   **6 pairs × 2 legs × 2 thresholds = 24 tests**; ~1.2 by chance. Net of the leg's cost (§177's table). Statistic: net bps a
+   trade; **carried** at |t| > 1.96 AND net > 0.
+3. **Validation as §187, 4** (sealed; (a) net > 0 t > 1.645 against not trading; (b) placebo: the z state from a random other day,
+   1,000 draws, ≥ 95th pct; (c) posterior > 0; (d) positive in ≥ 3 of 4 years). Z and D market-tests from 70.
+
+## 191. Family-17 discovery: no relative-value state predicts the next session — 0 of 24 carried (S1)
+
+**No trial spent; N 833.** `reporting/d17_relative.py`, `reports/d17_discovery.json`. 24 tests on 2018-01 → 2022-12; **none
+carried** (best: copper after the copper/gold ratio is 2.5 SD stretched, reversion +21.2 bps net on 64 sessions, t +1.57). Family
+17 is empty.
+
+## 192. D-series family 18 protocol: weekly structure and short-trend persistence (S1)
+
+**No trial spent; N 833. Written and committed BEFORE any statistic is computed.** Recent-period design (§180): discovery 2018-01
+→ 2022-12; validation 2023-01 → 2026-08, sealed. Year-round by construction.
+
+1. **Universe:** the 14 futures of §171 (Yahoo daily sessions, open → settlement; roll-free; §177's costs).
+2. **Tests, per market:** (i) **week so far** — the sum of Monday–Wednesday sessions predicts Thursday's and Friday's sessions
+   (each traded open → settlement, in or against its direction); (ii) **5-session trend** — the sum of the previous 5 sessions
+   predicts the next; (iii) **20-session trend** — the previous 20 predict the next. **14 × 3 = 42 tests**; ~2.1 by chance.
+   Statistic: net bps a trade, follow or fade by the gross sign; t over trades. **Carried:** |t| > 1.96 AND net > 0.
+3. **Validation as §187, 4** (sealed; (a) net > 0 t > 1.645 against not trading; (b) placebo, the predictor from a random other
+   date, 1,000 draws, ≥ 95th pct; (c) posterior > 0; (d) positive in ≥ 3 of 4 years). Z and D market-tests from 70.
+
+## 193. Family-18 discovery: no weekly or short-trend pattern — 0 of 42 carried (S1)
+
+**No trial spent; N 833.** `reporting/d18_weekly.py`, `reports/d18_discovery.json`. 42 tests on 2018-01 → 2022-12; **none carried**;
+nearest: crude following its 20-session trend, +15.9 bps net (t +1.91 — time-series momentum, published), natural gas the same
+(+13.6, t +1.41). Week-so-far and 5-session trends predict nothing net of cost. Family 18 is empty; families 16–18 (§187–§193)
+added one validation (D57, faded) and nothing usable.
+
+## 194. D-series family 19 protocol: one combined model per window — many weak signals together (S1)
+
+**No trial spent; N 833. Written and committed BEFORE any model is fitted.** Families 3–18 tested one idea at a time; several were
+faintly positive but too weak alone (gold and silver London continuation, crude's 20-session trend, close momentum). This family
+combines them: for each of the plan's six windows, ONE ridge regression of the window's return on every feature already built,
+fitted on 2018-01 → 2022-12, scored ONCE on sealed 2023-01 → 2026-08. **6 trials** (one per window).
+
+1. **Targets:** NKD, DAX, MGC, MNQ windows; MCL and ZS sessions (family-3 series, §149).
+2. **Features, all known before the target's entry** (standardised with 2018–22 means and SDs only): the other five windows'
+   most recent completed returns (the §149 hand-off timing); the target's own previous window; its pre-window move where defined
+   (NKD, DAX, MGC, MNQ); its own 5- and 20-session trend; its volatility state (σ20 ÷ median σ20 of the previous 250, §180);
+   weekday dummies (Mon–Thu). Missing values → 0 (the standardised mean).
+3. **Model:** ridge regression (intercept free), penalty chosen from {1, 10, 100, 1,000, 10,000} by leave-one-year-out
+   cross-validation inside 2018–22 (maximise the out-of-fold Sharpe of trading the prediction's sign), then refitted on all of
+   2018–22. **Trade:** each day, the target window in the direction of the sign of the prediction.
+4. **Validation (one trial per window), sealed:** CONFIRM if (a) net of the account's cost (§180's table) > 0 against not
+   trading, t > 1.645; (b) placebo: the same frozen model scored on the features of a random other day, 1,000 draws, ≥ 95th pct;
+   (c) the sign-trade beats always-long (reported; required only if the window has positive drift in 2018–22); (d) positive in
+   ≥ 3 of the 4 years. WATCHLIST if net > 0; REJECT. Z and D market-tests 70–75. No discovery screen — every window's model is
+   validated, so the six are the whole family.
+
+## 195. Family-19 models fitted and frozen on 2018–22; D58–D63 registered (S1–S5)
+
+**No trial spent at registration; N 833. Committed BEFORE the sealed window is read.** `reporting/d19_model.py`,
+`reports/d19_models.json` (coefficients, standardisation, penalty). Out-of-fold skill inside 2018–22 is small:
+
+| id | window | penalty | out-of-fold daily Sharpe (net) | in-sample net bps | long share |
+|---|---|---|---|---|---|
+| D58 | NKD_win | 100 | +0.067 | +10.16 | 47% |
+| D59 | DAX_win | 1 | -0.077 | +2.64 | 50% |
+| D60 | MGC_win | 1000 | +0.010 | +5.74 | 59% |
+| D61 | MNQ_win | 10000 | +0.029 | +8.61 | 79% |
+| D62 | MCL | 10000 | +0.009 | +9.76 | 99% |
+| D63 | ZS | 10 | +0.036 | +8.58 | 54% |
+
+The models lean on the relay hand-offs (yesterday's MNQ against Tokyo and Xetra), trends and volatility state; DAX's best penalty
+already loses out of fold. Z and D market-tests 70–75.
+
+## 196. D58–D63 scored: no confirmation; the gold model (D60) passes everything but always-long (S6–S8)
+
+**Six trials spent: t00840–t00845. N 833 → 839.** Frozen 2018–22 models, sealed 2023-01 → 2026-08:
+
+| id, trial | window | net bps a day (t) | placebo pct | vs always-long | years positive | tier |
+|---|---|---|---|---|---|---|
+| D58 t00840 | NKD_win | +2.25 (t +0.76) | 80 | +3.22 (t +0.74) | 2 of 4 | **WATCHLIST** |
+| D59 t00841 | DAX_win | +2.52 (t +1.01) | 86 | -0.19 (t -0.05) | 2 of 4 | **WATCHLIST** |
+| D60 t00842 | MGC_win | +5.35 (t +1.89) | 98 | +4.72 (t +1.30) req. | 3 of 4 | **WATCHLIST** |
+| D61 t00843 | MNQ_win | -1.92 (t -0.59) | 14 | -3.64 (t -1.22) req. | 1 of 4 | **REJECT** |
+| D62 t00844 | MCL | +2.44 (t +0.30) | 93 | +1.86 (t +1.17) req. | 1 of 4 | **WATCHLIST** |
+| D63 t00845 | ZS | -3.75 (t -1.05) | 22 | -2.04 (t -0.41) req. | 1 of 4 | **REJECT** |
+
+**D60, gold:** net +5.35 bps a day (t +1.89), placebo 98th percentile, positive 2024–26 (+6.7, +7.9, +7.9) — and +4.7 bps a day
+over always-long (t +1.30), short of 1.645, the condition required because gold's 2018–22 drift was positive. It is the fourth
+independent route to the same finding (D16, D22–D27, D32/D36, now a model): **gold and silver carry a persistent, modest
+directional predictability into the London window, smaller than their own recent drift.** Combining signals did not lift the
+other windows (Nikkei, DAX: watchlist on noise; MNQ, soybeans: reject; crude: long 99% of days).
+
+## 197. A28 design, frozen on 2010–17 before any 2018–26 look: gold enters 04:00, silver 05:00 (S8)
+
+**No trial spent; N 839. Committed BEFORE the designed trades are evaluated on 2018–26.** The user asked whether the design
+questions can be answered with data: yes — on 2010–17 only, then frozen. `reporting/a28_metals_design.py`, `reports/a28_design.json`.
+Criterion fixed in advance: the largest t of the direction-signed, drift-removed return over entry hours 03:00 … 10:00 (exit
+11:30 New York) × day filters (every day; |overnight move| above its 2010–17 median; top fifth); follow the 11:30 → 03:00 move.
+
+- **Where the edge sits (gold, 2010–17):** the first hour REVERSES (03:00 → 04:00: −3.1 bps, t −1.81); the continuation builds
+  after 04:00 and most of all 08:00 → 11:30.
+- **Gold, chosen:** enter **04:00**, every day, follow; +11.49 bps beyond drift, t +3.70, 595 days (complete
+  minute days only). **Silver, chosen:** enter **05:00**, days with |overnight move| > 54.2 bps (the stronger half), follow;
+  +18.16 bps, t +4.22, 1024 days.
+- **Not blind:** 2018–26 already showed the gold and silver effects (§151, §154, §163, §196); only the entry hour and the day
+  filter are new. The evaluation that follows is a replication with that caveat; the clean check is forward data.
+
+## 198. A28 evaluated on 2018–26: the 2010–17 design did not transfer; silver modest; no account carried (S8)
+
+**No trial spent; N 839.** `reports/a28_eval_trade.json`, `reports/a28_eval_account.json`.
+
+| frozen design, 2018-01 → 2026-08 | trades | net vs not trading (t) | vs always-long (t) | 2021–26 net |
+|---|---|---|---|---|
+| gold, enter 04:00, every day, exit 11:30 | 2095 | +0.34 (+0.21) | +0.48 (+0.21) | +2.66 |
+| silver, enter 05:00, stronger half, exit 11:30 | 1072 | +5.57 (+1.26) | +11.74 (+1.93) | +5.63 |
+
+Gold by year: 2018 -4.3, 2019 -8.9, 2020 +0.2, 2021 +2.2, 2022 -2.4, 2023 -0.4, 2024 +5.0, 2025 +5.4, 2026 +8.1. Silver: 2018 +16.7, 2019 -23.5, 2020 +13.6, 2021 +3.3, 2022 -5.3, 2023 -6.6, 2024 +5.1, 2025 +6.6, 2026 +26.6.
+
+**The intraday shape found on 2010–17 (a reversing first hour, the edge built after 04:00) did not hold on 2018–26:** gold's
+designed trade kept almost nothing (+0.3 bps net), though 2024–26 are positive. Silver's held better (+11.7 bps a day over
+always-long, t +1.93) but swings by year. **As its own account** (3–4 SIL risk-matched to the 05:00 → 11:30 swing, rule days
+only): holding to 11:30 passes 0–10% (mean net −$289 to −$902 per 84 days); the plan's brackets on rule days return +$393 (2018–20)
+and +$680 (2021–26) — the zero-edge staking on half the days, below the existing accounts. **The metals' London predictability
+is real but cannot be engineered into a trade that carries a Tradeify account with this data.** Watchlist, forward-tested by time.
+
+## 199. D-series family 20 protocol: where a market's real drift accrues — night or day (S1)
+
+**No trial spent; N 839. Written and committed BEFORE any window statistic is computed.** The user: continue; report only genuine
+findings. The plan's replays remove drift (zero edge), but real accounts earn it; the windows were chosen under zero edge (§105,
+§106, §124). F13 (excluded) was the narrow 02:00–03:00 ET overnight-drift claim, decayed per its authors; the broad split of each
+market's day into night and day sessions was never measured. Recent-period design (§180): discovery 2018-01 → 2022-12;
+validation 2023-01 → 2026-08, sealed.
+
+1. **Windows (owned minute trades, family-8 grids, contract-consistent; daily round trips, flat 17:00–18:00):** MNQ night
+   18:00 → 09:30 and day 09:30 → 16:00; MGC Asia 18:00 → 03:00 and London 03:00 → 11:30. **Long only** (the question is drift).
+   **4 tests.** Net of a round trip (MNQ 0.56, MGC 1.0 bps).
+2. **Discovery:** each window's net mean and daily Sharpe on 2018–22; **carried** if net > 0 with t > 1.96.
+3. **Validation (one trial each), sealed:** CONFIRM if (a) net > 0 against not trading, t > 1.645; (b) its daily Sharpe exceeds the
+   plan's current window for that market (MNQ day / MGC London) over the same 2023–26 days — so a confirmed window is a better
+   use of the account, not just a premium already earned; (c) positive in ≥ 3 of the 4 years. WATCHLIST if net > 0; REJECT.
+   Z and D market-tests from 76. A CONFIRM is then replayed as the plan's account for that market (A23 engine, REAL drift) against
+   the current window before anything changes.
+
+## 200. Family-20 discovery: no window's drift is significant on 2018–22 — 0 of 4 carried (S1)
+
+**No trial spent; N 839.** `reports/d20_discovery.json`. Net, long, 2018-01 → 2022-12: MNQ night +2.99 bps (t +1.24), MNQ day −0.84
+(t −0.24), MGC Asia −1.61 (t −1.48), MGC London +0.57 (t +0.27). MNQ's drift sits in the night session, but not significantly.
+
+## 201. D-series family 21 protocol: carry (the futures curve's slope) as the daily direction (S1)
+
+**No trial spent; N 839. Written and committed BEFORE any carry statistic is computed.** Backwardated commodities (front above the
+next contract) pay longs a hedging premium; the owned daily file measures each market's carry (`data/daily_bars.py`: C = (F1 − F2)
+/ F2 / years, the front against the next liquid contract). W04 (§73–§75, retired) combined trend and carry in a daily portfolio on
+2010–26; carry alone, per market, on the recent period was not measured. Recent-period design (§180).
+
+1. **Markets** (owned GLBX daily bars, roll-correct held returns, bars ≈ the session, §74): NQ, GC, HG, CL, ZN, 6E. **Trade:** each
+   day's held return in the sign of the previous day's carry (long backwardation / positive carry, short contango); a daily round
+   trip at the account's contract, cost (bps) NQ 0.5, GC 0.8, HG 2.0, CL 0.7, ZN 0.4, 6E 0.3. Forms: every day; days with |carry|
+   above its 2018–22 median. **6 × 2 = 12 tests.**
+2. **Discovery 2018-01 → 2022-12;** net bps a day, t; **carried** if net > 0 with t > 1.96.
+3. **Validation (one trial each), sealed 2023-01 → 2026-09:** (a) net > 0 against not trading t > 1.645; (b) placebo: the carry
+   sign from a random other day, 1,000 draws, ≥ 95th pct; (c) positive in ≥ 3 of the 4 years; CONFIRM if all; WATCHLIST if net >
+   0; REJECT. Z and D market-tests from 76.
+
+## 202. Family-21 discovery: carry sets no direction on 2018–22 — 0 of 12 carried (S1)
+
+**No trial spent; N 839.** `reports/d21_discovery.json`: best 6E (strong carry, short euro) +1.79 bps net (t +0.95); gold and copper
+negative; crude +2.90 (t +0.31). Family 21 is empty.
+
+## 203. D-series family 22 protocol: gap-fill brackets at the window open (S1)
+
+**No trial spent; N 839. Written and committed BEFORE any gap statistic is computed.** A path effect in the plan's own terms. At a
+window's open, the gap g = the open minus the previous window's close. A bracket toward the fill — take at the previous close
+(distance |g|), stop at s·|g| beyond the open, else out at the window's end — has zero expected gross under a fair martingale; if
+gaps fill more often than the geometry implies, it earns. U01 (large opening gap NON-fill, blocked before running) is the mirror
+claim; the fill was never measured here. Recent-period design (§180).
+
+1. **Windows (family-8 grids, owned trades, minute closes, contract-consistent):** MNQ day 09:30–16:00 with the previous 16:00
+   close; MGC London 03:00–11:30 with the previous 11:30 close.
+2. **Tests:** gap threshold |g| > {0.25, 0.5, 1.0} × σ_g (σ_g = SD of the previous 60 gaps) × stop multiple s ∈ {0.5, 1, 2}:
+   **2 × 3 × 3 = 18 tests**; ~0.9 by chance. Net of a round trip (MNQ 0.56, MGC 1.0 bps). A stop touched and the take touched in the
+   same minute counts as the stop (as all replays). **Carried:** net > 0 with t > 1.96.
+3. **Validation (one trial each), sealed 2023-01 → 2026-08:** (a) net > 0 against not trading t > 1.645; (b) placebo: the same bracket
+   in the gap's OWN direction (a breakout of equal geometry) must do worse — real minus placebo > 0 with t > 1.645; (c) positive in
+   ≥ 3 of the 4 years. CONFIRM if all; WATCHLIST if net > 0; REJECT. Z and D market-tests from 76.
+
+## 204. Family-22 discovery: gaps do not fill more than the bracket geometry implies — 0 of 18 carried (S1)
+
+**No trial spent; N 839.** `reporting/d22_gapfill.py`, `reports/d22_discovery.json`. On 2018-01 → 2022-12, every gap-fill bracket
+(MNQ day, MGC London; gaps beyond 0.25–1.0 σ; stops 0.5–2 × the gap) nets within −6 and +1 bps a trade (no t above +0.21): the
+fill happens about as often as a fair martingale implies, and costs make it negative. Family 22 is empty.
+
+## 205. D-series family 23 protocol: breakouts after range compression (NR4 / NR7) (S1)
+
+**No trial spent; N 839. Written and committed BEFORE any statistic is computed.** A volatility-compression breakout (Crabel's
+narrow-range days) in the plan's windows; F05 (volatility_compression_expansion, retired) used a different trigger and hold.
+Recent-period design (§180).
+
+1. **Windows (family-8 grids, minute closes, contract-consistent):** MNQ day 09:30–16:00; MGC London 03:00–11:30. The previous
+   window's range = its highest and lowest minute close.
+2. **Setup:** the previous window's range is the narrowest of the last N windows, N ∈ {4, 7}. **Trade:** in today's window, the
+   first minute close beyond the previous high (long) or low (short) enters; stop at the previous range's midpoint ("mid") or its
+   far side ("far"); exit at the window's end; one trade a day. **2 markets × 2 N × 2 stops = 8 tests**; net of a round trip
+   (MNQ 0.56, MGC 1.0 bps). **Carried:** net > 0 with t > 1.96.
+3. **Validation (one trial each), sealed 2023-01 → 2026-08:** (a) net > 0 against not trading t > 1.645; (b) placebo: the same
+   breakout on the days that are NOT narrow-range must do worse — difference t > 1.645; (c) positive in ≥ 3 of the 4 years.
+   CONFIRM if all; WATCHLIST if net > 0; REJECT. Z and D market-tests from 76.
+
+## 206. Family-23 discovery: narrow-range breakouts do not follow through significantly — 0 of 8 carried (S1)
+
+**No trial spent; N 839.** `reporting/d23_breakout.py`, `reports/d23_discovery.json`. Best: gold after an NR7 window, breakout with a
+midpoint stop, +8.34 bps net (t +1.64; ordinary days −2.48); MNQ +2 to +5 bps on NR days, no better than ordinary days. Empty.
+
+## 207. D-series family 24 protocol: the next session across markets after a shock day (S1)
+
+**No trial spent; N 839. Written and committed BEFORE any statistic is computed.** Family 12 asked whether a market continues its
+OWN extreme session; family 10 used every day's sign. This asks how OTHER markets' next sessions respond after a shock in a major
+market (flight to safety, risk-on rebound). Recent-period design (§180).
+
+1. **Data:** the §171 universe (Yahoo daily sessions, roll-free; §177's costs). **Shock day** in predictor P: |P's session| > 2 σ
+   (SD of P's previous 60 sessions). Predictors: ES, CL, GC, ZN. **Target:** each other market's NEXT session, traded in the
+   direction of P's shock (follow) or against it (fade), the sign fixed by discovery. **4 × 13 = 52 tests**; ~2.6 by chance.
+2. **Discovery 2018-01 → 2022-12:** net bps a trade, t; **carried** if net > 0 with t > 1.96.
+3. **Validation (one trial each), sealed 2023-01 → 2026-08:** (a) net > 0 against not trading t > 1.645; (b) placebo: the same
+   rule after random non-shock days (direction from that day's sign), 1,000 draws, ≥ 95th pct; (c) positive in ≥ 3 of the 4 years.
+   CONFIRM if all; WATCHLIST if net > 0; REJECT. Z and D market-tests from 76.
+
+## 208. Family-24 discovery: eight cross-market shock responses (≈2.6 by chance); D64–D71 registered (S1–S5)
+
+**No trial spent at registration; N 839. Committed BEFORE validation data is read.** `reporting/d24_shock.py`,
+`reports/d24_discovery.json`; `signals/d_shock.py`. 52 tests on 2018-01 → 2022-12; **8 carried** — three times the chance count,
+with per-trade effects of 11–80 bps. Bond (ZN) shocks lead four of them (euro, gold, S&P, copper all follow the next session).
+
+| id | shock | target | rule | trades | discovery net | prior |
+|---|---|---|---|---|---|---|
+| D64 | ZN shock | 6E | follow | 82 | +23.84, t +3.65 | N(+11.92, 11.92) |
+| D65 | GC shock | 6E | follow | 87 | +18.81, t +3.15 | N(+9.41, 9.41) |
+| D66 | CL shock | ZC | fade | 75 | +44.70, t +2.64 | N(+22.35, 22.35) |
+| D67 | ZN shock | GC | follow | 82 | +29.36, t +2.49 | N(+14.68, 14.68) |
+| D68 | ZN shock | ES | follow | 81 | +37.60, t +2.15 | N(+18.80, 18.80) |
+| D69 | GC shock | ES | follow | 86 | +46.38, t +2.11 | N(+23.19, 23.19) |
+| D70 | ES shock | NG | follow | 88 | +79.63, t +2.11 | N(+39.81, 39.81) |
+| D71 | ZN shock | HG | follow | 82 | +34.42, t +2.08 | N(+17.21, 17.21) |
+
+Correlated: the four ZN-led tests share their event days. Z and D market-tests 76–83.
+
+## 209. D66 and D68 CONFIRM: corn fades a crude shock; the S&P follows a bond shock (S6–S8)
+
+**Eight trials spent: t00846–t00853. N 839 → 847.** Z and D market-tests 76–83. Sealed 2023-01 → 2026-08, standalone, net:
+
+| id, trial | rule | trades | net bps a trade (t) | placebo pct | years positive | tier |
+|---|---|---|---|---|---|---|
+| D64 t00846 | 6E follows the previous session's ZN shock | 48 | +1.52 (t +0.20) | 60 | 2 of 4 | **WATCHLIST** |
+| D65 t00847 | 6E follows the previous session's GC shock | 55 | +6.51 (t +0.97) | 91 | 2 of 4 | **WATCHLIST** |
+| D66 t00848 | ZC fades the previous session's CL shock | 51 | +38.41 (t +2.47) | 99 | 4 of 4 | **CONFIRM** |
+| D67 t00849 | GC follows the previous session's ZN shock | 48 | -1.01 (t -0.04) | 67 | 2 of 4 | **REJECT** |
+| D68 t00850 | ES follows the previous session's ZN shock | 48 | +33.38 (t +2.01) | 100 | 3 of 4 | **CONFIRM** |
+| D69 t00851 | ES follows the previous session's GC shock | 55 | +4.18 (t +0.24) | 67 | 2 of 4 | **WATCHLIST** |
+| D70 t00852 | NG follows the previous session's ES shock | 52 | +16.12 (t +0.39) | 44 | 2 of 4 | **WATCHLIST** |
+| D71 t00853 | HG follows the previous session's ZN shock | 48 | +13.16 (t +0.66) | 85 | 3 of 4 | **WATCHLIST** |
+
+**D66 — after a crude session beyond 2 σ, corn's next session against the shock: +38.4 bps a trade (t +2.47), 99th percentile, all
+four years positive. D68 — after a 10-year-note session beyond 2 σ, the S&P's next session with the shock: +33.4 (t +2.01), 100th
+percentile, three of four years.** Per-trade effects of ~0.25–0.3 of a day's SD — about five times anything else found — on ~50
+trades each (~14 a year). **Before use:** an independent-data replication (owned GLBX bars for ZN, ES, NQ, CL), robustness
+(thresholds, the plan's MNQ instead of ES), and an account replay.
+
+## 210. D66 and D68 stress-tested: D68 replicates on independent data and adds to the MNQ account after 2021; D66 does not (S8)
+
+**No trial spent; N 847.** `reports/a29_d68_replay.json`.
+
+**Independent data (owned GLBX daily bars — roll-correct, different session boundaries from Yahoo).**
+- **D68 (S&P follows a 10-year-note shock):** positive in every variant since 2018 — ES and NQ, thresholds 1.5 / 2 / 2.5 σ, 2018–22 and
+  2023–26: +12.7 to +37.0 bps a trade (t +0.75 to +1.68 individually); 2010–17 faintly positive (+0.0 to +11.5). On the plan's MNQ
+  window (09:30–16:00, owned minute trades): 2018–22 +22.7 (t +1.34), **2023–26 +38.9 (t +2.15)**. Consistent sign, modest strength,
+  a plain mechanism (a bond rally lifts equities the next day; a bond sell-off weighs on them).
+- **D66 (corn fades a crude shock):** with the crude shock from the owned bars, 2023–26 reproduces (k = 2: +38.7, t +2.54) but
+  2018–22 vanishes (+2.9, t +0.16) and 2010–17 turns negative at 2.5 σ (−33.3). A recent pattern, not a stable one: **not used.**
+
+**D68 in the plan (A23 engine, MNQ 4 contracts, drift removed, 84-day replay):** an overlay — on the ~5–6% of sessions after a ZN
+shock, the MNQ ticket takes the shock's direction instead of long (about half are shorts):
+
+| | 2015–20 | 2021–26 |
+|---|---|---|
+| plan, always long | 76%, +$1,960, P(net > 0) 61% | 80%, +$1,265, 59% |
+| **overlay, the shock's direction on shock days** | 72%, +$1,971, 55% | **77%, +$1,720, 64%** |
+| standalone, shock days only (plan brackets / hold) | 0–7%, ≈ $0 | 0–1%, ≈ −$110 |
+
+**Reading.** D68 is the most robust directional finding of the programme — confirmed on sealed data under the strict rule,
+replicated in sign on an independent source, economically sensible — and it is modest: about +$455 per four months on one
+account in 2021–26, nothing in 2015–20. Too rare (≈ 14 days a year) to carry an account alone. **Candidate for the plan, not yet
+adopted:** the user decides; the clean forward test is the demo (the bot could set MNQ's direction on bond-shock days).
+
+## 211. D68 added to the demo: the MNQ ticket follows a 10-year-note shock (S8)
+
+**No trial spent; N 847.** The user (2026-10-13, minutes before the 17:30 alert): "go ahead". `bot/d68.py`: at each alert, today's
+ZN session (Yahoo daily ZN=F, open → settlement) against 2 × the SD of its previous 60 sessions; beyond it, the MNQ ticket is
+issued in the shock's direction (LONG after a bond rally, SHORT after a sell-off) and the post carries a "D68" line; otherwise, or if
+the data cannot be read, LONG as before. `bot/schedule.py` passes the side to the ticket (the shadow tracker already handles
+shorts). Deployed 17:22 New York with the user's go-ahead (previous schedule.py in `/opt/futures-bot/backup-2026-10-13b/`); the first
+check (2026-10-13): ZN +18 bps against a 52 bps threshold — no shock, MNQ long. The `!eod` filing fix (§147) was already live.
+Expected frequency ≈ 14 shock days a year; the demo's forward record is D68's first out-of-sample use.
+
+## 212. D-series family 25 protocol: shocks into the plan's next windows (S1)
+
+**No trial spent; N 847. Written and committed BEFORE any statistic is computed.** Family 24 found the largest per-trade effects of
+the programme after shock days (D68 confirmed and deployed, §209–§211). This family carries the shocks into the plan's own next
+windows. Recent-period design (§180): discovery 2018-01 → 2022-12; validation 2023-01 → 2026-08, sealed.
+
+1. **Shock day** (Yahoo daily sessions, §171): |session| > 2 σ (SD of the previous 60) in ZN, 6E, ES, CL or GC on day D−1.
+2. **Targets, the plan's windows after it** (family-3 series, §149): NKD (Tokyo date D, entry 20:00 New York D−1), DAX and MGC
+   (03:00 D), MNQ (09:30 D), ZS (session D). Traded in the shock's direction (follow) or against it (fade), fixed by discovery.
+   **5 × 5 = 25 pairs minus ZN → MNQ (D68) = 24 tests**; ~1.2 by chance. Net of the account's cost (§180's table).
+3. **Carried:** net > 0 with t > 1.96. **Validation (one trial each), sealed:** (a) net > 0 against not trading t > 1.645;
+   (b) placebo: the same rule after random non-shock days, 1,000 draws, ≥ 95th pct; (c) positive in ≥ 3 of the 4 years. CONFIRM if
+   all; WATCHLIST if net > 0; REJECT. Z and D market-tests from 84.
+
+## 213. Family-25 discovery: three shock-into-window tests (≈1.2 by chance); D72–D74 registered (S1–S5)
+
+**No trial spent at registration; N 847. Committed BEFORE validation data is read.** `reporting/d25_shockwin.py`,
+`reports/d25_discovery.json`; `signals/d_shockwin.py`. 24 tests on 2018-01 → 2022-12; 3 carried:
+
+| id | shock | window | rule | trades | discovery net | prior |
+|---|---|---|---|---|---|---|
+| D72 | ZN shock | MGC_win | follow | 80 | +21.82, t +2.32 | N(+10.91, 10.91) |
+| D73 | 6E shock | MGC_win | follow | 64 | +23.25, t +2.24 | N(+11.62, 11.62) |
+| D74 | 6E shock | DAX_win | fade | 68 | +31.67, t +2.01 | N(+15.83, 15.83) |
+
+Next: DAX following a ZN shock (+25.7, t +1.93), Nikkei following a ZN shock (+14.9, t +1.57) — bond shocks lead most of the list,
+as in family 24. Z and D market-tests 84–86.
+
+## 214. D72–D74 validated: no confirmation — shocks into the plan's other windows did not hold (S6–S8)
+
+**Three trials spent: t00854–t00856. N 847 → 850.** Z and D market-tests 84–86.
+
+| id, trial | rule | trades | net bps a trade (t) | placebo pct | years positive | tier |
+|---|---|---|---|---|---|---|
+| D72 t00854 | MGC_win follows the previous session's ZN shock | 47 | +15.12 (t +1.00) | 92 | 1 of 4 | **WATCHLIST** |
+| D73 t00855 | MGC_win follows the previous session's 6E shock | 41 | -6.43 (t -0.34) | 42 | 2 of 4 | **REJECT** |
+| D74 t00856 | DAX_win fades the previous session's 6E shock | 41 | +13.10 (t +0.74) | 81 | 2 of 4 | **WATCHLIST** |
+
+Gold following a bond shock (D72) was positive only through one year (2026 +93); nothing generalises beyond D68's S&P response.
+
+## 215. D-series family 26 protocol: the response to a shock over the following sessions (S1)
+
+**No trial spent; N 850. Written and committed BEFORE any statistic is computed.** Family 24 measured the session right after a shock
+(D68 confirmed). This asks whether the response continues: the next three sessions together, and sessions two and three alone
+(skipping the first). Recent-period design (§180).
+
+1. **Shock day** in P ∈ {ZN, 6E, ES, CL, GC} (Yahoo sessions, |session| > 2 σ of the previous 60). **Targets:** every other §171
+   market. **Trade:** (i) sessions D+1 … D+3, or (ii) sessions D+2 … D+3, each a daily round trip in the shock's direction or against
+   it (fixed by discovery); net of h costs. **5 × 13 × 2 = 130 tests**; ~6.5 by chance. Non-overlapping (a shock during an open
+   trade is ignored).
+2. **Carried:** net > 0 with t > 1.96. **Validation (one trial each), sealed 2023-01 → 2026-08:** as §207, 3 (net t > 1.645;
+   placebo after random non-shock days ≥ 95th pct; positive in ≥ 3 of 4 years). Z and D market-tests from 87.
+
+## 216. Family-26 discovery: 4 of 130 carried — fewer than chance (~6.5); D75–D78 registered per protocol (S1–S5)
+
+**No trial spent at registration; N 850. Committed BEFORE validation data is read.** `reporting/d26_shocklag.py`,
+`reports/d26_discovery.json`; `signals/d_shocklag.py`.
+
+| id | shock | target | span | rule | trades | discovery net |
+|---|---|---|---|---|---|---|
+| D75 | GC shock | ES | next3 | follow | 63 | +90.42, t +2.52 |
+| D76 | ZN shock | ZS | days2-3 | fade | 63 | +49.28, t +2.17 |
+| D77 | ES shock | GC | days2-3 | follow | 60 | +33.36, t +2.09 |
+| D78 | GC shock | ES | days2-3 | follow | 63 | +39.08, t +1.97 |
+
+As a family the multi-session response shows no excess signal. Z and D market-tests 87–90.
+
+## 217. D75–D78 validated: no confirmation — the shock response does not extend past the next session (S6–S8)
+
+**Four trials spent: t00857–t00860. N 850 → 854.**
+
+| id, trial | rule | trades | net bps a trade (t) | placebo pct | years positive | tier |
+|---|---|---|---|---|---|---|
+| D75 t00857 | ES follows a GC shock over next3 | 40 | +4.47 (t +0.19) | 53 | 3 of 4 | **WATCHLIST** |
+| D76 t00858 | ZS fades a ZN shock over days2-3 | 39 | +3.83 (t +0.18) | 22 | 2 of 4 | **WATCHLIST** |
+| D77 t00859 | GC follows a ES shock over days2-3 | 38 | -18.23 (t -0.63) | 37 | 0 of 4 | **REJECT** |
+| D78 t00860 | ES follows a GC shock over days2-3 | 40 | +9.67 (t +0.60) | 54 | 3 of 4 | **WATCHLIST** |
+
+## 218. D-series family 27 protocol: volume shocks — does a heavy-volume session's move continue? (S1)
+
+**No trial spent; N 854. Written and committed BEFORE any statistic is computed.** Recent-period design (§180). Yahoo daily bars
+carry volume (continuous front month; a roll day inflates it — those sessions are dropped: |volume change| with a price-series jump
+is not identifiable here, so a session is a volume shock only if its volume exceeds 2 × the mean of the previous 60 AND the next
+session's volume stays above 1.2 × that mean, which excludes one-day roll spikes). **Trade:** the next session (h = 1) or the next
+three (h = 3) in the shock session's direction or against it, fixed by discovery; daily round trips, §177's costs. **14 markets × 2 h
+= 28 tests**; ~1.4 by chance. Carried at net > 0 with t > 1.96; validation as §207, 3 (sealed 2023-01 → 2026-08). Z and D from 91.
+
+**Amendment before any computation (a flaw in the protocol as committed):** the roll filter used the NEXT session's volume, which is
+not known when the next session is entered — look-ahead. Replaced: a volume shock is volume > 2 × the mean of the previous 60
+sessions, judged only on information known at the shock session's close; no roll filter (a roll-day spike in Yahoo's continuous
+volume may enter as a false event — it dilutes, it cannot bias the direction rule).
+
+## 219. Family-27 discovery: three volume-shock tests (≈1.3 by chance); D79–D81 registered (S1–S5)
+
+**No trial spent at registration; N 854. Committed BEFORE validation data is read.** `reporting/d27_volume.py`,
+`reports/d27_discovery.json`; `signals/d_volume.py`. 26 tests (two markets lacked enough shocks), 2018–22; 3 carried:
+
+| id | market | horizon | rule | events | discovery net |
+|---|---|---|---|---|---|
+| D79 | NQ | next 3 | follow | 17 | +180.67, t +2.43 |
+| D80 | ZS | next 1 | fade | 103 | +16.98, t +2.00 |
+| D81 | ZW | next 1 | fade | 67 | +46.67, t +2.00 |
+
+NQ rests on 17 events (2020 dominates). Z and D market-tests 91–93.
+
+## 220. D79–D81 validated: no confirmation (S6–S8)
+
+**Three trials spent: t00861–t00863. N 854 → 857.**
+
+| id, trial | rule | trades | net bps (t) | placebo pct | tier |
+|---|---|---|---|---|---|
+| D79 t00861 | NQ follows a volume-shock session over the next 3 | 1 | -132.40 (t +nan) | 24 | **REJECT** |
+| D80 t00862 | ZS fades a volume-shock session over the next 1 | 67 | +5.60 (t +0.42) | 82 | **WATCHLIST** |
+| D81 t00863 | ZW fades a volume-shock session over the next 1 | 50 | +9.55 (t +0.34) | 91 | **WATCHLIST** |
+
+## 221. D-series family 28 protocol: yield-curve shocks — steepening and flattening days (S1)
+
+**No trial spent; N 857. Written and committed BEFORE any data is fetched.** D68 (bond shock → equities next session) is the
+programme's most robust directional finding. Its natural extension: the SHAPE of the curve. Yahoo daily ZT (2-year), ZN (10-year), ZB
+(30-year) sessions, open → settlement. **Curve change** = ZT − ZB session return (a steepener in price terms: the long end falls
+against the short); a shock day = |change| > 2 σ of its previous 60. **Targets:** the next session of ES, NQ, GC, 6E, 6J, HG
+(Yahoo, §171), each in the shock's direction or against it, fixed by discovery. **6 tests**; ~0.3 by chance. Recent-period
+design (§180); carried at net > 0 with t > 1.96; validation as §207, 3. Z and D market-tests from 94.
+
+## 222. Family-28 discovery: euro and copper fade a yield-curve shock — two of 6 (≈0.3 by chance); D82–D83 registered (S1–S5)
+
+**No trial spent at registration; N 857. Committed BEFORE validation data is read.** `reporting/d28_curve.py`,
+`reports/d28_discovery.json`; `signals/d_curve.py`. 2018-01 → 2022-12, ~70 curve-shock days:
+
+| id | target | rule | events | discovery net |
+|---|---|---|---|---|
+| D82 | 6E | fade | 70 | +16.22, t +2.43 |
+| D83 | HG | fade | 70 | +41.02, t +2.42 |
+
+ES fades too (+30.1, t +1.18); every target faded. Z and D market-tests 94–95.
+
+## 223. D82–D83 validated: the curve-shock fade reversed — rejected (S6–S8)
+
+**Two trials spent: t00864–t00865. N 857 → 859.**
+
+| id, trial | rule | trades | net bps (t) | placebo pct | tier |
+|---|---|---|---|---|---|
+| D82 t00864 | 6E fades a yield-curve shock (next session) | 48 | -6.83 (t -1.20) | 15 | **REJECT** |
+| D83 t00865 | HG fades a yield-curve shock (next session) | 48 | -5.73 (t -0.31) | 45 | **REJECT** |
+
+## 224. D-series family 29 protocol: shocks from every other market, next session (S1)
+
+**No trial spent; N 859. Written and committed BEFORE any statistic is computed.** Family 24 (shocks in ES, CL, GC, ZN) was the
+programme's most productive scan (8 carried of 52; D68 confirmed, replicated, deployed). This extends it to the other ten markets of
+§171 as shock sources: NQ, RTY, SI, HG, NG, 6E, 6J, ZC, ZS, ZW — each into every other market's next session. **10 × 13 = 130
+tests**; ~6.5 by chance. Method, costs, carry rule and validation exactly as §207 (recent-period design). Z and D market-tests from 96.
+
+## 225. Family-29 discovery: eleven shock responses (≈6.5 by chance); D84–D94 registered (S1–S5)
+
+**No trial spent at registration; N 859. Committed BEFORE validation data is read.** `reports/d29_discovery.json`;
+`signals/d_shock29.py`. 130 tests, 2018–22; **11 carried** — a mild excess over chance, mostly currencies following equity shocks
+and equities following yen shocks (risk-on / risk-off transmission):
+
+| id | shock | target | rule | trades | discovery net |
+|---|---|---|---|---|---|
+| D84 | NQ shock | 6J | follow | 93 | +22.24, t +3.04 |
+| D85 | NQ shock | 6E | follow | 93 | +14.74, t +2.74 |
+| D86 | 6J shock | NQ | follow | 76 | +57.80, t +2.34 |
+| D87 | ZC shock | 6J | follow | 80 | +16.19, t +2.33 |
+| D88 | RTY shock | 6E | follow | 75 | +13.23, t +2.31 |
+| D89 | SI shock | 6E | follow | 86 | +12.39, t +2.22 |
+| D90 | 6J shock | ES | follow | 76 | +48.30, t +2.20 |
+| D91 | NQ shock | ZN | follow | 93 | +10.01, t +2.19 |
+| D92 | RTY shock | 6J | follow | 75 | +18.79, t +2.18 |
+| D93 | HG shock | 6E | follow | 77 | +12.84, t +2.17 |
+| D94 | 6J shock | RTY | follow | 76 | +51.84, t +1.97 |
+
+Z and D market-tests 96–106.
+
+## 226. D84–D94 validated: three CONFIRM — the yen follows Nasdaq and corn shocks, the euro follows silver shocks (S6–S8)
+
+**Eleven trials spent: t00866–t00876. N 859 → 870.** Z and D market-tests 96–106.
+
+| id, trial | rule | trades | net bps a trade (t) | placebo pct | years positive | tier |
+|---|---|---|---|---|---|---|
+| D84 t00866 | 6J follows the previous session's NQ shock | 48 | +16.33 (t +1.67) | 98 | 4 of 4 | **CONFIRM** |
+| D85 t00867 | 6E follows the previous session's NQ shock | 48 | +0.31 (t +0.04) | 55 | 3 of 4 | **WATCHLIST** |
+| D86 t00868 | NQ follows the previous session's 6J shock | 44 | -16.14 (t -0.66) | 12 | 2 of 4 | **REJECT** |
+| D87 t00869 | 6J follows the previous session's ZC shock | 49 | +14.50 (t +1.83) | 98 | 3 of 4 | **CONFIRM** |
+| D88 t00870 | 6E follows the previous session's RTY shock | 46 | +3.17 (t +0.37) | 72 | 3 of 4 | **WATCHLIST** |
+| D89 t00871 | 6E follows the previous session's SI shock | 59 | +10.04 (t +2.24) | 99 | 3 of 4 | **CONFIRM** |
+| D90 t00872 | ES follows the previous session's 6J shock | 44 | -15.67 (t -0.78) | 3 | 1 of 4 | **REJECT** |
+| D91 t00873 | ZN follows the previous session's NQ shock | 48 | -2.97 (t -0.53) | 32 | 1 of 4 | **REJECT** |
+| D92 t00874 | 6J follows the previous session's RTY shock | 46 | +1.27 (t +0.11) | 49 | 3 of 4 | **WATCHLIST** |
+| D93 t00875 | 6E follows the previous session's HG shock | 60 | -2.18 (t -0.42) | 33 | 2 of 4 | **REJECT** |
+| D94 t00876 | RTY follows the previous session's 6J shock | 44 | -17.33 (t -0.74) | 10 | 2 of 4 | **REJECT** |
+
+Three of eleven confirm (≈0.4 false confirmations expected at these thresholds). **Before use:** independent-data replication
+(HistData spot FX for the euro and yen sessions; owned GLBX NQ for the Nasdaq shock) and an account test.
+
+## 227. D84/D87/D89 on independent data; a macro-shock account cannot pass an evaluation (S8)
+
+**No trial spent; N 870.** `reports/a30_shock_account.json`.
+
+**Independent data** (HistData spot FX sessions 18:05 → 16:55 New York; owned GLBX NQ for the shock; HistData silver):
+- **D89 (euro follows a silver shock):** positive at every threshold (1.5 / 2 / 2.5 σ) in 2018–22 (t 1.5–2.5) and 2023–26 (t 0.6–2.3),
+  with either silver source; ~0 in 2010–17. Holds since 2018 — the same profile as D68.
+- **D84 (yen follows a Nasdaq shock):** strong in 2018–22 (t 2–3), positive but weak in 2023–26 (t 0.5–1.6), ~0 in 2010–17. Moderate.
+- **D87 (yen follows a corn shock):** mixed; at 2.5 σ strongly negative in 2010–17 (t −2.5). Fragile; set aside.
+
+**As a standalone account** (one 50K Daily account trading whichever rule fires — D68 → 8 MES, D89 → 30 M6E, D84 → 3 6J — sitting out
+other days; Yahoo daily bars, one-bar paths; the plan's solver brackets; 84-day replay): 13–44 trades a year; **P(payout) 0–9%, mean
+net −$25 to −$180** in both 2018–22 and 2023–26. Event rules this rare cannot reach a $3,000 target inside four months, whatever their
+per-trade edge. **The macro-shock edges are real enough to keep (D68 is in the demo) but are not a standalone strategy.**
+
+## 228. D-series family 30 protocol: speculator positioning (CFTC COT) sets next week's direction (S1)
+
+**No trial spent; N 870. Written and committed BEFORE any positioning statistic is computed.** A daily-direction signal is what a
+standalone account needs (§227: event rules are too rare). The legacy COT report (owned, `data/cot/`, 2010–2026) carries
+non-commercial (speculator) long and short positions for every market of §171; Z08 (§117–§118, retired) used COMMERCIAL flow for
+gold and crude only. Positions are as of Tuesday, published Friday 15:30 New York; the signal applies to the five sessions of the
+following week (Monday … Friday), each a daily round trip (§177's costs). Recent-period design (§180).
+
+1. **Signals per market:** net = (non-commercial long − short) / open interest. (i) **flow** = net this week − net last week; (ii)
+   **crowding** = (net − its mean over the previous 52 weeks) / their SD, used only when |z| > 1.5. Direction: with the signal (follow)
+   or against it (fade), fixed by discovery. Codes: ES 13874A, NQ 209742, RTY 239742, ZN 043602, 6E 099741, 6J 097741, GC 088691,
+   SI 084691, HG 085692, CL 067651, NG 023651, ZC 002602, ZS 005602, ZW 001602.
+2. **Tests: 14 × 2 = 28**; ~1.4 by chance. Statistic: net bps per session, t clustered by week. **Carried:** net > 0 with t > 1.96.
+3. **Validation (one trial each), sealed 2023-01 → 2026-08:** (a) net > 0 against not trading, t > 1.645 (week-clustered); (b) placebo:
+   the signal from a random other week, 1,000 draws, ≥ 95th pct; (c) positive in ≥ 3 of the 4 years. CONFIRM if all; WATCHLIST if net
+   > 0; REJECT. A CONFIRM is replayed as a standalone account. Z and D market-tests from 107.
+
+## 229. Family-30 discovery: speculator positioning sets no direction — 0 of 28 carried (S1)
+
+**No trial spent; N 870.** `reporting/d30_cot.py`, `reports/d30_discovery.json`. Best: wheat fading crowded speculator positions
+(+20.5 bps a session, t +1.55, 60 weeks), ES following speculator flow (+5.5, t +1.52). Family 30 is empty.
+
+## 230. D-series family 31 protocol: small-trader and commercial positioning (S1)
+
+**No trial spent; N 870. Written and committed BEFORE any statistic is computed.** The other two COT groups: non-reportable
+(small traders — the retail proxy) and commercials (hedgers; Z08 used them for gold and crude only, 2010–26, retired). Exactly §228's
+design (flow and crowding, next week's five sessions, week-clustered t, recent-period discovery / sealed validation), with net =
+(group long − short) / open interest for each group. **14 markets × 2 groups × 2 signals = 56 tests**; ~2.8 by chance. Z and D
+market-tests from 107.
+
+## 231. Family-31 discovery: two of 56 (fewer than chance, ~2.8); D95–D96 registered per protocol (S1–S5)
+
+**No trial spent at registration; N 870. Committed BEFORE validation data is read.** `reporting/d31_cotgroups.py`,
+`reports/d31_discovery.json`; `signals/d_cot.py`.
+
+| id | market | signal | rule | sessions | discovery net |
+|---|---|---|---|---|---|
+| D95 | ZW | small crowding | fade | 324 | +24.16, t +2.43 |
+| D96 | SI | small flow | follow | 1255 | +7.22, t +1.98 |
+
+Z and D market-tests 107–108.
+
+## 232. D95–D96 validated: rejected; COT positioning holds nothing (S6–S8)
+
+**Two trials spent: t00877–t00878. N 870 → 872.**
+
+| id, trial | rule | sessions | net bps (t) | placebo pct | tier |
+|---|---|---|---|---|---|
+| D95 t00877 | ZW fades small crowding (next week) | 217 | -12.37 (t -1.25) | 12 | **REJECT** |
+| D96 t00878 | SI follows small flow (next week) | 915 | -1.41 (t -0.24) | 42 | **REJECT** |
+
+## 233. D68's timing: since 2023 the S&P's response to a bond shock is all in the day window (S8)
+
+**No trial spent; N 872.** Owned MNQ trades after a ZN shock (Yahoo ZN, 2 σ): 2018–22 night 18:00 → 09:30 +20.1 bps (t +1.67) and day
+09:30 → 16:00 +19.8 (t +1.19); **2023–26 night +2.0 (t +0.13), day +40.7 (t +2.26).** The deployed implementation (§211: the MNQ
+ticket's 09:30 → 16:00 window) is the right one; no change.
+
+## 234. D-series family 32 protocol: weekend gaps (S1)
+
+**No trial spent; N 872. Written and committed BEFORE any statistic is computed.** Weekend news arrives while futures are shut; the
+Sunday 18:00 reopen gaps from Friday's close. Does Monday's window follow or reverse it? Family-8 grids (owned trades): MNQ — gap =
+the night session's first price (Sunday 18:00) against Friday's day-window close (16:00); target = Monday's day window 09:30–16:00.
+MGC — gap = Sunday 18:00 against Friday's London close (11:30); target = Monday's London window 03:00–11:30. Forms: |gap| > 1 σ
+and > 2 σ (σ = SD of the previous 52 weekend gaps). **2 markets × 2 thresholds = 4 tests.** Recent-period design (§180); carried at
+net > 0 with t > 1.96 (follow or fade by the sign); validation as §207, 3 (placebo: random non-gap Mondays). Z and D tests from 109.
+
+## 235. Family-32 discovery: weekend gaps predict nothing — 0 of 4 carried (S1)
+
+**No trial spent; N 872.** `reports/d32_discovery.json`: MNQ and gold Mondays after weekend gaps beyond 1 or 2 σ: best +13.9 bps
+(t +0.37). Empty.
+
+## 236. D-series family 33 protocol: effort versus result overnight (S1)
+
+**No trial spent; N 872. Written and committed BEFORE any statistic is computed.** The family-4 segment table (owned trades, §152)
+has each night's volume ratio (to the previous 20) and return. Two states, defined in advance: **absorption** — volume ratio > 1.3
+with |overnight return| below its median (heavy trading, little movement); **thin push** — volume ratio < 0.8 with |return| above its
+median (a move on light trading). Direction = the sign of the overnight close location (where the night ended in its range) for
+absorption, and of the overnight return for the thin push; the target window (MNQ 09:30–16:00, MGC 03:00–11:30) is traded in that
+direction or against it, fixed by discovery. **2 markets × 2 states = 4 tests.** Recent-period design (§180); carried at net > 0 with
+t > 1.96; validation as §207, 3 (placebo: the same rule on random other days). Z and D market-tests from 109.
+
+## 237. Family-33 discovery: effort versus result predicts nothing usable — 0 of 4 carried (S1)
+
+**No trial spent; N 872.** `reports/d33_discovery.json`: MNQ absorption nights (fade the close location) +24.6 bps, t +1.90, n 89 —
+below the bar; thin push and both gold states ~0. Empty.
+
+## 238. D-series family 34 protocol: failed and accepted breaks of the prior session's range (S1)
+
+**No trial spent; N 872. Written and committed BEFORE any statistic is computed.** Family-8 minute grids (closes). For each target
+session (MNQ day 09:30–16:00; MGC London 03:00–11:30), the reference range is the previous target session's high/low close, and the
+excursion window is the session before the target (MNQ night 18:00–09:30; MGC Asia 18:00–03:00), same contract at both ends required.
+**Failed break**: the excursion traded beyond one side of the reference range but its last close is back inside (direction = the side
+broken). **Accepted break**: its last close is beyond the range (direction = that side). Days breaking both sides are excluded. The
+target session is traded open→close in the direction or against it, fixed by discovery. **2 markets × 2 states = 4 tests.**
+Recent-period design (§180), costs §180; carried at net > 0 with t > 1.96; validation as §207, 3. Z and D market-tests from 109.
+
+## 239. Family-34 discovery: prior-range breaks predict nothing — 0 of 4 carried (S1)
+
+**No trial spent; N 872.** `reports/d34_discovery.json`: failed breaks faded +7.4 bps (MNQ, t +1.07) and +6.2 bps (gold, t +1.48);
+accepted breaks ~0. Empty.
+
+## 240. D-series family 35 protocol: signed jump variation (S1)
+
+**No trial spent; N 872. Written and committed BEFORE any statistic is computed.** From each target session's 1-minute close-to-close
+returns (family-8 grids, same contract only): SJ = (Σ r² over r > 0 − Σ r² over r < 0) / Σ r². Signal for session D = sign of SJ on
+session D−1 (same window: MNQ day 09:30–16:00, MGC London 03:00–11:30); session D traded open→close, follow or fade fixed by
+discovery. Forms: **all** days, and **strong** (|SJ| above its discovery median). **2 markets × 2 forms = 4 tests.** Recent-period
+design (§180); costs §180; carried at net > 0, t > 1.96; validation as §207, 3. Z and D market-tests from 109.
+
+## 241. Family-35 discovery: signed jump variation predicts nothing — 0 of 4 carried (S1)
+
+**No trial spent; N 872.** `reports/d35_discovery.json`: MNQ fade, all days +5.8 bps (t +1.66); strong +3.7 (t +0.76); gold ~0. Empty.
+
+## 242. D-series family 36 protocol: the open against the prior session's VWAP (S1)
+
+**No trial spent; N 872. Written and committed BEFORE any statistic is computed.** Prior target session's VWAP from the family-8 grids
+(closes × volume, same contract as the target's open required). Signal = sign(target open − prior VWAP); target session open→close
+(MNQ day, MGC London), follow or fade fixed by discovery. Forms: **all**, **strong** (|distance| in bps above its discovery median).
+**2 × 2 = 4 tests.** Recent-period design (§180); costs §180; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 243. Family-36 discovery: the open against prior VWAP predicts nothing — 0 of 4 carried (S1)
+
+**No trial spent; N 872.** `reports/d36_discovery.json`: best +1.8 bps (t +0.32). Empty.
+
+## 244. D-series family 37 protocol: the plan's foreign windows after a US-session shock (S1)
+
+**No trial spent; N 872. Written and committed BEFORE any statistic is computed.** Family 24's design (§207) never had the two
+foreign plan products as targets. Targets: the NKD Tokyo window 09:00–15:00 and the FDXM Xetra window 09:00–17:30 (A21's HistData
+window paths; their within-era drift removal is kept — it only centres the target). Both windows open after the US session of the
+previous weekday has closed, so the predictor (a shock on that weekday: |Yahoo daily return| > 2 × SD of the previous 60, the
+family-24 definition) is known before entry. **Predictors: all 14 family-10 markets; 14 × 2 = 28 tests.** Follow or fade fixed by
+discovery; costs §180 (NKD 0.2, DAX 0.3 bps). Recent-period design (§180); carried at net > 0, t > 1.96; validation as §207, 3. ~1.4
+carried expected by chance — the validation is the filter.
+
+## 245. Family-37 discovery: NKD and DAX after US shocks — 0 of 28 carried (S1)
+
+**No trial spent; N 872.** `reports/d37_discovery.json`: best DAX after a ZN shock, follow, +25.9 bps (t +1.87), n 79; NKD after a ZN
+shock, follow, +15.5 (t +1.61). Both point the same way as the confirmed D68 (MNQ follows a ZN shock) but neither clears the bar, and
+no pooled test is formed after seeing them. Recorded as consistent with D68, not as evidence. Empty.
+
+## 246. D-series family 38 protocol: the volatility index (S1)
+
+**No trial spent; N 872. Written and committed BEFORE any statistic is computed.** First use of the VIX in the programme (Yahoo ^VIX,
+^VIX3M daily closes, 16:15 ET). Signals on day D−1, known before both targets open (MNQ day 09:30–16:00 on D; MGC London 03:00–11:30
+on D): **A shock** — |log VIX change| > 2 × SD of the previous 60; direction = sign of the change; follow/fade fixed by discovery.
+**B inversion** — VIX close > VIX3M close; **C elevated** — VIX close ≥ 1.25 × its previous-20 mean; B and C trade the target long or
+short (fixed by discovery) on those days only, judged on the DEMEANED target return (discovery-window mean removed) so that drift is
+not carried. **3 signals × 2 targets = 6 tests.** Costs §180; recent-period design (§180); carried at net > 0, t > 1.96; validation as
+§207, 3 (placebo: random other days).
+
+## 247. Family-38 discovery: the VIX predicts nothing usable — 0 of 6 carried (S1)
+
+**No trial spent; N 872.** `reports/d38_discovery.json`: MNQ follows a VIX shock +23.3 bps (t +1.36, n 75); elevated-VIX short +18.2
+(t +0.95); inversion and every gold test ~0. Empty.
+
+## 248. D-series family 39 protocol: shocks in markets new to the programme (S1)
+
+**No trial spent; N 872. Written and committed BEFORE any statistic is computed.** D68 (a 10-year shock leads MNQ) is the strongest
+confirmed rule; family 24 used only four predictors from the 14-market universe. New predictors (Yahoo daily, open→close, family-10
+outlier filter): **ZT=F** (2-year), **ZB=F** (30-year), **DX-Y.NYB** (dollar index), **HYG** (high-yield credit, 16:00 close),
+**BTC-USD** (dated by its UTC day, which ends 20:00 ET — before both targets open). Shock on the previous weekday: |return| > 2 × SD of
+the previous 60 (family 24). Targets: MNQ day 09:30–16:00 and MGC London 03:00–11:30 (family-8 grids), follow or fade fixed by
+discovery. **5 × 2 = 10 tests.** Costs §180; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 249. Family-39 discovery: shocks in five new markets — 0 of 10 carried (S1)
+
+**No trial spent; N 872.** `reports/d39_discovery.json`: best MNQ fades a bitcoin shock +31.0 bps (t +1.64, n 73); MNQ follows a
+2-year shock +21.9 (t +1.44). Empty.
+
+## 250. D-series family 40 protocol: the day after the weekly energy inventory reports (S1)
+
+**No trial spent; N 872. Written and committed BEFORE any statistic is computed.** EIA crude stocks are released Wednesdays 10:30 ET
+and natural-gas storage Thursdays 10:30 ET (holiday-shifted weeks are not adjusted — they dilute, not bias). Release-day move = the
+Yahoo daily open→settlement bar of that weekday (family-10 series, which contains the release); target = the next weekday's bar,
+follow or fade fixed by discovery. **CL: Wednesday → Thursday; NG: Thursday → Friday; forms all and strong (|release-day| above its
+discovery median) — 4 tests.** Costs §177 (CL 0.7, NG 1.4 bps); recent-period design (§180); carried at net > 0, t > 1.96; validation
+as §207, 3 (placebo: the same rule on the other weekdays).
+
+## 251. Family-40 discovery: energy inventory days — 0 of 4 carried (S1)
+
+**No trial spent; N 872.** `reports/d40_discovery.json`: best NG strong-Thursday fade +35.5 bps (t +1.26, n 122); CL ~0. Empty.
+
+## 252. D-series family 41 protocol: the London 16:00 FX fix (S1)
+
+**No trial spent; N 872. Written and committed BEFORE any statistic is computed.** The WM/Reuters benchmark fix (16:00 London) concentrates
+hedging and rebalancing flow in a window around it; a move into the fix may unwind, or continue, afterwards. HistData minute bars
+(corrected New York clock, §140) converted to London time. Pre-fix move = close at 16:00 vs close at 15:30 London (last bar at or before
+each); target = 16:00 → 16:30, follow or fade fixed by discovery; dollar-quoted direction as the futures (USD/JPY, USD/CAD, USD/CHF
+inverted to 6J, 6C, 6S). Pairs: EUR, GBP, JPY, AUD, CAD, CHF; forms **all** and **strong** (|pre-fix| above its discovery median).
+**6 × 2 = 12 tests.** Costs §177 where listed (6E 0.3, 6J 0.5), 0.5 bps otherwise. Recent-period design (§180); carried at net > 0,
+t > 1.96; validation as §207, 3 (placebo: the same rule at 15:00 → 15:30 / 15:30 → 16:00 on random days).
+
+## 253. Family-41 discovery: the move into the London fix unwinds — 3 of 12 carried, registered D97–D99 (S1)
+
+**No trial spent yet; N 872.** `reports/d41_discovery.json` (module `reporting/d41_fix.py`). All six pairs FADE the 15:30 → 16:00 move
+over 16:00 → 16:30 (gross +0.2 to +1.9 bps) — one direction everywhere, the documented fix reversal. Carried:
+- **D97** 6B all: fade, +0.68 bps net, t +2.37, n 1294; Z and D market-test 109.
+- **D98** 6B strong: fade, +1.43 bps net, t +3.36, n 647; Z and D market-test 110.
+- **D99** 6S strong: fade, +0.99 bps net, t +2.75, n 647; Z and D market-test 111.
+
+**Before validation, the scale.** About 1 bp a day on 6B ($62,500 notional) is ~$12 a contract a day before the account's own costs;
+§177's 0.5 bps is below 6B's one tick (~0.7 bps). Even confirmed, this is a D32-sized edge: it cannot carry or protect an account.
+Validated once each by `signals/d_fix.py` (outcome injection first) because the protocol says so; the answer goes to the watchlist
+or the record, not to the bot.
+
+## 254. D97–D99 validated (t00879–t00881): the fix reversal did not survive — 0 CONFIRM (S1)
+
+**N 875.** Sealed 2023-01 → 2026-08, HistData minute bars, outcome injection recovered first (power 25–37%).
+- **D97** 6B fade, all days: **REJECT** — 840 days, −0.60 bps (t −2.01): the sign reversed; years 2 of 4.
+- **D98** 6B fade, strong: **REJECT** — 302 days, −0.77 bps (t −1.42); years 1 of 4.
+- **D99** 6S fade, strong: **WATCHLIST** — 408 days, +0.18 bps (t +0.31); placebo 0th pct; years 3 of 4. Not worth tracking:
+  a positive mean this small is below any futures round trip.
+
+The one-direction-everywhere pattern of 2018–22 was a period effect (the fix's reform after 2015 and the post-2020 shift to
+algorithmic fix execution are both plausible), not a standing edge. Family 41 is closed. Z and D market-tests reach 111.
+
+## 255. D-series family 42 protocol: D68 below the shock threshold (S1)
+
+**No trial spent; N 875. Written and committed BEFORE any statistic is computed.** D68 trades only beyond 2σ (~14 sessions a year). If
+equities absorb rate news slowly in general, moderate 10-year moves should carry the same sign, and the overlay could trade far more
+often. ZN (Yahoo daily open→settlement, family-24 SD of the previous 60) on the previous weekday, in two DISJOINT bands that exclude
+D68's own days: **1σ < |r| ≤ 2σ** and **0.5σ < |r| ≤ 1σ**. Targets: MNQ day 09:30–16:00 (family-8 grid), the DAX and NKD windows
+(A21 paths, as family 37). Follow or fade fixed by discovery. **2 bands × 3 targets = 6 tests.** Costs §180; recent-period design;
+carried at net > 0, t > 1.96; validation as §207, 3 (placebo: days with |r| ≤ 0.5σ).
+
+## 256. Family-42 discovery: D68 does not extend below 2σ — 0 of 6 carried (S1)
+
+**No trial spent; N 875.** `reports/d42_discovery.json`: MNQ after 1–2σ ZN moves +0.8 bps (t +0.11), after 0.5–1σ +3.0 (t +0.44);
+DAX even fades moderate moves (t +1.60 for the fade). The 10-year effect is a tail phenomenon only; D68 stays as deployed. Empty.
+
+## 257. A29 design: contracts sized to a volatility forecast (S8)
+
+**A COMPUTATION; zero edge; no trial; N 875. Variants fixed BEFORE any result.** The plan's brackets are dollars set by the account's
+state and its contract count never changes, so a quiet day ends at the window close with little decided and a wild one hits a
+bracket in minutes. Direction is not predictable; volatility is. Per session d: R = the window's per-contract range (max high −
+min low of its path), forecast F_d = mean R over the previous 20 sessions, reference = median F over the previous 250 (causal);
+n_d = round(n × reference / F_d) clipped. Variants: **plan** (n fixed); **V1** clip [1, 2n]; **V2** clip [1, n] (only ever smaller);
+**V3** the inverse, n × F_d / reference, clip [1, 2n] (direction check). A23 engine (it reproduces the live engine; `nvec` added,
+default path unchanged and re-checked), 50K Daily, live sizes, both histories, every start, 84 days; books of the five live markets.
+Adopt only if V1 or V2 beats the plan on the five-account book in BOTH histories on mean net and P(net > 0).
+
+## 258. A29 result: volatility-sized contracts do not beat the plan — not adopted (S8)
+
+**No trial; N 875.** `reports/a29_book.json`, five live markets, 50K Daily, every start, 84 days:
+
+| book | 2016–20 mean / P(net>0) / p10 | 2021–26 mean / P(net>0) / p10 |
+|---|---|---|
+| plan | +8,023 / 92% / +259 | +9,468 / 93% / +1,748 |
+| V1 (ref/F, [1, 2n]) | +8,268 / 88% / −140 | +10,569 / 93% / +1,237 |
+| V2 (ref/F, [1, n]) | +7,246 / 89% / −272 | +8,671 / 93% / +1,286 |
+| V3 (F/ref, [1, 2n]) | +7,406 / 90% / −75 | +9,517 / 91% / +285 |
+
+V1 raises the mean in both histories but lowers P(net > 0) in 2016–20 and the 10th percentile in both, so it fails §257's rule.
+Per market the sign flips between histories (MNQ +$778 in 2021–26, −$531 in 2010–20; crude worse in both), which is what a
+zero-edge reshuffle of variance looks like. The fixed-contract plan stays. `a23.replay(nvec=...)` is kept for later sizing questions.
+
+## 259. D-series family 43 protocol: gold's Asia session as a target (S1)
+
+**No trial spent; N 875. Written and committed BEFORE any statistic is computed.** No family has traded gold's Asia session (18:00 →
+03:00 ET, family-8 grid, dated by its end day D). Predictors finished before it opens, on the previous weekday: **gold's London window**
+(03:00–11:30) and **MNQ's day session** (09:30–16:00), each open→close on its own grid. Target open→close, same contract; follow or
+fade fixed by discovery; forms **all** and **strong** (|predictor| above its discovery median). **2 × 2 = 4 tests.** Cost MGC 0.8 bps;
+recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 260. Family-43 discovery: gold's Asia session — 0 of 4 carried (S1)
+
+**No trial spent; N 875.** `reports/d43_discovery.json`: best follows MNQ's day, +1.2 bps (t +1.12). Asia gold barely moves. Empty.
+
+## 261. D-series family 44 protocol: Europe's pre-US move against MNQ's (S1)
+
+**No trial spent; N 875. Written and committed BEFORE any statistic is computed.** If US index futures under-react to Europe's morning,
+the gap closes in the US session. Divergence on day D = DAX (HistData grxeur, corrected clock) 03:00 → 09:30 ET return minus MNQ's
+(night grid) over the same span, in bps. Target: MNQ day 09:30–16:00 on D, in the sign of the divergence or against it (fixed by
+discovery). Forms **all** and **strong** (|divergence| above its discovery median). **2 tests.** Cost MNQ 0.5 bps; recent-period design;
+carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 262. Family-44 discovery: Europe's pre-US divergence — 0 of 2 carried (S1)
+
+**No trial spent; N 875.** `reports/d44_discovery.json`: MNQ moves with the divergence +2.6 bps (t +0.75), strong +6.6 (t +1.20). Empty.
+
+## 263. D-series family 45 protocol: bitcoin's weekend into Monday (S1)
+
+**No trial spent; N 875. Written and committed BEFORE any statistic is computed.** Bitcoin is the one large risk asset that trades
+through the weekend. Weekend move = the sum of BTC-USD's Saturday and Sunday UTC daily open→close returns (Yahoo; ends 20:00 ET Sunday,
+before both targets open). Targets on Monday: MNQ day 09:30–16:00 and MGC London 03:00–11:30 (family-8 grids), follow or fade fixed
+by discovery; forms **all** and **strong** (|weekend| above its discovery median). **2 × 2 = 4 tests.** Costs §180; recent-period
+design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 264. Family-45 discovery: bitcoin's weekend predicts nothing on Monday — 0 of 4 carried (S1)
+
+**No trial spent; N 875.** `reports/d45_discovery.json`: all |t| < 0.5. Empty.
+
+## 265. D-series family 46 protocol: intraday breaks of the prior session's range (S1)
+
+**No trial spent; N 875. Written and committed BEFORE any statistic is computed.** Family 34 tested breaks made overnight; this tests
+them inside the target session (MNQ day; MGC London), family-8 grids, prior session's high/low close on the same contract. The FIRST
+minute (after the first 5) whose close is beyond either side defines the event; one per session. **Break**: enter at that minute's
+close, with the break or against it (fixed by discovery), exit at the session close. **Sweep**: the price is back inside the range
+within 15 minutes of the break — enter at that minute's close against the break's side (or with it, fixed by discovery), exit at the
+close. **2 markets × 2 forms = 4 tests.** Costs §180; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 266. Family-46 discovery: intraday range breaks and sweeps — 0 of 4 carried (S1)
+
+**No trial spent; N 875.** `reports/d46_discovery.json`: MNQ with the break +2.6 bps (t +0.78); gold sweep fade +4.6 (t +1.48). Empty.
+
+## 267. D-series family 47 protocol: the morning sets the afternoon (S1)
+
+**No trial spent; N 875. Written and committed BEFORE any statistic is computed.** Family 16 tested only the last 30 minutes. Here the
+whole afternoon: MNQ 09:30 → 12:00 predicts 13:00 → 16:00; gold (London grid) 03:00 → 07:00 predicts 08:30 → 11:30 (after the
+08:30 releases). Prices at those minutes, same contract; follow or fade fixed by discovery; forms **all** and **strong** (|morning|
+above its discovery median). **2 × 2 = 4 tests.** Costs §180; recent-period design; carried at net > 0, t > 1.96; validation §207, 3.
+
+## 268. Family-47 discovery: the morning does not set the afternoon — 0 of 4 carried (S1)
+
+**No trial spent; N 875.** `reports/d47_discovery.json`: MNQ follow +4.0 bps (t +1.81), strong +4.6 (t +1.28); gold ~0. Empty.
+
+## 269. D-series family 48 protocol: drift after the 10:00 ET releases (S1)
+
+**No trial spent; N 875. Written and committed BEFORE any statistic is computed.** Family 9 (§168) covered 08:30 and 14:00 only.
+10:00 ET carries ISM, consumer confidence, home sales, JOLTS. Release days detected as family 9: 5-minute volume from 10:00 above 3 ×
+its previous-20 median. The first k minutes (k = 5, 15) from 09:59's close predict 10:00+k → the window's close (MNQ day grid to
+16:00; gold London grid to 11:30), follow or fade fixed by discovery. **2 markets × 2 k = 4 tests.** Costs §180; recent-period design;
+carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 270. Family-48 discovery: 10:00 releases — 0 of 4 carried; the MNQ half is uninformative (S1)
+
+**No trial spent; N 875.** `reports/d48_discovery.json`: gold, 68 detected release days, follow +6.9 / +6.5 bps (t +1.48 / +1.77).
+MNQ: the volume detector found only **8** days in five years — 10:00 volume sits inside the opening half hour's, so 3 × the median is
+rarely reached. That half tests nothing; it is NOT re-tuned after the fact (a release calendar would be needed). Empty.
+
+## 271. D-series family 49 protocol: follow or fade the morning by the recent intraday regime (S1)
+
+**No trial spent; N 875. Written and committed BEFORE any statistic is computed.** Family 47 asked one fixed direction of all days. Here
+the direction adapts: variance ratio VR = var(30-minute returns) / (6 × var(5-minute returns)) within each session, averaged over the
+previous 20 sessions (same contract within each return). Rule: trade the afternoon (family 47's windows) in sign(morning) × sign(VR − 1)
+— follow after trending weeks, fade after mean-reverting ones. Also **inverse** (the opposite sign) is not a separate test: the
+direction of the whole rule is fixed by discovery as usual. **2 markets = 2 tests.** Costs §180; recent-period design; carried at
+net > 0, t > 1.96; validation as §207, 3.
+
+## 272. Family-49 discovery: 1 of 2 carried — MNQ's afternoon follows the morning unless the weeks have trended; D100 registered (S1)
+
+**No trial spent yet; N 875.** `reports/d49_discovery.json` (module `reporting/d49_vr.py`). MNQ: the rule's INVERSE carried —
+afternoon in sign(morning) × −sign(VR − 1): +4.63 bps a session net, t +2.11, n 1270. Gold −0.6 (t −0.37).
+
+**Read honestly.** VR < 1 on 90% of sessions, so the rule is mostly "follow the morning" — family 47's near-miss (+4.0, t +1.81) —
+with a fade after trending weeks. It shares its data with family 47; the validation reports always-follow beside it so the regime
+part's own contribution is visible. **Placebo (fixed now):** the same rule with the VR series rolled by a random 60+ sessions, 1000
+draws. Registry ids widened to three digits (tests/test_registry_consistency.py) — the D-series reached D100. Z and D market-test 112.
+
+**Scale, before validation.** +4.6 bps on MNQ (~$40,000 notional) is ~$18 a contract a session; at the plan's 4 contracts ~$75 a
+session, ~$6,000 over an 84-session account — the first discovery cell large enough to matter to an account if it held.
+
+## 273. D100 validated (t00882): WATCHLIST — the regime adds nothing; the afternoon edge shrank to noise (S1)
+
+**N 876.** Sealed 2023-01 → 2026-08, 928 sessions, injection recovered first (power 28%): net **+1.73 bps**
+(t +0.86); placebo (regime rolled) **54th** pct — the VR switch is no better than a random one; years 3 of 4
+(2023 −2.0, 2024 +1.3, 2025 +5.8, 2026 +1.8). Positive mean → WATCHLIST, but nothing here to trade: what remains is a small,
+insignificant "follow the morning" tilt. Not deployed. Z and D market-test 112.
+
+## 274. D-series family 50 protocol: the LBMA gold auctions (S1)
+
+**No trial spent; N 876. Written and committed BEFORE any statistic is computed.** The LBMA gold price is set by auction at 10:30 and
+15:00 London; hedging and benchmark flow concentrates into it, as at the FX fix (family 41). Owned MGC trades (family-8 London grid,
+03:00–11:30 ET); auction times converted to New York per day (London/New York DST offsets differ for a few weeks a year). Pre-move =
+the 30 minutes into the auction; target = the 30 minutes after, follow or fade fixed by discovery, same contract. Forms **all** and
+**strong** (|pre-move| above its discovery median). **2 auctions × 2 forms = 4 tests.** Cost MGC 0.8 bps; recent-period design;
+carried at net > 0, t > 1.96; validation as §207, 3 (placebo: the same rule one hour earlier).
+
+## 275. Family-50 discovery: the LBMA gold auctions — 0 of 4 carried (S1)
+
+**No trial spent; N 876.** `reports/d50_discovery.json`: gross moves after either auction are +0.2 to +0.8 bps, below gold's 0.8 bps
+cost; every net is ≤ 0. Empty.
+
+## 276. D-series family 51 protocol: MNQ's night session as a target (S1)
+
+**No trial spent; N 876. Written and committed BEFORE any statistic is computed.** The plan trades MNQ's day; the night (18:00 → 09:30,
+family-8 grid, dated by its end day) has not been a target. Predictors from the preceding day session (09:30–16:00): its whole
+return, and its last hour (15:00 → 16:00). Target open→close of the night, same contract as the predictor's end; follow or fade fixed
+by discovery; forms **all** and **strong** (above the discovery median). **2 × 2 = 4 tests.** Cost MNQ 0.5 bps; recent-period design;
+carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 277. Family-51 discovery: MNQ's night after the day — 0 of 4 carried (S1)
+
+**No trial spent; N 876.** `reports/d51_discovery.json`: fading a strong last hour +6.6 bps (t +1.67); the day's return predicts
+nothing. Empty.
+
+## 278. D-series family 52 protocol: the opening print (S1)
+
+**No trial spent; N 876. Written and committed BEFORE any statistic is computed.** The first minute after a pit-era open carries the
+opening imbalance. MNQ: 09:30 → 09:31 (day grid); gold: 08:20 → 08:21 (COMEX open, London grid). Target: the next minute's close →
+the window's close (16:00 / 11:30), follow or fade fixed by discovery, same contract. Forms **all** and **heavy** (that minute's volume
+above 2 × its previous-20 median). **2 × 2 = 4 tests.** Costs §180; recent-period design; carried at net > 0, t > 1.96; validation
+as §207, 3.
+
+## 279. Family-52 discovery: 1 of 4 carried — MNQ's day follows its opening minute; D101 registered (S1)
+
+**No trial spent yet; N 876.** `reports/d52_discovery.json` (module `reporting/d52_open.py`): MNQ, all sessions, follow the
+09:30 → 09:31 move to 16:00: **+9.59 bps** net, t +2.73, n 1257. Heavy-volume form n 29 only (t +1.34);
+gold's COMEX-open minute +1.1 / +4.3 (t +0.67 / +1.10). Entry at the 09:31 close, signal from the night grid's 09:30:00 close to
+it — no look-ahead. **Placebo (fixed now):** first-minute signs shuffled across the sealed sessions (keeps drift, breaks the
+link), 1000 draws. Scale: +9.6 bps on ~$40,000 notional ≈ $38 a contract a session; at 4 contracts ~$150 — account-sized if it held.
+Z and D market-test 113.
+
+## 280. D101 validated (t00883): WATCHLIST — the opening minute adds ~0.6 bps over the plan's long (S1)
+
+**N 877.** Sealed 2023-01 → 2026-08, 926 sessions, injection recovered first (power 41%): net **+3.80 bps** (t
++1.13); placebo (shuffled signs) **91th** pct; years 3 of 4 (2023 +5.5, 2024 −0.6, 2025 +3.9, 2026 +7.8).
+The plan's always-long MNQ ticket made **+3.24** over the same sessions, so switching to the opening-minute
+direction would add ~0.6 bps — nothing. Discovery's +9.6 was 2018–22 specific. WATCHLIST by the positive mean; no action.
+Z and D market-test 113.
+
+## 281. D-series family 53 protocol: gold against the dollar before New York (S1)
+
+**No trial spent; N 877. Written and committed BEFORE any statistic is computed.** Gold is priced in dollars; a dollar move that gold
+has not matched may be closed later. Divergence = gold's 03:00 → 08:00 ET return (London grid) minus
+EUR/USD's (HistData eurusd, corrected clock) over the same span, in bps (a weaker dollar should lift both). Target: gold 08:00 → 11:30,
+against the divergence (catch-up) or with it, fixed by discovery; forms **all** and **strong** (above the discovery median). **2 tests.**
+Cost MGC 0.8 bps; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 282. Family-53 discovery: gold against the dollar before New York — 0 of 2 carried (S1)
+
+**No trial spent; N 877.** `reports/d53_discovery.json`: catch-up +1.1 bps (t +0.63 / +0.41). Empty.
+
+## 283. D-series family 54 protocol: the top of the hour (S1)
+
+**No trial spent; N 877. Written and committed BEFORE any statistic is computed.** Scheduled execution (TWAP slices, hourly
+rebalances) clusters at the top of the hour. Each full hour inside the window (MNQ 10:00–15:00 → 6 hours; gold 04:00–11:00 → 8):
+pre = :55 → :00, target = :00 → :05, follow or fade fixed by discovery, same contract; t clustered by day (family 8's statistic).
+Forms **all** and **strong** (|pre| above its discovery median). **2 markets × 2 forms = 4 tests.** Costs §180 per round trip;
+recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 284. Family-54 discovery: the top of the hour — 0 of 4 carried (S1)
+
+**No trial spent; N 877.** `reports/d54_discovery.json`: a fade exists in gross terms (gold +0.3 to +0.5 bps) but never covers the
+round trip; every net is negative. Empty.
+
+## 285. D-series family 55 protocol: the variance risk premium (S1)
+
+**No trial spent; N 877. Written and committed BEFORE any statistic is computed.** VRP on day D−1 = (VIX/100)² / 252 − the mean of
+squared MNQ day-session log returns over the previous 20 sessions (both per-day variances; VIX from family 38). Signal: VRP above its
+trailing 250-session median → one side, below → the other, fixed by discovery; the target (MNQ day; gold London on D) judged
+DEMEANED (discovery mean removed) so drift is not carried. **2 targets = 2 tests.** Costs §180; recent-period design; carried at net
+> 0, t > 1.96; validation as §207, 3.
+
+## 286. Family-55 discovery: the variance risk premium — 0 of 2 carried (S1)
+
+**No trial spent; N 877.** `reports/d55_discovery.json`: MNQ +0.5 bps (t +0.15), gold +0.1 (t +0.04). Empty.
+
+## 287. D-series family 56 protocol: the previous session's close location (S1)
+
+**No trial spent; N 877. Written and committed BEFORE any statistic is computed.** CLV = (close − low) / (high − low) of the previous
+target session's minute closes (MNQ day; gold London), same contract as the next session's open. Signal sign(CLV − 0.5); the next
+session open→close traded with it or against it, fixed by discovery. Forms **all** and **extreme** (CLV > 0.85 or < 0.15). **2 × 2 =
+4 tests.** Costs §180; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 288. Family-56 discovery: the previous close location — 0 of 4 carried (S1)
+
+**No trial spent; N 877.** `reports/d56_discovery.json`: fading an extreme close +7.7 bps on MNQ (t +1.45), +4.4 on gold (t +1.41).
+Empty.
+
+## 289. D-series family 57 protocol: the newer shock predictors into the plan's other products (S1)
+
+**No trial spent; N 877. Written and committed BEFORE any statistic is computed.** Cross-asset tail shocks are the only class that has
+confirmed (D68, D84, D89). Families 38–39 tried six newer predictors only on MNQ and gold. Here: predictors **ZT, ZB, DX, HYG, BTC**
+(family 39's series) and **VIX** (family 38, log change), shock on the previous weekday as family 24 (|x| > 2 × SD of the previous
+60); targets **NKD and DAX** (A21 window paths, as family 37), **CL and ZS** (family-10 Yahoo sessions). Follow or fade fixed by
+discovery. **6 × 4 = 24 tests** (~1.2 carried by chance). Costs §177/§180 (NKD 0.2, DAX 0.3, CL 0.7, ZS 0.7); recent-period design;
+carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 290. Family-57 discovery: 1 of 24 carried (fewer than chance, ~1.2); D102 registered per protocol (S1)
+
+**No trial spent yet; N 877.** `reports/d57_discovery.json` (module `reporting/d57_newshock.py`): **D102** the DAX window fades a
+HYG shock, +27.59 bps, t +1.98, n 89. Next: NKD follows a 2-year shock +21.7 (t +1.91); DAX follows a dollar
+shock +28.6 (t +1.70). Registered as families 10, 26 and 31 did with a chance-level count; the sealed window decides. Z and D
+market-test 114.
+
+## 291. D102 validated (t00884): WATCHLIST — fails only on t, with 31 events; an untouched-period check fixed before running (S1, S8)
+
+**N 878.** Sealed 2023-01 → 2026-08, injection recovered first (power **11%** — 31 events): net **+36.56 bps** (t
++1.58 < 1.645); placebo (after non-shock days) **100th** pct; years 3 of 4 (2023 −26.8, 2024 +0.8,
+2025 +59.0, 2026 +105.4). It kept its sign and grew (discovery +27.6). WATCHLIST under §119 — not confirmed, not deployed.
+
+**A check on untouched data, fixed now (no trial; it cannot change the tier).** 2010-01 → 2017-12 has never been used by family 57.
+The same rule (HYG shock on the previous weekday, fade, 0.3 bps) on (i) A21's DAX window paths and (ii) the real index, Yahoo ^GDAXI
+daily open→close. Read: the same sign with mean > 0 on both supports forward-tracking; anything else drops it to the record.
+
+## 292. D102's untouched-period check: reversed in 2010–17 — dropped to the record, not forward-tracked (S8)
+
+**No trial; N 878.** Fixed in §291 before running. HYG shock → fade the DAX, 2010-01 → 2017-12: A21 paths **−19.6 bps** (t −1.54,
+n 111, 3 of 8 years); real index ^GDAXI **−25.0 bps (t −2.11)**, n 119, 3 of 8 years. Over 2010–26: +6.1 (t +0.69) and +0.6
+(t +0.07). The sign flips by era: no standing edge. D102 stays WATCHLIST by its trial but is not tracked.
+
+## 293. D-series family 58 protocol: MNQ's hour after the cash close (S1)
+
+**No trial spent; N 878. Written and committed BEFORE any statistic is computed.** Index futures trade on after the 16:00 cash close
+(after-hours earnings, MOC-imbalance unwinds), and the plan never trades it. New family-8 grid ("MNQ", "post"), 16:00 → 16:55 ET (ends
+before the 17:00 break; `d8_intraday.EXTRA_SESSIONS`). Predictors from the same day's session (day grid): the whole day 09:30 → 16:00,
+and the last 10 minutes 15:50 → 16:00. Target 16:00 → 16:55 (open of the post grid's first minute to its last close), same contract;
+follow or fade fixed by discovery; forms **all** and **strong** (above the discovery median). **2 × 2 = 4 tests.** Cost MNQ 0.5 bps;
+recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 294. Family-58 discovery: MNQ's hour after the close — 0 of 4 carried (S1)
+
+**No trial spent; N 878.** `reports/d58_discovery.json`: following the last 10 minutes +1.3 / +1.7 bps (t +1.55 / +1.33); the day's
+move predicts nothing. Empty.
+
+## 295. D-series family 59 protocol: the post-close hour as a predictor (S1)
+
+**No trial spent; N 878. Written and committed BEFORE any statistic is computed.** After-hours earnings land in 16:00 → 16:55 (family-58
+grid). Its return (day close at 16:00 → 16:55) predicts **the night** (18:00 → 09:30, dated the next weekday) and **the next day
+session** (09:30 → 16:00); follow or fade fixed by discovery; forms **all** and **strong** (above the discovery median). Same contract
+at both ends of each target. **2 targets × 2 forms = 4 tests.** Cost MNQ 0.5 bps; recent-period design; carried at net > 0, t > 1.96;
+validation as §207, 3.
+
+## 296. Family-59 discovery: the post-close hour predicts neither the night nor the next day — 0 of 4 carried (S1)
+
+**No trial spent; N 878.** `reports/d59_discovery.json`: best follows a strong post-close move into the next day +6.9 bps (t +1.21).
+Empty.
+
+## 297. D-series family 60 protocol: the 200-day average as the direction (S1)
+
+**No trial spent; N 878. Written and committed BEFORE any statistic is computed.** Family 18 used 5- and 20-session trends. Here the
+long regime: the previous weekday's Yahoo settlement (NQ=F, GC=F, family-10 universe bars) above or below its 200-session mean →
+long or short the plan window on D (MNQ day; gold London; family-8 grids), JUDGED DEMEANED (discovery-window mean removed) so drift is
+not carried; the sign of the rule fixed by discovery. **2 tests.** Costs §180; recent-period design; carried at net > 0, t > 1.96;
+validation as §207, 3.
+
+## 298. Family-60 discovery: the 200-day regime — 0 of 2 carried (S1)
+
+**No trial spent; N 878.** `reports/d60_discovery.json`: MNQ −0.0 bps (t −0.01), gold +1.9 (t +0.91), demeaned. Empty.
+
+## 299. D-series family 61 protocol: Treasury auction demand (S1)
+
+**No trial spent; N 878. Written and committed BEFORE any data is fetched or any statistic computed.** New data: TreasuryDirect's
+public auction results (`TA_WS/securities/search`), every Note and Bond auction (2, 3, 5, 7, 10, 20, 30 years; reopenings grouped by
+the rounded original term; TIPS and FRNs excluded), results at ~13:00 ET. A weak auction is a timed rates shock — D68's class.
+Demand measures, each as a z-score against the previous 6 auctions of the same term: **dealer share** (primaryDealerAccepted /
+competitiveAccepted; high = weak) and **bid-to-cover** (low = weak). Event = |z| > 1, direction = weak (+1) or strong (−1).
+Targets: **MNQ 13:01 → 16:00 the same day** (day grid) and **MNQ's next day session** 09:30 → 16:00; with or against, fixed by
+discovery. **2 measures × 2 targets = 4 tests.** Cost MNQ 0.5 bps; recent-period design; carried at net > 0, t > 1.96; validation
+as §207, 3 (placebo: |z| ≤ 1 auctions).
+
+## 300. Family-61 discovery: Treasury auction demand — 0 of 4 carried (S1)
+
+**No trial spent; N 878.** 1,357 note and bond auctions fetched (2009 → 2026; `data/cache/treasury_auctions.json`, not committed —
+regenerable from the public API). `reports/d61_discovery.json`: after a weak auction by dealer share, MNQ's afternoon falls the
+sensible way, +9.9 bps short (t +1.38, n 154); next day +7.2 (t +0.67); bid-to-cover weaker still. Empty.
+
+## 301. D-series family 62 protocol: Treasury auction demand into the other plan targets (S1)
+
+**No trial spent; N 878. Written and committed BEFORE any statistic is computed.** Family 61's events (both measures, |z| > 1) on
+auction day D. Targets, all opening after the 13:00 result: **gold's London window** on the next weekday (family-8 grid), **ZN's next
+session** (family-10 Yahoo bar), **NKD** and **DAX** windows on the next weekday (A21 paths). With or against the weak side, fixed by
+discovery. **2 measures × 4 targets = 8 tests.** Costs §177/§180 (MGC 0.8, ZN 0.4, NKD 0.2, DAX 0.3); recent-period design; carried at
+net > 0, t > 1.96; validation as §207, 3.
+
+## 302. Family-62 discovery: auction demand into gold, ZN, NKD, DAX — 0 of 8 carried (S1)
+
+**No trial spent; N 878.** `reports/d62_discovery.json`: best DAX short after a weak auction +14.6 bps (t +1.79); ZN itself does not
+move after its own auctions (t +0.30 / +0.05) — the result is priced by the close. Empty.
+
+## 303. D-series family 63 protocol: real-yield and breakeven shocks (S1)
+
+**No trial spent; N 878. Written and committed BEFORE any statistic is computed.** New data: FRED daily **DFII10** (10-year TIPS real
+yield) and **T10YIE** (10-year breakeven inflation), end-of-day values from that day's closing prices (fredgraph CSV; the high-yield
+OAS series only reaches back to 2023 there and is excluded). Change in bps on day D; shock = |change| > 2 × SD of the previous 60.
+Targets on the next weekday: **gold's London window** and **MNQ's day session** (family-8 grids), with or against the shock's sign,
+fixed by discovery. **2 × 2 = 4 tests.** Costs §180; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+(Deployment note for later: a live version needs those closing values by 03:00 ET — a market proxy, not FRED's publication.)
+
+## 304. Family-63 discovery: 1 of 4 carried — gold moves against a real-yield shock; D103 registered (S1)
+
+**No trial spent yet; N 878.** `reports/d63_discovery.json` (module `reporting/d63_realyield.py`): **D103** gold's next London window
+against a DFII10 shock, **+31.56 bps**, t +2.22, n 71. The sign is the textbook one (gold falls when real
+yields jump). MNQ +13.7 (t +0.85); breakeven shocks ~0. Z and D market-test 115.
+
+**Fixed now, before the trial:** (i) the sealed validation as §207, 3; (ii) whatever its tier, the untouched-period check §291
+introduced — 2010-01 → 2017-12 (never used by family 63) on the owned MGC London grid and on Yahoo GC=F daily sessions — the same
+sign with mean > 0 on both is required before anything is forward-tracked or proposed. (iii) Scale if it held: ~14 events a year;
++30 bps on gold's ~$4,000 × 10 oz ≈ $40,000 MGC notional is ~$120 a contract per event, ~$950 at the plan's 8 contracts.
+
+## 305. D103 validated (t00885): REJECT — gold stopped answering real yields after 2022 (S1, S8)
+
+**N 879.** Sealed 2023-01 → 2026-08, 42 events, injection recovered first (power 31%): net **-11.08 bps** (t
+-0.61); placebo **21th** pct; years 2 of 4 (2023 +2.5, 2024 +0.4, 2025 −41.0, 2026 −25.4). The
+pre-committed 2010–17 check (§304): MGC London +2.7 (t +0.32, 5 of 8 years); GC=F daily sessions −6.5 (t −0.67). So the effect was a
+2018–22 phenomenon: the gold/real-yield link that held then broke as central-bank buying took over the gold price from 2022. Closed.
+Z and D market-test 115.
+
+## 306. D-series family 64 protocol: platinum shocks; and a descriptive 2010–17 column from here on (S1)
+
+**No trial spent; N 879. Written and committed BEFORE any statistic is computed.** Platinum (Yahoo PL=F daily, family-10 outlier filter) has not been a predictor. *Amended before any statistic
+existed: Yahoo's PL=F has no session open (open = close), so its return is settlement → settlement.* Shock on the previous weekday as family 24 → gold's London window and MNQ's day
+session (family-8 grids), follow or fade fixed by discovery. **2 tests.** Costs §180; recent-period design; carried at net > 0,
+t > 1.96; validation as §207, 3.
+
+**Descriptive only (does not change carrying):** every carried test since §252 (D97–D103) failed out of sample, and the two checked
+on 2010–17 were flat or reversed. From this family on, each scan also prints the same rule on 2010-01 → 2017-12 beside the discovery
+result, so a carried test's history is visible before a trial is spent. The carrying rule (§119, §133) is unchanged.
+
+## 307. Family-64 discovery: platinum shocks — 0 of 2 carried (S1)
+
+**No trial spent; N 879.** `reports/d64_discovery.json`: gold fades +6.9 bps (t +0.75; 2010–17 −5.9), MNQ +0.3 (t +0.02). Empty.
+
+## 308. D-series family 65 protocol: the foreign windows' morning sets their afternoon (S1)
+
+**No trial spent; N 879. Written and committed BEFORE any statistic is computed.** Family 47 for the two foreign plan products. Tokyo's
+cash market breaks for lunch (11:30–12:30), so the Nikkei's day has two sessions. NKD: 09:00 → 11:30 Tokyo predicts 12:30 → 15:00;
+DAX: 09:00 → 12:00 Berlin predicts 13:00 → 17:30 (HistData via `d3.histdata`, corrected clock, local times). Follow or fade fixed by
+discovery; forms **all** and **strong** (above the discovery median). **2 × 2 = 4 tests**, with the descriptive 2010–17 column (§306).
+Costs §180 (NKD 0.2, DAX 0.3); recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 309. Family-65 discovery: the foreign windows' morning — 0 of 4 carried (S1)
+
+**No trial spent; N 879.** `reports/d65_discovery.json`: NKD follows a strong morning +1.5 bps (t +0.78; 2010–17 +4.6, t +2.19 —
+an older effect that has faded); DAX +4.8 (t +1.47; 2010–17 0.0). Empty.
+
+## 310. D-series family 66 protocol: the Tokyo fix on gotobi days (S1)
+
+**No trial spent; N 879. Written and committed BEFORE any statistic is computed.** Japanese importers settle on "gotobi" days (the
+5th, 10th, 15th, 20th, 25th and the month's last day; a weekend date moves to the previous weekday) and buy dollars at the 09:55 Tokyo
+fix. HistData usdjpy (from 2016; corrected clock) at Tokyo times. **Pre**: 08:00 → 09:55; **post**: 09:55 → 12:00. Each traded on
+gotobi days only, in 6J's direction (long 6J = short USD/JPY), side fixed by discovery. **2 tests.** Non-gotobi days shown beside
+(descriptive) and are the validation placebo. Cost 6J 0.5 bps; recent-period design; carried at net > 0, t > 1.96; §306's
+descriptive early column covers 2016–17 only.
+
+## 311. Family-66 discovery: 1 of 2 carried — the yen recovers after the gotobi fix; D104 registered (S1)
+
+**No trial spent yet; N 879.** `reports/d66_discovery.json` (module `reporting/d66_gotobi.py`): **D104** long 6J 09:55 → 12:00 Tokyo
+on gotobi days, **+1.70 bps**, t +2.69, n 359; the same window on other days +0.34; 2016–17
++5.01 (t +1.65) — the mechanism's sign in both periods. The run-up (08:00 → 09:55) +0.8 (t +1.04). Scale,
+before validation: ~1.7 bps on 6J's ~$85,000 is ~$14 a contract, ~70 times a year — a D32-sized edge; it would not carry an account.
+Z and D market-test 116.
+
+## 312. D104 validated (t00886): WATCHLIST — the gotobi reversal replicated in size, failing only on years (S1)
+
+**N 880.** Sealed 2023-01 → 2026-08, 249 gotobi days, injection recovered first (power 22%): net **+1.78 bps**
+(t +1.74 > 1.645 ✓); placebo (non-gotobi days, same window, -1.64) **100th** pct ✓;
+years **2 of 4** ✗ (2023 −1.08, 2024 +3.80, 2025 +3.41, 2026 −0.32, eight months). The size matched discovery (+1.70) and the
+gotobi-specific difference is ~3.4 bps — the most robust replication in the D-series since D68 — but under §119 it is WATCHLIST.
+
+**Usability, regardless of tier:** ~$15 a 6J contract per trade, ~70 trades a year (~$1,000 a contract a year); 6J is not one of the
+plan's products, and a standalone 50K evaluation ($3,000 target) would take years. Forward-tracked on the watchlist (§133): the next
+gotobi days' 09:55 → 12:00 6J moves can be logged at no cost. Not deployed. Z and D market-test 116.
+
+## 313. D-series family 67 protocol: the Shanghai Gold Exchange benchmark auctions (S1)
+
+**No trial spent; N 880. Written and committed BEFORE any statistic is computed.** The one robust recent replication (D104) is a
+scheduled-flow effect at a fix. The Shanghai gold benchmark is set by auction at 10:15 and 14:15 Beijing (no DST; 22:15 / 02:15 ET in
+summer, 21:15 / 01:15 in winter) — inside gold's Asia session (owned MGC trades, family-8 grid). Pre = the 30 minutes into the auction,
+target = the 30 minutes after, follow or fade fixed by discovery, same contract; forms **all** and **strong** (|pre| above its discovery
+median). **2 × 2 = 4 tests**, with the descriptive 2010–17 column (§306; the SGE benchmark began April 2016, so 2016–17 only). Cost
+MGC 0.8 bps; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3 (placebo: the same rule one hour earlier).
+
+## 314. Family-67 discovery: the Shanghai gold auctions — 0 of 4 carried (S1)
+
+**No trial spent; N 880.** `reports/d67_discovery.json`: gross moves around either auction are +0.1 to +0.3 bps against 0.8 bps of
+cost; every net is negative (2016–17 the same). Empty.
+
+## 315. D-series family 68 protocol: gold's New York afternoon (S1)
+
+**No trial spent; N 880. Written and committed BEFORE any statistic is computed.** New family-8 grid ("MGC", "ny"), 11:30 → 16:55 ET.
+(i) **Settlement**: COMEX gold settles on 13:28–13:30 ET trades; pre = 13:00 → 13:30, target 13:30 → 14:00, follow or fade fixed by
+discovery; forms **all** and **strong**. (ii) **Relay**: the same day's London window (03:00 → 11:30) predicts the afternoon 11:30 →
+16:55, follow or fade; forms **all** and **strong**. Same contract throughout. **4 tests**, with the descriptive 2010–17 column (§306).
+Cost MGC 0.8 bps; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 316. Family-68 discovery: gold's New York afternoon — 0 of 4 carried (S1)
+
+**No trial spent; N 880.** `reports/d68_discovery.json`: a small settlement fade (strong +0.7 bps net, t +1.29; 2010–17 +0.8, t +1.73)
+and a London→afternoon follow (+1.4, t +0.87) — consistent in sign across periods but below the bar and below cost-worthiness. Empty.
+
+## 317. D-series family 69 protocol: the Friday afternoon before the weekend (S1)
+
+**No trial spent; N 880. Written and committed BEFORE any statistic is computed.** Weekend risk is hedged on Friday afternoons. Gold:
+Friday 11:30 → 16:55 (family-68 grid); MNQ: Friday 13:00 → 16:00 (day grid). Each Friday's return minus the mean of the same window on
+Monday–Thursday in discovery (so drift and time-of-day are not credited); long or short fixed by discovery. **2 tests**, with the
+descriptive 2010–17 column (§306). Costs §180; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3 (placebo: the
+same window on other weekdays).
+
+## 318. Family-69 discovery: the Friday afternoon — 0 of 2 carried (S1)
+
+**No trial spent; N 880.** `reports/d69_discovery.json`: gold's Friday afternoon was strong in 2010–17 (+8.5 bps over other days,
+t +2.48) and is gone in 2018–22 (−0.5, t −0.20); MNQ +5.0 (t +1.11; 2010–17 −2.3). Empty.
+
+## 319. D-series family 70 protocol: the commodity index roll (S1)
+
+**No trial spent; N 880. Written and committed BEFORE any statistic is computed.** Index funds tracking the S&P GSCI roll from the
+front contract to the next on the 5th–9th business days of each month (the "Goldman roll"): selling pressure on the front month in
+those days is a documented, monthly flow. Family-10 Yahoo front-continuous sessions (open → settlement) of the GSCI's commodity
+futures in the universe: **CL, NG, HG, GC, SI, ZC, ZS, ZW**. Each roll-day session's return minus the market's mean on other days in
+discovery (not crediting drift); long or short fixed by discovery. **8 tests** (~0.4 by chance), with the descriptive 2010–17 column
+(§306). Costs §177; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3 (placebo: other business days).
+Business days = weekdays with a session in the market's own series.
+
+## 320. Family-70 discovery: the commodity index roll — 0 of 8 carried (S1)
+
+**No trial spent; N 880.** `reports/d70_discovery.json`: crude is weaker on roll days in both periods (short +15.4 bps, t +0.94;
+2010–17 +14.0, t +1.66) — the documented sign, but not significant; every other market ~0 or inconsistent. Empty.
+
+## 321. D-series family 71 protocol: the Nikkei on gotobi days (S1)
+
+**No trial spent; N 880. Written and committed BEFORE any statistic is computed.** D104's gotobi dollar demand weakens the yen into the
+09:55 Tokyo fix; a weaker yen lifts Japanese exporters. NKD (HistData jpxjpy, Tokyo times): **pre** 09:00 → 09:55 and **post** 09:55 →
+12:00 on gotobi days (family-66 calendar), each minus the same window's mean on non-gotobi days in discovery; long or short fixed by
+discovery. **2 tests**, with the descriptive 2010–17 column (§306). Cost NKD 0.2 bps; recent-period design; carried at net > 0,
+t > 1.96; validation as §207, 3 (placebo: non-gotobi days).
+
+## 322. Family-71 discovery: the Nikkei on gotobi days — 0 of 2 carried (S1)
+
+**No trial spent; N 880.** `reports/d71_discovery.json`: pre −0.1 bps (t −0.02), post +1.4 (t +0.64). The gotobi flow does not reach
+the Nikkei. Empty.
+
+## 323. D-series family 72 protocol: pinning to round strikes into the close (S1)
+
+**No trial spent; N 880. Written and committed BEFORE any statistic is computed.** Option open interest clusters at round strikes, and
+dealers' hedging can pull the underlying toward them into expiry and the close. **MNQ**: at 15:00 the NQ price's nearest multiple of
+100; trade 15:00 → 16:00 toward it (direction = sign(level − price)), or away (fixed by discovery). **Gold**: at 13:00 the nearest
+multiple of $10; trade 13:00 → 13:30 (into settlement, family-68 grid) toward or away. Only when the distance is under half the grid
+step (always true) — so all days. **2 tests**, with the descriptive 2010–17 column (§306). Costs §180; recent-period design; carried
+at net > 0, t > 1.96; validation as §207, 3 (placebo: a level grid shifted by half a step).
+
+## 324. Family-72 discovery: pinning to round strikes — 0 of 2 carried (S1)
+
+**No trial spent; N 880.** `reports/d72_discovery.json`: MNQ toward the 100-point level +1.1 bps (t +0.72); gold moves slightly
+AWAY from $10 levels into settlement but below cost (−0.7 net). Empty.
+
+## 325. D-series family 73 protocol: gold and silver catching up with each other in London (S1)
+
+**No trial spent; N 880. Written and committed BEFORE any statistic is computed.** Divergence over 03:00 → 07:00 ET = silver's return
+(HistData xagusd, corrected clock) minus gold's (owned MGC London grid). Targets 07:00 → 11:30: **gold** in the sign of the divergence
+(catch-up) or against it, and **silver** (xagusd, the D32 instrument) against the divergence or with it; fixed by discovery. **2 tests**,
+with the descriptive 2010–17 column (§306). Costs §177/§180 (MGC 0.8, SI 0.5); recent-period design; carried at net > 0, t > 1.96;
+validation as §207, 3.
+
+## 326. Family-73 discovery: gold and silver catching up — 0 of 2 carried (S1)
+
+**No trial spent; N 880.** `reports/d73_discovery.json`: gold +0.5 bps (t +0.27), silver +2.4 (t +0.77). Empty.
+
+## 327. D-series family 74 protocol: the ECB reference-rate fix (S1)
+
+**No trial spent; N 880. Written and committed BEFORE any statistic is computed.** The ECB publishes euro reference rates from a 14:15
+Frankfurt concertation; some corporate and fund flows execute against it. HistData (corrected clock) at Frankfurt times for EUR, GBP,
+JPY, CHF against the dollar, in the futures' direction (6E, 6B, 6J, 6S). **Pre** 13:45 → 14:15 and **post** 14:15 → 14:45, each traded
+long or short (fixed by discovery) every day — the question is a directional drift around the fix, judged against the same pair's
+mean 30-minute return in 10:00–13:00 Frankfurt (not crediting drift). **4 pairs × 2 windows = 8 tests**, with the descriptive 2010–17
+column (§306; JPY from 2016). Costs §177 (6E 0.3, 6J 0.5; 6B, 6S 0.5); recent-period design; carried at net > 0, t > 1.96; validation
+as §207, 3.
+
+## 328. Family-74 discovery: the ECB reference-rate fix — 0 of 8 carried (S1)
+
+**No trial spent; N 880.** `reports/d74_discovery.json`: every |net| < 0.5 bps; best 6E long after the fix +0.5 (t +1.36). Empty.
+
+## 329. D-series family 75 protocol: crude against its refining margin (S1)
+
+**No trial spent; N 880. Written and committed BEFORE any statistic is computed.** The 3-2-1 crack (Yahoo settlements; $/bbl =
+(2 × RB × 42 + HO × 42 − 3 × CL) / 3) measures refiners' margin; a jump in it raises refiners' demand for crude. Days where any of the
+three front-continuous series moves more than 6 × its MAD (contract-roll jumps) are dropped. Signals on day D: **A shock** — the
+crack's daily change beyond 2 × SD of the previous 60; **B stretch** — the crack's level more than 2 SD from its previous-60 mean.
+Target CL's next session (family-10 open → settlement), with the signal's sign or against it, fixed by discovery. **2 tests**, with
+the descriptive 2010–17 column (§306). Cost CL 0.7 bps; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 330. Family-75 discovery: crude against its refining margin — 0 of 2 carried (S1)
+
+**No trial spent; N 880.** `reports/d75_discovery.json`: fading a crack shock +20.3 bps (t +0.51; 2010–17 +34.0, t +1.90); following a
+stretch +26.8 (t +1.09; 2010–17 −17.2). Empty.
+
+## 331. D-series family 76 protocol: sector and regional ETF shocks (S1)
+
+**No trial spent; N 880. Written and committed BEFORE any statistic is computed.** Predictors new to the programme (Yahoo daily, open →
+close, 16:00 ET; family-10 outlier filter): **SMH** (semiconductors), **XLF** (banks), **XLE** (energy), **EEM** (emerging markets),
+**FXI** (China large caps), **TLT** (long Treasuries). Shock on the previous weekday as family 24. Targets: MNQ's day session and gold's
+London window (family-8 grids), follow or fade fixed by discovery. **6 × 2 = 12 tests** (~0.6 by chance), with the descriptive 2010–17
+column (§306). Costs §180; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 332. Family-76 discovery: 1 of 12 carried — MNQ fades a bank-stock shock; D105 registered (S1)
+
+**No trial spent yet; N 880.** `reports/d76_discovery.json` (module `reporting/d76_etf.py`): **D105** MNQ fades an XLF shock,
+**+55.20 bps**, t +2.33, n 69; 2010–17 +9.01 (t +0.69) — same sign, weak. Next: MNQ fades a
+semiconductor shock +35.3 (t +1.74; 2010–17 +23.2, t +2.18); MNQ follows a TLT shock +31.1 (t +1.64 — D68's direction). Z and D
+market-test 117.
+
+## 333. D105 validated (t00887): WATCHLIST — the bank-shock fade replicated in size; fails only on years (S1)
+
+**N 881.** Sealed 2023-01 → 2026-08, 57 events, injection recovered first (power 23%): net **+47.84 bps** (t
++1.85 ✓); placebo (non-shock days) **100th** pct ✓; years **2 of 4** ✗ (2023 +23.7, 2024 −7.9, 2025
++163.5, 2026 −22.6). The size matched discovery (+55.2) but the out-of-sample gain is concentrated in 2025 (the April sell-off and
+rebound), and 2010–17 was only weakly the same sign (+9.0, t +0.69). WATCHLIST under §207, 3 — forward-tracked, not deployed. The
+second result in a row (after D104) that fails only (c). Z and D market-test 117.
+
+## 334. D-series family 77 protocol: a second set of ETF shocks (S1)
+
+**No trial spent; N 881. Written and committed BEFORE any statistic is computed.** Family 76's design (§331) with six more predictors:
+**GDX** (gold miners), **KRE** (regional banks), **XLU** (utilities), **LQD** (investment-grade credit), **XLK** (technology), **XLY**
+(consumer discretionary). Targets MNQ day and gold London; **12 tests**, descriptive 2010–17 column. Costs §180; recent-period design;
+carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 335. Family-77 discovery: 1 of 12 carried — MNQ fades a technology shock; D106 registered (S1)
+
+**No trial spent yet; N 881.** `reports/d77_discovery.json` (scan via `d76_etf.py --family77`): **D106** MNQ fades an XLK shock,
+**+43.70 bps**, t +2.21, n 80; **2010–17 +23.06 (t +1.97)** — the first carried test of
+recent families whose earlier history is nearly significant the same way. Across families 76–77 MNQ FADES every equity-sector shock
+(XLF, XLK, SMH, KRE, XLY: +21 to +55 bps), while it FOLLOWS bond-side shocks (TLT, LQD, and D68's ZN). Z and D market-test 118.
+
+## 336. D106 validated (t00888): WATCHLIST — and what the equity-shock fades are: crisis rebounds (S1, S8)
+
+**N 882.** Sealed 2023-01 → 2026-08, 52 events (power 10%): net **+38.51 bps** (t +1.39); placebo
+**100th** pct; years **1 of 4** (2023 −12.7, 2024 −8.3, **2025 +151.8**, 2026 −19.7). WATCHLIST by the mean only.
+
+**Reading D105 and D106 together.** Both fade an equity-sector shock, both replicate their discovery size, and both owe it to one
+year: 2025 (the April crash and V-shaped rebound), as discovery owes much to 2020. These rules are "buy the crash" — paid in
+V-shaped crises, slightly negative in ordinary years. That is a crisis bet, not a standing edge, and for a prop account it is worse
+than it looks: the losing years are the normal ones, and the winning trades come in the weeks the daily loss limits bind hardest.
+Neither is forward-tracked for deployment; future sector-shock fades on MNQ are read in this light. Z and D market-test 118.
+
+## 337. D-series family 78 protocol: Nasdaq against the S&P inside the day (S1)
+
+**No trial spent; N 882. Written and committed BEFORE any statistic is computed.** Family 17 tested relative value on daily bars only.
+Divergence = MNQ's 09:30 → 12:00 return (day grid) minus the S&P's (HistData spxusd, corrected clock) over the same span, in bps.
+Target MNQ 12:00 → 16:00, against the divergence (catch-down) or with it, fixed by discovery. Forms **all** and **strong** (|divergence|
+above its discovery median). **2 tests**, with the descriptive 2010–17 column (§306; NQ day sessions are sparse before 2013). Cost MNQ
+0.5 bps; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 338. Family-78 discovery: Nasdaq against the S&P inside the day — 0 of 2 carried (S1)
+
+**No trial spent; N 882.** `reports/d78_discovery.json`: MNQ with the morning divergence +3.7 bps (t +1.51) — and the opposite sign
+in 2010–17 (−2.3, t −1.60). Empty.
+
+## 339. D-series family 79 protocol: MNQ's Asian night sets its European morning (S1)
+
+**No trial spent; N 882. Written and committed BEFORE any statistic is computed.** MNQ's night grid split at 03:00 ET: the Asian part
+18:00 → 03:00 predicts the European part 03:00 → 09:30, follow or fade fixed by discovery, same contract; forms **all** and **strong**
+(above the discovery median). **2 tests**, with the descriptive 2010–17 column. Cost MNQ 0.5 bps; recent-period design; carried at
+net > 0, t > 1.96; validation as §207, 3.
+
+## 340. Family-79 discovery: MNQ's Asian night and European morning — 0 of 2 carried (S1)
+
+**No trial spent; N 882.** `reports/d79_discovery.json`: fading a strong Asian night +5.1 bps (t +1.87; 2010–17 +1.7, t +0.67). Empty.
+
+## 341. D-series family 80 protocol: soybeans against the crush margin (S1)
+
+**No trial spent; N 882. Written and committed BEFORE any statistic is computed.** Family 75's design for the demo's soybean account:
+board crush ($/bu) = ZM × 0.022 + ZL × 0.11 − ZS (Yahoo settlements; ZM $/short ton, ZL ¢/lb, ZS ¢/bu converted to $), roll-jump days
+dropped as §329. **A shock** — the crush's daily change beyond 2 SD of the previous 60; **B stretch** — its level more than 2 SD from
+the previous-60 mean. Target ZS's next session (family-10 open → settlement), with or against, fixed by discovery. **2 tests**, with
+the descriptive 2010–17 column. Cost ZS 0.7 bps; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 342. Family-80 discovery: soybeans against the crush margin — 0 of 2 carried (S1)
+
+**No trial spent; N 882.** `reports/d80_discovery.json`: +5.9 / +9.0 bps (t +0.46 / +0.96), opposite in 2010–17. Empty.
+
+## 343. D-series family 81 protocol: the mid-month Treasury settlement (S1)
+
+**No trial spent; N 882. Written and committed BEFORE any statistic is computed.** Coupon Treasuries settle and pay on the 15th and
+the month's end; the mid-month date (the 15th, or the next business day) moves cash between the Treasury's account and banks' reserves
+— a liquidity flow twice a month that the turn-of-month calendar (family 5) did not isolate at mid-month. Target on that day: MNQ's
+day session and gold's London window, each minus its mean on other days in discovery; long or short fixed by discovery. **2 tests**,
+with the descriptive 2010–17 column. Costs §180; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 344. Family-81 discovery: the mid-month Treasury settlement — 0 of 2 carried (S1)
+
+**No trial spent; N 882.** `reports/d81_discovery.json`: MNQ long +10.5 bps (t +0.68; 2010–17 +10.4, t +1.22); gold short +13.3
+(t +1.62; 2010–17 +11.3, t +1.19). The same signs in both periods, ~12 events a year, neither significant. Empty.
+
+## 345. D-series family 82 protocol: VVIX and SKEW shocks (S1)
+
+**No trial spent; N 882. Written and committed BEFORE any statistic is computed.** Two option-market gauges new to the programme (Yahoo
+daily closes): **VVIX** (volatility of the VIX) and **SKEW** (CBOE tail-risk pricing). Daily log change on day D; shock = beyond 2 SD
+of the previous 60. Targets on the next weekday: MNQ's day session and gold's London window, with the shock's sign or against it,
+fixed by discovery. **2 × 2 = 4 tests**, with the descriptive 2010–17 column. Costs §180; recent-period design; carried at net > 0,
+t > 1.96; validation as §207, 3.
+
+## 346. Family-82 discovery: VVIX and SKEW shocks — 0 of 4 carried (S1)
+
+**No trial spent; N 882.** `reports/d82_discovery.json`: every |t| < 0.5. Empty.
+
+## 347. D-series family 83 protocol: shocks into the currencies not yet targeted (S1)
+
+**No trial spent; N 882. Written and committed BEFORE any statistic is computed.** Families 24/29 targeted only 6E and 6J among
+currencies. Targets: **6A, 6B, 6C, 6S** (Yahoo daily open → settlement, family-10 cleaning). Predictors from the family-10 universe:
+**ES, NQ, CL, GC, HG, ZN** (commodity-currency links: copper/gold → AUD, crude → CAD), shock on the previous weekday as family 24;
+follow or fade fixed by discovery. **6 × 4 = 24 tests** (~1.2 by chance), with the descriptive 2010–17 column. Cost 0.5 bps (§180's
+FX level); recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 348. Family-83 discovery: 8 of 24 carried (vs ~1.2 by chance) — all "follow", none in 2010–17; D107–D114 registered (S1)
+
+**No trial spent yet; N 882.** `reports/d83_discovery.json` (module `reporting/d83_fx.py`):
+- **D107** 6B follows a ZN shock: +33.5 bps, t +3.63, n 82; 2010–17 -5.1 (t -0.80); market-test 119.
+- **D108** 6A follows a ZN shock: +30.8 bps, t +3.44, n 82; 2010–17 -0.4 (t -0.05); market-test 120.
+- **D109** 6S follows a NQ shock: +19.6 bps, t +3.28, n 93; 2010–17 -2.5 (t -0.34); market-test 121.
+- **D110** 6S follows a GC shock: +15.9 bps, t +2.65, n 87; 2010–17 +0.9 (t +0.12); market-test 122.
+- **D111** 6B follows a GC shock: +22.6 bps, t +2.60, n 87; 2010–17 -4.1 (t -0.92); market-test 123.
+- **D112** 6S follows a ZN shock: +18.0 bps, t +2.56, n 82; 2010–17 +10.9 (t +1.28); market-test 124.
+- **D113** 6S follows a ES shock: +15.8 bps, t +2.37, n 88; 2010–17 -5.9 (t -0.75); market-test 125.
+- **D114** 6C follows a ZN shock: +12.1 bps, t +2.32, n 82; 2010–17 +3.5 (t +0.61); market-test 126.
+
+**Before the trials, the reading.** Eight passes against ~1.2 expected is a real 2018–22 pattern, but the descriptive 2010–17 column
+shows none of it, and every carried test FOLLOWS a rates, equity or gold shock into the dollar crosses — the signature of 2022's
+one-way dollar trend under repeated rate shocks. Checked first for an artifact: Yahoo's currency-future opens are not the previous
+settlement (2–9% of days equal, median gap 5–10 bps), and the target session opens at 18:00 ET after every predictor has settled, so
+there is no look-ahead. Registered and validated once each, per protocol; expectation: most fail.
+
+## 349. D107–D114 validated (t00889–t00896): none confirm — the 2022 dollar trend, as read in §348 (S1)
+
+**N 890.** Sealed 2023-01 → 2026-08, injection recovered first for each:
+- **D107** 6B follows the previous session's ZN shock: **WATCHLIST** — 48 events, +2.37 bps (t +0.37), placebo 70th.
+- **D108** 6A follows the previous session's ZN shock: **REJECT** — 48 events, -2.56 bps (t -0.29), placebo 39th.
+- **D109** 6S follows the previous session's NQ shock: **WATCHLIST** — 48 events, +9.05 bps (t +0.85), placebo 93th.
+- **D110** 6S follows the previous session's GC shock: **WATCHLIST** — 55 events, +3.20 bps (t +0.32), placebo 76th.
+- **D111** 6B follows the previous session's GC shock: **WATCHLIST** — 55 events, +5.79 bps (t +0.90), placebo 86th.
+- **D112** 6S follows the previous session's ZN shock: **REJECT** — 48 events, -13.89 bps (t -1.24), placebo 2th.
+- **D113** 6S follows the previous session's ES shock: **WATCHLIST** — 52 events, +10.80 bps (t +1.05), placebo 97th.
+- **D114** 6C follows the previous session's ZN shock: **WATCHLIST** — 48 events, +3.51 bps (t +0.70), placebo 84th.
+
+Discovery t +2.3 to +3.6 became −1.2 to +1.05; two flipped sign. Family 83 was a 2018–22 (mostly 2022) regime, which the descriptive
+2010–17 column had already shown. Lesson recorded for the remaining search: a carried test whose 2010–17 column is flat (|t| < 1) has
+now failed out of sample every time (D97–D99, D102, D103, D107–D114). Z and D market-tests reach 126.
+
+## 350. D-series family 84 protocol: signed volume (a tick-rule order-flow proxy) overnight (S1)
+
+**No trial spent; N 890. Written and committed BEFORE any statistic is computed.** Earlier families used volume levels (27, 33), never
+its sign. Per minute, signed volume = sign(close − previous close) × volume (same contract; zero change → 0), from the family-8 grids.
+Imbalance = Σ signed / Σ volume over the session before the target: **MNQ** night (18:00 → 09:30) → day session; **gold** Asia
+(18:00 → 03:00) → London window. Signal sign(imbalance); follow or fade fixed by discovery; forms **all** and **strong** (|imbalance|
+above its discovery median). **2 × 2 = 4 tests**, with the descriptive 2010–17 column. Costs §180; recent-period design; carried at
+net > 0, t > 1.96; validation as §207, 3.
+
+## 351. Family-84 discovery: overnight signed volume — 0 of 4 carried (S1)
+
+**No trial spent; N 890.** `reports/d84_discovery.json`: MNQ follow +3.2 bps (t +0.91; 2010–17 the opposite, −4.4, t −2.19); gold ~0.
+Empty.
+
+## 352. D-series family 85 protocol: a session's signed volume into the next session (S1)
+
+**No trial spent; N 890. Written and committed BEFORE any statistic is computed.** Family 84's imbalance measured over the target
+window itself (MNQ day 09:30 → 16:00; gold London 03:00 → 11:30), predicting the same window on the next weekday; follow or fade fixed
+by discovery; forms **all** and **strong**. **4 tests**, descriptive 2010–17 column. Costs §180; recent-period design; carried at
+net > 0, t > 1.96; validation as §207, 3.
+
+## 353. Family-85 discovery: a session's signed volume — 0 of 4 carried (S1)
+
+**No trial spent; N 890.** `reports/d85_discovery.json`: fades of +2 to +3 bps, |t| ≤ 1.0. Empty.
+
+## 354. D-series family 86 protocol: near-misses that held in both periods (a pooled re-read) (S1)
+
+**No trial spent; N 890. Written and committed BEFORE any pooled statistic is computed.** In this search every carried test whose
+2010–17 column was flat failed out of sample (§349), and the few results that held in both periods were the most robust (D104).
+**Rule, fixed now:** over every test in families 64–85 that printed a 2010–17 column, recompute the same rule (direction fixed by
+2018–22) on 2010-01 → 2022-12 pooled; **carried** if net > 0 in 2018–22 AND in 2010–17 AND pooled t > 1.96. Honest caveat: the
+2010–17 columns were already printed, so this selection is informed by them; it spends no sealed data — 2023-01 → 2026-08 stays the
+only test, validation as §207, 3 (each family's own placebo). Tests already validated (D104, D105, D106) and the equity-sector-shock
+fades on MNQ (crisis-rebound class, §336) are excluded before computing.
+
+## 355. Family-86: 6 of 9 two-period near-misses clear pooled t > 1.96; D115–D120 registered (S1)
+
+**No trial spent yet; N 890.** `reports/d86_discovery.json`, module `reporting/d86_pooled.py` (each rule's direction and strong
+threshold fixed by its 2018–22 discovery; placebos fixed per rule in the registry). Not carried: CL roll-day short (t +1.78), MNQ
+strong-Asia fade (t +1.96, not above), gold mid-month short (t +1.86).
+- **D115** (nkd_morning) NKD strong morning follow: pooled +3.30 bps, t +2.24, n 1484 (2010–17 +4.64, 2018–22 +1.52); market-test 127.
+- **D116** (gotobi_pre) gotobi pre short 6J: pooled +1.42 bps, t +2.01, n 502 (2010–17 +2.95, 2018–22 +0.81); market-test 128.
+- **D117** (gold_settlement) gold settlement strong fade: pooled +0.78 bps, t +2.16, n 1645 (2010–17 +0.80, 2018–22 +0.74); market-test 129.
+- **D118** (ecb_fix_6e) 6E long after ECB fix: pooled +0.68 bps, t +2.65, n 3365 (2010–17 +0.81, 2018–22 +0.47); market-test 130.
+- **D119** (gold_tlt) 77 MGC follows TLT shock: pooled +18.79 bps, t +2.47, n 171 (2010–17 +20.79, 2018–22 +16.40); market-test 131.
+- **D120** (gold_lqd) 77 MGC follows LQD shock: pooled +14.18 bps, t +1.97, n 169 (2010–17 +24.99, 2018–22 +0.63); market-test 132.
+
+**Scale, before validation.** D117 (+0.8 bps) and D118 (+0.7) are below anything an account would notice; D116 (+1.4 on 6J) is
+D104-sized. **D119** (+18.8 bps a gold London window, ~14 events a year; ~$600 an event at the plan's 8 MGC) would be a D68-like overlay
+for the gold account; **D115** (+3.3 bps on NKD's ~$200,000 notional, ~$66 a contract on half the sessions) is NKD-account-sized.
+
+## 356. D115–D120 validated (t00897–t00902): none confirm; gold's rates link reversed after 2022 (S1)
+
+**N 896.** Sealed 2023-01 → 2026-08, injection recovered first for each:
+- **D115** nkd_morning: **REJECT** — 515 trades, -0.56 bps (t -0.28), placebo 28th.
+- **D116** gotobi_pre: **WATCHLIST** — 249 trades, +0.68 bps (t +0.66), placebo 69th.
+- **D117** gold_settlement: **REJECT** — 508 trades, -0.16 bps (t -0.19), placebo 28th.
+- **D118** ecb_fix_6e: **WATCHLIST** — 873 trades, +0.15 bps (t +0.32), placebo 100th.
+- **D119** gold_tlt: **REJECT** — 48 trades, -36.03 bps (t -2.05), placebo 0th.
+- **D120** gold_lqd: **REJECT** — 50 trades, -18.37 bps (t -1.15), placebo 5th.
+
+Two-period consistency (2010–17 and 2018–22) did not protect any of them. **D119** reversed hard — gold FADED long-bond shocks in
+every sealed year (−36 bps, t −2.05) — the same post-2022 break as D103 (§305): since central-bank buying took over, gold no longer
+moves with US rates the next day. The pooled re-read (§354) is closed. Z and D market-tests reach 132.
+
+## 357. D-series family 87 protocol: "net liquidity" week to week (S1)
+
+**No trial spent; N 896. Written and committed BEFORE any statistic is computed.** New data: FRED weekly **WALCL** (Fed balance sheet),
+**WTREGEN** (Treasury General Account), daily **RRPONTSYD** (reverse repo, taken on the same Wednesday); net liquidity = WALCL − TGA −
+RRP ($bn, Wednesday levels), published Thursday 16:30 ET (H.4.1). Signal = sign of the week's change. Target: the five sessions from
+the next Friday through Thursday — MNQ day sessions and gold London windows — each traded in the signal's direction or against it
+(fixed by discovery), judged DEMEANED (discovery mean removed) with week-clustered t. Forms **all** and **strong** (|change| above its
+discovery median). **2 markets × 2 forms = 4 tests**, descriptive 2010–17 column. Costs §180 per session; recent-period design;
+carried at net > 0, t > 1.96; validation as §207, 3 (placebo: signs shuffled across weeks).
+
+## 358. Family-87 discovery: "net liquidity" week to week — 0 of 4 carried (S1)
+
+**No trial spent; N 896.** `reports/d87_discovery.json`: MNQ with liquidity +2.0 / +3.9 bps a session (t +0.67 / +0.96; 2010–17 ~0);
+gold against it +2.0 / +3.9 (t +1.04 / +1.26; 2010–17 the opposite). The popular weekly liquidity signal predicts nothing. Empty.
+
+## 359. D-series family 88 protocol: MNQ around the European close (S1)
+
+**No trial spent; N 896. Written and committed BEFORE any statistic is computed.** European cash markets close at 11:30 ET (17:30 CET);
+their closing flows land in US index futures. MNQ day grid: pre 11:00 → 11:30, target 11:30 → 12:00, follow or fade fixed by
+discovery; forms **all** and **strong** (above the discovery median). **2 tests**, descriptive 2010–17 column. (The weeks when US and
+European clocks differ shift the close to 10:30 or 12:30 ET; those days are kept at 11:30 — a dilution, not a bias.) Cost MNQ 0.5 bps;
+recent-period design; carried at net > 0, t > 1.96; validation as §207, 3 (placebo: one hour earlier).
+
+## 360. Family-88 discovery: MNQ around the European close — 0 of 2 carried (S1)
+
+**No trial spent; N 896.** `reports/d88_discovery.json`: 2018–22 ~0 (+0.5 / +0.0 bps); in 2010–17 the move into the European close
+reversed significantly (fade +1.7 / +2.8 gross, t −3.33 / −2.68 for "follow") — an effect that has disappeared. Empty.
+
+## 361. D-series family 89 protocol: crude after the EIA release, intraday (S1)
+
+**No trial spent; N 896. Written and committed BEFORE any statistic is computed.** New data: HistData Brent (bcousd) minute bars, 2010 →
+2026-09, corrected clock, grid `reporting/hd_grid.py` (WTI has a 2024–26 gap there, so Brent stands in for crude intraday). The EIA
+weekly petroleum report (Wednesdays 10:30 ET; holiday-shifted weeks not adjusted) is crude's largest scheduled flow. The first k
+minutes after 10:30 (k = 5, 15; from the 10:29 close) predict 10:30 + k → 14:30 (NYMEX settlement), follow or fade fixed by
+discovery. **2 tests**, descriptive 2010–17 column. Cost: the MCL account's **5.4 bps** (§180) — what the plan would pay. Recent-period
+design; carried at net > 0, t > 1.96; validation as §207, 3 (placebo: the same rule on Tuesdays and Thursdays).
+
+## 362. Family-89 discovery: crude after the EIA release — 0 of 2 carried (S1)
+
+**No trial spent; N 896.** `reports/d89_discovery.json`: k = 15 follow +14.3 bps gross, +8.9 net of MCL's 5.4 (t +1.02); 2010–17 ~0.
+Empty.
+
+## 363. D-series family 90 protocol: crude's settlement and its London morning (S1)
+
+**No trial spent; N 896. Written and committed BEFORE any statistic is computed.** Brent grid (§361). **(i) Settlement**: 14:00 → 14:30
+ET into NYMEX settlement predicts 14:30 → 15:30, follow or fade; forms all / strong. **(ii) Relay**: London morning 03:00 → 08:00 ET
+predicts New York 09:00 → 14:30, follow or fade; forms all / strong. **4 tests**, descriptive 2010–17 column. Cost MCL 5.4 bps;
+recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 364. Family-90 discovery: crude's settlement and London morning — 0 of 4 carried; MCL's cost rules out intraday crude (S1)
+
+**No trial spent; N 896.** `reports/d90_discovery.json`: gross moves of +0.7 to +2.3 bps against MCL's 5.4 bps of cost; every net is
+negative in 2018–22 (2010–17's relay +14.6 on strong mornings has gone). At MCL's cost, crude sub-windows of a few hours need a gross
+edge several times what any minute-level effect here has shown. Empty.
+
+## 365. D-series family 91 protocol: crude's post-settlement drift into the next MCL day (S1)
+
+**No trial spent; N 896. Written and committed BEFORE any statistic is computed.** At the MCL ticket's own scale: crude's move from
+settlement to the close, 14:30 → 16:55 ET (Brent grid), predicts the next full window 18:00 → 16:55 (the ticket), follow or fade fixed
+by discovery; forms **all** and **strong**. **2 tests**, descriptive 2010–17 column. Cost MCL 5.4 bps; recent-period design; carried
+at net > 0, t > 1.96; validation as §207, 3.
+
+## 366. Family-91 discovery: uninformative — Brent has no 18:00 ET price (S1)
+
+**No trial spent; N 896.** `reports/d91_discovery.json`: only 201 of ~1,250 days matched in 2018–22 (ICE Brent pauses 18:00 → 20:00
+ET, so the ticket's 18:00 entry is usually missing); net −2.7 / −4.8 (t −0.23 / −0.29). Not re-defined after the fact. Closed as
+uninformative; crude at the ticket's scale was covered on daily bars by families 24–29.
+
+## 367. D-series family 92 protocol: the Hang Seng's day into gold and MNQ (S1)
+
+**No trial spent; N 896. Written and committed BEFORE any statistic is computed.** New data: HistData Hang Seng (hkxhkd) minute bars,
+corrected clock. Predictor: the Hang Seng's session 09:30 → 16:00 Hong Kong (ends 03:00–04:00 ET). Targets the same ET day: gold
+04:00 → 11:30 ET (family-8 London grid, after Hong Kong has closed) and MNQ's day session; follow or fade fixed by discovery; forms
+**all** and **strong**. **2 × 2 = 4 tests**, descriptive 2010–17 column. Costs §180; recent-period design; carried at net > 0,
+t > 1.96; validation as §207, 3.
+
+## 368. Family-92 discovery: the Hang Seng into gold and MNQ — 0 of 4 carried (S1)
+
+**No trial spent; N 896.** `reports/d92_discovery.json`: every |t| ≤ 1.0 in 2018–22. Empty.
+
+## 369. A30 design: skip the quietest forecast days (S8)
+
+**A COMPUTATION; zero edge; no trial; N 896. Variants fixed BEFORE any result.** Under zero edge a trade's expectation is minus its
+cost. On days whose range is small against the brackets, the window usually ends between them with a small P&L — little progress
+toward the target, a full round trip paid. Forecast F_d = mean per-contract window range over the previous 20 sessions (A29's);
+reference = its previous-250 median. Variants: **plan** (trade every day); **S20** skip days with F_d below the 20th percentile of
+the previous 250 forecasts; **S40** below the 40th. A23 engine with `skip` (the account sits; no cost), 50K Daily, live sizes, both
+histories, every start, 84 days; five-account books. Adopt only if S20 or S40 beats the plan in BOTH histories on mean net AND
+P(net > 0).
+
+## 370. A30 result: skipping quiet days loses — not adopted (S8)
+
+**No trial; N 896.** `reports/a30_book.json`, five live markets: plan +8,023 / 92% (2016–20) and +9,468 / 93% (2021–26); S20
++5,132 / 89% and +7,139 / 84%; S40 +4,935 / 84% and +5,523 / 81%. Skipping 16–40% of days saves fees but costs far more: within an
+84-day account, trading days are the scarce resource — the quiet days' small P&L still moves accounts toward targets and the payout
+clock. Trade every day, as the plan does.
+
+## 371. D-series family 93 protocol: nearness to the 52-week high (S1)
+
+**No trial spent; N 896. Written and committed BEFORE any statistic is computed.** Anchoring: traders treat the 52-week high as a
+reference, under-reacting near it. Nearness on day D−1 = Yahoo settlement / max settlement of the previous 252 sessions (NQ=F,
+GC=F). Signal: nearness in the top third of its trailing 250-session distribution → one side; bottom third → the other; middle not
+traded; side fixed by discovery; the target (MNQ day; gold London on D, family-8 grids) judged DEMEANED. **2 tests**, descriptive
+2010–17 column. Costs §180; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 372. Family-93 discovery: nearness to the 52-week high — 0 of 2 carried (S1)
+
+**No trial spent; N 896.** `reports/d93_discovery.json`: MNQ +1.2 bps (t +0.26), gold +1.1 (t +0.50), both reversed in 2012–17. Empty.
+
+## 373. D-series family 94 protocol: the month-end London fix and equity-hedge rebalancing (S1)
+
+**No trial spent; N 896. Written and committed BEFORE any statistic is computed.** Foreign holders of US equities re-hedge at the
+month-end WM/R 16:00 London fix: after a month in which US equities rose, they sell dollars into it. Last London business day of
+each month; signal = sign of the S&P's month (ES=F Yahoo settlements, last day of the prior month → the day before the fix).
+Windows (HistData via family 41's `d41_fix.rows`, futures' direction): **pre** 15:30 → 16:00 and **post** 16:00 → 16:30, each traded
+in the direction "dollar weaker when equities rose" or the reverse, fixed by discovery. Pairs pooled per window across 6E, 6B, 6J
+(day-clustered). **2 tests**, descriptive 2010–17 column. Cost 0.5 bps; recent-period design; carried at net > 0, t > 1.96;
+validation as §207, 3 (placebo: the same rule on the second-last business day).
+
+## 374. Family-94 discovery: 1 of 2 carried — the dollar recovers after the month-end fix; D121 registered (S1)
+
+**No trial spent yet; N 896.** `reports/d94_discovery.json` (module `reporting/d94_monthend.py`): **post** (16:00 → 16:30), dollar
+stronger after a rising S&P month, **+2.20 bps**, t +1.98, n 60 months; 2010–17 +1.67 (t +1.57).
+**pre** (into the fix) ~0 in 2018–22 — but in 2010–17 the documented run-up was strong (dollar weaker into the fix after equity gains,
++5.7 bps, t +4.5): the published effect has gone; only its unwind remains. Scale: ~2 bps on a currency future 12 times a year —
+unusable whatever the trial says. Z and D market-test 133.
+
+## 375. D121 validated (t00903): WATCHLIST — the unwind persists in sign but is not month-end specific (S1)
+
+**N 897.** Sealed 2023-01 → 2026-08, 40 month-ends (power 29%): net **+1.53 bps** (t +1.40); placebo
+(second-last business day) **48th** pct — the same move happens a day earlier, so it is not the month-end flow;
+years 3 of 4. WATCHLIST by the mean; unusable at ~2 bps twelve times a year. Z and D market-test 133.
+
+## 376. D-series family 95 protocol: the 10-year's move into MNQ, by stock–bond correlation regime (S1)
+
+**No trial spent; N 897. Written and committed BEFORE any statistic is computed.** Family 10 found no all-days link from ZN to NQ, and
+D68 uses only ZN's tails. The sign of the stock–bond correlation changes what a bond move means for equities (inflation scare vs
+growth scare). Regime on day D−1: correlation of ES and ZN daily open→settlement returns (family-10 series) over the previous 60
+sessions, positive or negative. Signal: sign of ZN's session on D−1 (every day, not only shocks). Target: MNQ's day session on D
+(family-8 grid), with or against, fixed by discovery within each regime. **2 regimes = 2 tests**, descriptive 2010–17 column. Cost
+MNQ 0.5 bps; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 377. Family-95 discovery: ZN into MNQ by correlation regime — 0 of 2 carried (S1)
+
+**No trial spent; N 897.** `reports/d95_discovery.json`: positive-correlation regime follow +5.4 bps (t +0.67; 2010–17 −6.4), negative
++0.2 (t +0.04). D68's link lives only in ZN's tails. Empty.
+
+## 378. D-series family 96 protocol: D68's 10-year tail into the DAX and NKD accounts, pooled (S1)
+
+**No trial spent; N 897. Written and committed BEFORE any pooled statistic is computed.** D68 (MNQ follows a ZN shock) is confirmed and
+deployed; family 37 found the same sign for the DAX (+25.9 bps, t +1.87) and NKD (+15.5, t +1.61) windows on 2018–22. Rule as §354:
+the same rule (follow a ZN shock, family 24's definition; A21 window paths; costs DAX 0.3, NKD 0.2) on 2010-01 → 2022-12 pooled;
+**carried** if net > 0 in both 2010–17 and 2018–22 AND pooled t > 1.96. **2 tests.** Validation as §207, 3 on sealed 2023-01 → 2026-08
+(placebo: after non-shock days).
+
+## 379. Family-96: D68's 10-year tail does not carry to the DAX or NKD — 0 of 2 (S1)
+
+**No trial spent; N 897.** `reports/d96_discovery.json`: DAX pooled +6.6 bps (t +0.74; 2010–17 −10.9); NKD pooled +18.4 (t +1.74;
+both periods positive, +23.5 and +15.5, but below the bar). NKD's sign matches D68 throughout and is the nearest thing to a second
+D68 — noted for the NKD account's demo review, not adopted. Empty.
+
+## 380. D-series family 97 protocol: the Brazilian real into soybeans and corn (S1)
+
+**No trial spent; N 897. Written and committed BEFORE any statistic is computed.** Brazil is the largest soy exporter; a sharply
+weaker real raises farmers' local-currency price and their selling. Yahoo BRL=X daily, close → close (its opens are stale on a third
+of days; CNY=X, stale on 71%, is not used), dated by its UTC day (closes 20:00 ET). Shock = |change| beyond 2 SD of the previous 60.
+Targets: ZS and ZC sessions (family-10 open → settlement) dated the next weekday (grains reopen 20:00 ET), with the shock (USD/BRL up)
+or against it, fixed by discovery. **2 tests**, descriptive 2010–17 column. Costs §177 (ZS 0.7, ZC 1.9); recent-period design;
+carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 381. Family-97 discovery: 2 of 2 carried — grains fall after the real weakens; D122–D123 registered (S1)
+
+**No trial spent yet; N 897.** `reports/d97_discovery.json` (module `reporting/d97_brl.py`):
+- **D122** ZS short after the real weakens (long after it strengthens): +39.37 bps, t +2.92, n 64; 2010–17 +2.36 (t +0.19); market-test 134.
+- **D123** ZC short after the real weakens (long after it strengthens): +40.10 bps, t +2.22, n 64; 2010–17 +3.78 (t +0.21); market-test 135.
+
+The sign is the mechanism's (a weaker real → more Brazilian selling → lower US grain prices). Caution recorded before the trials: the
+2010–17 column is flat (t ≈ 0.2), the pattern that has preceded every out-of-sample failure in this search (§349). ZS is the demo's
+sixth account; a confirmed D122 would be a D68-like overlay for it.
+
+## 382. D122 CONFIRMED (t00904): soybeans fall after the Brazilian real weakens; D123 (corn) WATCHLIST (t00905) (S1)
+
+**N 899.** Sealed 2023-01 → 2026-08, injection recovered first (power 30% / 35%):
+- **D122 ZS: CONFIRM** — 51 events, net **+32.86 bps** (t +1.88 > 1.645), placebo (non-shock days)
+  **97th** pct, years 3 of 4 (2023 +39.9, 2024 −3.3, 2025 +53.2, 2026 +86.5). The first confirmation since D89, on a
+  product the plan trades (the demo's soybean account), with the mechanism's sign (a weaker real → Brazilian farmer and exporter
+  selling → lower US soybeans next session; a stronger real → the reverse).
+- **D123 ZC: WATCHLIST** — 51 events, +15.81 bps (t +1.00), placebo 78th, years 3 of 4.
+
+**Before any use — stress tests fixed now (no trial), as D68's §210:** (1) **independent data on both sides** — USD/BRL from FRED
+DEXBZUS (the noon New York buying rate, close → close; a shock as before) and soybeans from the owned GLBX daily bars (roll-correct
+settle → settle, the next session) *[amended before computing: the owned bar file has no ZS (0 dates), and Stooq answers with a
+browser challenge, which is not circumvented; the independent soybean price is the SOYB ETF (NYSE Arca, holds soybean futures),
+Yahoo daily open → close; combinations FRED-BRL × Yahoo-ZS, Yahoo-BRL × SOYB, FRED-BRL × SOYB]*; periods 2010–17, 2018–22, 2023–26; thresholds 1.5 / 2 / 2.5 σ. (2) **The ZS account overlay** —
+A23 engine, 3 ZS, both histories, drift removed: the plan (always long) against the overlay (short the session after the real weakens
+beyond 2σ; long otherwise), as D68's table. Read: adopt for the demo only if (1) keeps the sign in 2023–26 on independent data and (2)
+does not lower the account's P(payout) in 2021–26.
+
+## 383. D122 stress-tested: the sign survives on independent data, weakly; the overlay meets the pre-set reading but lowers mean net (S8)
+
+**No trial; N 899.** `reports/a31_d122.json`, module `reporting/a31_d122.py`.
+
+**(1) Independent data, 2σ, 2023–26** (short soybeans the session after the real weakens): Yahoo BRL × Yahoo ZS (the trial's own data)
++32.9 (t +1.88); **FRED BRL × Yahoo ZS +7.4 (t +0.48); Yahoo BRL × SOYB +6.6 (t +0.57); FRED BRL × SOYB +11.5 (t +1.12)**. 2018–22
++11 to +39 throughout; 2010–17 ≈ 0 (−10.9 to +4.9). The sign holds out of sample on every independent combination at 2σ, at a
+fraction of the trial's size — partly the FRED rate's noon timing (half a day earlier than the close the rule uses). At 2.5σ the
+2023–26 events are 13–15 and the FRED × Yahoo cell turns negative (−34, n 13). A real but modest effect, as D68 was.
+
+**(2) The ZS account (3 ZS, 50K Daily, drift removed, 84 days; short days 3.3% of sessions):**
+
+| | 2010–20 | 2021–26 |
+|---|---|---|
+| plan, always long | P(payout) 70%, +$3,061, P(net > 0) 59% | 86%, +$3,310, 81% |
+| overlay, D122 short days | 75%, +$2,990, 62% | 87%, +$2,792, 85% |
+
+The pre-set reading (§382) is met — the sign holds on independent data in 2023–26, and P(payout) in 2021–26 does not fall (86 → 87%)
+— but the mean net is LOWER in both histories (−$71, −$518): with brackets, a handful of flipped days moves outcomes more by
+path than by the edge. **Status: a demo candidate for the soybean account, NOT deployed** — changes to the droplet need the user's
+confirmation (and the soybean ticket is itself still being evaluated by the demo). Recorded for the 2026-10-25 review.
+
+## 384. D-series family 98 protocol: producer currencies into their commodities (S1)
+
+**No trial spent; N 899. Written and committed BEFORE any statistic is computed.** D122's mechanism generalised: when an exporter's
+currency weakens, its producers' local-currency price rises and they sell more. Pairs (Yahoo daily, close → close, UTC day, shock
+beyond 2 SD of the previous 60, as family 97): **CLP → HG** (Chile, copper), **ZAR → GC** (South Africa, gold), **RUB → ZW** (Russia,
+wheat), **CAD → CL** (Canada, crude), **AUD → GC** (Australia, gold; AUDUSD inverted so "up" = the local currency weaker). Target the
+commodity's next-weekday session (family-10), with or against the local-currency weakening, fixed by discovery. A currency whose
+closes are unchanged on more than 30% of days in discovery is reported but not carried (stale quotes). **5 tests**, descriptive
+2010–17 column. Costs §177; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 385. Family-98 discovery: 1 of 5 carried — copper falls after the peso weakens; D124 registered (S1)
+
+**No trial spent yet; N 899.** `reports/d98_discovery.json` (module `reporting/d98_producer.py`): **D124** HG against a CLP weakening,
+**+34.81 bps**, t +2.16, n 75; 2010–17 +13.32 (t +1.23) — the same sign. All five pairs chose
+"against local weakness" (the mechanism's sign): ZAR → GC +24.9 (t +1.49), CAD → CL +49.9 (t +0.72), AUD → GC +6.1, RUB → ZW +1.1.
+D122's mechanism looks general in direction, strong only where the producer dominates (Brazil soy, Chile copper). HG is not a
+plan product (MHG was listed as a candidate market, §140s). Z and D market-test 136.
+
+## 386. D124 validated (t00906): WATCHLIST — copper after the peso keeps its sign, not its strength (S1)
+
+**N 900.** Sealed 2023-01 → 2026-08, 52 events (power 20%): net **+14.62 bps** (t +0.73); placebo
+77th; years 2 of 4 (2023 +19.5, 2024 −8.6, 2025 +47.1, 2026 −21.9). Positive across all three periods (2010–17
++13.3, 2018–22 +34.8, 2023–26 +14.6), never significant out of sample. WATCHLIST; HG is not a plan product. Z and D market-test 136.
+
+## 387. D-series family 99 protocol: the real into Brazil's other CME exports (S1)
+
+**No trial spent; N 900. Written and committed BEFORE any statistic is computed.** D122's mechanism for the other CME products Brazil
+exports in volume: **ZM** (soybean meal), **ZL** (soybean oil), **LE** (live cattle — Brazil is the largest beef exporter). Family 97's
+USD/BRL shock (2σ, close → close, UTC day) → the next-weekday session (Yahoo open → settlement, family-10 cleaning), with or against,
+fixed by discovery. **3 tests**, descriptive 2010–17 column. Costs: 1.5 bps each (between §177's ZS 0.7 and ZC 1.9; these are thinner);
+recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 388. Family-99 discovery and a D122 mechanism check: the real moves commodities, not equities (S1, S8)
+
+**No trial spent; N 900.** `reports/d99_discovery.json`: ZM +29.7 bps (t +1.83), ZL +15.5 (t +1.00), LE +18.7 (t +1.00) — none carried,
+all with the mechanism's sign (short after the real weakens). **Descriptive check of what a real shock moves next session** (short after
+weakening, gross, 2018–22 | 2023–26): ZS +40.1 (t +2.97) | **+33.6 (t +1.92)**; ZC +42.0 | +17.7; ZW +33.3 | +15.4; CL +135.8 | +29.6;
+HG +25.6 | −12.3; GC −0.1 | +4.8; ES −3.5 | −10.2; NQ −34.4 | −13.5. Equities do not fall after a real shock and gold is flat: D122 is a
+commodity-exporter effect, strongest and most persistent in soybeans — not a general emerging-market risk-off signal. It supports
+reading D122 as the producer-selling mechanism it was registered under.
+
+## 389. D-series family 100 protocol: oil exporters' currencies into crude (S1)
+
+**No trial spent; N 900. Written and committed BEFORE any statistic is computed.** Family 98's design (§384) for crude: **NOK, MXN,
+RUB, COP** (Yahoo, close → close, UTC day; up = the producer's currency weaker; 2σ) → CL's next-weekday session (family 10), with or
+against, fixed by discovery; currencies stale (> 30% unchanged closes) reported, not carried. **4 tests**, descriptive 2010–17 column.
+Cost CL 0.7 bps (§177; the MCL account would pay 5.4, noted at validation); recent-period design; carried at net > 0, t > 1.96;
+validation as §207, 3.
+
+## 390. Family-100 discovery: 1 of 4 carried — crude falls after the Colombian peso weakens; D125 registered (S1)
+
+**No trial spent yet; N 900.** `reports/d100_discovery.json`: **D125** COP → CL against, **+88.32 bps**, t +2.05, n 73;
+2010–17 +13.62 (t +0.73). MXN +80.8 (t +1.37; 2010–17 +50.9, t +1.89), RUB +44.6, NOK +28.2 — all four with the
+mechanism's sign, as every pair in families 97–99. Crude's 2020 swings inflate 2018–22 sizes. Z and D market-test 137.
+
+## 391. D125 validated (t00907): REJECT — crude after the peso was 2020 (S1)
+
+**N 901.** Sealed 2023-01 → 2026-08, 50 events (power 44%): **-21.93 bps** (t -0.73); placebo
+21th; years 1 of 4. The 2018–22 size came from crude's 2020 swings. The producer-currency mechanism holds out of sample
+only for soybeans (D122) so far; copper (D124) kept its sign weakly, crude did not. Z and D market-test 137.
+
+## 392. D-series family 101 protocol: does D122 last beyond the next session? (S1)
+
+**No trial spent; N 901. Written and committed BEFORE any statistic is computed.** D122 trades only the session after a real shock.
+Lags: the **2nd** and **3rd** ZS sessions after the shock day (Yahoo, family 10), short after the real weakens / long after it
+strengthens (D122's direction, not re-chosen). **2 tests**, descriptive 2010–17 column. Cost ZS 0.7; recent-period design; carried at
+net > 0, t > 1.96; validation as §207, 3. A carried lag would extend D122's overlay; none changes D122 itself.
+
+## 393. Family-101 discovery: D122 is a one-session effect — 0 of 2 carried (S1)
+
+**No trial spent; N 901.** `reports/d101_discovery.json`: lag 2 +19.4 bps (t +1.32; 2010–17 −19.0), lag 3 −13.8 (t −1.14). The
+response is the next session only; D122's overlay stays one day. Empty.
+
+## 394. D-series family 102 protocol: importers' currencies into what they import (S1)
+
+**No trial spent; N 901. Written and committed BEFORE any statistic is computed.** The mirror of D122: when a large importer's currency
+weakens, its local price rises and demand falls. **INR → GC** (India, gold), **INR → CL** (India, crude), **KRW → CL** (Korea, crude).
+Yahoo close → close, UTC day, 2σ, up = the importer's currency weaker; target the next-weekday session (family 10), with or against,
+fixed by discovery; stale (> 30% unchanged) reported, not carried. **3 tests**, descriptive 2010–17 column. Costs §177; recent-period
+design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 395. Family-102 discovery: importers' currencies — 0 of 3 carried; the sign is universal (S1)
+
+**No trial spent; N 901.** `reports/d102_discovery.json`: INR → GC +18.2 (t +1.37), INR → CL +70.3 (t +1.22), KRW → CL +97.6 (t +1.57) —
+all "against local weakness", as every one of the 12 pairs in families 97–102, producer and importer alike. So the broad pattern is
+"an emerging currency's sharp fall precedes weaker commodities next session" (a dollar-funding / risk channel), of which the soybean
+case (D122) is the strongest and the only one confirmed out of sample. Empty.
+
+## 396. D-series family 103 protocol: an emerging-currency stress composite into the plan's commodities (S1)
+
+**No trial spent; N 901. Written and committed BEFORE any composite statistic is computed.** Families 97–102 found one sign in all
+12 currency → commodity pairs. Composite on day D (UTC): the mean of z = change / SD(previous 60 changes) over **BRL, MXN, ZAR, CLP, COP,
+INR, KRW** (Yahoo close → close; RUB excluded — its 2022 sanctions break), each oriented so + = that currency weaker; requires ≥ 5 of 7.
+Shock: |composite| > 2 SD of its own previous 60. Targets the next-weekday session (family 10): **ZS, CL, GC** — the plan's commodity
+products — with or against, fixed by discovery. **3 tests**, descriptive 2010–17 column. Honest caveat: the composite is motivated
+by results already seen in 2018–22 and 2010–17; the sealed 2023–26 window is untouched by it and is the test. Costs §177; carried at
+net > 0, t > 1.96; validation as §207, 3.
+
+## 397. Family-103 discovery: 1 of 3 carried — crude falls after emerging-currency stress; D126 registered (S1)
+
+**No trial spent yet; N 901.** `reports/d103_discovery.json` (module `reporting/d103_emfx.py`): **D126** CL against the composite,
+**+120.22 bps**, t +2.08, n 67; **2010–17 +37.13 (t +1.89)** — the same sign and nearly
+significant in the untouched earlier period. ZS +31.6 (t +1.82; 2010–17 +14.3), GC +30.4 (t +1.84; 2010–17 +1.4): same sign, below the
+bar. MCL's 5.4 bps of cost is small against this size. Z and D market-test 138.
+
+## 398. D126 validated (t00908): REJECT — the composite did not carry crude out of sample (S1)
+
+**N 902.** Sealed 2023-01 → 2026-08, 50 events (power 51%): **-3.28 bps** (t -0.09); placebo
+28th; years 2 of 4. Even a rule positive in both 2010–17 and 2018–22 fell to zero after 2022 — crude's response to
+emerging-currency stress was a pre-2023 regime. D122 (soybeans × the real) remains the one currency → commodity rule that held.
+Z and D market-test 138.
+
+## 399. D-series family 104 protocol: dominant-producer currencies in oilseeds and wheat (S1)
+
+**No trial spent; N 902. Written and committed BEFORE any statistic is computed.** D122 held where one producer dominates. Pairs:
+**MYR → ZL** and **IDR → ZL** (Malaysia/Indonesia, palm oil — soybean oil's substitute), **ARS → ZM** (Argentina, the largest meal
+exporter; its crawling peg makes shocks devaluation days), **AUD → ZW**, **CAD → ZW** (wheat exporters). Family 98's construction
+(Yahoo close → close, UTC day, 2σ, up = local currency weaker); targets next-weekday sessions (ZL, ZM: Yahoo open → settlement as
+family 99; ZW: family 10), with or against, fixed by discovery. **5 tests**, descriptive 2010–17 column. Costs ZL/ZM 1.5, ZW 1.4;
+recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 400. Family-104 discovery: dominant-producer currencies in oilseeds and wheat — 0 of 5 carried (S1)
+
+**No trial spent; N 902.** `reports/d104_discovery.json`: IDR → ZL against +38.9 (t +1.92), AUD → ZW against +41.9 (t +1.79); MYR → ZL
+and ARS → ZM chose "with" (+6.2, +10.6; 2010–17 the mechanism's way, −28.2 t −2.40 and −21.5) — the first pairs off the universal
+sign, both weak. Empty.
+
+## 401. D-series family 105 protocol: gold's and crude's own implied-volatility shocks (S1)
+
+**No trial spent; N 902. Written and committed BEFORE any statistic is computed.** CBOE's GVZ (gold) and OVX (crude) implied-volatility
+indices (Yahoo daily closes), new to the programme. Daily log change; shock beyond 2 SD of the previous 60 on day D. Targets the
+next-weekday: **GVZ → gold's London window** (family-8 grid), **OVX → CL's session** (family 10), with the volatility move or against
+it, fixed by discovery. **2 tests**, descriptive 2010–17 column. Costs §177/§180; recent-period design; carried at net > 0, t > 1.96;
+validation as §207, 3.
+
+## 402. Family-105 discovery: gold's and crude's implied-volatility shocks — 0 of 2 carried (S1)
+
+**No trial spent; N 902.** `reports/d105_discovery.json`: GVZ → gold +10.2 bps (t +1.14), OVX → crude +41.4 (t +0.96). Empty.
+
+## 403. D-series family 106 protocol: grain traders' stocks into grains (S1)
+
+**No trial spent; N 902. Written and committed BEFORE any statistic is computed.** ADM and Bunge (BG) crush and ship most of the US
+soybean flow; their share prices react first to margin and demand news. Yahoo daily open → close (16:00 ET), shock beyond 2 SD of the
+previous 60 on day D → the next-weekday ZS and ZC sessions (family 10; grains reopen 20:00 ET), with or against, fixed by discovery.
+**2 × 2 = 4 tests**, descriptive 2010–17 column. Costs §177; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 404. Family-106 discovery: grain traders' stocks — 0 of 4 carried (S1)
+
+**No trial spent; N 902.** `reports/d106_discovery.json`: grains fade an ADM/BG shock +17 to +26 bps (t +1.08 to +1.81), mixed in
+2010–17. Empty.
+
+## 405. D-series family 107 protocol: energy stocks into crude (S1)
+
+**No trial spent; N 902. Written and committed BEFORE any statistic is computed.** Family 106's design for crude: **XLE** (integrated
+energy) and **XOP** (exploration and production) shocks (Yahoo open → close, 2σ) → CL's next-weekday session (family 10), with or
+against, fixed by discovery. **2 tests**, descriptive 2010–17 column. Cost CL 0.7 (MCL 5.4 noted); recent-period design; carried at
+net > 0, t > 1.96; validation as §207, 3.
+
+## 406. Family-107 discovery: energy stocks into crude — 0 of 2 carried (S1)
+
+**No trial spent; N 902.** `reports/d107_discovery.json`: XLE +10.1 (t +0.26), XOP +47.5 (t +1.20). Empty.
+
+## 407. D-series family 108 protocol: 2-year Treasury shocks into currencies (S1)
+
+**No trial spent; N 902. Written and committed BEFORE any statistic is computed.** The 2-year yield carries Fed expectations, the core of
+rate differentials; families 24/29 used only ZN for currencies. ZT=F shocks (family 39's series, 2σ) on the previous weekday → the
+next sessions of **6E, 6J** (family 10) and **6B, 6A** (family 83's series), with or against, fixed by discovery. **4 tests**,
+descriptive 2010–17 column. Costs: 6E 0.3, 6J 0.5, 6B/6A 0.5; recent-period design; carried at net > 0, t > 1.96; validation as
+§207, 3.
+
+## 408. Family-108 discovery: 2 of 4 carried, both negative in 2010–17; D127–D128 registered (S1)
+
+**No trial spent yet; N 902.** `reports/d108_discovery.json` (module `reporting/d108_zt.py`):
+- **D127** 6E follows a ZT shock: +12.38 bps, t +2.33, n 90; 2010–17 -3.45; market-test 139.
+- **D128** 6A follows a ZT shock: +15.23 bps, t +2.12, n 90; 2010–17 -5.04; market-test 140.
+
+The 2022 dollar-regime signature again (family 83, §348–349): expected to fail; validated once each per protocol.
+
+## 409. D127–D128 validated (t00909–t00910): none confirm, as expected (S1)
+
+**N 904.** D127 6E: WATCHLIST, +7.05 bps (t +0.83), placebo 94th; D128 6A: REJECT, -6.83 (t -0.52).
+Negative 2010–17 columns again preceded failure. Z and D market-tests reach 140.
+
+## 410. D-series family 109 protocol: D68 when equities have not yet moved (S1)
+
+**No trial spent; N 904. Written and committed BEFORE any statistic is computed.** If D68 is slow diffusion from bonds to equities, the
+next-day catch-up should be largest when the S&P barely moved on the ZN-shock day. D68's events (ZN beyond 2σ, family 24), split by the
+same day's ES session (family 10): **quiet** — |ES| below its own 60-session median absolute move — vs the rest. Target MNQ's next day
+session (family-8 grid), following the ZN shock (D68's direction, not re-chosen). **1 test (quiet)**; the other half reported beside.
+Descriptive 2010–17 column. Cost MNQ 0.5; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3. A carried test
+would sharpen D68's overlay, not replace it.
+
+## 411. Family-109 discovery: D68 is not sharper when equities were quiet — 0 of 1 carried (S1)
+
+**No trial spent; N 904.** `reports/d109_discovery.json`: quiet-equity ZN shocks +15.8 bps (t +0.60, n 23) vs the rest +21.5 (t +1.02,
+n 56). No support for a slow-diffusion refinement; D68 stays as deployed. Empty.
+
+## 412. D-series family 110 protocol: dominant-producer currencies in copper and silver (S1)
+
+**No trial spent; N 904. Written and committed BEFORE any statistic is computed.** Family 98's construction for metals where one or two
+countries dominate supply: **PEN → HG** (Peru, copper), **MXN → SI** (Mexico, the largest silver producer), **PEN → SI**. Yahoo close →
+close, UTC day, 2σ, up = local currency weaker; targets next-weekday sessions (family 10), with or against, fixed by discovery; stale
+(> 30% unchanged) reported, not carried. **3 tests**, descriptive 2010–17 column. Costs §177 (HG 2.0, SI 0.5); recent-period design;
+carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 413. Family-110 discovery: copper and silver producer currencies — 0 of 3 carried (S1)
+
+**No trial spent; N 904.** `reports/d110_discovery.json`: PEN → HG +6.9 (t +0.67, "with"); MXN → SI +19.8 (t +0.69), PEN → SI +15.8 (t +1.04),
+both "against" and the same in 2010–17 (+17.1, +18.7), all weak. Empty.
+
+## 414. A timing caveat found, and D-series family 111 protocol: a two-period screen of the whole shock class (S1)
+
+**Caveat (recorded, no result changes).** Yahoo's currency bars are dated by UTC day and close at 19:00 (winter) / 20:00 (summer) New
+York time — after crude's Globex session opens (18:00 ET). Currency → CL tests (families 98's CAD → CL, 100, 102's INR/KRW → CL, 103's
+D126) could therefore see up to two hours of the target session. All were null or rejected, so no conclusion changes; D125 and D126's
+REJECTs stand (a look-ahead could only have helped them). Soybeans reopen at 20:00 ET, at or after the currency close, so **D122 is not
+affected**; nor are targets opening later (MGC 03:00, DAX 03:00, MNQ 09:30 ET).
+
+**Family 111 protocol (no trial spent; N 904; written and committed BEFORE any statistic is computed).** Predictors: every daily series
+fetched so far — futures and ETFs open → close; VIX-type indices, PL=F and currencies close → close (log); FRED DFII10/T10YIE changes;
+stale CNY/CNH excluded. Shock 2σ on the previous weekday (family 24). Targets: **MNQ day, MGC London** (family-8 grids), **NKD, DAX**
+(A21 paths), **CL, ZS** (family 10). Excluded before computing: a predictor on its own market; currency/BTC-USD predictors for CL and NKD
+(their sessions open before the currency close); pairs already validated (D68, D102, D103, D105, D106, D119, D120, D122, D123); and
+family-29 pairs (14-universe → CL/ZS). Follow or fade fixed by 2018–22. **Carried only if** 2018–22 net > 0 with t > 1.96 AND the same
+rule in 2010–17 net > 0 with t > 1.0 (≈ 0.4% of null tests pass both; the count is reported against it). Costs §177/§180; validation
+as §207, 3.
+
+## 415. Family-111 screen: 4 of 359 carried (≈ 1.4 by chance); D129–D132 registered (S1)
+
+**No trial spent yet; N 904.** `reports/d111_discovery.json` (module `reporting/d111_screen.py`); 12 pass 2018–22 alone (≈ 9 by chance).
+- **D129** NKD follows a ^VIX3M shock: +29.25 bps, t +2.49, n 73; 2010–17 +33.64 (t +1.48); market-test 141.
+- **D130** MGC fades a CLP=X shock: +19.25 bps, t +2.25, n 70; 2010–17 +14.26 (t +2.09); market-test 142.
+- **D131** MGC follows a 6S=F shock: +19.87 bps, t +2.22, n 71; 2010–17 +11.67 (t +1.39); market-test 143.
+- **D132** NKD follows a LQD shock: +35.58 bps, t +2.08, n 72; 2010–17 +27.73 (t +1.25); market-test 144.
+
+A modest excess over chance. NKD after an LQD shock follows bonds the way D68 does; NKD after a VIX3M shock follows a fear spike
+(a crisis-rebound reading, §336, is likely); gold fading a CLP shock carries the emerging-currency sign (§395).
+
+## 416. D129–D132 validated (t00911–t00914): none confirm — the screen's excess was chance (S1)
+
+**N 908.**
+- **D129** NKD follows the previous session's ^VIX3M shock: **REJECT** — 57 events, -10.91 bps (t -0.51), placebo 9th.
+- **D130** MGC fades the previous session's CLP=X shock: **WATCHLIST** — 43 events, +8.10 bps (t +0.74), placebo 80th.
+- **D131** MGC follows the previous session's 6S=F shock: **WATCHLIST** — 47 events, +6.66 bps (t +0.35), placebo 82th.
+- **D132** NKD follows the previous session's LQD shock: **REJECT** — 51 events, -1.98 bps (t -0.19), placebo 43th.
+
+The two-period filter (2010–17 t > 1.0) did not rescue any of them. With families 24, 29, 37, 39, 57, 76–77, 83, 108 and this screen,
+the next-session shock class has now been searched across ~45 predictors and every plan product; its survivors out of sample are D68
+(ZN → MNQ), D84, D89, and D122 (BRL → ZS). The shock class is exhausted on the data in hand.
+
+## 417. D122's implementation caveat: the bot cannot see the close the rule was confirmed on (S8)
+
+**No trial; N 908.** The bot issues every ticket at its 17:30 ET alert; the ZS ticket enters 20:00 ET (19:00 CT). D122 was confirmed on
+Yahoo's USD/BRL bar dated by UTC day, which closes at 19:00 (winter) / 20:00 (summer) ET — after the alert. A live rule would read the
+real at ~17:30 ET (Brazil's onshore market has closed at ~16:00 ET; offshore trading is thin). The only other timing tested, FRED's
+noon rate, gave a far weaker 2023–26 result (+7.4 bps, t +0.48, vs +32.9 at the UTC close, §383): the effect is sensitive to when the
+real's move is measured, and the implementable reading lies between the two. No intraday USD/BRL source is in hand to test 17:30
+directly. **For the user's decision:** D122 as confirmed is not exactly implementable by the current bot; a live version would either
+move the ZS ticket's direction decision to just before 20:00 ET (a second, later bot step) or accept an untested 17:30 reading.
+
+## 418. D122 on an implementable reading: CME's real future (6L) — positive in every period (S8)
+
+**No trial; N 908. Descriptive (the rule is unchanged; this is its implementable form).** CME's Brazilian real future (Yahoo 6L=F)
+settles before the bot's 17:30 ET alert. Shock = the 6L session beyond 2σ (oriented so + = real weaker), short ZS's next session:
+
+| 6L measure | 2010–17 | 2018–22 | 2023–26 |
+|---|---|---|---|
+| open → settle | +11.9 (t +1.19, n 128) | +7.6 (t +0.59, n 70) | +11.7 (t +0.75, n 44) |
+| **settle → settle** | **+10.3 (t +0.86, n 111)** | **+13.7 (t +1.18, n 75)** | **+22.4 (t +1.55, n 45)** |
+
+Weaker than the confirmed Yahoo-close version (+32.9 in 2023–26) but the same sign in all three periods — including 2010–17, where
+the confirmed version was flat — and computable at the alert. **If the user adopts D122 for the demo, this is the version the bot can
+run** (yesterday's 6L settle → settle move, 60-session SD, 2σ; ZS ticket short after a real weakening).
+
+## 419. D122's implementable overlay does not help the soybean account — recommendation: do not adopt (S8)
+
+**No trial; N 908.** `reports/a31_d122_6l_overlay.json` — the 6L (settle → settle) version as the ZS account's overlay (short days
+2.8–3.5%): 2010–20 P(payout) 70 → 69%, mean net +$3,061 → +$2,796, P(net > 0) 59 → 61%; 2021–26 86 → 87%, +$3,310 → +$2,815,
+81 → 82%. Mean net falls in both histories, as with the Yahoo-close version (§383). With brackets, a few flipped days per year change
+paths more than the rule's ~10–20 bps edge adds. **D122 stays CONFIRMED as a finding, but is not recommended for the bot** — unlike D68,
+whose overlay added ~$455 per four months in 2021–26 (§210). Recorded for the user and the 2026-10-25 review.
+
+## 420. D-series family 112 protocol: the opening half-hour's volatility sets the rest of the session (S1)
+
+**No trial spent; N 908. Written and committed BEFORE any statistic is computed.** The leverage effect intraday: a turbulent open
+signals selling pressure. Ratio = realized volatility of 1-minute returns in the window's first 30 minutes (MNQ 09:30–10:00; gold
+03:00–03:30) over its mean in the previous 20 sessions. Top third of its trailing-250 distribution → one side, bottom third → the other,
+middle not traded; target the rest of the window (10:00 → 16:00; 03:30 → 11:30), JUDGED DEMEANED; side fixed by discovery. **2 tests**,
+descriptive 2010–17 column. Costs §180; recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 421. Family-112 discovery: the opening half-hour's volatility — 0 of 2 carried (S1)
+
+**No trial spent; N 908.** `reports/d112_discovery.json`: MNQ +0.7 bps (t +0.17), gold −0.4 (t −0.16). Empty.
+
+## 422. A32 design: D68 as a flip (deployed) or as a skip (S8)
+
+**A COMPUTATION; no trial; N 908. Variants fixed BEFORE any result.** The overlay replays (§383, §419) suggest flipped days can cost
+more in bracket paths than their edge adds. MNQ account (4 MNQ, 50K Daily, drift removed, A23 engine, both histories, 84 days):
+**plan** (always long); **flip** (deployed: the ZN shock's direction on shock days); **skip** (sit out the day after a ZN sell-off,
+long otherwise); **flip-short-only** is identical to flip (a bond rally already means long). Read: if skip beats flip on mean net in
+both histories without lowering P(payout), propose it to the user as a change to the bot (not made without confirmation).
+
+## 423. A32 result: D68's flip beats a skip — the deployed form stays (S8)
+
+**No trial; N 908.** `reports/a32_d68_skip.json` (sell-off days 2.4% / 3.3% of sessions): 2015–20 plan +$1,960 (76%, 61%), flip +$1,971
+(72%, 55%), skip +$1,767 (72%, 63%); 2021–26 plan +$1,265 (80%, 59%), **flip +$1,720 (77%, 64%)**, skip +$1,337 (79%, 63%). The flip
+reproduces §210 exactly and earns more than skipping in both histories; the bot's D68 is unchanged.
+
+## 424. D-series family 113 protocol: the DAX's reaction to US 08:30 data (S1)
+
+**No trial spent; N 908. Written and committed BEFORE any statistic is computed.** US releases at 08:30 ET land at 14:30 Frankfurt, inside
+the DAX window. HistData grxeur at New York times: the move 08:29 → 08:44 ET predicts 08:44 → 11:30 ET (17:30 Frankfurt, the window's
+close; the weeks when the clocks differ shift the close by an hour — kept, a dilution), follow or fade fixed by discovery; forms **all**
+and **strong** (|first 15 min| above its discovery median — mostly release days). **2 tests**, descriptive 2010–17 column. Cost DAX 0.3;
+recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
+
+## 425. Family-113 discovery: the DAX after US 08:30 data — 0 of 2 carried (S1)
+
+**No trial spent; N 908.** `reports/d113_discovery.json`: fade +0.3 / +3.0 bps (t +0.16 / +1.03). Empty.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —
