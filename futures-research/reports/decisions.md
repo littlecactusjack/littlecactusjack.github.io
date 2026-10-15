@@ -11206,6 +11206,1737 @@ recent-period design; carried at net > 0, t > 1.96; validation as §207, 3.
 
 **No trial spent; N 908.** `reports/d113_discovery.json`: fade +0.3 / +3.0 bps (t +0.16 / +1.03). Empty.
 
+## 426. The user's decisions (2026-10-14): D122 not adopted; a new search design — the current regime (S1, S8)
+
+**D122:** the user agrees with §419 — not adopted, not deployed; it stays a CONFIRMED finding on record.
+
+**New design, from family 114 on (user-approved), replacing §180's for new families:** discovery **2021-01-01 → 2024-12-31**; sealed
+validation **2025-01-01 → 2026-08-31** (20 months). Why: §349, §356 and §416 showed that rules found in 2018–22 rarely survived
+2023–26 — the market after 2022 behaves differently, and the plan trades now. Rules, fixed now:
+1. Discovery as before: carried at net > 0 with t > 1.96 (no multiple-testing cut, §133); the 2010–20 column is printed for context
+   only and does not gate carrying.
+2. Validation, once per carried test, on 2025-01 → 2026-08: CONFIRM if (a) net > 0 with t > 1.645, (b) ≥ 95th pct of the family's
+   placebo, (c) positive in BOTH 2025 and 2026 (Jan–Aug) — two periods replace §207's "3 of 4 years"; WATCHLIST if net > 0; REJECT.
+3. Not re-tested: any rule already validated (D01–D132). Rules scanned under older designs but never validated may be re-scanned.
+4. Honest caveats: 2023–24 sits inside the new discovery window and was the older design's validation data, so what failed or worked
+   there is known in general terms; 2025–26 has been read only through earlier trials' validations, never to choose a rule. Power is
+   low (20 months), so true effects will often land on WATCHLIST.
+5. A CONFIRM is stress-tested (independent data, account replay) before any proposal, and nothing reaches the bot without the user.
+
+## 427. D-series family 114 protocol: the shock screen on the current regime (S1)
+
+**No trial spent; N 908. Written and committed BEFORE any statistic is computed.** Family 111's screen (§414: ~45 predictors' 2σ shocks
+on the previous weekday → MNQ day, MGC London, NKD, DAX, CL, ZS; the same exclusions, including currency predictors for CL and NKD and
+pairs already validated) under §426's design: discovery 2021-01 → 2024-12, carried at net > 0 with t > 1.96 (~2.5% of nulls pass;
+the count is reported against it); 2010–20 printed for context only. Validation on 2025-01 → 2026-08 per §426, 2 (placebo: after
+non-shock days). Module `reporting/d114_screen.py` (family 111's functions with the new windows).
+
+## 428. Family-114 screen: 19 of 359 carried (≈ 9 by chance); D133–D151 registered (S1)
+
+**No trial spent yet; N 908.** `reports/d114_discovery.json` (2021–24 discovery, §426):
+- **D133** NKD follows a ^GDAXI shock: +41.32 bps, t +4.58, n 60; market-test 145.
+- **D134** ZS follows a 6A=F shock: +50.67 bps, t +2.92, n 54; market-test 146.
+- **D135** NKD follows a XLF shock: +30.52 bps, t +2.71, n 54; market-test 147.
+- **D136** CL follows a 6A=F shock: +75.98 bps, t +2.38, n 54; market-test 148.
+- **D137** DAX follows a PL=F shock: +33.92 bps, t +2.30, n 41; market-test 149.
+- **D138** ZS fades a KRW=X shock: +49.85 bps, t +2.21, n 50; market-test 150.
+- **D139** NKD fades a BTC=F shock: +22.23 bps, t +2.18, n 59; market-test 151.
+- **D140** DAX follows a GC=F shock: +35.78 bps, t +2.15, n 44; market-test 152.
+- **D141** ZS fades a COP=X shock: +30.94 bps, t +2.13, n 59; market-test 153.
+- **D142** ZS follows a AUDUSD=X shock: +32.17 bps, t +2.13, n 54; market-test 154.
+- **D143** MNQ fades a HG=F shock: +34.73 bps, t +2.09, n 63; market-test 155.
+- **D144** ZS fades a CLP=X shock: +40.34 bps, t +2.08, n 54; market-test 156.
+- **D145** ZS follows a FXI shock: +38.34 bps, t +2.07, n 49; market-test 157.
+- **D146** DAX follows a ZN=F shock: +32.26 bps, t +2.03, n 49; market-test 158.
+- **D147** DAX fades a 6B=F shock: +27.03 bps, t +2.02, n 52; market-test 159.
+- **D148** DAX follows a 6C=F shock: +27.72 bps, t +2.01, n 48; market-test 160.
+- **D149** NKD fades a ZS=F shock: +25.95 bps, t +2.01, n 52; market-test 161.
+- **D150** DAX follows a RUB=X shock: +30.89 bps, t +2.01, n 54; market-test 162.
+- **D151** ZS fades a ZM=F shock: +38.47 bps, t +1.96, n 56; market-test 163.
+
+About twice the chance count: some of these should be real, most are not; the sealed 2025–26 window decides. The strongest by far is
+NKD following a DAX shock (t +4.58, n 60).
+
+## 429. D133–D151 validated (t00915–t00933): two CONFIRM — soybeans fade a meal shock (D151), NKD fades a bitcoin-futures shock (D139) (S1)
+
+**N 927.** Sealed 2025-01 → 2026-08 under §426, 2:
+- **D133** NKD follows the previous session's ^GDAXI shock: **REJECT** — n 28, -13.7 bps (t -0.74), placebo 31th, 2025 -26.7, 2026 +6.3
+- **D134** ZS follows the previous session's 6A=F shock: **REJECT** — n 21, -2.2 bps (t -0.08), placebo 44th, 2025 -25.1, 2026 +18.7
+- **D135** NKD follows the previous session's XLF shock: **WATCHLIST** — n 27, +4.6 bps (t +0.24), placebo 79th, 2025 +14.8, 2026 -12.7
+- **D136** CL follows the previous session's 6A=F shock: **REJECT** — n 21, -15.4 bps (t -0.17), placebo 31th, 2025 -62.2, 2026 +27.2
+- **D137** DAX follows the previous session's PL=F shock: **REJECT** — n 30, -19.3 bps (t -0.84), placebo 10th, 2025 -6.8, 2026 -81.8
+- **D138** ZS fades the previous session's KRW=X shock: **WATCHLIST** — n 19, +9.7 bps (t +0.47), placebo 58th, 2025 +18.7, 2026 -2.6
+- **D139** NKD fades the previous session's BTC=F shock: **CONFIRM** — n 20, +53.9 bps (t +2.80), placebo 100th, 2025 +1.7, 2026 +96.7
+- **D140** DAX follows the previous session's GC=F shock: **REJECT** — n 32, -31.1 bps (t -1.16), placebo 2th, 2025 -39.8, 2026 -18.2
+- **D141** ZS fades the previous session's COP=X shock: **WATCHLIST** — n 19, +18.2 bps (t +0.79), placebo 74th, 2025 +21.2, 2026 +13.0
+- **D142** ZS follows the previous session's AUDUSD=X shock: **WATCHLIST** — n 15, +16.5 bps (t +0.63), placebo 75th, 2025 -12.8, 2026 +36.0
+- **D143** MNQ fades the previous session's HG=F shock: **REJECT** — n 29, -5.7 bps (t -0.21), placebo 19th, 2025 -5.4, 2026 -6.3
+- **D144** ZS fades the previous session's CLP=X shock: **WATCHLIST** — n 19, +15.4 bps (t +0.43), placebo 68th, 2025 -3.3, 2026 +47.6
+- **D145** ZS follows the previous session's FXI shock: **REJECT** — n 24, -7.8 bps (t -0.31), placebo 42th, 2025 +6.6, 2026 -51.0
+- **D146** DAX follows the previous session's ZN=F shock: **WATCHLIST** — n 24, +28.4 bps (t +1.30), placebo 99th, 2025 +28.9, 2026 +28.0
+- **D147** DAX fades the previous session's 6B=F shock: **WATCHLIST** — n 30, +20.0 bps (t +1.02), placebo 83th, 2025 +8.7, 2026 +36.9
+- **D148** DAX follows the previous session's 6C=F shock: **REJECT** — n 24, -9.2 bps (t -0.38), placebo 28th, 2025 -30.8, 2026 +12.5
+- **D149** NKD fades the previous session's ZS=F shock: **WATCHLIST** — n 26, +18.7 bps (t +0.76), placebo 88th, 2025 +41.1, 2026 -23.7
+- **D150** DAX follows the previous session's RUB=X shock: **WATCHLIST** — n 20, +36.1 bps (t +1.47), placebo 94th, 2025 +20.8, 2026 +54.8
+- **D151** ZS fades the previous session's ZM=F shock: **CONFIRM** — n 27, +30.3 bps (t +2.32), placebo 99th, 2025 +40.4, 2026 +10.1
+
+**Reading.** Under a null, each trial confirms with probability ~2% (t, placebo and both years together), so ~0.4 confirmations
+were expected by chance from 19; two arrived. **D151** (ZS, a plan product): +30.3 bps, t +2.32, placebo 99th, both years positive.
+**D139** (NKD, a plan product): +53.9, t +2.80, placebo 100th — but 20 events and 2025 barely positive (+1.7). D146 (the DAX follows a
+ZN shock — D68's mechanism on the DAX) held in both years with placebo 99th but t +1.30: WATCHLIST. Per §426, 5 both confirmations
+are stress-tested before anything is proposed (§430).
+
+## 430. Stress tests for D151 and D139, fixed before running (S8)
+
+**No trial; N 927.** As §210 / §382. **D151 (ZS fades a ZM shock):** (1) thresholds 1.5 / 2 / 2.5σ; periods 2010–20, 2021–24, 2025–26;
+target also the SOYB ETF (open → close, next weekday) as an independent soybean price; (2) the ZS account (3 ZS, A23, drift removed,
+both histories): plan vs the overlay (short ZS the session after a ZM up-shock; a down-shock already means long). **D139 (NKD fades a
+BTC=F shock):** (1) thresholds 1.5 / 2 / 2.5σ; predictor also BTC-USD spot (UTC day; closes at Tokyo's open, no overlap); target also
+Yahoo NKD=F's CME session (open → settlement) as an independent Nikkei price; periods 2018–20, 2021–24, 2025–26 (BTC=F starts Dec
+2017); (2) the NKD account (1 NKD): plan vs short the window after a bitcoin up-shock. Read, per §426, 5: propose to the user only if
+(1) keeps the sign in 2025–26 on the independent variants and (2) does not lower mean net or P(payout) in 2021–26.
+
+## 431. D139 replicates strongly on independent data; D151 holds in sign; neither moves its account much (S8)
+
+**No trial; N 927.** `reports/a33_stress.json`, module `reporting/a33_stress.py`.
+
+**D139 (NKD fades a bitcoin shock) — 2025–26, every independent variant positive:** spot BTC-USD → NKD window +38.7 bps (t +2.51, n 28),
+spot → NKD=F CME session +65.0 (t +2.28); BTC=F → NKD=F +128.8 (t +3.40); thresholds 1.5σ (+25 to +48, t +1.5 to +2.5) and 2.5σ the
+same sign. 2021–24 positive throughout (+3 to +47); 2018–20 mixed (≈ 0). The most consistent independent replication in the programme
+— a post-2021 phenomenon (bitcoin's spot ETFs and Japanese retail's crypto/equity overlap are the plausible channel: a crypto rally
+pulls Japanese risk money the next morning, then reverses). **D151 (ZS fades a meal shock):** SOYB 2025–26 +17.4 (t +1.51) at 2σ,
++8 to +11 at 1.5 / 2.5σ — the sign holds; but 2010–20 is negative on ZS (−19.1, t −1.79): a current-regime effect.
+
+**The accounts (A23, drift removed, 2021–26 | 2010–20):**
+
+| | 2021–26 P(payout), mean net, P(net > 0) | 2010–20 |
+|---|---|---|
+| ZS plan | 86%, +$3,310, 81% | 70%, +$3,061, 59% |
+| ZS + D151 (short 3.7% of days) | 88%, +$3,318, 81% | 71%, +$2,503, 58% |
+| NKD plan (1 contract) | 74%, +$2,763, 63% | 67%, +$1,189, 58% |
+| NKD + D139 (short 3.0% of days) | 75%, +$2,715, 65% | 67%, +$1,099, 55% |
+
+§430's reading: D151 meets it narrowly in 2021–26 (+$8, P(payout) +2 pts); D139 misses it by mean net (−$48) while raising P(payout)
+and P(net > 0). Both are real-looking and both are too rare (~3% of days) to change an account under brackets — the same lesson as
+D68 and D122. **Status: CONFIRMED and replicated findings; candidates for the user, not deployed.**
+
+## 432. The user's decisions (2026-10-14): D139 to the demo's NKD ticket; D151 not adopted; the search continues (S8)
+
+**D139 deployed** to the demo bot at 14:41 ET on 2026-10-14 (backup `/opt/futures-bot/backup-2026-10-14`): `bot/d139.py` reads Yahoo
+BTC=F's daily sessions at the 17:30 ET alert (CME's session has closed at 17:00); if today's open → close is beyond 2 × the SD of the
+previous 60 sessions, the next NKD ticket FADES it (short after a rally, long after a sell-off) and the post carries a "D139:" note;
+otherwise, or on any data error, long. Wired in `bot/schedule.py` beside D68; `tests/test_bot_ticket.py` covers it. A forward test at
+no cost: the account replay (§431) expects it roughly neutral to the account, the statistics expect the shock days to favour it.
+**D151 not adopted** (the user, per §431). The search continues under §426's design.
+
+## 433. D-series family 115 protocol: the intraday structures on the current regime (S1)
+
+**No trial spent; N 927. Written and committed BEFORE any statistic is computed.** Earlier intraday families re-run under §426's design
+(owned minute grids, family 8; each predictor → target same contract; follow or fade fixed by 2021–24; forms **all** and **strong**
+(|predictor| above its discovery median)). MNQ (day/night/post grids) and gold (London/Asia/NY grids):
+1. the session before → the window (MNQ night → day; gold Asia → London);
+2. morning → afternoon (MNQ 09:30–12:00 → 13:00–16:00; gold 03:00–07:00 → 08:30–11:30);
+3. first 30 minutes → the rest (MNQ 10:00 → 16:00; gold 03:30 → 11:30);
+4. the opening minute → the rest (MNQ 09:30 → 09:31 vs night close; gold 08:20 → 08:21);
+5. the previous window → the window (day → next day; London → next London);
+6. the previous window's close location → the window (sign of CLV − 0.5);
+7. the window's last hour → the next session (MNQ 15:00–16:00 → night; gold 10:30–11:30 → NY afternoon 11:30–16:55);
+8. overnight signed volume → the window (family 84's imbalance);
+9. into a fix → after it (MNQ 11:00–11:30 → 11:30–12:00, the European close; gold 13:00–13:30 → 13:30–14:00, COMEX settlement).
+**9 rules × 2 markets × 2 forms = 36 tests** (~0.9 by chance at 2.5%). Costs §180; validation per §426, 2 (placebo: predictor signs
+shuffled across the sealed sessions).
+
+## 434. Family-115 discovery: 2 of 36 carried (≈ 0.9 by chance); D152–D153 registered (S1)
+
+**No trial spent yet; N 927.** `reports/d115_discovery.json` (module `reporting/d115_intraday.py`):
+- **D152** MNQ opening_minute (strong) follow: +11.57 bps, t +2.06, n 505; 2010–20 +11.55 (t +2.69); market-test 164.
+- **D153** MNQ last_hour_next (all) fade: +4.90 bps, t +2.03, n 954; 2010–20 +0.61 (t +0.43); market-test 165.
+
+D152 is the strong form of D101 (the all-days opening-minute rule, WATCHLIST in §280); the strong form was never validated, and its
+2010–20 context is the same sign and size. Validation per §426, 2 with shuffled predictor signs as the placebo.
+
+## 435. D152–D153 validated (t00934–t00935): WATCHLIST both — positive in both years, below significance (S1)
+
+**N 929.** D152 MNQ strong opening minute, follow: +8.26 bps (t +0.94), placebo 86th, 2025 +9.4 / 2026 +6.7 —
+but always-long over the same sessions earned +7.08, so it adds ~1 bp over the plan (as D101). D153 MNQ night fades the last hour:
++3.51 (t +0.92), placebo 87th, both years positive. Neither usable. Z and D market-tests reach 165.
+
+## 436. D-series family 116 protocol: the calendar on the current regime (S1)
+
+**No trial spent; N 929. Written and committed BEFORE any statistic is computed.** Family 5's question (§155) under §426's design. Cells
+from the dates alone: Monday … Friday; the first three trading days of the month; the last trading day; the first trading day on or
+after the 15th; the third Friday (expiry); its Monday–Thursday (expiry week). **10 cells × 6 plan windows** (MNQ day, MGC London —
+family-8 grids; NKD, DAX — A21 paths; CL, ZS — family 10) **= 60 tests** (~1.5 by chance). Statistic: the window on the cell's days
+minus its mean on all other days in the period; long or short fixed by 2021–24. Costs §177/§180; validation per §426, 2 (placebo: the
+same number of random other days, 1,000 draws).
+
+## 437. Family-116 discovery and D154 (t00936): the calendar on the current regime — 1 of 60 carried, rejected (S1)
+
+**N 930.** `reports/d116_discovery.json` (module `reporting/d116_calendar.py`): one carried, at chance level — **D154** ZS short in
+equity-option expiry week (+21.7 bps, t +2.16, n 187; no mechanism). Sealed 2025–26: -1.55 bps (t -0.12), placebo
+47th, 2025 −7.6 / 2026 +7.4: **REJECT**. The calendar sets no direction in the current regime either. Z and D
+market-test 166.
+
+## 438. D-series family 117 protocol: each plan market's own past on the current regime (S1)
+
+**No trial spent; N 930. Written and committed BEFORE any statistic is computed.** For each plan window (MNQ day, MGC London, NKD, DAX,
+CL, ZS; family 114's targets), from the window's own series: **(i) own shock** — the previous window beyond 2 × the SD of the previous
+60; **(ii) trend5** — the sign of the sum of the previous 5 windows; **(iii) trend20** — of the previous 20. Follow or fade fixed by
+2021–24. **3 × 6 = 18 tests** (~0.5 by chance). Costs §177/§180; validation per §426, 2 (placebo: signals shuffled across the sealed
+windows).
+
+## 439. Family-117 discovery: 2 of 18 carried; D155–D156 registered (S1)
+
+**No trial spent yet; N 930.** `reports/d117_discovery.json` (module `reporting/d117_own.py`):
+- **D155** MNQ fades its trend5: +7.87 bps, t +2.19, n 1016; 2010–20 +0.69 (t +0.34); market-test 167.
+- **D156** DAX fades its own_shock: +27.56 bps, t +1.98, n 53; 2010–20 -11.67 (t -1.33); market-test 168.
+
+D155 is an every-session rule (short-horizon mean reversion on MNQ's day window): if it held, it would change the plan's direction on
+about half the days — the scale an account notices (~$125 a session at 4 MNQ for +7.9 bps). Its 2010–20 context is flat.
+
+## 440. D155–D156 validated (t00937–t00938): MNQ's weekly reversal fails; the DAX's own-shock fade is WATCHLIST (S1)
+
+**N 932.** D155 MNQ fades its 5-day trend: **REJECT**, -0.72 bps (t -0.13), placebo 50th, 2025 +5.4 / 2026 −10.0. D156 the
+DAX fades its own shock: **WATCHLIST**, +31.16 (t +1.37, n 30), placebo 88th, both years positive. Z and D market-tests
+reach 168.
+
+## 441. D-series family 118 protocol: currency fix flows on the current regime (S1)
+
+**No trial spent; N 932. Written and committed BEFORE any statistic is computed.** Families 41, 66 and 74 under §426's design (HistData,
+corrected clock). **London 16:00 fix** (family 41's `d41_fix.rows`): 15:30 → 16:00 predicts 16:00 → 16:30, follow or fade, forms all /
+strong, for 6E, 6B, 6J, 6A, 6C, 6S (12 tests). **Gotobi** (family 66's `d66_gotobi.rows`): pre and post windows, long or short 6J
+(2 tests; D104 and D116 were validated on 2023–26 with the same rules and are therefore NOT re-tested — the gotobi tests are skipped).
+**ECB fix** (family 74): pre / post 6E (2 tests; D118, the post-fix 6E rule, is excluded — pre only, 1 test). **13 tests**. Costs as the
+originals; validation per §426, 2 (placebos as the originals).
+
+## 442. Family-118 discovery: fix flows on the current regime — the only carry is an already-validated rule; empty (S1)
+
+**No trial spent; N 932.** `reports/d118_discovery.json`: 6B fades a strong move into the London fix, +0.98 bps (t +1.98) — the same
+rule as D98, REJECTED on 2023–26 (§254), so not re-tested (§426, 3; §441 should have listed D97–D99 among the exclusions — it omitted
+them, and the global rule governs). Everything else |t| < 1.7, all below 1 bp. The fixes are not where the current regime pays.
+
+## 443. D-series family 119 protocol: yesterday's direction across markets, every day, on the current regime (S1)
+
+**No trial spent; N 932. Written and committed BEFORE any statistic is computed.** Family 10's question under §426's design with family
+111's predictor list: the sign of each predictor's previous-weekday move (every day, not only shocks) → each plan window (MNQ, MGC,
+NKD, DAX, CL, ZS), with or against, fixed by 2021–24; family 111's exclusions (own market, currency → CL/NKD timing, family-29 pairs,
+validated pairs). Forms **all** and **strong** (|move| above its 2021–24 median). Carried at net > 0, t > 1.96 (~2.5% of nulls; the count
+is reported against it). Costs §177/§180; validation per §426, 2 (placebo: signs shuffled across the sealed sessions). These are
+every-day rules, so a survivor would be account-sized.
+
+## 444. Family-119 discovery: 44 of 718 carried (≈ 18 by chance); D157–D200 registered (S1)
+
+**No trial spent yet; N 932.** `reports/d119_discovery.json` (module `reporting/d119_alldays.py`):
+- **D157** CL follows KRE (all): +25.25, t +3.57; 2010–20 -6.17 (t -1.36).
+- **D158** DAX fades 6S=F (strong): +14.51, t +3.35; 2010–20 +6.19 (t +1.98).
+- **D159** CL follows KRE (strong): +33.46, t +3.28; 2010–20 -13.38 (t -1.51).
+- **D160** CL follows XOP (strong): +33.27, t +3.27; 2010–20 +3.89 (t +0.51).
+- **D161** CL follows XOP (all): +22.76, t +3.21; 2010–20 +0.56 (t +0.12).
+- **D162** DAX fades 6E=F (all): +9.43, t +3.18; 2010–20 +2.72 (t +1.31).
+- **D163** NKD follows XOP (all): +7.83, t +3.00; 2010–20 -3.28 (t -1.18).
+- **D164** MNQ follows ^SKEW (strong): +15.36, t +2.99; 2010–20 +4.14 (t +1.40).
+- **D165** CL follows XLF (all): +20.59, t +2.89; 2010–20 -11.46 (t -2.49).
+- **D166** NKD follows NG=F (all): +7.34, t +2.80; 2010–20 +3.71 (t +1.34).
+- **D167** DAX fades 6C=F (strong): +12.32, t +2.71; 2010–20 +1.47 (t +0.51).
+- **D168** MNQ fades ZL=F (strong): +13.83, t +2.69; 2010–20 -0.85 (t -0.20).
+- **D169** DAX fades 6E=F (strong): +12.41, t +2.61; 2010–20 +5.57 (t +1.84).
+- **D170** CL follows HYG (all): +18.62, t +2.59; 2010–20 +0.42 (t +0.09).
+- **D171** DAX fades 6B=F (all): +7.56, t +2.55; 2010–20 -1.59 (t -0.76).
+- **D172** CL follows NKD=F (all): +17.71, t +2.50; 2010–20 -2.18 (t -0.48).
+- **D173** CL follows XLF (strong): +26.08, t +2.44; 2010–20 -16.31 (t -2.21).
+- **D174** DAX follows DX-Y.NYB (strong): +10.94, t +2.42; 2010–20 +5.23 (t +1.63).
+- **D175** DAX fades 6A=F (strong): +11.27, t +2.41; 2010–20 -2.26 (t -0.68).
+- **D176** NKD fades ^GVZ (all): +6.22, t +2.36; 2010–20 -3.23 (t -1.16).
+- **D177** DAX fades 6S=F (all): +6.90, t +2.31; 2010–20 +3.89 (t +1.87).
+- **D178** NKD follows XOP (strong): +9.48, t +2.31; 2010–20 -3.12 (t -0.79).
+- **D179** CL follows EEM (all): +15.97, t +2.24; 2010–20 +1.00 (t +0.22).
+- **D180** ZS follows BG (strong): +14.06, t +2.23; 2010–20 +5.24 (t +1.44).
+- **D181** ZS fades ^VIX (strong): +13.48, t +2.20; 2010–20 +4.30 (t +1.32).
+- **D182** MNQ follows ^SKEW (all): +8.29, t +2.18; 2010–20 +1.10 (t +0.54).
+- **D183** DAX fades MXN=X (all): +6.96, t +2.17; 2010–20 +9.69 (t +4.49).
+- **D184** NKD follows ADM (strong): +8.42, t +2.16; 2010–20 -2.94 (t -0.68).
+- **D185** CL follows XLE (strong): +22.20, t +2.14; 2010–20 +6.58 (t +0.77).
+- **D186** CL follows HYG (strong): +23.75, t +2.12; 2010–20 -4.31 (t -0.53).
+- **D187** MNQ fades CLP=X (strong): +12.14, t +2.09; 2010–20 +2.18 (t +0.49).
+- **D188** DAX fades 6J=F (all): +6.18, t +2.06; 2010–20 -0.23 (t -0.11).
+- **D189** MNQ fades ZL=F (all): +7.84, t +2.06; 2010–20 -3.28 (t -1.59).
+- **D190** MNQ fades INR=X (all): +8.09, t +2.05; 2010–20 -2.43 (t -1.11).
+- **D191** NKD follows FXI (all): +5.35, t +2.03; 2010–20 -3.10 (t -1.12).
+- **D192** NKD follows HYG (strong): +6.83, t +2.02; 2010–20 -9.53 (t -1.97).
+- **D193** MNQ fades ZS=F (all): +7.51, t +2.02; 2010–20 +2.87 (t +1.42).
+- **D194** CL follows EEM (strong): +21.35, t +2.00; 2010–20 -0.71 (t -0.11).
+- **D195** ZS follows EEM (strong): +12.58, t +2.00; 2010–20 +1.89 (t +0.58).
+- **D196** NKD follows XLE (all): +5.19, t +1.98; 2010–20 -3.64 (t -1.32).
+- **D197** DAX fades 6J=F (strong): +9.14, t +1.97; 2010–20 +0.91 (t +0.28).
+- **D198** DAX follows KRW=X (all): +6.32, t +1.97; 2010–20 +0.78 (t +0.36).
+- **D199** NKD fades ^GVZ (strong): +7.98, t +1.97; 2010–20 -5.85 (t -1.50).
+- **D200** DAX follows DX-Y.NYB (all): +5.86, t +1.96; 2010–20 +2.18 (t +1.04).
+
+The clearest excess over chance in the search, in themes: **the DAX moves against the dollar crosses** (6S, 6E, 6C, 6A, 6B, 6J — fade;
+the dollar index — follow): a weaker euro lifts German exporters the next morning, partly visible in 2010–20 too; **crude follows the
+previous day's risk assets** (KRE, XLF, XOP, HYG, EEM) — opposite in 2010–20; **MNQ follows SKEW**. Many tests share days (correlated);
+each is validated once per §426, 2.
+
+## 445. D157–D200 validated (t00939–t00982): three CONFIRM, all one theme — the DAX moves with the dollar the next day (S1)
+
+**N 976.** Sealed 2025-01 → 2026-08 under §426, 2. Non-rejected (the other 23 REJECT — every crude-follows-risk rule among them):
+- **D158** DAX fades 6S=F (strong): **WATCHLIST** — n 215, +7.86 (t +1.27), placebo 89th, 2025 +3.2, 2026 +15.2
+- **D159** CL follows KRE (strong): **WATCHLIST** — n 149, +3.24 (t +0.16), placebo 66th, 2025 -16.4, 2026 +31.6
+- **D160** CL follows XOP (strong): **WATCHLIST** — n 167, +0.16 (t +0.01), placebo 51th, 2025 -15.9, 2026 +24.2
+- **D162** DAX fades 6E=F (all): **WATCHLIST** — n 409, +6.84 (t +1.65), placebo 96th, 2025 -1.1, 2026 +18.9
+- **D163** NKD follows XOP (all): **WATCHLIST** — n 405, +0.27 (t +0.06), placebo 57th, 2025 -3.4, 2026 +5.8
+- **D164** MNQ follows ^SKEW (strong): **WATCHLIST** — n 215, +8.47 (t +0.92), placebo 85th, 2025 +15.8, 2026 -3.6
+- **D167** DAX fades 6C=F (strong): **WATCHLIST** — n 153, +4.10 (t +0.56), placebo 74th, 2025 +5.1, 2026 +2.3
+- **D169** DAX fades 6E=F (strong): **WATCHLIST** — n 187, +10.36 (t +1.51), placebo 94th, 2025 +3.7, 2026 +24.1
+- **D171** DAX fades 6B=F (all): **CONFIRM** — n 409, +7.05 (t +1.70), placebo 97th, 2025 +2.6, 2026 +13.7
+- **D174** DAX follows DX-Y.NYB (strong): **CONFIRM** — n 198, +10.93 (t +1.66), placebo 96th, 2025 +7.0, 2026 +18.4
+- **D175** DAX fades 6A=F (strong): **CONFIRM** — n 173, +19.01 (t +2.54), placebo 100th, 2025 +7.1, 2026 +36.9
+- **D177** DAX fades 6S=F (all): **WATCHLIST** — n 411, +5.03 (t +1.22), placebo 92th, 2025 +2.5, 2026 +8.8
+- **D182** MNQ follows ^SKEW (all): **WATCHLIST** — n 402, +6.75 (t +1.17), placebo 89th, 2025 +10.6, 2026 +0.9
+- **D184** NKD follows ADM (strong): **WATCHLIST** — n 242, +9.24 (t +1.55), placebo 93th, 2025 +7.7, 2026 +11.1
+- **D185** CL follows XLE (strong): **WATCHLIST** — n 175, +2.40 (t +0.12), placebo 56th, 2025 -16.0, 2026 +28.1
+- **D188** DAX fades 6J=F (all): **WATCHLIST** — n 405, +5.10 (t +1.21), placebo 90th, 2025 +2.5, 2026 +9.2
+- **D195** ZS follows EEM (strong): **WATCHLIST** — n 208, +0.58 (t +0.08), placebo 53th, 2025 +6.4, 2026 -4.8
+- **D197** DAX fades 6J=F (strong): **WATCHLIST** — n 200, +7.27 (t +1.07), placebo 86th, 2025 +3.6, 2026 +16.4
+- **D198** DAX follows KRW=X (all): **WATCHLIST** — n 373, +3.27 (t +0.75), placebo 76th, 2025 -1.9, 2026 +11.1
+- **D200** DAX follows DX-Y.NYB (all): **WATCHLIST** — n 408, +6.94 (t +1.68), placebo 95th, 2025 -2.4, 2026 +21.2
+
+**The theme.** Every DAX × dollar rule (6B, 6A, 6E, 6S, 6C, 6J faded; the dollar index followed) is positive out of sample; three
+pass every condition (**D171** 6B all, **D174** DXY strong, **D175** 6A strong) and the rest sit just below. The DAX rises the session
+after the dollar strengthens and falls after it weakens — a weaker euro lifting exporters, read a session late. Unlike every earlier
+confirmation this is an EVERY-DAY rule on a plan product (FDXM): at 2 FDXM (~$260,000 notional) +7 bps a session is ~$180. Crude
+following risk assets — the largest discovery cluster — failed completely (2025–26 negative). Stress tests fixed in §446.
+
+## 446. Stress tests for the DAX–dollar theme, fixed before running (S8)
+
+**No trial; N 976.** The theme's rule in one form: **the DAX window takes the sign of the previous weekday's dollar move** (dollar up →
+long DAX; dollar down → short). (1) **Independent data** — dollar: Yahoo DX-Y.NYB (the trial's), FRED **DTWEXBGS** (broad trade-weighted,
+daily change), and **EUR/USD** from HistData (16:55 → 16:55 ET, inverted); DAX: A21's window (the trial's) and the real index **^GDAXI**
+(Yahoo open → close); forms all and strong (2021–24 medians); periods 2010–20, 2021–24, 2025–26. (2) **The FDXM account** (2 FDXM, A23,
+drift removed, both histories): plan (always long) vs **every-day** (the rule's sign every session) vs **strong-only** (short only after a
+strong dollar fall; long otherwise). Read: propose to the user if (1) holds in 2025–26 on the independent variants and (2) raises mean net
+and P(net > 0) in 2021–26 without lowering P(payout).
+
+## 447. The DAX–dollar rule passes every stress test and nearly doubles the FDXM account's net — the first account-sized edge (S8)
+
+**No trial; N 976.** `reports/a34_daxdollar.json`, module `reporting/a34_daxdollar.py`. Rule: the DAX window takes the sign of the
+previous weekday's dollar move.
+
+**(1) Independent data, 2025–26 (sealed for this theme):** all 12 variants positive — DX-Y.NYB → ^GDAXI +7.0 (t +1.64); FRED broad dollar
+→ A21 +9.2 (t +2.22), → ^GDAXI +8.5 (t +2.00); EUR/USD (16:55 ET) → A21 +4.8 / strong +10.3, → ^GDAXI +4.6 / +10.5. 2021–24: all 12
+positive (t +0.94 to +2.91). 2010–20: weakly positive on DX-Y.NYB and EUR/USD (+1.1 to +5.2), negative on FRED's noon-fixed broad index —
+the effect is strongest in the current regime and on end-of-day dollar measures.
+
+**(2) The FDXM account (2 FDXM, 50K Daily, A23, drift removed, every start, 84 days):**
+
+| | 2021–26 P(payout), mean net, P(net > 0) | 2010–20 |
+|---|---|---|
+| plan, always long | 83%, +$1,879, 67% | 73%, +$2,071, 62% |
+| **every-day rule** (short after a dollar fall; 45% of sessions) | **85%, +$3,720, 81%** | **85%, +$3,144, 73%** |
+| strong-only (short after a strong fall; 23%) | 86%, +$3,241, 76% | 70%, +$2,174, 60% |
+
+The every-day rule raises mean net by **+$1,841** per four months in 2021–26 and +$1,073 in 2010–20, and P(net > 0) by 14 and 11 points,
+without lowering P(payout) — §446's reading is met in full. Unlike D68/D122/D139/D151 (event rules on ~3% of days, account-neutral),
+this acts every session. **Status: CONFIRMED (D171, D174, D175 and the theme), stress-tested, proposed to the user; NOT deployed.**
+Implementation note: the bot's 17:30 ET alert can read the day's dollar move (EUR/USD to 16:55 ET, or DX-Y.NYB's session) before
+the FDXM ticket's 03:00 ET entry.
+
+## 448. The DAX–dollar rule deployed to the demo's FDXM ticket (2026-10-14, the user) (S8)
+
+**No trial; N 976.** Deployed at ~15:00 ET (backup `/opt/futures-bot/backup-2026-10-14b`): `bot/daxdollar.py` reads Yahoo DX-Y.NYB's
+daily bar at the 17:30 ET alert (open → latest; the bar updates through the day) and sets the FDXM ticket LONG after a dollar rise,
+SHORT after a fall — every session; unchanged or unreadable → long. Wired in `bot/schedule.py` beside D68 and D139, posts carry a
+"DAX-dollar:" note; `tests/test_bot_ticket.py` covers it. First reading: 2026-10-14 dollar +36 bps → FDXM long.
+
+**What the replay's numbers mean (answered to the user):** §447's means are per FDXM account (2 contracts, 50K Daily) per 84 trading days
+(~4 months) from each start date — payouts after Tradeify's 10% minus evaluation/reset fees, commissions included, drift removed. Only
+the FDXM account changes: the five-account book gains ~+$1,841 per four months, not five times it. Not modelled: extra slippage, and
+whether the 2021–26 strength persists — which is what the demo now tests.
+
+## 449. D-series family 120 protocol: the last five days' direction across markets, every day, current regime (S1)
+
+**No trial spent; N 976. Written and committed BEFORE any statistic is computed.** Family 119 (§443) found the DAX–dollar rule with
+one-day predictors. Here the predictor is the sign of each series' summed moves over the previous 5 weekdays (ending the previous
+weekday), every session; same predictor list, targets and exclusions; forms **all** and **strong** (|5-day sum| above its 2021–24
+median); pairs carried in family 119 are kept (a 5-day sum is a different rule). Carried at net > 0, t > 1.96; the count reported
+against ~2.5% by chance. Validation per §426, 2 (placebo: signs shuffled across the sealed sessions).
+
+## 450. Family-120 discovery: 49 of 718 carried (≈ 18 by chance); D201–D249 registered (S1)
+
+**No trial spent yet; N 976.** `reports/d120_discovery.json` (module `reporting/d120_week.py`):
+- **D201** NKD follows ^GDAXI 5-day (strong): +12.65, t +3.25.
+- **D202** NKD follows 6E=F 5-day (strong): +10.94, t +3.09.
+- **D203** NKD follows FXI 5-day (all): +8.00, t +3.07.
+- **D204** CL fades PL=F 5-day (strong): +30.05, t +3.01.
+- **D205** NKD follows 6B=F 5-day (all): +7.84, t +3.00.
+- **D206** NKD follows ^GDAXI 5-day (all): +7.32, t +2.84.
+- **D207** CL fades HE=F 5-day (strong): +28.51, t +2.79.
+- **D208** NKD follows FXI 5-day (strong): +10.98, t +2.75.
+- **D209** NKD follows EEM 5-day (strong): +11.46, t +2.74.
+- **D210** NKD follows EEM 5-day (all): +7.05, t +2.70.
+- **D211** DAX fades HO=F 5-day (strong): +11.76, t +2.62.
+- **D212** DAX fades CL=F 5-day (all): +7.77, t +2.62.
+- **D213** NKD fades ^VIX3M 5-day (all): +6.68, t +2.56.
+- **D214** NKD fades ^GVZ 5-day (strong): +10.31, t +2.56.
+- **D215** DAX follows ZB=F 5-day (strong): +10.23, t +2.54.
+- **D216** NKD fades ZC=F 5-day (strong): +8.69, t +2.51.
+- **D217** DAX fades CL=F 5-day (strong): +11.19, t +2.48.
+- **D218** MNQ fades KRE 5-day (strong): +12.86, t +2.42.
+- **D219** NKD fades ^VIX 5-day (all): +6.31, t +2.41.
+- **D220** MNQ fades RTY=F 5-day (strong): +13.06, t +2.39.
+- **D221** DAX follows ZN=F 5-day (all): +7.06, t +2.38.
+- **D222** NKD follows 6B=F 5-day (strong): +8.47, t +2.37.
+- **D223** ZS fades CLP=X 5-day (all): +10.37, t +2.36.
+- **D224** ZS follows ZB=F 5-day (all): +9.96, t +2.32.
+- **D225** NKD fades ^VVIX 5-day (all): +5.99, t +2.29.
+- **D226** MNQ fades ADM 5-day (strong): +12.31, t +2.28.
+- **D227** NKD follows 6E=F 5-day (all): +5.93, t +2.27.
+- **D228** NKD follows XLY 5-day (strong): +9.21, t +2.27.
+- **D229** ZS fades KRW=X 5-day (strong): +13.43, t +2.24.
+- **D230** NKD fades ^VIX3M 5-day (strong): +9.33, t +2.24.
+- **D231** NKD fades ZC=F 5-day (all): +5.84, t +2.23.
+- **D232** DAX follows ZN=F 5-day (strong): +9.21, t +2.22.
+- **D233** ZS follows XLF 5-day (strong): +13.90, t +2.21.
+- **D234** NKD fades ^VVIX 5-day (strong): +9.04, t +2.15.
+- **D235** MNQ fades EEM 5-day (all): +7.88, t +2.14.
+- **D236** CL fades SOYB 5-day (strong): +22.65, t +2.11.
+- **D237** DAX fades HO=F 5-day (all): +6.25, t +2.10.
+- **D238** NKD fades ^GVZ 5-day (all): +5.47, t +2.09.
+- **D239** ZS fades CLP=X 5-day (strong): +13.04, t +2.05.
+- **D240** CL follows XLF 5-day (all): +14.52, t +2.05.
+- **D241** NKD follows SMH 5-day (all): +5.34, t +2.04.
+- **D242** NKD fades DX-Y.NYB 5-day (strong): +8.09, t +2.04.
+- **D243** NKD follows SMH 5-day (strong): +8.48, t +2.03.
+- **D244** CL follows XLY 5-day (strong): +21.22, t +2.02.
+- **D245** NKD follows XLF 5-day (strong): +7.82, t +2.01.
+- **D246** MNQ fades SMH 5-day (strong): +11.09, t +2.00.
+- **D247** DAX fades DFII10 5-day (all): +6.12, t +2.00.
+- **D248** DAX fades DFII10 5-day (strong): +8.94, t +1.97.
+- **D249** NKD fades ^VIX 5-day (strong): +8.27, t +1.97.
+
+Themes: **NKD follows the past week's global risk** (DAX, FXI, EEM, SMH, XLF, XLY, 6E/6B up → long; VIX, VIX3M, VVIX, GVZ up → short) —
+every-day, a plan product; **the DAX fades the week's oil** (CL, HO) **and follows bonds** (ZB, ZN). Each validated once per §426, 2.
+
+## 451. D201–D249 validated (t00983–t01031): six CONFIRM — NKD follows a weaker dollar over the week (S1)
+
+**N 1,025.** Sealed 2025-01 → 2026-08 under §426, 2; 16 WATCHLIST (mostly the same NKD risk theme), 27 REJECT (the crude rules again
+among them). Confirmed:
+- **D202** NKD follows 6E=F (strong): **CONFIRM** — n 200, +17.89 (t +2.83), placebo 100th, 2025 +16.8, 2026 +19.6
+- **D222** NKD follows 6B=F (strong): **CONFIRM** — n 188, +16.11 (t +2.49), placebo 100th, 2025 +7.9, 2026 +31.0
+- **D227** NKD follows 6E=F (all): **CONFIRM** — n 408, +11.85 (t +2.67), placebo 100th, 2025 +6.6, 2026 +20.0
+- **D231** NKD fades ZC=F (all): **CONFIRM** — n 407, +9.60 (t +2.15), placebo 99th, 2025 +4.6, 2026 +17.3
+- **D242** NKD fades DX-Y.NYB (strong): **CONFIRM** — n 183, +21.80 (t +3.27), placebo 100th, 2025 +19.0, 2026 +26.4
+- **D246** MNQ fades SMH (strong): **CONFIRM** — n 196, +15.99 (t +1.66), placebo 97th, 2025 +19.6, 2026 +11.2
+
+**The theme:** five of six confirmations are NKD moving with a WEAKER dollar over the previous week (euro and pound up, the dollar index
+down → NKD long), every-day in D227's form (+11.9 bps, t +2.67). It mirrors the DAX–dollar rule (§445–448) on a different horizon and
+sign: dollar strength helps the DAX the next day; a week of dollar weakness helps the Nikkei.
+
+## 452. Stress tests for the NKD–dollar-week theme, fixed before running (S8)
+
+**No trial; N 1,025.** (1) Independent data — the dollar's previous-5-weekday direction from Yahoo 6E=F (the trial's), DX-Y.NYB
+(inverted), FRED DTWEXBGS (inverted) and HistData EUR/USD (16:55 ET); the Nikkei from A21's window (the trial's) and Yahoo NKD=F's CME
+session; forms all and strong; periods 2010–20, 2021–24, 2025–26. (2) The NKD account (1 NKD, A23, drift removed, both histories): plan
+vs every-day (long after a weak-dollar week, short after a strong one) vs strong-only. Read as §446.
+
+## 453. The NKD dollar-week rule and the DAX–dollar rule, calibrated: both beat random flips; NKD's should replace D139 (S8)
+
+**No trial; N 1,025.** `reports/a35_nkddollar.json`, `a35_flip_null.json`, `a35_sealed_replay.json`; module `reporting/a35_nkddollar.py`.
+
+**(1) Independent data (NKD rule: long after a week of dollar weakness, short after a week of strength).** On the Tokyo window (A21)
+every dollar measure is strong in 2025–26 (6E +11.9, t +2.67; DX-Y.NYB +10.9, t +2.44; FRED broad +10.1, t +2.27; EUR/USD +13.7, t +3.13;
+strong forms +16 to +22, t +2.6 to +3.3). On NKD=F's whole CME session it is positive but weak (+0.9 to +17, t ≤ 1.3) — the effect lives
+in Tokyo hours, the window the plan trades. 2010–20: negative everywhere — a post-2021 regime.
+
+**(2) The replays are noisy, so they were calibrated** against 40 random flip masks (the same share of flipped days, random dates):
+NKD 2021–26 rule Δ +$3,373 vs random +$87 ± $996 (beats 100%); FDXM 2021–26 +$1,841 vs +$110 ± $622 (100%); FDXM 2010–20 +$1,073 vs
++$87 ± $579 (98%); NKD 2010–20 +$2,069 vs random +$1,700 ± $861 (72% — that era's gain is NOT the rule's; its own edge there is
+negative, −$71 a session). **Accounts starting in the sealed period (2025-01 →, ~360 starts):**
+
+| | mean net / 84 days | P(payout) | P(net > 0) | vs random flips |
+|---|---|---|---|---|
+| NKD plan | +$3,206 | 85% | 63% | |
+| **NKD + dollar-week** | **+$8,040** | **95%** | **95%** | beats 100% (random −$525 ± $1,466) |
+| NKD + D139 + dollar-week | +$4,630 | 92% | 87% | |
+| NKD + D139 only (deployed) | +$3,475 | 87% | 70% | |
+| FDXM plan | +$1,061 | 71% | 56% | |
+| **FDXM + DAX–dollar (deployed)** | **+$5,616** | **92%** | **87%** | beats 98% (random +$1,119 ± $1,564) |
+
+**Reading.** The DAX–dollar rule's account gain is real (not a replay artefact), out of sample. The NKD dollar-week rule is the largest
+account effect in the programme, and combining it with D139 HALVES its gain — D139 should be replaced by it on the NKD ticket.
+Caveats: regime-dependent (nothing before 2021); 20 sealed months; replay paths are HistData CFD prices, drift removed. **Proposed to
+the user; not deployed.**
+
+## 454. The NKD dollar-week rule replaces D139 on the demo's NKD ticket (2026-10-14, the user) (S8)
+
+**No trial; N 1,025.** Deployed 15:27 ET (backup `/opt/futures-bot/backup-2026-10-14c`): `bot/nkddollar.py` sums Yahoo 6E=F's open →
+close over the last 5 sessions through the alert day and sets NKD LONG after a week of dollar weakness (euro up), SHORT after a week of
+strength — every session; missing data → long. `bot/schedule.py` now calls it for NKD in place of D139 (`d139.py` stays on disk,
+unused; D139 remains a confirmed finding). Posts carry a "dollar-week:" note. First reading, 2026-10-14: euro −43 bps over 5 sessions
+→ NKD short. The demo now runs three direction rules: MNQ D68 (ZN shocks), NKD dollar-week, FDXM DAX–dollar.
+
+## 455. D-series family 121 protocol: the last twenty days' direction across markets, every day, current regime (S1)
+
+**No trial spent; N 1,025. Written and committed BEFORE any statistic is computed.** Family 120 (§449) with a 20-weekday sum in place of
+5: the sign of each series' summed moves over the previous 20 weekdays (ending the previous weekday) → each plan window, every session;
+same predictor list, targets, exclusions and forms. Carried at net > 0, t > 1.96 (~2.5% by chance; counted against it). Validation per
+§426, 2 (placebo: signs shuffled across the sealed sessions). Monthly-horizon signals change slowly (few sign changes), so the
+effective sample is smaller than n suggests — the shuffled placebo is the guard.
+
+## 456. Family-121 discovery: 15 of 718 carried (≈ 18 by chance — no excess); D250–D264 registered (S1)
+
+**No trial spent yet; N 1,025.** `reports/d121_discovery.json` (module `reporting/d121_month.py`):
+- **D250** DAX follows COP=X 20-day (all): +9.38, t +2.94.
+- **D251** MNQ fades ADM 20-day (strong): +15.22, t +2.66.
+- **D252** NKD follows EEM 20-day (strong): +10.25, t +2.54.
+- **D253** MGC follows COP=X 20-day (all): +5.59, t +2.34.
+- **D254** ZS fades CLP=X 20-day (all): +10.22, t +2.33.
+- **D255** MGC follows IDR=X 20-day (strong): +8.01, t +2.32.
+- **D256** DAX fades CL=F 20-day (all): +6.69, t +2.26.
+- **D257** MNQ fades CL=F 20-day (all): +8.30, t +2.25.
+- **D258** NKD follows XLF 20-day (strong): +7.70, t +2.23.
+- **D259** NKD follows FXI 20-day (all): +5.82, t +2.23.
+- **D260** ZS fades KRW=X 20-day (strong): +12.82, t +2.22.
+- **D261** DAX fades NG=F 20-day (strong): +9.53, t +2.22.
+- **D262** MNQ follows ^OVX 20-day (strong): +11.27, t +2.16.
+- **D263** ZS follows RUB=X 20-day (all): +9.01, t +2.04.
+- **D264** NKD fades ZC=F 20-day (all): +5.28, t +2.02.
+
+Fewer passes than chance: the monthly horizon shows no cross-market structure beyond noise. Validated anyway, once each, per §426.
+
+## 457. D250–D264 validated (t01032–t01046): one CONFIRM — NKD fades corn's month (D264); not proposed (S1)
+
+**N 1,040.** 14 of 15 WATCHLIST or REJECT; **D264** NKD fades corn's 20-day move: +9.00 bps (t +2.01), placebo 98th, 2025 +5.4 / 2026
++14.6 — CONFIRM. With D231 (the 5-day form, §451) it makes NKD–corn a second NKD theme, but the family as a whole was at chance (15
+carried vs ~18 expected; ~0.3 chance confirmations), and NKD already runs the far stronger dollar-week rule — one direction per day.
+Recorded, not proposed.
+
+## 458. D-series family 122 protocol: Asia overnight into the European and US windows, current regime (S1)
+
+**No trial spent; N 1,040. Written and committed BEFORE any statistic is computed.** Predictors that finish before 03:00 ET on day D:
+the NKD Tokyo window (A21 path, Tokyo date D), the Hang Seng's morning 09:30 → 12:00 Hong Kong (HistData hkxhkd), and USD/JPY, AUD/USD,
+EUR/USD from 18:00 ET (D−1) to 02:55 ET (HistData grids, `reporting/hd_grid.py`; USD/JPY inverted so + = yen stronger... reported as
+the pair's own sign). Targets opening after: **gold's London window** (03:00), **the DAX window** (03:00 ET), **MNQ's day** (09:30).
+Follow or fade fixed by 2021–24; forms all / strong. **5 × 3 × 2 = 30 tests.** Costs §180; validation per §426, 2 (placebo: shuffled
+signs).
+
+## 459. Family-122 discovery and D265 (t01047): Asia overnight — 1 of 30 carried, REJECT (S1)
+
+**N 1,041.** `reports/d122_discovery.json` (module `reporting/d122_asia.py`): gold and MNQ take nothing from Asia's session; the one carry
+(**D265**, the DAX fades USD/JPY's overnight move, +6.9 bps, t +2.05, at chance level) on sealed 2025–26: -1.90 bps (t -0.43),
+placebo 37th, {2025: -2.1594867284352923, 2026: -1.5072172537233124} — **REJECT**. Of note, not tested: the DAX FOLLOWS EUR/USD overnight (+6.0, t +1.77; 2010–20 +4.0, t +1.78) —
+the opposite sign to the DAX–dollar rule's previous-day reading, at a different time.
+
+## 460. D-series family 123 protocol: the last two days' direction across markets, every day, current regime (S1)
+
+**No trial spent; N 1,041. Written and committed BEFORE any statistic is computed.** Family 120 (§449) with a 2-weekday sum (the
+previous two weekdays). Same predictors, targets, exclusions, forms, carrying rule and validation (§426, 2; shuffled-sign placebo).
+
+## 461. Family-123 discovery: 51 of 718 carried (≈ 18 by chance); D266–D316 registered (S1)
+
+**No trial spent yet; N 1,041.** `reports/d123_discovery.json` (module `reporting/d123_twoday.py`). Themes: NKD follows two days of
+global risk (FXI, XLY, EEM, ES, RTY, 6B up; GVZ, VIX3M down → long); crude follows risk assets (failed in families 119–120); ZS follows
+the grain traders' stocks (ADM, BG) and fades the VIX; the DAX follows the dollar index (strong) — the deployed theme again. Each
+validated once per §426, 2.
+
+## 462. D266–D316 validated (t01048–t01098): two CONFIRM, at chance; neither proposed (S1)
+
+**N 1,092.** 24 WATCHLIST, 25 REJECT. **D279** NKD follows the pound's 2-day move (+7.6 bps, t +1.70, placebo 95th; 2025 +4.5 / 2026 +12.5)
+— the deployed dollar-week theme at a shorter horizon, adding nothing new. **D309** the DAX fades a strong 2-day Nikkei move (+10.4, t +1.81,
+placebo 97th; +7.9 / +13.4) — on the FDXM ticket, which already follows the DAX–dollar rule. With 51 trials, ~1 confirmation was
+expected by chance; two arrived. Crude-follows-risk failed a third time (all WATCHLIST/REJECT). The every-day cross-market screens
+(families 119–121, 123) are complete; their durable product is the dollar theme on the DAX and the Nikkei.
+
+## 463. A36: the five-account book with the deployed rules (no trial) (S8)
+
+**N 1,092.** `reports/a36_book.json` — MNQ (D68), NKD (dollar-week), FDXM (DAX–dollar), MGC and MCL always long; 50K Daily, drift removed,
+84 days, common starts:
+
+| book | starts 2025-01 → (298) | 2021–26 (1,040) | 2010–20 (689) |
+|---|---|---|---|
+| plan | +$8,994, P(net > 0) 99%, p10 +$1,855 | +$9,468, 93%, +$1,748 | +$8,023, 92%, +$259 |
+| deployed rules | **+$17,492, 100%, +$8,228** | **+$15,008, 96%, +$4,148** | +$10,494, 85%, −$826 |
+
+In the current regime the rules roughly double the book's mean and lift its bad cases; in 2010–20 the mean rises but P(net > 0)
+falls (92 → 85%) — the rules did not work before 2021. That is the risk the demo now watches: if the regime ends, the book is worse
+than the plan. A review trigger, set now: if the two dollar rules' forward record over the demo's first 40 sessions is negative in
+sum, propose reverting them.
+
+## 464. D-series family 124 protocol: the plan windows relay into each other, current regime (S1)
+
+**No trial spent; N 1,092. Written and committed BEFORE any statistic is computed.** Family 3's question (§149) under §426's design,
+with every predictor finished before its target opens (New York times): targets **MGC London** (03:00 D) ← NKD window (D), MNQ day,
+MGC NY afternoon, DAX window, CL session, ZS session (all D−1); **MNQ day** (09:30 D) ← NKD window (D), MGC London (D), MGC NY, DAX, CL,
+ZS (D−1); **CL session** (opens 18:00 D−1) ← MNQ day, MGC London, MGC NY, DAX, ZS (D−1); **ZS session** (opens 20:00 D−1) ← MNQ day,
+MGC London, MGC NY, DAX, CL (D−1). Follow or fade fixed by 2021–24; forms all / strong. **22 pairs × 2 = 44 tests** (~1.1 by chance).
+Costs §177/§180; validation per §426, 2 (placebo: shuffled signs).
+
+## 465. Family-124 discovery: the plan windows do not relay — empty (S1)
+
+**No trial spent; N 1,092.** `reports/d124_discovery.json` (module `reporting/d124_relay.py`): 1 of 44 carried — MNQ fades ZS's previous
+session (+7.5 bps, t +2.02), the same rule as D193 (family 119), already REJECTED on 2025–26; not re-tested (§426, 3). Nearest others:
+MNQ follows the same morning's gold London (+5.7, t +1.57); ZS follows a strong DAX (+10.6, t +1.61). Empty.
+
+## 466. D-series family 125 protocol: the dollar rules on other foreign indices, current regime (S1)
+
+**No trial spent; N 1,092. Written and committed BEFORE any statistic is computed.** The deployed dollar rules act on the DAX (previous
+day's dollar index) and the Nikkei (the euro's previous 5 days). Do they generalise? Targets (Yahoo daily open → close, local sessions):
+**^STOXX50E** (Euro Stoxx 50 — Eurex-listed like FDXM, so a candidate account), **^FCHI**, **^FTSE**, **^AXJO**, **^HSI**, **^KS11**. Rules:
+(a) the sign of DX-Y.NYB's previous weekday (follow or fade), (b) the sign of 6E=F's previous-5-weekday sum (follow or fade); forms
+all / strong. **6 × 2 × 2 = 24 tests.** Cost 0.3 bps (index-futures level); validation per §426, 2 (placebo: shuffled signs). Only
+^STOXX50E is a tradable candidate; the rest test the theme's generality.
+
+## 467. Family-125: the dollar theme on other foreign indices — ASX excluded as an artefact; CAC and KOSPI validated (S1)
+
+**N 1,095.** `reports/d125_discovery.json`. **^AXJO's carries (t +3.8 to +5.6) are an artefact**: Yahoo's ASX open equals the previous
+close on 71% / 38% / 93% of days (2010–20 / 2021–24 / 2025–26), so its "open → close" is close → close and contains the overnight
+reaction to the predictor — excluded before validation. (^KS11, ^HSI, ^FCHI, ^GDAXI, ^STOXX50E opens are real: ≤ 4% equal the previous close;
+the DAX–dollar stress test on ^GDAXI, §447, stands.) Validated (not tradable at Tradeify; tests of the theme's generality):
+- **D317** ^FCHI follows dxy_day (strong): discovery +8.05 (t +2.17) → sealed **WATCHLIST** +5.87 (t +1.04), placebo 85th, 2025 +6.0, 2026 +5.5
+- **D318** ^KS11 follows euro_week (all): discovery +6.67 (t +2.39) → sealed **WATCHLIST** +14.49 (t +1.57), placebo 94th, 2025 +8.2, 2026 +23.9
+- **D319** ^KS11 follows euro_week (strong): discovery +11.26 (t +2.93) → sealed **WATCHLIST** +7.80 (t +0.57), placebo 73th, 2025 +8.9, 2026 +6.2
+
+The Euro Stoxx 50 (the Eurex candidate) does not carry the theme (t ≤ 1.42). The theme is specific to the DAX and the Nikkei among
+tradable products.
+
+## 468. The DAX–dollar rule's measurement time: the bot's 17:30 reading works; a 02:55 ET reading is steadier (S8)
+
+**No trial; N 1,095.** `reports/a37_daxdollar_timing.json`. Yahoo's DX-Y.NYB daily bar covers 00:00 → 24:00 ET (hourly bars checked), so
+the replay's rule used the whole day while the bot reads it at 17:30 ET; no look-ahead either way (the DAX opens 03:00 ET next day).
+With HistData EUR/USD (dollar = −EUR/USD) at three cut-offs, the DAX window's net (follow the dollar), 2021–24 | 2025–26:
+16:55 → 16:55 ET (≈ the bot) **+8.9 (t +2.96) | +4.4 (t +1.08)**; 23:55 → 23:55 +8.7 (t +2.28) | +1.4 (t +0.26); **02:55 → 02:55 ET (just
+before the DAX opens) +7.0 (t +2.36) | +7.0 (t +1.72)** — positive at every cut-off and steadiest when read just before the open. The
+deployed form stands; an optional improvement for the user: a second bot step at ~02:50 ET that re-reads the dollar and updates the
+FDXM ticket's side before its 03:00 entry.
+
+## 469. D-series family 126 protocol: the dollar before New York into the US windows, current regime (S1)
+
+**No trial spent; N 1,095. Written and committed BEFORE any statistic is computed.** The dollar theme moved the DAX and the Nikkei. For the
+US windows: dollar = −EUR/USD (HistData grid). Predictors: **overnight** 16:55 (D−1) → 09:25 (D) and **London morning** 02:55 → 09:25 (D).
+Targets: **MNQ day** (09:30 → 16:00, D) and **gold NY afternoon** (11:30 → 16:55, D; family-68 grid — the dollar measured to 09:25,
+before it). Follow or fade fixed by 2021–24; forms all / strong. **2 × 2 × 2 = 8 tests.** Costs §180; validation per §426, 2 (placebo:
+shuffled signs).
+
+## 470. Family-126 discovery: the dollar before New York does not move the US windows — empty (S1)
+
+**No trial spent; N 1,095.** `reports/d126_discovery.json`: best MNQ follows a strong London-morning dollar move, +8.3 bps (t +1.49);
+gold's NY afternoon ~0. The dollar theme is a foreign-index effect (DAX, Nikkei), not a US one. Empty.
+
+## 471. D-series family 127 protocol: slow regime states as every-day direction, current regime (S1)
+
+**No trial spent; N 1,095. Written and committed BEFORE any statistic is computed.** States on the previous weekday: (1) **VIX high** —
+^VIX close above its trailing-250 median; (2) **VIX inverted** — ^VIX > ^VIX3M; (3) **own trend** — the target market's Yahoo settlement
+above its 200-session mean (NQ=F, GC=F, NKD=F, ^GDAXI, CL=F, ZS=F); (4) **dollar trend** — DX-Y.NYB above its 50-session mean; (5) **rates
+rising** — ZN=F settlement below its 20-session mean (yields up). Each state → long one side / short the other, every session, side
+fixed by 2021–24, the target JUDGED DEMEANED (its 2021–24 mean removed). **5 × 6 = 30 tests.** Costs §177/§180; validation per §426, 2
+(placebo: the state series rolled by a random 60+ sessions).
+
+## 472. Family-127 and D320 (t01102): slow regimes set no direction — 1 of 30 carried, REJECT (S1)
+
+**N 1,096.** `reports/d127_discovery.json` (module `reporting/d127_regime.py`): VIX level, VIX inversion, own 200-day trend, the dollar's
+50-day trend and rising yields give no direction to any plan window (all |t| < 1.6 but one). **D320** (DAX short while yields rise, t +1.97,
+at chance) on sealed 2025–26: -1.08 bps (t -0.26), placebo 39th, {2025: 2.2644045125630345, 2026: -6.147645530211748} — **REJECT**.
+
+## 473. D-series family 128 protocol: gold-specific every-day signals, current regime (S1)
+
+**No trial spent; N 1,096. Written and committed BEFORE any statistic is computed.** For gold's London window (the plan's MGC account):
+(1) **miners vs gold, 1 day** — sign of GDX's minus GLD's open → close on the previous weekday; (2) the same over **5 days**; (3) **silver vs
+gold, 1 day** — SI=F minus GC=F (Yahoo sessions); (4) the same over **5 days**; (5) **heavy-volume GLD days** — the sign of GLD's session
+when its volume exceeds 1.5 × the previous-20 median (other days not traded); (6) **gold implied vol, 5 days** — sign of ^GVZ's 5-day log
+change. Follow or fade fixed by 2021–24; forms all / strong (except 5). **11 tests.** Cost MGC 0.8; validation per §426, 2 (placebo:
+shuffled signs).
+
+## 474. Family-128 discovery: gold-specific signals — 0 of 11 carried (S1)
+
+**No trial spent; N 1,096.** `reports/d128_discovery.json`: every |t| ≤ 1.03 on 2021–24 (best: gold follows a strong 5-day silver
+outperformance, +3.3 bps). Gold's London window takes no direction from miners, silver, ETF volume or its own implied volatility. Empty.
+
+## 475. D-series family 129 protocol: refining spreads as every-day crude direction, current regime (S1)
+
+**No trial spent; N 1,096. Written and committed BEFORE any statistic is computed.** From Yahoo settlements (roll-jump days dropped as
+§329): the 3-2-1 **crack** change, **RB − CL** and **HO − CL** relative changes (log), each over the previous weekday (1-day) and the
+previous 5 weekdays. Sign → CL's next session (family 10; it opens 18:00 ET, after the 14:30 settlements), follow or fade fixed by
+2021–24; forms all / strong. **3 × 2 × 2 = 12 tests.** Cost CL 0.7 (MCL's 5.4 noted at validation); validation per §426, 2 (placebo:
+shuffled signs).
+
+## 476. Family-129: crude follows its refining margin over the week — 5 of 12 carried (≈ 0.3 by chance); validated (S1)
+
+**N 1,101.** `reports/d129_discovery.json` (module `reporting/d129_crack.py`). Every carry is the 5-day form: when refined products have
+outpaced crude over the previous week, crude rises next session (refiners' demand catching up); 2010–20 the opposite sign — a current-
+regime effect, as the dollar rules. Sealed 2025–26:
+- **D321** CL follows crack_5d (all): discovery +14.2 (t +2.05) → **REJECT** -10.64 (t -0.78), at MCL's cost -15.3; placebo 30th; 2025 -12.8, 2026 -6.3 (t01103)
+- **D322** CL follows crack_5d (strong): discovery +28.5 (t +2.83) → **REJECT** -8.04 (t -0.36), at MCL's cost -12.7; placebo 50th; 2025 -22.9, 2026 +6.3 (t01104)
+- **D323** CL follows rb_cl_5d (all): discovery +15.0 (t +2.16) → **WATCHLIST** +4.84 (t +0.36), at MCL's cost +0.1; placebo 68th; 2025 -3.0, 2026 +20.3 (t01105)
+- **D324** CL follows ho_cl_5d (all): discovery +23.2 (t +3.37) → **REJECT** -8.86 (t -0.65), at MCL's cost -13.6; placebo 33th; 2025 -13.3, 2026 -0.1 (t01106)
+- **D325** CL follows ho_cl_5d (strong): discovery +26.6 (t +2.58) → **REJECT** -7.50 (t -0.39), at MCL's cost -12.2; placebo 44th; 2025 -19.3, 2026 +9.9 (t01107)
+
+**Reading (added after the trials):** none survived — the refining-margin effect was 2021–24 (the 2022 energy shock), negative in 2025–26.
+Crude has now failed four themes on the current regime (risk assets ×3, refining margin); the MCL account stays always long.
+
+## 477. D-series family 130 protocol: currency windows as candidate new markets, current regime (S1)
+
+**No trial spent; N 1,101. Written and committed BEFORE any statistic is computed.** Targets new to the plan (CME micro FX exists for
+each): the London session 08:00 → 16:00 London of **6E, 6J, 6B, 6A, 6C, 6S** (HistData via `d3.histdata`, the futures' direction, family
+41's orientation). Predictors on the previous weekday (all known before 08:00 London): the target's own 1-day and 5-day sums (Yahoo
+futures sessions, family 83's series / 6E=F, 6J=F), **DX-Y.NYB** 1-day and 5-day, **ES=F** 1-day and 5-day, **ZN=F** 1-day and 5-day,
+**GC=F** 1-day. Follow or fade fixed by 2021–24; forms all / strong. **9 × 6 × 2 = 108 tests** (~2.7 by chance). Cost 0.5 bps (§180's FX
+level); validation per §426, 2 (placebo: shuffled signs).
+
+## 478. Family-130 and D326 (t01108): currency sessions are not predictable from these inputs — 1 of 108, REJECT (S1)
+
+**N 1,102.** `reports/d130_discovery.json` (module `reporting/d130_fx.py`): one carry, fewer than chance (~2.7) — **D326** 6S follows the
+S&P's week (+2.7 bps, t +2.11): sealed -0.04 (t -0.02), placebo 47th, {2025: 0.2144817179585634, 2026: -0.42511774754722115} — **REJECT**. No micro-FX account is
+indicated: the dollar's moves predict foreign equity indices (DAX, Nikkei), not the currencies themselves.
+
+## 479. D-series family 131 protocol: the dollar rules on the Swiss SMI (S1)
+
+**No trial spent; N 1,102. Written and committed BEFORE any statistic is computed.** Family 125's design (§466) for ^SSMI (Yahoo daily
+open → close; Eurex lists SMI futures, so a candidate account if the theme holds): (a) DX-Y.NYB's previous weekday, (b) 6E=F's
+previous-5-weekday sum; follow or fade; forms all / strong. **4 tests.** Opens checked for staleness before computing (as §467).
+Cost 0.3; validation per §426, 2.
+
+## 480. Family-131 discovery: the SMI does not carry the dollar rules — 0 of 4 (S1)
+
+**No trial spent; N 1,102.** `reports/d131_discovery.json` (opens real: 1% stale): following the dollar +1.9 / 0.0 bps (t ≤ 0.89),
+the euro's week +0.7 / +4.2 (t ≤ 1.31). No SMI account is indicated. Empty.
+
+## 481. D-series family 132 protocol: gaps and narrow ranges on the current regime (S1)
+
+**No trial spent; N 1,102. Written and committed BEFORE any statistic is computed.** Families 22–23 under §426's design, on the owned
+grids. **Gap**: the window's first close vs the previous window's last close (MNQ day vs the previous 16:00; gold London vs the previous
+11:30), same contract; the rest of the window (open → close) with the gap or against it (fill), fixed by 2021–24; forms all / strong.
+**NR7**: when the previous window's high–low range is the narrowest of the last 7, the window in the previous window's direction or
+against it. **2 markets × 3 = 6 tests.** Costs §180; validation per §426, 2 (placebo: shuffled signs).
+
+## 482. Family-132 discovery: gaps and narrow ranges — 0 of 6 carried (S1)
+
+**No trial spent; N 1,102.** `reports/d132_discovery.json`: all |t| ≤ 1.36 (best: gold continues a strong gap, +4.6 bps). Empty.
+
+## 483. D-series family 133 protocol: positioning (COT) on the current regime (S1)
+
+**No trial spent; N 1,102. Written and committed BEFORE any statistic is computed.** Families 30–31 (§228, §230) under §426's design:
+speculators (non-commercial), commercials and small traders; **flow** (the week's change in net / open interest) and **crowding**
+(|52-week z| > 1.5); the five sessions of the week after the report (Yahoo family-10 sessions), follow or fade fixed by 2021–24;
+week-clustered t. **3 groups × 2 kinds × 14 markets = 84 tests** (~2.1 by chance); D95 and D96's exact rules excluded (§426, 3).
+Costs §177; validation per §426, 2 (placebo: weeks shuffled; both 2025 and 2026 positive).
+
+## 484. Family-133: positioning on the current regime — 2 of 82 carried (at chance); validated (S1)
+
+**N 1,104.** `reports/d133_discovery.json`:
+- **D327** ZN follows speculators crowding: discovery +6.39 (t +2.93) → **REJECT** -7.20 (t -1.92), placebo 1th, {2025: -10.885357240029858, 2026: -5.276173220755352} (t01109)
+- **D328** ES fades commercial crowding: discovery +11.56 (t +2.02) → **REJECT** -8.78 (t -1.10), placebo 22th, {2025: -21.798236895272474, 2026: 13.007076814041733} (t01110)
+
+Positioning data sets no direction for the plan's products in the current regime either.
+
+## 485. Stress tests for D246 (MNQ fades a strong week in semiconductors), fixed before running (S8)
+
+**No trial; N 1,104.** D246 (§451) was confirmed but not followed up. Rule: when SMH's previous-5-weekday sum exceeds its 2021–24 median
+size, MNQ's day session goes against its sign; other days long (the plan). (1) **Independent data**: the semiconductor index from ^SOX
+(Yahoo) in place of SMH — predictors SMH (the trial's) and ^SOX; MNQ target from the owned grid (the trial's)
+and Yahoo NQ=F's session; periods 2010–20, 2021–24, 2025–26. (2) **The MNQ account** (4 MNQ, A23, drift removed, both histories, and
+starts from 2025-01): plan vs D246 vs D246 + D68 (D68 overriding on its shock days), with the random-flip calibration of §453. Read as
+§446.
+
+## 486. D246 stress-tested: right sign everywhere, no account edge — not proposed (S8)
+
+**No trial; N 1,104.** `reports/a38_d246.json`, module `reporting/a38_d246.py`. (1) Independent data: positive in all 12 variants
+(SMH or ^SOX × MNQ grid or NQ=F × three periods), but weak on NQ=F's whole session (t ≤ 1.11) and on ^SOX in 2010–20 (+4.0, t +0.96).
+(2) MNQ account: 2021–26 D246 Δ mean net +$15 vs random flips +$849 ± $792 (beats 12%); 2010–20 +$185 vs −$185 ± $868 (78%); starts
+from 2025: plan +$633, D68 +$1,315, D246 +$1,110, D246 + D68 +$1,747. The rule's sessions do not translate into account gains beyond
+what random flips of the same share achieve. MNQ keeps D68 alone. Not proposed.
+
+## 487. The DAX–dollar rule's dollar measure: DX-Y.NYB, the euro or a seven-currency vote perform alike out of sample (S8)
+
+**No trial; N 1,104. Descriptive.** DAX window following the previous weekday's dollar, by measure (2010–20 | 2021–24 | 2025–26):
+DX-Y.NYB (deployed) +2.2 | +5.9 | **+6.9**; −6E +2.7 | +9.4 | **+6.8**; a seven-currency sign vote +2.0 | +8.2 | **+7.0**. The euro was
+stronger in-sample but the three are equal on the sealed period; the deployed measure stays.
+
+## 488. The NKD dollar-week rule's measure: euro, dollar index or a currency vote all hold out of sample (S8)
+
+**No trial; N 1,104. Descriptive.** NKD window following a weaker dollar over the week (2010–20 | 2021–24 | 2025–26): euro week (deployed)
+−2.3 | +5.9 | **+11.9 (t +2.67)**; −DX-Y.NYB week −2.9 | +4.3 | **+10.9 (t +2.44)**; seven-currency vote −1.6 | +2.5 | **+12.2 (t +2.74)**. All three
+hold on the sealed period; all are negative before 2021 (the regime caveat, §453). The deployed measure stays.
+
+## 489. The bot posts each alert as embeds; the ticket board turns green when every `!eod` is in (2026-10-14, the user) (S8)
+
+**No trial; N 1,104.** Deployed 19:23 ET (backup `/opt/futures-bot/backup-2026-10-14d`). Each 17:30 alert is ONE message with up to two
+embeds: "results & notes" (shadow results, missing-balance notes, the Friday weekly check) and "tickets" — one field per ticket (⏳ / ✅
+/ ▫️, side, window in ET, the bracket instructions, any rule note). The tickets embed's side bar is **red while at least one traded ticket
+lacks its `!eod`** and **green once all are recorded**. `!eod` marks every traded ticket of that product that has started
+(`Tickets.mark_eod`), reissues the product's next ticket as before, and edits every stored board holding it (`boards.json`: alert date →
+message id, keys); `!board` re-posts the latest board. On first start the bot posted a board for the 2026-10-14 tickets. Tests:
+`tests/test_bot_ticket.py` (marking / colour logic; embed limits checked on the droplet — discord.py is not installed locally).
+
+## 490. The FDXM ticket's dollar is re-read at 02:50 ET before its 03:00 entry (the user's option 3) (S8)
+
+**No trial; N 1,104.** Deployed 19:25 ET 2026-10-14 (backup `/opt/futures-bot/backup-2026-10-14e`). Per §468 the dollar measured just
+before the DAX opens is the steadiest form (+7.0 bps in both 2021–24 and 2025–26). Between 02:45 and 02:58 ET on weekdays the bot reads
+Yahoo's 5-minute EUR/USD, takes the dollar's move over the last 24 hours (−EUR/USD from the previous weekday's same time), and: if it
+gives the 17:30 side, notes the check on the board; if it flips the side, reissues the FDXM ticket with the new side
+(`Tickets.issue(..., side_override=...)`), edits the board and posts a one-line "FDXM side changed" message. No data → the 17:30 side
+stands. Tests: `test_daxdollar_preopen_side`. (Illustration: 2026-10-14's 02:50 reading was dollar −28 bps → short, against the
+previous evening's +33 → long — flips happen.)
+
+## 491. Every time the bot shows is Chicago, 12-hour (2026-10-14, the user) (S8)
+
+**No trial; N 1,104.** Deployed 19:30 ET (backup `/opt/futures-bot/backup-2026-10-14f`). The board's headings showed New York time while
+each ticket's instruction line showed its market's own clock (Tokyo for NKD, Frankfurt for FDXM, Chicago for ZS) — one moment on two
+clocks. Now every displayed time is Chicago, 12-hour: field headings ("Wed 7:00 PM → Thu 1:00 AM CT"), the instruction lines (entry and
+"if neither filled" times), shadow results (`_res_time`), the alert title ("4:30 PM CT"), the weekend note and the FDXM re-check message.
+Scheduling is unchanged (the windows still follow each market's own clock; only the display changed). `schedule.clock()`, `CT`.
+
+## 492. Recorded results override the shadow; FDXM's shadow is labelled a proxy (2026-10-14, the user) (S8)
+
+**No trial; N 1,104.** The user saw stops on two tickets the shadow scored as takes. Checked against every recorded close (17 since
+2026-10-11): all agree except **FDXM on 10-13 and 10-14** (shadow TAKE; recorded −$650 and −$600). Cause: Yahoo has no Eurex futures, so
+`shadow.py` tracks FDXM on the cash DAX index (^GDAXI), which starts at 09:02 Frankfurt from its own auction price; both days were near
+misses (10-13: the index came within 2 points of an 89-point stop), so the proxy can flip the outcome. Deployed 19:35 ET (backup
+`/opt/futures-bot/backup-2026-10-14g`): `!eod` now stores the day's actual P&L on the latest started ticket (`user_pnl`); results lines,
+`!results` totals and the board show the recorded outcome (TAKE / STOP within 20% of the bracket, else TIME EXIT, with the exact P&L),
+noting the shadow only when it disagrees, and FDXM shadow lines carry "[DAX index proxy]". The 17 past closes were backfilled onto their
+tickets. `a18_demo_check` now scores recorded results wherever they exist (tickets.json pulled beside the logs). Tests:
+`test_recorded_result_overrides_shadow`.
+
+## 493. D-series family 134 protocol: relative value against a sibling market, current regime (S1)
+
+**No trial spent; N 1,104. Written and committed BEFORE any statistic is computed.** Family 17 (§190) under §426's design, from Yahoo
+settlements: the log ratio of target to partner, its z-score against the previous 20 sessions on the previous weekday. When |z| > 1.5
+(form "stretched") or > 2 ("extreme"), the target's next window goes against its relative stretch (or with it — fixed by 2021–24).
+Pairs: **MNQ** (NQ=F) vs ES=F, RTY=F; **MGC** (GC=F) vs SI=F, HG=F; **CL** vs HO=F, RB=F; **ZS** vs ZC=F, ZM=F, ZL=F; **NKD** (NKD=F) vs
+ES=F; **DAX** (^GDAXI) vs ES=F, ^STOXX50E. Targets as family 114 (MNQ day, MGC London, NKD and DAX windows, CL and ZS sessions).
+**13 pairs × 2 forms = 26 tests.** Costs §177/§180; validation per §426, 2 (placebo: signs shuffled).
+
+## 494. Family-134 and D329 (t01111): relative value on the current regime — 1 of 24 carried, CONFIRM (S1)
+
+**N 1,105.** `reports/d134_discovery.json` (module `reporting/d134_rv.py`; 24 tests had enough events): one carry — **D329**, crude
+reverses an extreme 20-day stretch against gasoline (+59.3 bps, t +3.35, n 142). Sealed 2025–26: +51.25 bps (t +1.92, n
+79), placebo 98th, {2025: 25.49813299088345, 2026: 95.64719150881298} — **CONFIRM**. Every other pair |t| < 2 on 2021–24.
+
+## 495. Stress tests for D329 (crude reverses an extreme stretch against gasoline), fixed before running (S8)
+
+**No trial; N 1,105.** (1) **Independent data**: the target from the owned GLBX daily bars (roll-correct front-contract close → close)
+as well as Yahoo's session; the stretch measured against RB=F (the trial's) and against HO=F; thresholds 1.5 / 2 / 2.5; periods 2010–20,
+2021–24, 2025–26. (2) **The MCL account** (10 MCL, A23, drift removed, both histories and starts from 2025): plan (always long) vs D329
+(short after crude's ratio to RB is > +2 SD, long otherwise — a long day already matches the plan), calibrated against 40 random flip
+masks of the same share (§453). Read as §446.
+
+## 496. D329 stress-tested: robust on independent data, too rare to move the MCL account — confirmed, not proposed (S8)
+
+**No trial; N 1,105.** `reports/a39_d329.json`, module `reporting/a39_d329.py`. (1) Independent data: all 36 variants positive in 2025–26
+(vs RB=F at 2σ on the owned CME bars +75.5 bps, t +2.10; at 1.5σ +40.7; vs HO=F +1.5 to +43.8); 2010–20 weakly positive throughout
+(+5 to +30) — among the programme's more robust statistical results. (2) The MCL account: the rule only adds shorts (crude stretched
+ABOVE gasoline, 7–9% of sessions; the other side is long, as the plan): 2021–26 Δ +$3 vs random flips −$240 ± $420 (beats 60%); 2010–20
++$135 (55%); starts from 2025 +$2,953 → +$3,428 (beats 90%). Below §446's reading. **CONFIRMED finding, not proposed for the bot** —
+like D68's pre-2021 era and D122, an event rule on ~8% of days barely moves an account under brackets.
+
+## 497. D-series family 135 protocol: relative value as an every-day sign, current regime (S1)
+
+**No trial spent; N 1,105. Written and committed BEFORE any statistic is computed.** Family 134's twelve pairs with no threshold: every
+session, the target's next window goes with or against the SIGN of its previous-weekday 20-session z (fixed by 2021–24). Every-day rules
+are the ones that move an account (§453, §496). **12 tests.** Costs §177/§180; validation per §426, 2 (placebo: signs shuffled), then
+the §446 stress tests for any CONFIRM.
+
+## 498. Family-135 discovery: relative value every day — 0 of 12 carried (S1)
+
+**No trial spent; N 1,105.** `reports/d135_discovery.json`: all |t| ≤ 1.77 (best: crude against its stretch vs heating oil, +12.5 bps).
+The relative-value edge lives only in the extremes (D329), not as an every-day signal. Empty.
+
+## 499. D-series family 136 protocol: gold's other windows as every-day targets, current regime (S1)
+
+**No trial spent; N 1,105. Written and committed BEFORE any statistic is computed.** Gold's London window (the MGC ticket) took no direction
+from anything in families 114–135. If another gold window does, the ticket could move there. Targets: **gold's NY afternoon** 11:30 →
+16:55 ET (family-68 grid) and **gold's whole Globex session** (GC=F Yahoo open → settlement). Predictors: family 111's list (excluding
+GC=F itself and gold-ETF duplicates GLD/GDX), the sign of the previous weekday's move (1-day) and of the previous 5 weekdays' sum (5-day);
+forms all / strong. Currency/BTC-USD predictors excluded for the whole session (it opens 18:00 ET, before their close). Carried at net >
+0, t > 1.96 (~2.5% by chance; counted). Cost 0.8; validation per §426, 2 (placebo: shuffled signs), then §446-style stress tests and a
+replay of the MGC account trading the new window before any proposal.
+
+## 500. Family-136: gold's other windows — 5 of 488 carried (below chance); validated (S1)
+
+**N 1,110.** `reports/d136_discovery.json` (module `reporting/d136_goldwin.py`):
+- **D330** gold_ny fades CLP=X 1d (strong): **WATCHLIST** +2.56 (t +0.49), placebo 74th, 2025 +7.1, 2026 -4.5
+- **D331** gold_session fades ZW=F 5d (strong): **WATCHLIST** +3.85 (t +0.38), placebo 57th, 2025 +9.0, 2026 -1.3
+- **D332** gold_session fades ZS=F 1d (all): **REJECT** -3.20 (t -0.45), placebo 37th, 2025 -3.6, 2026 -2.6
+- **D333** gold_session fades ZW=F 5d (all): **REJECT** -1.34 (t -0.19), placebo 46th, 2025 +4.3, 2026 -10.0
+- **D334** gold_ny follows PL=F 5d (all): **REJECT** -2.39 (t -0.84), placebo 32th, 2025 -4.1, 2026 +0.2
+
+Fewer carries than chance: no gold window — London, New York afternoon or the whole session — takes an every-day direction from the
+cross-market set. The MGC account stays on its London window, always long.
+
+## 501. The user: search on until something usable is found (2026-10-14). D-series family 137 protocol: the ten-day horizon (S1)
+
+**No trial spent; N 1,110. Written and committed BEFORE any statistic is computed.** The every-day cross-market screens found the
+account-sized rules at 1 day (DAX, §445) and 5 days (NKD, §451); 2 and 20 days gave chance-level results. Family 120's design (§449)
+with a 10-weekday sum. Same predictors, targets, exclusions, forms, carrying rule; validation per §426, 2 (shuffled signs); any CONFIRM
+then gets §446/§453's stress tests (independent data, account replay calibrated against random flips).
+
+## 502. Family-137 discovery: 42 of 718 carried (≈ 18 by chance); D335–D376 registered (S1)
+
+**No trial spent yet; N 1,110.** `reports/d137_discovery.json` (module `reporting/d137_tenday.py`). A new every-day theme on the demo's
+soybean account: **ZS rises after two weeks of calm and risk appetite** — it fades the VIX family (VIX, VIX3M, VVIX), follows bonds and
+credit (LQD, TLT, ZB, HYG), moves against the dollar (DX-Y.NYB, 6B, 6A, AUD; weaker KRW/ZAR/CLP → ZS down). NKD repeats its themes (fades
+corn — also strong in 2010–20, +10.6, t +3.87; follows global risk). Each validated once per §426, 2.
+
+## 503. D335–D376 validated (t01117–t01158): two CONFIRM, both NKD — the soybean theme failed (S1)
+
+**N 1,152.** 13 WATCHLIST, 27 REJECT. **D343** NKD fades corn's 10-day move (strong): +15.54 bps (t +2.50), placebo 100th, 2025 +11.4 / 2026
++21.5. **D372** NKD follows semiconductors' 10-day move (every day): +7.54 (t +1.68), placebo 96th, +5.1 / +11.4. Every ZS rule (the
+family's main new theme) is WATCHLIST or REJECT. **NKD–corn now confirms at three horizons** (D231 5-day, D343 10-day, D264 20-day) and,
+unlike the dollar rules, is strong before 2021 too (10-day all: 2010–20 +10.6, t +3.87).
+
+## 504. Stress tests for the NKD–corn theme, fixed before running (S8)
+
+**No trial; N 1,152.** (1) Independent data: corn's 10-day direction from Yahoo ZC=F (the trial's) and the CORN ETF; the Nikkei from A21's
+window (the trial's) and Yahoo NKD=F's CME session; forms all / strong; periods 2010–20, 2021–24, 2025–26. (2) Overlap with the deployed
+NKD dollar-week rule (§454): their agreement rate, and the NKD account (1 NKD, A23, drift removed, starts from 2025 and 2021–26) for
+plan / dollar-week (deployed) / corn (D343's form: short after a strong corn rise, long after a strong fall, plan otherwise) / both
+agreeing (take the dollar-week side; where corn is strong and disagrees, stand aside — flat), each calibrated against random flips.
+Read: propose only if a variant beats the DEPLOYED dollar-week rule in both 2021–26 and 2025-start accounts.
+
+## 505. NKD–corn stress-tested: consistent in statistics, no account gain, worse alongside the deployed rule — not adopted (S8)
+
+**No trial; N 1,152.** `reports/a40_nkdcorn.json`, module `reporting/a40_nkdcorn.py`. (1) On the Tokyo window (A21) NKD fades corn's 10-day
+move in every period (all: 2010–20 +10.6 t +3.87, 2021–24 +8.1, 2025–26 +5.4; strong +10.5 / +9.7 / +15.5); weaker on independent data
+(NKD=F's whole session: +4.8 to +21.9, t ≤ 2.1; the CORN ETF as predictor: +0.2 to +11.8). (2) Accounts: corn alone 2021–26 +$2,474 vs
+plan +$2,763 (beats 37% of random flips; 2025 starts 50%); the deployed dollar-week rule +$6,136 / +$8,040 (100%); dollar-week standing
+aside where strong corn disagrees +$5,051 / +$6,995 — worse than dollar-week alone. The signals agree on 54% of strong-corn days. NKD
+stays as deployed.
+
+## 506. D-series family 138 protocol: new candidate account markets, every day, current regime (S1)
+
+**No trial spent; N 1,152. Written and committed BEFORE any statistic is computed.** Tradeify offers CME micros the plan does not trade:
+**M2K** (Russell 2000), **MHG** (copper), **SIL** (silver). Targets (Yahoo sessions open → settlement): RTY=F, HG=F, SI=F. Predictors:
+family 111's list (each target's own series excluded; currency/BTC-USD predictors excluded — these sessions open 18:00 ET); the sign of
+the previous weekday's move (1-day) and of the previous 5 weekdays' sum (5-day); forms all / strong. Carried at net > 0, t > 1.96 (~2.5%
+by chance; counted). Costs §177 (RTY 2.0, HG 2.0, SI 0.5); validation per §426, 2; a CONFIRM then needs §446/§453's stress tests and a
+new-account replay before any proposal.
+
+## 507. Family-138: new candidate markets — 10 of 660 carried (below chance ~16.5); validated (S1)
+
+**N 1,162.** `reports/d138_discovery.json` (module `reporting/d138_newmkts.py`):
+- **D377** HG follows NKD=F 1d (strong): **REJECT** -0.32 (t -0.03), placebo 51th, 2025 -5.3, 2026 +5.3
+- **D378** RTY follows ^SKEW 1d (strong): **WATCHLIST** +2.91 (t +0.31), placebo 68th, 2025 +7.4, 2026 -4.6
+- **D379** HG follows NKD=F 1d (all): **REJECT** -2.04 (t -0.30), placebo 47th, 2025 -5.2, 2026 +2.7
+- **D380** RTY fades ADM 5d (strong): **WATCHLIST** +4.91 (t +0.53), placebo 85th, 2025 +0.2, 2026 +10.9
+- **D381** HG follows XOP 1d (strong): **WATCHLIST** +6.07 (t +0.58), placebo 77th, 2025 +7.7, 2026 +3.7
+- **D382** RTY follows ZB=F 5d (all): **REJECT** -2.07 (t -0.32), placebo 48th, 2025 +1.5, 2026 -7.4
+- **D383** HG follows SMH 1d (strong): **REJECT** -1.77 (t -0.18), placebo 43th, 2025 +5.9, 2026 -10.5
+- **D384** HG fades ^GVZ 1d (all): **WATCHLIST** +5.70 (t +0.83), placebo 83th, 2025 +7.0, 2026 +3.7
+- **D385** HG follows ES=F 1d (strong): **REJECT** -7.73 (t -0.70), placebo 24th, 2025 -2.7, 2026 -14.8
+- **D386** SI follows XLU 5d (strong): **REJECT** -23.14 (t -1.37), placebo 14th, 2025 -22.1, 2026 -24.6
+
+## 508. D-series family 139 protocol: overnight cross-asset moves into MNQ's day, current regime (S1)
+
+**No trial spent; N 1,162. Written and committed BEFORE any statistic is computed.** MNQ's day session (09:30 → 16:00) is the plan's only
+US window without an every-day rule. Predictors measured to 09:25 ET the same day (minute data): **Brent** (HistData grid, 16:00 D−1 →
+09:25), **gold** (owned MGC: Asia + London grids, 18:00 D−1 → 09:25), **DAX** (HistData grxeur 03:00 → 09:25), **EUR/USD, USD/JPY,
+AUD/USD** (HistData grids, 16:00 D−1 → 09:25). Sign → MNQ day, follow or fade fixed by 2021–24; forms all / strong. **6 × 2 = 12 tests.**
+Cost 0.5; validation per §426, 2 (shuffled signs).
+
+## 509. Family-139 and D387 (t01169): overnight cross-asset into MNQ — 1 of 12 carried, REJECT (S1)
+
+**N 1,163.** `reports/d139_discovery.json` (module `reporting/d139_overnight.py`): Brent, gold, the DAX's morning, EUR/USD and AUD/USD give
+MNQ's day nothing (|t| ≤ 1.40); **D387** MNQ follows USD/JPY's overnight move (+9.2 bps, t +2.43, n 943) on sealed 2025–26: -4.78 bps
+(t -0.85, n 416), placebo 22th, {2025: -10.778906381462674, 2026: 4.339857477130312}; always long over the same sessions +2.81 — **REJECT**.
+
+## 510. D-series family 140 protocol: spreads between markets as every-day predictors, current regime (S1)
+
+**No trial spent; N 1,163. Written and committed BEFORE any statistic is computed.** Single-market predictors are exhausted at every
+horizon (families 119–123, 137). Spread predictors (difference of Yahoo open → close moves, family 111's series): **curve** ZN=F − ZT=F
+(long end vs short end), **credit vs duration** HYG − TLT and LQD − TLT, **growth vs broad** NQ=F − ES=F, **small vs large** RTY=F −
+ES=F, **semis vs Nasdaq** SMH − NQ=F. Sign of the previous weekday (1-day) and of the previous 5 weekdays' sum (5-day) → each plan window
+(family 114's targets), follow or fade fixed by 2021–24; forms all / strong. **6 × 2 × 6 × 2 = 144 tests** (~3.6 by chance). Costs
+§177/§180; validation per §426, 2 (shuffled signs); any CONFIRM then the §446/§453 stress tests.
+
+## 511. Family-140: spread predictors — 8 of 144 carried (≈ 3.6 by chance); validated (S1)
+
+**N 1,171.** `reports/d140_discovery.json` (module `reporting/d140_spreads.py`):
+- **D388** CL follows rty_es 1d (all): **REJECT** -26.11 (t -1.88), placebo 4th, 2025 -18.3, 2026 -38.0
+- **D389** CL follows rty_es 1d (strong): **REJECT** -20.27 (t -1.02), placebo 18th, 2025 -5.2, 2026 -43.0
+- **D390** CL follows hyg_tlt 1d (strong): **REJECT** -44.25 (t -1.84), placebo 4th, 2025 -42.6, 2026 -48.7
+- **D391** DAX follows curve 5d (strong): **REJECT** -12.27 (t -1.48), placebo 7th, 2025 -6.1, 2026 -27.8
+- **D392** DAX follows curve 5d (all): **REJECT** -3.20 (t -0.77), placebo 26th, 2025 -4.3, 2026 -1.6
+- **D393** DAX fades rty_es 5d (strong): **WATCHLIST** +1.95 (t +0.30), placebo 68th, 2025 -0.3, 2026 +4.7
+- **D394** MNQ fades rty_es 5d (strong): **REJECT** -7.15 (t -0.66), placebo 29th, 2025 -17.1, 2026 +5.6
+- **D395** CL follows hyg_tlt 1d (all): **REJECT** -20.49 (t -1.47), placebo 8th, 2025 -27.9, 2026 -9.2
+
+## 512. D-series family 141 protocol: MNQ's other windows as every-day targets, current regime (S1)
+
+**No trial spent; N 1,171. Written and committed BEFORE any statistic is computed.** Family 136's design (§499) for MNQ: targets **MNQ's
+night session** (18:00 D−1 → 09:30 D, family-8 grid) and **NQ's whole Globex session** (NQ=F Yahoo open → settlement). Predictors:
+family 111's list, NQ=F / ES=F / SMH excluded (the same market), currency/BTC-USD excluded (their close is after 18:00 ET); 1-day and
+5-day signs on the previous weekday; forms all / strong. Carried at net > 0, t > 1.96 (~2.5% by chance). Cost 0.5; validation per §426,
+2; a CONFIRM then needs stress tests and an MNQ-account replay on the new window.
+
+## 513. Family-141: MNQ's other windows — 23 of 424 carried (≈ 10.6 by chance); validated (S1)
+
+**N 1,194.** `reports/d141_discovery.json` (module `reporting/d141_mnqwin.py`):
+- **D396** mnq_night fades 6S=F 1d (strong): **WATCHLIST** +1.52 (t +0.30), placebo 66th, 2025 +0.5, 2026 +3.1
+- **D397** mnq_night fades SOYB 1d (all): **CONFIRM** +9.60 (t +2.56), placebo 99th, 2025 +10.1, 2026 +8.9
+- **D398** mnq_night fades SOYB 1d (strong): **CONFIRM** +18.85 (t +2.92), placebo 100th, 2025 +16.5, 2026 +24.1
+- **D399** mnq_night fades 6A=F 1d (strong): **CONFIRM** +12.40 (t +1.97), placebo 99th, 2025 +16.8, 2026 +5.8
+- **D400** nq_session follows ^SKEW 1d (all): **WATCHLIST** +11.26 (t +1.61), placebo 95th, 2025 +12.8, 2026 +8.9
+- **D401** mnq_night fades ZM=F 1d (strong): **CONFIRM** +14.87 (t +2.19), placebo 98th, 2025 +6.6, 2026 +26.1
+- **D402** nq_session follows ZB=F 5d (all): **WATCHLIST** +2.22 (t +0.32), placebo 67th, 2025 +4.7, 2026 -1.6
+- **D403** nq_session follows ^SKEW 1d (strong): **WATCHLIST** +7.52 (t +0.69), placebo 75th, 2025 +13.6, 2026 -2.7
+- **D404** nq_session fades SOYB 1d (all): **WATCHLIST** +7.43 (t +1.04), placebo 84th, 2025 +9.1, 2026 +4.9
+- **D405** nq_session fades ZL=F 1d (strong): **WATCHLIST** +8.95 (t +0.78), placebo 81th, 2025 +8.5, 2026 +9.5
+- **D406** nq_session fades 6S=F 1d (strong): **REJECT** -3.66 (t -0.34), placebo 38th, 2025 -9.0, 2026 +4.9
+- **D407** mnq_night fades 6B=F 1d (strong): **WATCHLIST** +4.35 (t +0.69), placebo 76th, 2025 +3.3, 2026 +6.1
+- **D408** nq_session fades SOYB 1d (strong): **WATCHLIST** +18.09 (t +1.33), placebo 91th, 2025 +13.7, 2026 +27.4
+- **D409** nq_session fades ZS=F 1d (all): **WATCHLIST** +2.67 (t +0.37), placebo 68th, 2025 +0.8, 2026 +5.5
+- **D410** mnq_night fades 6A=F 1d (all): **WATCHLIST** +4.24 (t +1.14), placebo 90th, 2025 +4.6, 2026 +3.7
+- **D411** mnq_night fades 6B=F 1d (all): **WATCHLIST** +4.77 (t +1.27), placebo 91th, 2025 +4.8, 2026 +4.7
+- **D412** nq_session follows ZB=F 5d (strong): **REJECT** -4.17 (t -0.28), placebo 41th, 2025 -5.1, 2026 -2.1
+- **D413** mnq_night fades 6E=F 1d (strong): **REJECT** -0.26 (t -0.04), placebo 52th, 2025 +5.3, 2026 -11.9
+- **D414** nq_session fades DFII10 5d (strong): **WATCHLIST** +7.09 (t +0.44), placebo 65th, 2025 +3.2, 2026 +15.3
+- **D415** mnq_night fades DFII10 5d (all): **WATCHLIST** +4.71 (t +1.22), placebo 91th, 2025 +5.0, 2026 +4.2
+- **D416** nq_session fades ADM 5d (strong): **WATCHLIST** +2.05 (t +0.20), placebo 67th, 2025 +2.9, 2026 +1.0
+- **D417** nq_session follows ZN=F 5d (strong): **REJECT** -13.28 (t -0.91), placebo 17th, 2025 -14.3, 2026 -11.0
+- **D418** mnq_night fades 6S=F 1d (all): **WATCHLIST** +1.36 (t +0.36), placebo 64th, 2025 +1.8, 2026 +0.7
+
+**Four CONFIRMs, one theme: MNQ's night session (18:00 → 09:30 ET) fades the previous day's move in the soy complex (SOYB, ZM) or the
+Australian dollar (6A).** All predictors close before 18:00 ET (no look-ahead). 2010–20 context is negative for every one (the
+pre-2021 regime risk seen with the dollar rules). The whole-session version (NQ to 16:00) does not hold: the effect lives in the night.
+Next: §446/§453 stress tests (independent data, then an MNQ-night account replay against random flips).
+
+## 514. A41: the MNQ-night fade theme (D397-D401) stress-tested — real signal, not an account edge; not proposed (S1)
+
+**No trial; N 1,194.** `reports/a41_mnqnight.json` (module `reporting/a41_mnqnight.py`).
+- **Independent data:** fade SOYB → QQQ's 16:00 → 09:30 gap: +5.75 (t 2.20) 2021–24, +11.18 (t 2.43) 2025–26; 6A replicates (+5.45 / +6.72).
+  ZS=F, ZM=F, ZL=F and DBA are weaker (t < 1.9). SOYB is independent of MNQ's own previous day (agreement 50–52%; joint regression
+  SOYB t −3.4 / −2.6 with QQQ's day included). **Before 2021 every predictor reverses (t −1.2 to −2.8)**: a current-regime effect only.
+- **Account replay** (50K Daily, 4 MNQ on the night session 18:00 → 09:30, drift removed, the plan's brackets): post-2021, the plan on the night
+  window makes +$736 (P(payout) 70%); D397 every day makes +$2,116 (74%), but **random flips at the same short share make +$1,339, and the rule
+  beats only 87% of them** (below §453's 95%). D398 strong-only beats 82%; the SOYB+ZM+6A vote beats 24%. 2025 starts: plan +$2,986 (87%) →
+  D397 +$3,252 (66%). Pre-2021: D397 +$465 vs random +$679 (29%). For comparison, the plan's RTH window: +$1,265 post-2021, +$633 for 2025 starts.
+- **Verdict:** the bps signal is genuine in 2021–26 and replicates on QQQ, but its account value is no better than random direction changes
+  on this window and it lowers P(payout) for 2025 starts. Not proposed; D397/D398 stay CONFIRMED in the record.
+
+## 515. D-series family 142 protocol: 3-day predictor moves into every plan window, current regime (S1)
+
+**No trial spent; N 1,194. Written and committed BEFORE any statistic is computed.** Families 119–123 and 137 covered 1-, 2-, 5-, 10-, 20-day
+signs; 3 days was never tried. Family 111's predictor list, eligibility (no same market; timing exclusions for CL/NKD/ZS), the sum of the
+previous 3 weekdays' moves ending the weekday before the session; sign follow/fade fixed on 2021–24; forms all / strong; the six plan
+windows; costs §177/§180. Carried at net > 0, t > 1.96 (~2.5% by chance). Validation per §426, 2; a CONFIRM then needs §446/§453 stress
+tests (beat ≥ 95% of random flips in the account replay).
+
+## 516. Family-142: 3-day predictors — 37 of 592 carried (≈ 14.8 by chance); validated (S1)
+
+**N 1,231.** `reports/d142_discovery.json` (module `reporting/d142_threeday.py`):
+- **D419** NKD follows FXI 3d (all): **WATCHLIST** +0.60 (t +0.13), placebo 59th, 2025 -2.1, 2026 +4.7
+- **D420** NKD follows FXI 3d (strong): **WATCHLIST** +0.62 (t +0.08), placebo 60th, 2025 -1.0, 2026 +2.9
+- **D421** NKD follows EEM 3d (strong): **REJECT** -2.43 (t -0.36), placebo 45th, 2025 -5.1, 2026 +0.7
+- **D422** CL fades ZM=F 3d (all): **REJECT** -10.02 (t -0.72), placebo 24th, 2025 -10.0, 2026 -10.0
+- **D423** CL follows XLF 3d (all): **WATCHLIST** +7.69 (t +0.55), placebo 75th, 2025 +3.5, 2026 +14.0
+- **D424** NKD follows 6B=F 3d (all): **WATCHLIST** +6.14 (t +1.37), placebo 91th, 2025 +4.5, 2026 +8.7
+- **D425** NKD follows 6B=F 3d (strong): **CONFIRM** +11.24 (t +1.70), placebo 96th, 2025 +8.8, 2026 +15.3
+- **D426** NKD follows ^GDAXI 3d (strong): **REJECT** -2.24 (t -0.36), placebo 39th, 2025 -3.1, 2026 -0.8
+- **D427** NKD follows HYG 3d (all): **WATCHLIST** +2.70 (t +0.60), placebo 76th, 2025 +9.3, 2026 -7.5
+- **D428** ZS follows XLF 3d (strong): **REJECT** -0.22 (t -0.03), placebo 50th, 2025 -6.1, 2026 +9.8
+- **D429** NKD follows EEM 3d (all): **WATCHLIST** +1.99 (t +0.44), placebo 70th, 2025 +2.6, 2026 +1.0
+- **D430** NKD follows ^GDAXI 3d (all): **REJECT** -3.13 (t -0.70), placebo 25th, 2025 -1.1, 2026 -6.2
+- **D431** NKD follows RTY=F 3d (strong): **WATCHLIST** +1.33 (t +0.20), placebo 57th, 2025 -0.9, 2026 +5.2
+- **D432** CL fades SOYB 3d (strong): **REJECT** -7.03 (t -0.34), placebo 39th, 2025 +12.9, 2026 -51.7
+- **D433** NKD follows XLY 3d (all): **WATCHLIST** +3.54 (t +0.79), placebo 80th, 2025 +3.8, 2026 +3.1
+- **D434** CL fades ZM=F 3d (strong): **REJECT** -4.83 (t -0.21), placebo 42th, 2025 +2.5, 2026 -13.4
+- **D435** ZS fades ^SKEW 3d (all): **REJECT** -2.54 (t -0.51), placebo 39th, 2025 +9.1, 2026 -20.1
+- **D436** NKD fades ^VIX3M 3d (strong): **REJECT** -4.99 (t -0.77), placebo 24th, 2025 -5.8, 2026 -3.2
+- **D437** NKD fades DX-Y.NYB 3d (strong): **WATCHLIST** +6.41 (t +0.93), placebo 85th, 2025 +7.7, 2026 +4.1
+- **D438** CL fades HE=F 3d (strong): **REJECT** -57.02 (t -2.49), placebo 0th, 2025 -36.8, 2026 -100.2
+- **D439** MNQ fades XLY 3d (all): **REJECT** -0.14 (t -0.02), placebo 52th, 2025 +5.8, 2026 -9.1
+- **D440** NKD follows SMH 3d (all): **REJECT** -5.71 (t -1.27), placebo 11th, 2025 +0.7, 2026 -15.6
+- **D441** NKD fades ^VIX 3d (strong): **WATCHLIST** +3.22 (t +0.51), placebo 70th, 2025 -1.9, 2026 +14.2
+- **D442** NKD fades ^VIX3M 3d (all): **REJECT** -1.12 (t -0.25), placebo 41th, 2025 +0.2, 2026 -3.1
+- **D443** NKD follows 6C=F 3d (all): **WATCHLIST** +7.28 (t +1.63), placebo 96th, 2025 +10.0, 2026 +3.1
+- **D444** NKD follows 6E=F 3d (strong): **CONFIRM** +15.26 (t +2.21), placebo 99th, 2025 +14.8, 2026 +16.2
+- **D445** NKD follows XLK 3d (strong): **WATCHLIST** +8.22 (t +1.22), placebo 89th, 2025 +6.4, 2026 +10.4
+- **D446** NKD fades ^GVZ 3d (strong): **REJECT** -2.76 (t -0.47), placebo 31th, 2025 -3.5, 2026 -1.8
+- **D447** NKD fades ^VIX 3d (all): **WATCHLIST** +2.01 (t +0.45), placebo 67th, 2025 +2.9, 2026 +0.6
+- **D448** CL follows KRE 3d (all): **REJECT** -0.09 (t -0.01), placebo 54th, 2025 -9.1, 2026 +13.6
+- **D449** CL follows KRE 3d (strong): **REJECT** -21.97 (t -1.12), placebo 18th, 2025 -10.4, 2026 -44.3
+- **D450** NKD follows ^SKEW 3d (strong): **REJECT** -4.32 (t -0.73), placebo 26th, 2025 +3.0, 2026 -16.4
+- **D451** NKD follows RTY=F 3d (all): **WATCHLIST** +0.47 (t +0.11), placebo 57th, 2025 +2.2, 2026 -2.2
+- **D452** NKD follows SMH 3d (strong): **WATCHLIST** +9.69 (t +1.43), placebo 92th, 2025 +12.9, 2026 +5.8
+- **D453** NKD fades ZC=F 3d (strong): **REJECT** -0.62 (t -0.09), placebo 49th, 2025 +1.0, 2026 -3.2
+- **D454** NKD follows 6E=F 3d (all): **CONFIRM** +11.05 (t +2.48), placebo 100th, 2025 +10.0, 2026 +12.7
+- **D455** NKD follows 6A=F 3d (all): **REJECT** -0.70 (t -0.16), placebo 46th, 2025 +1.5, 2026 -4.2
+
+**Three CONFIRMs (D425, D444, D454), all the deployed NKD dollar-week rule at a 3-day horizon** (NKD follows the euro / sterling, i.e. dollar
+weakness). They add confirmation of the deployed theme, nothing new to trade; no stress test (the 5-day rule already passed A35). The
+NKD-follows-risk cluster (FXI, EEM, DAX, HYG, RTY, SMH) that dominated discovery failed out of sample.
+
+## 517. D-series family 143 protocol: composite predictors (dollar, risk, rates, commodities, grains), current regime (S1)
+
+**No trial spent; N 1,231. Written and committed BEFORE any statistic is computed.** Single predictors are exhausted; averages of many
+noisy series may carry a common factor more cleanly. Each member's 1-day move is scaled by its 2021–24 median absolute move; a composite is
+the mean of its members' scaled moves (sign-adjusted), summed over h = 1, 3, 5 weekdays ending the weekday before the session.
+- **dollar** (+ = dollar up): DX-Y.NYB, −6E, −6B, −6A, −6C, −6S, −6J
+- **risk** (+ = risk on): ES, NQ, RTY, EEM, FXI, HYG, KRE, SMH, XLF, XLY, ^GDAXI, −^VIX
+- **rates** (+ = bond prices up): ZT, ZN, ZB, TLT
+- **commodities**: CL, NG, RB, HO, HG, SI, GC, ZC, ZS, ZW
+- **grains**: ZC, ZS, ZM, ZL, ZW, SOYB
+A target's own market is dropped from every composite; for CL and ZS the members excluded by family 111's timing rule (UNIV14) are dropped.
+Six plan windows; forms all / strong; follow/fade fixed on 2021–24. **5 × 3 × 6 × 2 = 180 tests** (~4.5 by chance at t > 1.96). Validation
+per §426, 2; a CONFIRM that is not the deployed dollar theme then needs the §446/§453 stress tests.
+
+## 518. Family-143: composite predictors — 12 of 180 carried (≈ 4.5 by chance); validated (S1)
+
+**N 1,243.** `reports/d143_discovery.json` (module `reporting/d143_composite.py`):
+- **D456** DAX follows the dollar composite 1d (all): **CONFIRM** +9.31 (t +2.26), placebo 99th, 2025 +5.4, 2026 +15.3
+- **D457** NKD follows the risk composite 3d (strong): **WATCHLIST** +3.37 (t +0.50), placebo 69th, 2025 +2.1, 2026 +5.5
+- **D458** CL follows the risk composite 1d (strong): **REJECT** -30.26 (t -1.42), placebo 11th, 2025 -45.8, 2026 -7.9
+- **D459** CL fades the grains composite 3d (all): **REJECT** -18.41 (t -1.32), placebo 10th, 2025 -1.6, 2026 -44.0
+- **D460** CL follows the risk composite 3d (all): **WATCHLIST** +13.93 (t +1.00), placebo 85th, 2025 +3.0, 2026 +30.5
+- **D461** DAX follows the dollar composite 1d (strong): **CONFIRM** +13.02 (t +1.88), placebo 98th, 2025 +5.3, 2026 +25.6
+- **D462** CL fades the grains composite 3d (strong): **REJECT** -3.86 (t -0.21), placebo 43th, 2025 +2.8, 2026 -17.2
+- **D463** DAX follows the rates composite 5d (strong): **REJECT** -13.85 (t -1.74), placebo 4th, 2025 -8.3, 2026 -28.9
+- **D464** NKD follows the risk composite 5d (strong): **WATCHLIST** +1.11 (t +0.16), placebo 56th, 2025 +1.8, 2026 -0.2
+- **D465** ZS follows the risk composite 1d (strong): **REJECT** -6.31 (t -0.78), placebo 24th, 2025 -5.8, 2026 -7.1
+- **D466** NKD follows the risk composite 5d (all): **WATCHLIST** +6.13 (t +1.36), placebo 92th, 2025 +0.3, 2026 +15.0
+- **D467** NKD follows the risk composite 3d (all): **WATCHLIST** +3.21 (t +0.71), placebo 78th, 2025 -0.2, 2026 +8.5
+
+**Only the deployed DAX–dollar theme confirms (D456, D461).** Descriptive comparison, DAX window following yesterday's sign (net bps, t):
+composite +9.21 (3.11) / +9.55 (2.32) in 2021–24 / 2025–26; DX alone +5.86 (1.96) / +7.20 (1.74); 6E alone +9.43 (3.18) / +7.06 (1.70).
+The composite is ~2 bps better than the DX-only signal the bot uses at 17:30, within noise and already partly captured by the 02:50 EUR/USD
+re-check (§490). Not worth a bot change now; noted as an option if the forward record holds. Risk, rates, grains composites add nothing.
+
+## 519. D-series family 144 protocol: more candidate account markets, every day, current regime (S1)
+
+**No trial spent; N 1,243. Written and committed BEFORE any statistic is computed.** Family 138 covered M2K/MHG/SIL; family 130 the
+currencies. Remaining CME markets a Tradeify account could trade: **YM (MYM)**, **ZN**, **ZB**, **NG (QG/MNG)**, **ZC**, **ZW**, **HE**,
+**LE**, **BTC (MBT)**. Targets: Yahoo session open → settlement (bad-print rule §149). Predictors: family 111's list minus the target's own
+series and the spot currencies/BTC-USD (closing after 18:00 ET); signs of the previous weekday (1-day) and the previous 5 weekdays (5-day);
+forms all / strong; follow/fade fixed on 2021–24. Costs per session (bps): YM 1.0, ZN 0.4, ZB 0.8, NG 1.4, ZC 1.9, ZW 1.4, HE 2.0, LE 1.0,
+BTC 3.0 (§177 where listed). Carried at net > 0, t > 1.96 (~2.5% by chance). Validation per §426, 2; a CONFIRM then needs §446/§453 stress
+tests and a new-account replay before any proposal.
+
+## 520. Family-144: more candidate markets — 59 of 1,984 carried (≈ 49.6 by chance); validated (S1)
+
+**N 1,302.** `reports/d144_discovery.json` (module `reporting/d144_moremkts.py`; the registry test now admits MYM, ZB, HE, LE, MBT as single-market
+instruments):
+- **D468** BTC=F fades ZM=F 1d (strong): **WATCHLIST** +4.52 (t +0.20), placebo 60th, 2025 -11.4, 2026 +25.7
+- **D469** YM=F follows ZN=F 5d (strong): **REJECT** -14.14 (t -1.35), placebo 9th, 2025 -12.4, 2026 -18.1
+- **D470** YM=F fades DFII10 5d (strong): **REJECT** -2.79 (t -0.25), placebo 44th, 2025 -1.0, 2026 -6.7
+- **D471** NG=F follows LQD 1d (strong): **REJECT** -4.73 (t -0.17), placebo 44th, 2025 -0.7, 2026 -11.5
+- **D472** ZB=F follows XLU 5d (all): **WATCHLIST** +1.58 (t +0.58), placebo 80th, 2025 -1.5, 2026 +6.3
+- **D473** ZB=F fades LE=F 1d (strong): **REJECT** -7.41 (t -2.04), placebo 3th, 2025 -8.3, 2026 -6.0
+- **D474** HE=F follows GDX 1d (strong): **REJECT** -4.15 (t -0.73), placebo 40th, 2025 -5.9, 2026 -1.8
+- **D475** BTC=F follows TLT 5d (strong): **WATCHLIST** +5.39 (t +0.23), placebo 64th, 2025 +17.7, 2026 -24.3
+- **D476** YM=F follows ^SKEW 1d (strong): **REJECT** -1.48 (t -0.20), placebo 49th, 2025 +2.0, 2026 -7.4
+- **D477** YM=F follows ZB=F 5d (all): **REJECT** -1.51 (t -0.31), placebo 43th, 2025 +1.3, 2026 -5.8
+- **D478** HE=F follows ZT=F 1d (strong): **REJECT** -0.95 (t -0.16), placebo 58th, 2025 -4.5, 2026 +4.5
+- **D479** HE=F follows NG=F 1d (all): **REJECT** -8.27 (t -1.93), placebo 7th, 2025 -4.7, 2026 -13.7
+- **D480** ZN=F fades LE=F 1d (strong): **REJECT** -4.94 (t -2.42), placebo 2th, 2025 -5.1, 2026 -4.7
+- **D481** HE=F follows GC=F 5d (all): **CONFIRM** +11.07 (t +2.62), placebo 100th, 2025 +10.5, 2026 +12.0
+- **D482** NG=F fades KRE 5d (all): **REJECT** -10.66 (t -0.56), placebo 34th, 2025 -1.4, 2026 -24.7
+- **D483** HE=F follows PL=F 5d (strong): **CONFIRM** +10.86 (t +1.99), placebo 99th, 2025 +9.0, 2026 +13.2
+- **D484** ZB=F follows 6E=F 5d (strong): **REJECT** -8.05 (t -1.95), placebo 4th, 2025 -11.6, 2026 -2.6
+- **D485** YM=F follows HYG 1d (all): **REJECT** -8.05 (t -1.63), placebo 7th, 2025 -8.2, 2026 -7.9
+- **D486** ZB=F follows ES=F 1d (all): **REJECT** -3.07 (t -1.13), placebo 18th, 2025 +1.0, 2026 -9.3
+- **D487** BTC=F follows ZN=F 5d (strong): **REJECT** -33.93 (t -1.52), placebo 9th, 2025 -44.6, 2026 -10.1
+- **D488** NG=F follows KRE 1d (strong): **REJECT** -10.81 (t -0.36), placebo 37th, 2025 +3.0, 2026 -30.7
+- **D489** BTC=F fades DFII10 5d (all): **WATCHLIST** +17.96 (t +1.38), placebo 94th, 2025 +8.2, 2026 +32.8
+- **D490** ZB=F follows NQ=F 5d (strong): **REJECT** -7.03 (t -1.67), placebo 9th, 2025 -4.4, 2026 -10.6
+- **D491** ZB=F follows ^GDAXI 5d (strong): **REJECT** -3.08 (t -0.77), placebo 27th, 2025 -5.9, 2026 +2.6
+- **D492** ZN=F fades HO=F 5d (all): **REJECT** -2.27 (t -1.54), placebo 11th, 2025 -3.4, 2026 -0.6
+- **D493** BTC=F follows ZB=F 5d (all): **REJECT** -11.34 (t -0.88), placebo 26th, 2025 -9.5, 2026 -14.2
+- **D494** LE=F follows BG 1d (strong): **REJECT** -5.08 (t -0.85), placebo 25th, 2025 -19.9, 2026 +12.5
+- **D495** ZN=F fades XOP 5d (all): **REJECT** -0.21 (t -0.14), placebo 57th, 2025 -0.3, 2026 -0.1
+- **D496** BTC=F fades PL=F 5d (strong): **REJECT** -3.46 (t -0.19), placebo 35th, 2025 +0.6, 2026 -8.6
+- **D497** YM=F follows ZB=F 5d (strong): **REJECT** -13.05 (t -1.26), placebo 13th, 2025 -11.5, 2026 -16.5
+- **D498** HE=F follows NG=F 1d (strong): **REJECT** -0.66 (t -0.10), placebo 59th, 2025 -0.8, 2026 -0.4
+- **D499** HE=F follows GC=F 1d (strong): **REJECT** -3.66 (t -0.70), placebo 40th, 2025 -0.0, 2026 -8.3
+- **D500** HE=F follows 6C=F 1d (all): **WATCHLIST** +2.54 (t +0.58), placebo 86th, 2025 +4.8, 2026 -0.8
+- **D501** ZN=F fades XOP 5d (strong): **REJECT** -0.93 (t -0.40), placebo 49th, 2025 -1.6, 2026 +0.2
+- **D502** NG=F follows LQD 1d (all): **WATCHLIST** +17.97 (t +0.94), placebo 84th, 2025 -3.4, 2026 +50.0
+- **D503** ZB=F follows ZT=F 5d (strong): **REJECT** -7.45 (t -1.78), placebo 8th, 2025 -3.7, 2026 -14.2
+- **D504** YM=F fades DFII10 5d (all): **WATCHLIST** +2.57 (t +0.52), placebo 78th, 2025 +2.4, 2026 +2.8
+- **D505** BTC=F fades NKD=F 5d (strong): **WATCHLIST** +23.91 (t +1.44), placebo 90th, 2025 -2.1, 2026 +57.2
+- **D506** HE=F follows 6S=F 1d (strong): **REJECT** -9.99 (t -1.78), placebo 8th, 2025 -7.4, 2026 -14.0
+- **D507** HE=F follows ^SKEW 1d (strong): **WATCHLIST** +8.39 (t +1.35), placebo 94th, 2025 +11.5, 2026 +3.2
+- **D508** ZB=F fades ^OVX 5d (strong): **REJECT** -1.79 (t -0.52), placebo 42th, 2025 -0.8, 2026 -3.2
+- **D509** NG=F fades ZM=F 5d (strong): **WATCHLIST** +19.97 (t +0.63), placebo 72th, 2025 +13.8, 2026 +28.6
+- **D510** YM=F follows HYG 1d (strong): **REJECT** -23.08 (t -1.58), placebo 6th, 2025 -18.2, 2026 -31.9
+- **D511** ZC=F fades SOYB 5d (strong): **REJECT** -3.93 (t -0.42), placebo 41th, 2025 +1.8, 2026 -16.9
+- **D512** LE=F follows KRE 1d (strong): **WATCHLIST** +1.31 (t +0.17), placebo 53th, 2025 +7.2, 2026 -7.2
+- **D513** LE=F follows ADM 1d (all): **REJECT** -6.41 (t -1.42), placebo 10th, 2025 -13.3, 2026 +3.8
+- **D514** LE=F follows XLU 1d (strong): **WATCHLIST** +4.22 (t +0.64), placebo 78th, 2025 -3.5, 2026 +14.9
+- **D515** BTC=F follows ZN=F 5d (all): **REJECT** -0.84 (t -0.07), placebo 54th, 2025 -2.5, 2026 +1.7
+- **D516** HE=F follows 6C=F 1d (strong): **WATCHLIST** +1.96 (t +0.27), placebo 72th, 2025 +10.6, 2026 -14.1
+- **D517** BTC=F fades ZS=F 1d (all): **WATCHLIST** +0.46 (t +0.04), placebo 61th, 2025 +14.4, 2026 -20.4
+- **D518** ZB=F follows ES=F 1d (strong): **REJECT** -2.73 (t -0.67), placebo 32th, 2025 +6.2, 2026 -15.2
+- **D519** ZB=F follows 6S=F 1d (strong): **REJECT** -1.44 (t -0.39), placebo 43th, 2025 +2.7, 2026 -8.0
+- **D520** YM=F fades 6S=F 1d (strong): **REJECT** -1.76 (t -0.24), placebo 47th, 2025 -6.4, 2026 +5.6
+- **D521** HE=F follows 6S=F 5d (all): **REJECT** -2.53 (t -0.59), placebo 45th, 2025 -3.3, 2026 -1.4
+- **D522** ZB=F follows 6J=F 5d (strong): **REJECT** -6.50 (t -1.58), placebo 9th, 2025 -7.6, 2026 -4.3
+- **D523** ZN=F fades XLE 5d (all): **REJECT** -0.57 (t -0.39), placebo 48th, 2025 -1.2, 2026 +0.3
+- **D524** HE=F follows PL=F 5d (all): **CONFIRM** +10.70 (t +2.53), placebo 100th, 2025 +13.3, 2026 +6.7
+- **D525** HE=F follows RTY=F 1d (strong): **WATCHLIST** +0.16 (t +0.03), placebo 60th, 2025 +0.1, 2026 +0.2
+- **D526** LE=F follows HE=F 1d (strong): **WATCHLIST** +1.29 (t +0.17), placebo 61th, 2025 +8.0, 2026 -9.9
+
+**Three CONFIRMs, one theme: lean hogs (HE) follow the 5-day sign of gold or platinum (D481, D483, D524).** Stress (descriptive, no trial),
+at a realistic 4 bps cost (1 tick + commission on HE): following GC's 5-day sign makes 2010–14 −5.7 (t −2.0), 2015–20 −8.9 (t −2.0),
+2021 +24.7, 2022 +16.7, **2023 −7.7, 2024 −0.7**, 2025–26 +9.1 (t 2.1). Silver, gold miners (GDX) and copper show nothing; the sibling LE
+nothing; no mechanism ties hog prices to precious metals. Two good years either side of two flat ones, reversed before 2021, no
+replication across metals: **noise, not proposed.** The rest of family 144 is at chance (59 vs 49.6 carried).
+
+## 521. D-series family 145 protocol: one wide ridge model per plan window, current regime (S1)
+
+**No trial spent; N 1,302. Written and committed BEFORE any model is fitted.** Single predictors are exhausted; a model may pool many
+weak ones. Per plan window: features = each eligible family-111 predictor's previous-weekday 1-day move and previous-5-weekday sum, each
+scaled by its 2021–24 median absolute value and clipped at ±5 (missing = 0); ridge regression of the window's bps on the features, penalty
+from {1, 10, 100, 1000, 10000} by leave-one-year-out CV on 2021–24 (Sharpe of sign(prediction) × y − cost), refit on all of 2021–24, frozen.
+**Six tests (one per window)**, each validated ONCE on sealed 2025-01 → 2026-08: trade sign(prediction) every session; §426, 2 rule
+(placebo: the predicted signs shuffled across the sealed sessions). A CONFIRM then needs the §446/§453 account replay against random flips.
+No discovery carry gate: all six are validated (one trial each).
+
+## 522. Family-145: wide ridge models — none hold (S1)
+
+**N 1,308.** `reports/d145_discovery.json` (module `reporting/d145_ridge.py`):
+- **D527** MNQ follows a wide ridge model (current regime): **REJECT** -0.09 (t -0.02), placebo 53th, 2025 +1.2, 2026 -2.0
+- **D528** MGC follows a wide ridge model (current regime): **REJECT** -3.92 (t -0.76), placebo 34th, 2025 -2.1, 2026 -6.6
+- **D529** NKD follows a wide ridge model (current regime): **WATCHLIST** +0.15 (t +0.03), placebo 54th, 2025 -0.4, 2026 +1.0
+- **D530** DAX follows a wide ridge model (current regime): **WATCHLIST** +0.11 (t +0.03), placebo 55th, 2025 -3.1, 2026 +4.9
+- **D531** CL follows a wide ridge model (current regime): **REJECT** -20.14 (t -1.49), placebo 8th, 2025 -31.1, 2026 -3.4
+- **D532** ZS follows a wide ridge model (current regime): **REJECT** -0.13 (t -0.03), placebo 61th, 2025 -1.1, 2026 +1.3
+
+Pooling ~100 scaled predictor moves gives nothing out of sample; the NKD and DAX models (CV t 3.5 / 1.95) lose to the single dollar
+signals they dilute. Pooled models are closed as a route.
+
+## 523. D-series family 146 protocol: never-screened Yahoo series as every-day predictors, current regime (S1)
+
+**No trial spent; N 1,308. Written and committed BEFORE any statistic is computed.** Series not in family 111's list: **close → close**
+(indices, settle after the US close): ^MOVE (Treasury implied vol), ^VXN, ^TNX, ^IRX, ^TYX; **open → close** (US-hours ETFs / futures):
+ZQ=F (fed funds), UUP (dollar ETF, US hours), EWJ, EWG, EWZ, EWY, EWT, INDA, KWEB, IBB, XHB, ITB, XRT, JETS, ARKK, TAN, URA, COPX, XME,
+OIH. Six plan windows; EWJ is not used for NKD nor EWG for the DAX (same market in US hours). Previous weekday's sign (1-day) and previous
+5 weekdays' sum (5-day); forms all / strong; follow/fade fixed on 2021–24; carried at net > 0, t > 1.96 (~2.5% by chance). Costs §177/§180.
+Validation per §426, 2; a CONFIRM then needs the §446/§453 stress tests.
+
+## 524. Family-146: never-screened Yahoo series — 55 of 592 carried (≈ 14.8 by chance); validated (S1)
+
+**N 1,369.** `reports/d146_discovery.json` (module `reporting/d146_newseries.py`):
+- **D533** NKD follows KWEB 5d (all): **WATCHLIST** +3.78 (t +0.84), placebo 80th, 2025 +3.9, 2026 +3.6
+- **D534** CL follows COPX 1d (strong): **WATCHLIST** +0.80 (t +0.04), placebo 59th, 2025 -3.4, 2026 +5.2
+- **D535** CL follows EWJ 1d (all): **WATCHLIST** +0.24 (t +0.02), placebo 54th, 2025 -6.6, 2026 +10.3
+- **D536** CL follows COPX 1d (all): **WATCHLIST** +21.74 (t +1.55), placebo 95th, 2025 +11.5, 2026 +37.2
+- **D537** NKD follows TAN 5d (strong): **WATCHLIST** +0.55 (t +0.09), placebo 56th, 2025 -8.7, 2026 +13.8
+- **D538** NKD follows KWEB 5d (strong): **WATCHLIST** +4.63 (t +0.57), placebo 72th, 2025 -5.6, 2026 +17.8
+- **D539** NKD follows EWZ 1d (all): **REJECT** -1.77 (t -0.39), placebo 35th, 2025 -0.2, 2026 -4.1
+- **D540** NKD follows EWG 5d (strong): **WATCHLIST** +7.63 (t +1.18), placebo 86th, 2025 +5.4, 2026 +10.9
+- **D541** CL follows XME 1d (strong): **WATCHLIST** +16.62 (t +0.79), placebo 80th, 2025 -12.7, 2026 +48.9
+- **D542** NKD follows ARKK 5d (all): **WATCHLIST** +5.05 (t +1.12), placebo 89th, 2025 +3.7, 2026 +7.1
+- **D543** CL follows JETS 1d (strong): **WATCHLIST** +4.19 (t +0.21), placebo 60th, 2025 +12.3, 2026 -7.8
+- **D544** CL follows EWJ 1d (strong): **REJECT** -9.32 (t -0.43), placebo 39th, 2025 -9.9, 2026 -8.6
+- **D545** NKD follows EWT 5d (strong): **WATCHLIST** +7.33 (t +1.19), placebo 91th, 2025 +8.3, 2026 +6.3
+- **D546** CL follows TAN 1d (strong): **WATCHLIST** +8.83 (t +0.44), placebo 70th, 2025 -23.4, 2026 +51.7
+- **D547** CL follows XME 1d (all): **WATCHLIST** +8.04 (t +0.57), placebo 75th, 2025 -3.1, 2026 +24.8
+- **D548** ZS follows IBB 1d (strong): **CONFIRM** +13.41 (t +2.05), placebo 98th, 2025 +12.8, 2026 +14.3
+- **D549** NKD follows EWY 5d (strong): **WATCHLIST** +7.97 (t +1.34), placebo 93th, 2025 +10.0, 2026 +5.8
+- **D550** CL follows ARKK 1d (all): **WATCHLIST** +0.07 (t +0.00), placebo 55th, 2025 -8.8, 2026 +13.3
+- **D551** NKD follows ITB 5d (all): **CONFIRM** +10.97 (t +2.45), placebo 100th, 2025 +9.4, 2026 +13.4
+- **D552** ZS follows IBB 1d (all): **CONFIRM** +11.30 (t +2.30), placebo 99th, 2025 +16.7, 2026 +3.2
+- **D553** MNQ fades OIH 5d (strong): **WATCHLIST** +14.34 (t +1.41), placebo 94th, 2025 +16.6, 2026 +11.4
+- **D554** NKD follows IBB 5d (all): **REJECT** -8.15 (t -1.82), placebo 4th, 2025 -5.6, 2026 -12.1
+- **D555** CL follows TAN 1d (all): **WATCHLIST** +15.28 (t +1.08), placebo 85th, 2025 -19.0, 2026 +67.2
+- **D556** CL follows INDA 1d (all): **REJECT** -22.65 (t -1.61), placebo 7th, 2025 -22.4, 2026 -23.0
+- **D557** NKD follows EWG 5d (all): **REJECT** -0.86 (t -0.19), placebo 48th, 2025 +0.8, 2026 -3.4
+- **D558** CL follows ARKK 1d (strong): **REJECT** -12.77 (t -0.64), placebo 27th, 2025 -38.5, 2026 +23.1
+- **D559** CL follows XRT 1d (all): **REJECT** -25.97 (t -1.85), placebo 4th, 2025 -17.9, 2026 -38.1
+- **D560** MNQ fades EWZ 5d (strong): **WATCHLIST** +2.18 (t +0.26), placebo 72th, 2025 +1.3, 2026 +3.3
+- **D561** CL follows JETS 5d (strong): **WATCHLIST** +4.41 (t +0.25), placebo 60th, 2025 +20.3, 2026 -17.3
+- **D562** MNQ fades XRT 5d (all): **REJECT** -8.91 (t -1.55), placebo 8th, 2025 -6.6, 2026 -12.4
+- **D563** NKD follows JETS 1d (all): **REJECT** -6.80 (t -1.51), placebo 8th, 2025 +1.0, 2026 -18.8
+- **D564** NKD follows JETS 1d (strong): **REJECT** -4.82 (t -0.79), placebo 21th, 2025 +5.7, 2026 -20.6
+- **D565** ZS follows COPX 1d (strong): **REJECT** -0.61 (t -0.08), placebo 48th, 2025 -6.7, 2026 +5.8
+- **D566** ZS fades ^TYX 5d (all): **REJECT** -1.53 (t -0.31), placebo 45th, 2025 -3.5, 2026 +1.5
+- **D567** MGC fades ZQ=F 1d (strong): **REJECT** -2.01 (t -0.28), placebo 37th, 2025 +4.5, 2026 -11.6
+- **D568** NKD follows KWEB 1d (strong): **REJECT** -1.45 (t -0.17), placebo 45th, 2025 -10.5, 2026 +11.6
+- **D569** NKD follows XHB 5d (all): **WATCHLIST** +7.20 (t +1.60), placebo 95th, 2025 +11.0, 2026 +1.3
+- **D570** NKD follows EWY 5d (all): **WATCHLIST** +4.11 (t +0.91), placebo 85th, 2025 +5.4, 2026 +2.1
+- **D571** NKD follows JETS 5d (strong): **WATCHLIST** +0.31 (t +0.05), placebo 56th, 2025 +2.5, 2026 -2.7
+- **D572** NKD fades ^MOVE 5d (strong): **WATCHLIST** +1.40 (t +0.21), placebo 56th, 2025 -2.4, 2026 +6.5
+- **D573** MGC fades ZQ=F 1d (all): **REJECT** -2.01 (t -0.28), placebo 35th, 2025 +4.5, 2026 -11.6
+- **D574** ZS follows ZQ=F 1d (strong): **REJECT** -1.67 (t -0.23), placebo 46th, 2025 +7.4, 2026 -14.7
+- **D575** MNQ fades EWZ 5d (all): **WATCHLIST** +4.75 (t +0.82), placebo 84th, 2025 +5.4, 2026 +3.8
+- **D576** CL follows EWT 1d (all): **WATCHLIST** +1.61 (t +0.11), placebo 56th, 2025 -9.6, 2026 +18.5
+- **D577** CL follows JETS 1d (all): **WATCHLIST** +3.70 (t +0.26), placebo 60th, 2025 +13.0, 2026 -10.3
+- **D578** NKD fades ^VXN 5d (all): **WATCHLIST** +1.75 (t +0.39), placebo 68th, 2025 -2.1, 2026 +7.7
+- **D579** DAX fades XRT 5d (all): **WATCHLIST** +2.08 (t +0.50), placebo 72th, 2025 +4.9, 2026 -2.2
+- **D580** ZS follows EWJ 1d (all): **REJECT** -2.11 (t -0.42), placebo 34th, 2025 -3.0, 2026 -0.9
+- **D581** CL follows EWG 1d (strong): **REJECT** -18.10 (t -0.83), placebo 26th, 2025 -34.2, 2026 +4.6
+- **D582** ZS follows KWEB 1d (all): **REJECT** -4.94 (t -1.01), placebo 21th, 2025 -7.3, 2026 -1.4
+- **D583** ZS follows EWJ 1d (strong): **REJECT** -1.05 (t -0.14), placebo 50th, 2025 +0.0, 2026 -2.4
+- **D584** NKD follows INDA 5d (strong): **WATCHLIST** +11.01 (t +1.58), placebo 93th, 2025 +7.1, 2026 +15.5
+- **D585** NKD follows COPX 5d (all): **WATCHLIST** +2.27 (t +0.51), placebo 70th, 2025 +6.3, 2026 -3.9
+- **D586** CL follows OIH 1d (strong): **REJECT** -10.98 (t -0.57), placebo 32th, 2025 -25.4, 2026 +10.1
+- **D587** NKD follows INDA 5d (all): **WATCHLIST** +3.23 (t +0.72), placebo 80th, 2025 +0.6, 2026 +7.3
+
+**Three CONFIRMs: ZS follows IBB's 1-day sign (D548, D552); NKD follows ITB's (homebuilders) 5-day sign (D551).** Stress (descriptive):
+- **ZS ← IBB:** by period 2010–14 +0.6, 2015–20 −5.3 (t −1.9), 2021 +22.5, 2022 +19.5, 2023 +3.3, 2024 −0.9, 2025–26 +11.3; XBI (the other
+  biotech ETF) and ZM show it weaker; ZC/ZW not. No mechanism; a risk-on proxy at best.
+- **NKD ← ITB 5-day: positive in every period** — 2010–14 +5.5 (t 0.8), 2015–20 +5.8 (t 1.9), 2021 +8.0, 2022 +8.3, 2023 +3.1, 2024 +7.4,
+  2025–26 +11.0 (t 2.5) — the first NKD signal that does not reverse before 2021 (the dollar-week rule does: 2010–20 negative). Joint with
+  the deployed dollar-week sign: agreement 57% / 53%; regression ITB t 2.3 / 2.3, 6E t 2.0 / 2.6 in 2021–24 / 2025–26 — two partly
+  independent signals. XHB (the broader homebuilder ETF) is weaker (2015–20 −3.9). Mechanism candidate: homebuilders are the purest
+  rates/financial-conditions equity; five days of easing conditions carry into Japan's next session.
+Next: A42 account replay (NKD: ITB alone and ITB + dollar-week; ZS: IBB) against random flips. The combination's equal weights are fixed
+in advance (scaled 5-day moves summed, no fitting), but it is chosen after seeing 2025–26 — disclosed; it is judged mainly on 2010–20.
+
+## 525. A42: family 146's CONFIRMs in the account — neither proposed (S1)
+
+**No trial; N 1,369.** `reports/a42_itb.json` (module `reporting/a42_itb.py`); 50K Daily replays vs random flips at the same short share.
+- **NKD ← ITB 5-day (D551):** pre-2021 +$2,657 vs random +$2,972 (beats 44%); post-2021 +$3,573 vs +$2,963 (71%); 2025 starts +$2,934 —
+  below the plan's +$3,206. **ITB + dollar-week** (equal scaled weights): post-2021 +$4,659 (97%), 2025 starts +$3,495 — **worse than the
+  deployed dollar-week rule alone** (+$6,136; 2025 starts +$8,040, P(payout) 95%, beats 100% of random flips on 2025 starts, re-checked).
+  ITB's every-period bps consistency does not survive the brackets. Not proposed; the deployed rule stays.
+- **ZS ← IBB 1-day (D552):** 2025 starts +$5,129 (P(payout) 79%) vs plan +$1,703 (93%) and random +$1,288 — beats 100% (200 draws).
+  But the **sibling XBI fails on 2025 starts (+$1,006, beats 46%)**, broad risk proxies (ES, RTY, XLY) beat 34–77%, pre-2021 it loses
+  (beats 24%), 2024 is negative and no mechanism links biotech to soybeans. One ETF of 25 new series, chosen from 55 carries: read as
+  chance. **Not proposed**; kept on the watchlist record as D552 CONFIRMED (forward-test only if the user wants a ZS rule).
+
+## 526. D-series family 147 protocol: NKD's and the DAX's whole sessions as every-day targets, current regime (S1)
+
+**No trial spent; N 1,369. Written and committed BEFORE any statistic is computed.** As family 141 did for MNQ: targets **NKD=F's whole
+Globex session** (Yahoo open 18:00 ET → settlement) and the **DAX cash session** (^GDAXI open → close, 03:00 → 11:30 ET). Predictors:
+family 111's list + family 146's series; own-market series excluded (NKD=F and EWJ for NKD; ^GDAXI and EWG for the DAX); for NKD=F the
+spot currencies/BTC-USD excluded (they close after 18:00 ET). Previous weekday's sign (1-day) and previous 5 weekdays' sum (5-day); forms
+all / strong; follow/fade fixed on 2021–24; carried at net > 0, t > 1.96. Costs NKD 0.2, DAX 0.3. Validation per §426, 2; a CONFIRM that is
+not the deployed dollar theme then needs the §446/§453 stress tests.
+
+## 527. Family-147: whole NKD / DAX sessions — 19 of 696 carried (≈ 17.4 by chance); validated (S1)
+
+**N 1,388.** `reports/d147_discovery.json` (module `reporting/d147_wholesess.py`):
+- **D588** NKD=F fades 6S=F 1d (strong): **REJECT** -0.28 (t -0.02), placebo 48th, 2025 -19.4, 2026 +30.3
+- **D589** NKD=F fades 6B=F 1d (all): **WATCHLIST** +9.94 (t +1.24), placebo 91th, 2025 -2.4, 2026 +28.6
+- **D590** NKD=F fades 6B=F 1d (strong): **WATCHLIST** +0.04 (t +0.00), placebo 50th, 2025 -22.1, 2026 +37.5
+- **D591** NKD=F fades 6A=F 1d (strong): **CONFIRM** +25.86 (t +1.87), placebo 97th, 2025 +8.4, 2026 +51.3
+- **D592** ^GDAXI fades 6S=F 1d (strong): **WATCHLIST** +6.34 (t +1.03), placebo 86th, 2025 +2.9, 2026 +11.8
+- **D593** NKD=F fades 6A=F 1d (all): **WATCHLIST** +9.96 (t +1.24), placebo 91th, 2025 -3.8, 2026 +30.8
+- **D594** ^GDAXI follows TAN 1d (all): **REJECT** -10.06 (t -2.36), placebo 1th, 2025 -12.0, 2026 -7.1
+- **D595** NKD=F fades ZC=F 5d (strong): **WATCHLIST** +14.62 (t +1.19), placebo 89th, 2025 -6.2, 2026 +45.4
+- **D596** NKD=F follows ^SKEW 1d (strong): **WATCHLIST** +3.39 (t +0.30), placebo 63th, 2025 +8.3, 2026 -4.8
+- **D597** NKD=F fades 6S=F 1d (all): **WATCHLIST** +1.73 (t +0.22), placebo 55th, 2025 -10.1, 2026 +19.8
+- **D598** ^GDAXI fades 6E=F 1d (all): **WATCHLIST** +6.33 (t +1.49), placebo 93th, 2025 -0.7, 2026 +16.9
+- **D599** NKD=F follows ^SKEW 1d (all): **WATCHLIST** +4.06 (t +0.51), placebo 64th, 2025 +3.1, 2026 +5.6
+- **D600** ^GDAXI follows OIH 1d (all): **REJECT** -2.66 (t -0.62), placebo 30th, 2025 +4.5, 2026 -13.4
+- **D601** NKD=F fades ^GVZ 1d (all): **REJECT** -11.34 (t -1.42), placebo 5th, 2025 -4.7, 2026 -21.5
+- **D602** NKD=F fades PL=F 1d (all): **WATCHLIST** +3.27 (t +0.41), placebo 69th, 2025 -6.6, 2026 +18.5
+- **D603** ^GDAXI fades CL=F 5d (all): **REJECT** -2.52 (t -0.59), placebo 30th, 2025 -4.2, 2026 +0.0
+- **D604** ^GDAXI fades MXN=X 1d (all): **REJECT** -6.56 (t -1.52), placebo 9th, 2025 -2.7, 2026 -12.5
+- **D605** NKD=F follows KWEB 5d (all): **WATCHLIST** +1.17 (t +0.15), placebo 54th, 2025 -7.0, 2026 +13.6
+- **D606** NKD=F fades 6C=F 1d (strong): **WATCHLIST** +3.95 (t +0.32), placebo 60th, 2025 -5.2, 2026 +21.1
+
+One CONFIRM (D591, NKD's whole session fades the Australian dollar's strong days), a 1-day dollar-theme variant; its siblings (6B, 6S,
+6A all-days) are negative in 2025 and the cell is 2026-driven. Not stress-tested further: the plan windows already carry the dollar theme
+more steadily (§466–§468). At chance overall.
+
+## 528. D-series family 148 protocol: currency crosses (carry and euro crosses) as every-day predictors, current regime (S1)
+
+**No trial spent; N 1,388. Written and committed BEFORE any statistic is computed.** Crosses from CME currency futures' open → close
+moves (all close before 18:00 ET): **carry** AUD/JPY (6A − 6J), NZD/JPY (6N − 6J), MXN/JPY (6M − 6J), AUD/CHF (6A − 6S), CAD/JPY (6C − 6J);
+**euro crosses** EUR/JPY (6E − 6J), EUR/CHF (6E − 6S), EUR/GBP (6E − 6B). Previous weekday's sign (1-day) and previous 5 weekdays' sum
+(5-day) into the six plan windows; forms all / strong; follow/fade fixed on 2021–24. **8 × 2 × 6 × 2 = 192 tests** (~4.8 by chance at
+t > 1.96). Costs §177/§180. Validation per §426, 2; a CONFIRM then needs the §446/§453 stress tests.
+
+## 529. Family-148: currency crosses — 12 of 192 carried (≈ 4.8 by chance); validated, none confirmed (S1)
+
+**N 1,400.** `reports/d148_discovery.json` (module `reporting/d148_crosses.py`):
+- **D607** ZS follows audchf 1d (strong): **WATCHLIST** +2.00 (t +0.24), placebo 67th, 2025 -3.6, 2026 +10.7
+- **D608** CL follows audchf 1d (all): **WATCHLIST** +22.85 (t +1.64), placebo 97th, 2025 -0.6, 2026 +58.8
+- **D609** CL follows audchf 1d (strong): **WATCHLIST** +25.14 (t +0.93), placebo 82th, 2025 +1.6, 2026 +61.7
+- **D610** NKD follows eurjpy 5d (strong): **WATCHLIST** +0.89 (t +0.14), placebo 43th, 2025 +0.4, 2026 +1.9
+- **D611** MGC follows mxnjpy 5d (all): **WATCHLIST** +4.39 (t +0.55), placebo 75th, 2025 +6.1, 2026 -0.8
+- **D612** CL follows eurchf 5d (strong): **REJECT** -15.42 (t -0.58), placebo 37th, 2025 -38.4, 2026 +29.2
+- **D613** DAX follows mxnjpy 1d (all): **REJECT** -2.10 (t -0.37), placebo 36th, 2025 -3.7, 2026 +2.9
+- **D614** CL fades eurgbp 1d (strong): **WATCHLIST** +16.28 (t +0.83), placebo 80th, 2025 +4.3, 2026 +48.3
+- **D615** NKD follows eurjpy 5d (all): **WATCHLIST** +0.30 (t +0.07), placebo 55th, 2025 +1.5, 2026 -1.6
+- **D616** NKD follows eurchf 5d (strong): **REJECT** -5.86 (t -0.76), placebo 23th, 2025 +1.8, 2026 -20.9
+- **D617** CL fades eurjpy 1d (strong): **WATCHLIST** +20.70 (t +0.97), placebo 81th, 2025 +30.3, 2026 +0.0
+- **D618** ZS follows eurchf 5d (strong): **REJECT** -7.45 (t -0.90), placebo 15th, 2025 -12.9, 2026 +3.2
+
+No CONFIRM. Crude following the carry cross (AUD/CHF) is positive but 2026-only — the crude-follows-risk theme again (sixth time).
+
+## 530. A43 protocol: bracket scaling for the accounts that now trade with a rule (S1)
+
+**No trial; N 1,400. Written and committed BEFORE any replay is run.** The plan's bracket policy was solved for a zero-edge market; the NKD
+and FDXM accounts now trade the dollar rules every day. Question: do wider or tighter brackets capture more of a known edge? `a23.replay`
+gains `scale = (take factor, stop factor)` applied to the policy's brackets (stops still capped by the drawdown floor). Grid: take and stop
+factors each in {0.5, 0.75, 1, 1.5, 2} (25 pairs). **Chosen on 2021–24 starts only** (mean net per attempt sequence), per account
+(NKD + dollar-week; FDXM + DAX-dollar); then read ONCE on 2025 starts against (1, 1), and on 2010–20 as a robustness check. Adopt only if the
+chosen pair improves the 2025-start mean net AND does not lower 2025-start P(payout) by more than 3 points AND does not hurt 2010–20.
+
+## 531. A43: bracket scaling with the rules — the plan's brackets stay (S1)
+
+**No trial; N 1,400.** `reports/a43_scale.json` (module `reporting/a43_scale.py`). NKD + dollar-week: the chosen pair on 2021–24 starts is
+the current (1, 1) — +$5,454 (P(payout) 92%); every other pair is lower. FDXM + DAX-dollar: chosen (take ×1, stop ×2) +$3,482 (98%) vs (1, 1)
++$2,903 (82%) on 2021–24 starts, and better before 2021 (+$4,293 vs +$3,144), **but on 2025 starts +$3,770 vs +$5,616** (P(payout) 100% vs
+92%) — fails §530's rule (mean net must improve). Not adopted. Note for the user only if they prefer payout probability to mean net:
+doubling FDXM's stop raised P(payout) in every period at a cost in mean net on the sealed starts.
+
+## 532. D-series family 149 protocol: currency moves just before NKD's entry, current regime (S1)
+
+**No trial spent; N 1,400. Written and committed BEFORE any statistic is computed.** The FDXM re-check (§490) reads the dollar just before
+the DAX opens. The NKD analogue: HistData EUR/USD, USD/JPY, AUD/USD (corrected clock) over (a) the **evening**, 16:55 → 19:55 ET on the
+calendar day before the Tokyo session (Sunday's evening for Monday; Friday 16:55 as its start), and (b) the **24 hours** to 19:55 ET
+(start: the previous weekday's 19:55, or Friday 16:55 for a Sunday). Target: NKD's plan window (20:00 → 02:00 ET). Follow/fade fixed on
+2021–24; forms all / strong. **3 × 2 × 2 = 12 tests** (~0.3 by chance at t > 1.96). Cost 0.2. Validation per §426, 2; a CONFIRM then needs
+the account replay on top of the deployed dollar-week rule.
+
+## 533. Family-149: currency moves before NKD's entry — 0 of 12 carried (S1)
+
+**N 1,400 (no trial).** `reports/d149_discovery.json` (module `reporting/d149_nkdeve.py`). Best 2021–24 cell: NKD follows USD/JPY's 24 hours
+to 19:55 ET, +4.97 bps (t 1.59). Of note (context only, not a test): before 2021 NKD followed USD/JPY's evening move strongly (+11.5,
+t 3.7; strong days +17.1, t 3.5) — gone since 2021 (+1.3, t 0.5). No pre-entry re-check for NKD.
+
+## 534. D-series family 150 protocol: Japanese and euro-area government yields as every-day predictors, current regime (S1)
+
+**No trial spent; N 1,400. Written and committed BEFORE any statistic is computed.** New official data (cached under data/cache/yields,
+gitignored): **Japan MOF JGB constant-maturity yields** (jgbcme_all.csv + current month; Tokyo close, known by ~02:00 ET the same day) and
+**ECB euro-area AAA yield curve** 2Y / 10Y (published ~12:00 CET the next day, so **lagged two weekdays**: the value for the weekday before
+the previous weekday). US 10Y = ^TNX close. Predictors (daily change in bps; 1-day = the last available day, 5-day = the 5 days ending
+there): **jgb10**, **jgb2**, **jp_curve** (10Y − 2Y), **us_jp10** (US 10Y − JGB 10Y), **ea10**, **ea_curve**, **us_ea10** (US 10Y − EA 10Y; US
+leg on the same lagged date). Targets: NKD, DAX, MGC, MNQ plan windows. Follow/fade fixed on 2021–24; forms all / strong.
+**7 × 2 × 4 × 2 = 112 tests** (~2.8 by chance at t > 1.96). Costs §180. Validation per §426, 2; a CONFIRM then needs §446/§453 stress tests.
+
+## 535. Family-150: JGB and euro-area yields — 7 of 112 carried (≈ 2.8 by chance); all REJECT (S1)
+
+**N 1,407.** `reports/d150_discovery.json` (module `reporting/d150_yields.py`):
+- **D619** MNQ follows jp_curve 1d (all): **REJECT** -0.84 (t -0.15), placebo 46th, 2025 +2.8, 2026 -6.3
+- **D620** MNQ fades jgb2 1d (strong): **REJECT** -0.87 (t -0.13), placebo 51th, 2025 -12.3, 2026 +14.2
+- **D621** DAX fades ea10 5d (all): **REJECT** -2.10 (t -0.52), placebo 32th, 2025 -0.2, 2026 -4.9
+- **D622** DAX fades jp_curve 5d (strong): **REJECT** -4.32 (t -0.82), placebo 22th, 2025 +1.3, 2026 -10.6
+- **D623** NKD follows jgb10 1d (strong): **REJECT** -7.13 (t -1.34), placebo 9th, 2025 -12.7, 2026 -0.1
+- **D624** MGC follows jgb2 5d (strong): **REJECT** -5.69 (t -0.91), placebo 9th, 2025 -5.3, 2026 -6.3
+- **D625** MNQ follows jp_curve 1d (strong): **REJECT** -2.00 (t -0.27), placebo 41th, 2025 +4.6, 2026 -10.1
+
+Foreign yields carry nothing into the plan windows out of sample.
+
+## 536. D-series family 151 protocol: crude's other windows (Brent minute proxy) as every-day targets, current regime (S1)
+
+**No trial spent; N 1,407. Written and committed BEFORE any statistic is computed.** As families 136 (gold) and 141 (MNQ) did: the MCL
+account could trade a shorter window. Owned/HistData WTI minute data has a 2024–26 gap, so the target is **HistData Brent (bcousd, corrected
+clock)**: **London morning 03:00 → 09:00 ET** and **New York 09:00 → 14:30 ET** (the NYMEX pit hours), each minute-grid close → close,
+rows ≥ 80% filled. Predictors: family 111's list incl. spot currencies (all close before 03:00 ET), minus CL=F; previous weekday's sign
+(1-day) and previous 5 weekdays' sum (5-day); forms all / strong; follow/fade fixed on 2021–24; cost 0.7. Carried at net > 0, t > 1.96.
+Validation per §426, 2; a CONFIRM then needs §446/§453 stress tests (incl. whether WTI follows where data exist) and an MCL replay on the window.
+
+## 537. Family-151: crude's other windows — 21 of 568 carried (≈ 14.2 by chance); none confirmed (S1)
+
+**N 1,428.** `reports/d151_discovery.json` (module `reporting/d151_crudewin.py`):
+- **D626** brent_ny follows COP=X 1d (strong): **REJECT** -1.91 (t -0.16), placebo 43th, 2025 -1.2, 2026 -2.6
+- **D627** brent_ny fades CLP=X 1d (all): **REJECT** -3.72 (t -0.47), placebo 36th, 2025 -5.1, 2026 -1.6
+- **D628** brent_ny fades KRW=X 1d (strong): **REJECT** -14.88 (t -1.13), placebo 12th, 2025 -25.7, 2026 +0.8
+- **D629** brent_ny follows GC=F 1d (all): **REJECT** -4.92 (t -0.62), placebo 27th, 2025 +1.4, 2026 -14.4
+- **D630** brent_london follows XLF 5d (all): **WATCHLIST** +4.03 (t +0.53), placebo 76th, 2025 +4.0, 2026 +4.0
+- **D631** brent_ny fades KRW=X 1d (all): **REJECT** -15.48 (t -1.98), placebo 3th, 2025 -10.4, 2026 -23.2
+- **D632** brent_ny follows BG 5d (all): **REJECT** -0.21 (t -0.03), placebo 54th, 2025 -13.0, 2026 +18.9
+- **D633** brent_ny fades ZAR=X 1d (all): **REJECT** -6.56 (t -0.83), placebo 24th, 2025 -12.6, 2026 +2.4
+- **D634** brent_london fades T10YIE 5d (strong): **REJECT** -0.99 (t -0.05), placebo 49th, 2025 -36.3, 2026 +52.6
+- **D635** brent_london fades CLP=X 1d (all): **WATCHLIST** +11.40 (t +1.42), placebo 94th, 2025 -0.7, 2026 +30.0
+- **D636** brent_ny follows DFII10 1d (strong): **WATCHLIST** +14.41 (t +1.07), placebo 86th, 2025 +9.0, 2026 +24.8
+- **D637** brent_ny fades CLP=X 1d (strong): **REJECT** -10.78 (t -0.66), placebo 25th, 2025 -12.2, 2026 -8.4
+- **D638** brent_ny follows AUDUSD=X 1d (strong): **WATCHLIST** +1.67 (t +0.12), placebo 56th, 2025 +3.9, 2026 -1.1
+- **D639** brent_ny follows NG=F 5d (all): **REJECT** -5.00 (t -0.63), placebo 34th, 2025 -6.6, 2026 -2.5
+- **D640** brent_ny fades BRL=X 1d (strong): **REJECT** -20.37 (t -1.38), placebo 12th, 2025 -20.8, 2026 -19.6
+- **D641** brent_ny follows XLF 1d (all): **REJECT** -10.70 (t -1.35), placebo 10th, 2025 +5.0, 2026 -33.9
+- **D642** brent_ny follows COP=X 1d (all): **REJECT** -2.47 (t -0.31), placebo 38th, 2025 -2.1, 2026 -3.1
+- **D643** brent_ny follows NKD=F 1d (all): **REJECT** -9.02 (t -1.14), placebo 14th, 2025 -11.2, 2026 -5.7
+- **D644** brent_london follows KRE 1d (all): **REJECT** -1.37 (t -0.18), placebo 47th, 2025 -0.7, 2026 -2.4
+- **D645** brent_ny follows PL=F 1d (strong): **REJECT** -2.35 (t -0.23), placebo 41th, 2025 -0.7, 2026 -4.3
+- **D646** brent_ny follows NG=F 5d (strong): **REJECT** -5.56 (t -0.41), placebo 38th, 2025 -12.0, 2026 +7.3
+
+Crude is unpredictable from yesterday's cross-asset moves in every window tried (whole session, London morning, New York).
+
+## 538. D-series family 152 protocol: the US last hour across markets into the next plan windows, current regime (S1)
+
+**No trial spent; N 1,428. Written and committed BEFORE any statistic is computed.** Whole-day predictor moves are exhausted; the last hour
+carries most institutional rebalancing flow. Predictors: the 15:00 → 15:59 ET move of **MNQ** (owned trades, family-8 day grid, one contract),
+**gold** (MGC NY-afternoon grid), **EUR/USD**, **USD/JPY**, **Brent** (HistData, corrected clock). Targets: the next weekday's **NKD, DAX, MGC
+and MNQ** plan windows. Follow/fade fixed on 2021–24; forms all / strong. **5 × 4 × 2 = 40 tests** (~1 by chance at t > 1.96). Costs §180.
+Validation per §426, 2; a CONFIRM then needs §446/§453 stress tests.
+
+## 539. Family-152: the US last hour — 1 of 40 carried (≈ 1 by chance) (S1)
+
+**N 1,429.** `reports/d152_discovery.json` (module `reporting/d152_lasthour.py`):
+- **D647** DAX fades usdjpy's US last hour (strong): **REJECT** -2.63 (t -0.44), placebo 30th, 2025 +1.7, 2026 -10.1
+
+At chance; the last hour carries nothing the whole day does not.
+
+## 540. D-series family 153 protocol: Asian local indices into the plan windows, timing-aware, current regime (S1)
+
+**No trial spent; N 1,429. Written and committed BEFORE any statistic is computed.** Yahoo local indices, **close → close** (opens are
+unreliable, §467): ^KS11 (closes ~01:30–02:30 ET), ^TWII (~00:30–01:30), ^AXJO (~01:00–02:00), ^HSI (~03:00–04:00), 000001.SS (~02:00–03:00),
+^STI (~04:00–05:00), ^BSESN (~05:00–06:00). Same-date sessions are used only where they close before the target opens: **DAX and MGC**
+(03:00 ET) same date for ^KS11, ^TWII, ^AXJO, previous weekday for the rest; **MNQ** (09:30) same date for all; **NKD** (20:00 ET the evening
+before its Tokyo date) previous weekday for all. 1-day and 5-day (the 5 sessions ending at that date); forms all / strong; follow/fade fixed on
+2021–24. **7 × 4 × 2 × 2 = 112 tests** (~2.8 by chance at t > 1.96). Costs §180. Validation per §426, 2; a CONFIRM then needs §446/§453.
+
+## 541. Family-153: Asian local indices — first run discarded (date artefact), 6 of 112 carried (≈ 2.8 by chance); validated (S1)
+
+**N 1,435.** `reports/d153_discovery.json` (module `reporting/d153_asia.py`). **The first run was wrong and is not counted:** `a22.load` stamps Yahoo bars in New York time, which puts an Asian session (opening 19:00–23:00 ET) on the previous date, so 'previous weekday' was the same session and t-values reached 10. Fixed before any registration by dating each bar in its exchange's time zone. Earlier uses of Asian indices only as targets of US-dated predictors (family 125) were thereby lagged one extra day — conservative, not look-ahead. Corrected run:
+- **D648** MGC follows ^STI 1d (strong): **REJECT** -19.00 (t -2.25), placebo 1th, 2025 -17.1, 2026 -20.9
+- **D649** NKD follows ^HSI 5d (all): **WATCHLIST** +1.46 (t +0.32), placebo 67th, 2025 +4.1, 2026 -2.7
+- **D650** DAX fades ^HSI 5d (strong): **REJECT** -9.57 (t -1.35), placebo 8th, 2025 -5.7, 2026 -16.4
+- **D651** DAX fades ^HSI 5d (all): **WATCHLIST** +0.28 (t +0.07), placebo 55th, 2025 -0.2, 2026 +1.0
+- **D652** DAX fades ^KS11 1d (all): **WATCHLIST** +6.66 (t +1.58), placebo 95th, 2025 +1.5, 2026 +14.4
+- **D653** NKD follows ^AXJO 1d (all): **CONFIRM** +8.40 (t +1.87), placebo 97th, 2025 +3.4, 2026 +16.1
+
+## 542. D653 (NKD follows the ASX) stress-tested — independent of the dollar rule, but adds nothing in the account (S1)
+
+**No trial; N 1,435.** Descriptive: NKD following ^AXJO's last close → close: 2010–14 +3.2, 2015–20 −0.5, 2021–24 +5.1 (t 2.0), 2025–26 +8.4
+(t 1.9). Siblings do not replicate (KOSPI −4.9, Taiex +2.7, Hang Seng +2.4 in 2025–26). Joint regression with NKD's own previous window and
+the deployed dollar-week sign: ASX t 2.1 / 2.1, dollar-week t 2.1 / 3.1 (2021–24 / 2025–26); agreement with dollar-week 52–53%.
+Account (NKD 50K, random flips at the same short share): 2025 starts — dollar-week +$8,040 (P(payout) 95%, beats 98%); ASX alone +$4,248 (93%,
+beats 73%); ASX + dollar-week (equal scaled weights) +$4,647 (100%, beats 83%). Before 2021 the combination is worst (+$1,597, beats 3%).
+**Not proposed**; the deployed rule stays alone. Second time (after ITB, §525) that a partly independent NKD signal dilutes the dollar-week
+rule when combined: the account rewards the single strongest every-day sign, not an average.
+
+## 543. Timestamp check after §541; D-series family 154 protocol: the US afternoon after Europe closes, current regime (S1)
+
+**Check (no trial):** Yahoo daily bars for CME futures (ES=F, 6E=F, CL=F, ZS=F, NKD=F, BTC=F) and DX-Y.NYB are stamped 00:00 ET of their trade
+date; ^GDAXI and ^VIX at their local open; US ETFs at 09:30 ET — every family-111 predictor is dated by the session that ENDS that date, so
+'previous weekday' has no look-ahead. The §541 artefact was specific to Asian exchanges (sessions opening the previous evening ET).
+
+**Family 154 — no trial spent; N 1,435. Written and committed BEFORE any statistic is computed.** The DAX window (03:00 → 11:30 ET) and gold's
+London window (03:00 → 11:30) end as New York's afternoon begins; what happens after Europe closes is the market's last word before the next
+European session. Predictors, 11:30 → 16:00 ET on the previous weekday: **MNQ** (owned trades), **EUR/USD**, **gold** (MGC NY-afternoon grid),
+**Brent** (11:30 → 14:30). Targets: the next weekday's **DAX**, **MGC London** and **NKD** windows. Follow/fade fixed on 2021–24; forms
+all / strong. **4 × 3 × 2 = 24 tests** (~0.6 by chance at t > 1.96). Costs §180. Validation per §426, 2.
+
+## 544. Family-154: the US afternoon after Europe closes — 0 of 24 carried (S1)
+
+**N 1,435 (no trial).** `reports/d154_discovery.json` (module `reporting/d154_afternoon.py`). Best: NKD fades gold's 11:30 → 16:00 move,
++4.81 bps (t 1.87). Nothing carries.
+
+## 545. A44 protocol: where inside the window do the deployed dollar rules earn? (S1)
+
+**No trial; N 1,435. Written and committed BEFORE any statistic is computed.** Under brackets an edge counts relative to the window's swing;
+if the dollar rules earn early, a shorter window holds the same edge with less noise. HistData minute closes (local time): the **DAX**
+(grxeur) 09:00 → 11:30, 11:30 → 14:00, 14:00 → 17:30 Berlin and the whole 09:00 → 17:30; the **Nikkei** (jpxjpy) Tokyo morning 09:00 → 11:30,
+afternoon 12:30 → 15:00 and the whole 09:00 → 15:00. Signs: the deployed rules (DAX follows DX-Y.NYB's previous weekday; NKD follows 6E's
+previous-5-weekday sum). Statistic: per-trade Sharpe (mean / SD of the signed move, cost 0.3 / 0.2) and t, by period. **Choice on 2021–24
+only** (highest per-trade Sharpe); read once on 2025–26 and 2010–20. A shorter window is proposed only if it also beats the whole window in
+2025–26 AND an account replay on its paths beats the deployed window's replay on 2025 starts.
+
+## 546. A44: the dollar rules by sub-window — the edge sits in the Tokyo morning, but the whole window stays (S1)
+
+**No trial; N 1,435.** `reports/a44_subwin.json`, `reports/a44_replay.json` (module `reporting/a44_subwin.py`). Per-trade Sharpe (net bps):
+- **DAX** (follow DX-Y.NYB): 09:00–11:30 0.052 (+2.55) chosen on 2021–24 vs whole 0.050 (+4.15); 2025–26 0.040 (+2.20) vs whole **0.085 (+7.04)**
+  → fails; the DAX rule earns across the day.
+- **NKD** (dollar-week): Tokyo morning 0.085 (+5.38) chosen on 2021–24 vs whole 0.072 (+5.93); **2025–26 morning 0.163 (+12.44, t 3.31) vs
+  whole 0.134 (+12.02)**; afternoon ≈ 0 in both periods — **the whole edge is in the morning session**. Account (1 NKD, plan brackets):
+  morning-only 2025 starts +$6,740 (P(payout) 97%, beats 99% of random flips) vs the deployed whole window **+$8,040 (95%, beats 100%)**;
+  post-2021 all starts +$4,337 vs +$6,136; pre-2021 +$2,264 vs +$3,258. The brackets need the afternoon's swing even though it carries no edge.
+  **Not adopted.** Kept as an understanding of the rule: if the forward record weakens, check the morning first.
+
+## 547. The dollar-week rule on NKD's whole Globex session — worse than the deployed Tokyo window (S1)
+
+**No trial; N 1,435.** Descriptive replay (Yahoo NKD=F session bars → 3-point paths, drift removed, 1 NKD, plan brackets): post-2021 the rule
+makes +$2,496 (beats 41% of random flips); 2025 starts +$4,210 (P(payout) 90%, beats 78%) vs the deployed Tokyo window's +$8,040. With §546:
+the deployed 09:00–15:00 Tokyo window is the best of the three lengths tried (morning, Tokyo day, whole Globex) — enough swing for the
+brackets, and the edge concentrated in it.
+
+## 548. A45 protocol: one account trading both dollar rules in sequence (NKD then the DAX) (S1)
+
+**No trial; N 1,435. Written and committed BEFORE any replay is run.** The NKD window (20:00 → 02:00 ET) and the DAX window (03:00 → 11:30 ET)
+never overlap, so one account can trade both every day without two open positions (no hedge question). Replay: the two windows interleaved
+by date (NKD Tokyo date d, then the DAX on d), each a step of the A23 engine with its own contracts (1 NKD / 2 FDXM, $4 round trip each) and
+the deployed rule's side; horizon 168 steps (≈ 84 trading days, as the single-market replays). Approximation disclosed: the engine applies its
+per-day rules (consistency, payout-day counts) per WINDOW, which flatters cadence; read relative to the same engine's random flips. Compared
+on 2025 starts (sealed) and 2010–20 with NKD-only and FDXM-only accounts. Reported to the user as an option only if the combined account
+beats BOTH single accounts' mean net AND beats ≥ 95% of random flips on 2025 starts.
+
+## 549. A45: NKD then DAX in one account — worse than NKD alone; not offered (S1)
+
+**No trial; N 1,435.** `reports/a45_twowin.json` (module `reporting/a45_twowin.py`). Interleaved windows, 168 steps: post-2021 the rules make
++$7,457 (P(payout) 100%, beats 92% of random flips) vs plan +$3,983; **2025 starts +$6,348 vs random +$5,799 (beats 59%)** — below the NKD-only
+account (+$8,040) and barely above random. Pre-2021 the rules lose to the plan (+$4,603 vs +$5,813, beats 20%). Two edges in one account do
+not add: the account caps out (target reached, consistency/payout cadence) and the second window adds swing more than edge. Fails §548.
+
+## 550. D-series family 155 protocol: Japan MOF weekly cross-border flows as a week-long sign, current regime (S1)
+
+**No trial spent; N 1,435. Written and committed BEFORE any statistic is computed.** New official data: MOF "International Transactions in
+Securities (weekly)" (week.csv, from 2005; cached data/cache/mof_week.csv, gitignored), released Thursday 08:50 JST for the week ending the
+previous Saturday. Predictors (¥100m, net): **foreign net buying of Japanese equities**, **foreign net buying of Japanese long-term bonds**,
+**residents' net buying of foreign equities**. Rule: from the release Thursday (the NKD session of that Tokyo date; the DAX/MGC/MNQ sessions of
+that date, all opening after the release) through the next Wednesday, take each target's window in the sign of the latest week's figure
+(follow or fade fixed on 2021–24); forms all / strong (|figure| above its 2021–24 median). Targets: **NKD, DAX, MGC, MNQ**.
+**3 × 4 × 2 = 24 tests** (~0.6 by chance at t > 1.96; t over sessions, disclosed: one weekly sign spans 5 sessions, so t overstates — a
+carry must also hold on weekly sums). Costs §180. Validation per §426, 2 (placebo: weekly signs shuffled across the sealed weeks).
+
+## 551. Family-155: MOF weekly flows — 3 of 24 carried; none confirmed (S1)
+
+**N 1,438.** `reports/d155_discovery.json` (module `reporting/d155_mof.py`; placebo shuffles the weekly signs across sealed weeks):
+- **D654** MGC fades MOF weekly foreign_bonds (all): **REJECT** -0.31 (t -0.06), placebo 58th, 2025 -3.9, 2026 +5.2
+- **D655** MGC fades MOF weekly foreign_bonds (strong): **WATCHLIST** +1.28 (t +0.18), placebo 72th, 2025 -7.7, 2026 +11.2
+- **D656** MNQ follows MOF weekly resident_foreign_equity (strong): **WATCHLIST** +8.41 (t +1.09), placebo 89th, 2025 +3.6, 2026 +15.9
+
+Gold fading foreign JGB buying (2021–24 t 3.3, weekly t 3.25, same sign in 2010–20) disappears on 2025–26 (−0.31). Weekly flows add nothing.
+
+## 552. D-series family 156 protocol: Asian currencies not yet screened, current regime (S1)
+
+**No trial spent; N 1,438. Written and committed BEFORE any statistic is computed.** Yahoo spot USD/CNY, USD/TWD, USD/SGD, USD/THB, USD/PHP
+(close → close, UTC-dated as family 111's currencies; bars close ~18:00–20:00 ET, so only windows opening after are targets): the **DAX**
+and **gold's London** windows (03:00 ET next day) and **MNQ** (09:30). Previous weekday's sign (1-day) and previous 5 weekdays' sum (5-day);
+forms all / strong; follow/fade fixed on 2021–24. **5 × 3 × 2 × 2 = 60 tests** (~1.5 by chance at t > 1.96). Costs §180. Validation per
+§426, 2; a CONFIRM then needs §446/§453.
+
+## 553. Family-156: Asian currencies — 3 of 60 carried (≈ 1.5 by chance); no CONFIRM, one near miss (S1)
+
+**N 1,441.** `reports/d156_discovery.json` (module `reporting/d156_asiafx.py`):
+- **D657** MGC follows CNY=X 1d (strong): **WATCHLIST** +3.83 (t +0.35), placebo 66th, 2025 +5.5, 2026 +1.5
+- **D658** MGC follows PHP=X 1d (strong): **REJECT** -0.71 (t -0.10), placebo 49th, 2025 +0.6, 2026 -2.8
+- **D659** MGC follows CNY=X 1d (all): **WATCHLIST** +8.72 (t +1.43), placebo 94th, 2025 +8.1, 2026 +9.6
+
+**D659 (gold's London window follows USD/CNY's previous day, all days) is a near miss:** +8.72 bps in 2025–26, positive in both years
+(+8.1 / +9.6), placebo 94th, t 1.43 — fails only the t and placebo thresholds narrowly. Mechanism: Chinese buyers hedge yuan weakness
+with gold (strong since 2022); 2010–20 negative (−1.6), a current-regime effect. **Watchlist** (§133): forward-tested, not traded.
+
+## 554. D-series family 157 protocol: weekly US jobless claims as a week-long sign, current regime (S1)
+
+**No trial spent; N 1,441. Written and committed BEFORE any statistic is computed.** FRED **ICSA** (initial claims, week ending Saturday,
+released the next Thursday 08:30 ET) and **CCSA** (continuing claims, released the same Thursday a week later: observation + 12 days).
+Current FRED values carry small revisions (disclosed; claims revisions are typically < 1%). Predictor: the change over **1 week** and over
+**4 weeks** (+ = claims rising). A value applies from the first plan session opening after its release to the session before the next
+release: MNQ from the release Thursday itself (09:30); the DAX and MGC from Friday (03:00); NKD, CL and ZS from the Thursday-evening session.
+Six plan windows; follow/fade fixed on 2021–24; forms all / strong. **2 × 2 × 6 × 2 = 48 tests** (~1.2 by chance at t > 1.96; carried
+also needs weekly-sum t > 1.96). Costs §177/§180. Validation per §426, 2 (placebo: weekly signs shuffled across sealed weeks).
+
+## 555. Family-157: weekly jobless claims — 0 of 48 carried (S1)
+
+**N 1,441 (no trial).** `reports/d157_discovery.json` (module `reporting/d157_claims.py`). Best: ZS follows the 1-week change in initial
+claims, +8.12 bps (t 1.83). Weekly macro releases held for a week carry nothing into the plan windows.
+
+## 556. D-series family 158 protocol: own-curve carry as an every-day sign for crude and gold, current regime (S1)
+
+**No trial spent; N 1,441. Written and committed BEFORE any statistic is computed.** W04 (decisions.md 76) tested trend + carry as a
+six-market portfolio and failed post-2021; carry as a single-market direction for the plan's own windows was never tested. From the owned
+GLBX daily bars (`daily_bars.load_market`, W04's carry C = (F1 − F2)/F2/years, measured at the 00:00 UTC bar): **CL** → CL's session, **GC** →
+gold's London window. Predictors on the previous weekday's bar: (a) **carry level** (+ = backwardation), (b) **carry change over 5 bars**.
+Follow/fade fixed on 2021–24; forms all / strong (|value| above its 2021–24 median). **2 × 2 × 2 = 8 tests** (~0.2 by chance at t > 1.96).
+Costs §180. Validation per §426, 2; a CONFIRM then needs §446/§453. Note: a carry-level sign changes rarely, so t over sessions overstates;
+a carry must also hold on monthly sums (t > 1.96).
+
+## 557. Family-158: own-curve carry — 0 of 8 carried (S1)
+
+**N 1,441 (no trial).** `reports/d158_discovery.json` (module `reporting/d158_carry.py`). Gold's carry says nothing. Of note (not carried,
+not a test): crude following the 5-bar change in its own carry is positive in both periods — 2010–20 +8.0 (t 1.74; strong days +17.8, t 1.97),
+2021–24 +8.0 (t 1.12; strong +11.3, t 1.06) — consistent but below every threshold.
+
+## 558. D-series family 159 protocol: US equity factor spreads as every-day predictors, current regime (S1)
+
+**No trial spent; N 1,441. Written and committed BEFORE any statistic is computed.** Breadth and factor rotation were never screened.
+Spreads of Yahoo open → close moves (US hours, all close 16:00 ET) minus SPY: **RSP** (equal weight = breadth), **MTUM** (momentum), **USMV**
+(minimum vol), **VLUE** (value), **QUAL** (quality), **SPHB** (high beta), **SPLV** (low vol). Previous weekday's sign (1-day) and previous
+5 weekdays' sum (5-day) into the six plan windows; forms all / strong; follow/fade fixed on 2021–24. **7 × 2 × 6 × 2 = 168 tests** (~4.2 by
+chance at t > 1.96). Costs §177/§180. Validation per §426, 2; a CONFIRM then needs §446/§453.
+
+## 559. Family-159: US factor spreads — 11 of 168 carried (≈ 4.2 by chance); none confirmed (S1)
+
+**N 1,452.** `reports/d159_discovery.json` (module `reporting/d159_factors.py`):
+- **D660** MNQ follows qual_spy 1d (all): **WATCHLIST** +3.51 (t +0.61), placebo 75th, 2025 +6.7, 2026 -1.2
+- **D661** CL follows sphb_spy 1d (strong): **REJECT** -4.68 (t -0.28), placebo 39th, 2025 +2.5, 2026 -13.7
+- **D662** MNQ follows qual_spy 1d (strong): **WATCHLIST** +9.37 (t +1.08), placebo 84th, 2025 +20.1, 2026 -4.6
+- **D663** CL fades usmv_spy 1d (strong): **WATCHLIST** +17.46 (t +0.97), placebo 83th, 2025 -1.2, 2026 +44.5
+- **D664** ZS follows qual_spy 1d (strong): **REJECT** -4.40 (t -0.66), placebo 30th, 2025 -3.2, 2026 -5.9
+- **D665** CL fades splv_spy 1d (strong): **WATCHLIST** +13.50 (t +0.81), placebo 86th, 2025 -12.1, 2026 +46.8
+- **D666** CL follows mtum_spy 1d (strong): **REJECT** -27.04 (t -1.29), placebo 11th, 2025 -19.9, 2026 -34.8
+- **D667** CL fades splv_spy 1d (all): **WATCHLIST** +14.12 (t +1.01), placebo 88th, 2025 -7.4, 2026 +46.6
+- **D668** CL fades qual_spy 5d (all): **REJECT** -6.81 (t -0.49), placebo 32th, 2025 -22.5, 2026 +16.9
+- **D669** NKD follows sphb_spy 1d (strong): **REJECT** -2.00 (t -0.31), placebo 39th, 2025 +6.8, 2026 -13.3
+- **D670** CL fades usmv_spy 1d (all): **REJECT** -1.96 (t -0.14), placebo 45th, 2025 -16.9, 2026 +20.6
+
+No CONFIRM; crude-follows-risk fails a seventh time (2026-only gains).
+
+## 560. D-series family 160 protocol: European indices other than the DAX as every-day predictors, current regime (S1)
+
+**No trial spent; N 1,452. Written and committed BEFORE any statistic is computed.** Only ^GDAXI was in family 111's list. Yahoo **^FTSE,
+^FCHI, ^STOXX50E, ^IBEX, FTSEMIB.MI, ^AEX, ^SSMI**, close → close (some Yahoo opens are stale; bars dated by local session, stamped 03:00
+ET — checked), previous weekday (all close ≤ 11:35 ET, before every plan window of the next weekday). 1-day and 5-day; six plan windows;
+forms all / strong; follow/fade fixed on 2021–24. **7 × 2 × 6 × 2 = 168 tests** (~4.2 by chance at t > 1.96). Costs §177/§180.
+Validation per §426, 2; a CONFIRM then needs §446/§453.
+
+## 561. Family-160: European indices — 13 of 168 carried (≈ 4.2 by chance); none confirmed (S1)
+
+**N 1,465.** `reports/d160_discovery.json` (module `reporting/d160_europe.py`):
+- **D671** NKD follows ^STOXX50E 5d (strong): **WATCHLIST** +1.15 (t +0.18), placebo 47th, 2025 -8.4, 2026 +16.0
+- **D672** NKD follows ^AEX 5d (strong): **REJECT** -1.38 (t -0.22), placebo 41th, 2025 -6.1, 2026 +7.3
+- **D673** NKD follows ^SSMI 5d (strong): **REJECT** -4.45 (t -0.72), placebo 29th, 2025 -11.3, 2026 +6.4
+- **D674** NKD follows FTSEMIB.MI 5d (strong): **REJECT** -8.34 (t -1.23), placebo 8th, 2025 -10.8, 2026 -4.7
+- **D675** NKD follows ^FCHI 1d (strong): **REJECT** -4.36 (t -0.63), placebo 27th, 2025 -5.0, 2026 -3.4
+- **D676** NKD follows FTSEMIB.MI 5d (all): **REJECT** -0.28 (t -0.06), placebo 52th, 2025 -6.7, 2026 +9.5
+- **D677** CL follows ^IBEX 1d (strong): **WATCHLIST** +6.87 (t +0.31), placebo 74th, 2025 +0.6, 2026 +15.1
+- **D678** NKD follows ^SSMI 5d (all): **REJECT** -5.66 (t -1.28), placebo 12th, 2025 -11.2, 2026 +2.8
+- **D679** NKD follows ^FCHI 5d (strong): **WATCHLIST** +0.24 (t +0.04), placebo 58th, 2025 -9.0, 2026 +14.4
+- **D680** NKD follows ^IBEX 1d (strong): **REJECT** -8.74 (t -1.29), placebo 14th, 2025 -3.9, 2026 -15.3
+- **D681** NKD follows ^AEX 1d (strong): **REJECT** -8.24 (t -1.23), placebo 16th, 2025 -7.0, 2026 -10.1
+- **D682** NKD follows ^STOXX50E 1d (strong): **REJECT** -10.09 (t -1.53), placebo 7th, 2025 -7.4, 2026 -14.0
+- **D683** NKD follows FTSEMIB.MI 1d (all): **REJECT** -3.32 (t -0.74), placebo 28th, 2025 -4.7, 2026 -1.3
+
+NKD-follows-risk fails a third time (families 142, 143, 160): it was a 2021–24 pattern only.
+
+## 562. D-series family 161 protocol: the remaining Yahoo series (softs, other commodities, Americas indices, US sectors), current regime (S1)
+
+**No trial spent; N 1,465. Written and committed BEFORE any statistic is computed.** Open → close: **KC=F, SB=F, CC=F, CT=F** (ICE softs,
+close ~13:30–14:00 ET), **PA=F**, **BZ=F** (ICE Brent; trades to ~18:00 ET, so NOT used for CL and ZS, whose sessions open 18:00–20:00 ET),
+**KE=F**, **GF=F**, **XLB, XLI, XLP, XLV, XLRE**; close → close: **^BVSP, ^MXX, ^GSPTSE**. Previous weekday 1-day and 5-day; six plan windows;
+forms all / strong; follow/fade fixed on 2021–24. **≈ 16 × 2 × 6 × 2 = 380 tests** (~9.5 by chance at t > 1.96). Costs §177/§180.
+Validation per §426, 2; a CONFIRM then needs §446/§453.
+
+## 563. Family-161: the remaining Yahoo series — 24 of 352 carried (≈ 8.8 by chance); none confirmed (S1)
+
+**N 1,489.** `reports/d161_discovery.json` (module `reporting/d161_remaining.py`):
+- **D684** DAX fades BZ=F 5d (strong): **REJECT** -11.35 (t -1.78), placebo 5th, 2025 -12.8, 2026 -10.0
+- **D685** NKD follows CC=F 5d (strong): **REJECT** -4.10 (t -0.71), placebo 18th, 2025 +2.2, 2026 -14.8
+- **D686** ZS follows XLI 1d (all): **WATCHLIST** +5.70 (t +1.15), placebo 90th, 2025 +5.9, 2026 +5.4
+- **D687** DAX fades KC=F 5d (strong): **REJECT** -9.44 (t -1.97), placebo 3th, 2025 -13.2, 2026 -3.6
+- **D688** CL follows ^BVSP 1d (strong): **WATCHLIST** +0.32 (t +0.01), placebo 52th, 2025 -19.0, 2026 +22.2
+- **D689** CL follows GF=F 1d (all): **WATCHLIST** +5.91 (t +0.42), placebo 68th, 2025 +14.7, 2026 -7.4
+- **D690** NKD follows CC=F 5d (all): **REJECT** -0.57 (t -0.13), placebo 45th, 2025 +3.6, 2026 -7.0
+- **D691** NKD follows ^GSPTSE 5d (all): **REJECT** -0.91 (t -0.20), placebo 47th, 2025 +2.3, 2026 -5.8
+- **D692** ZS follows XLV 1d (all): **REJECT** -1.91 (t -0.39), placebo 39th, 2025 -1.4, 2026 -2.7
+- **D693** ZS follows XLP 5d (all): **REJECT** -1.16 (t -0.23), placebo 43th, 2025 -2.8, 2026 +1.2
+- **D694** NKD follows XLB 5d (strong): **WATCHLIST** +5.90 (t +0.96), placebo 87th, 2025 +1.1, 2026 +12.2
+- **D695** ZS follows ^BVSP 1d (strong): **WATCHLIST** +8.21 (t +1.01), placebo 85th, 2025 -12.8, 2026 +31.6
+- **D696** DAX follows CC=F 5d (strong): **REJECT** -4.84 (t -0.95), placebo 21th, 2025 -5.7, 2026 -3.4
+- **D697** ZS follows ^BVSP 5d (strong): **WATCHLIST** +4.92 (t +0.67), placebo 62th, 2025 +1.7, 2026 +9.2
+- **D698** DAX follows CC=F 5d (all): **REJECT** -2.73 (t -0.65), placebo 30th, 2025 -6.3, 2026 +2.7
+- **D699** ZS follows XLV 5d (strong): **WATCHLIST** +6.84 (t +1.02), placebo 75th, 2025 +2.7, 2026 +14.3
+- **D700** NKD follows ^BVSP 1d (all): **REJECT** -3.16 (t -0.70), placebo 26th, 2025 -1.0, 2026 -6.5
+- **D701** DAX fades BZ=F 5d (all): **REJECT** -5.04 (t -1.22), placebo 11th, 2025 -8.0, 2026 -0.5
+- **D702** CL follows XLB 1d (strong): **REJECT** -2.34 (t -0.11), placebo 46th, 2025 -3.3, 2026 -1.2
+- **D703** ZS follows XLB 5d (strong): **REJECT** -9.65 (t -1.50), placebo 8th, 2025 -10.7, 2026 -8.3
+- **D704** CL fades KC=F 1d (strong): **WATCHLIST** +1.76 (t +0.09), placebo 56th, 2025 -4.0, 2026 +10.8
+- **D705** MNQ fades XLP 5d (strong): **REJECT** -0.24 (t -0.02), placebo 50th, 2025 +13.4, 2026 -16.8
+- **D706** CL fades KC=F 5d (strong): **REJECT** -0.54 (t -0.03), placebo 51th, 2025 +15.8, 2026 -26.2
+- **D707** DAX fades KC=F 5d (all): **REJECT** -5.24 (t -1.26), placebo 14th, 2025 -1.3, 2026 -11.1
+
+No CONFIRM. The DAX fading coffee's week (2010–20 t 4.2, 2021–24 t 2.5) reversed in 2025–26 (−9.4, t −2.0): a long-lived pattern that
+ended, the sharpest example yet of why 2025–26 decides. The Yahoo daily universe is now screened end to end (families 111–161).
+
+## 564. D-series family 162 protocol: the US index's move after the cash close, just before the NKD, DAX and gold entries (S1)
+
+**No trial spent; N 1,489. Written and committed BEFORE any statistic is computed.** HistData S&P 500 CFD (spxusd, corrected clock, grid
+`hd_spxusd`), measured to 5 minutes before each entry: for **NKD** (20:00 ET) the **16:00 → 19:55 ET** move (calendar day before the Tokyo
+date; Sunday evening for Monday, from Friday 16:00); for the **DAX** and **gold's London** window (03:00 ET) the **16:00 → 02:55** move
+(the previous weekday's 16:00) and the **20:00 → 02:55** move (the Asian session only). Follow/fade fixed on 2021–24; forms all / strong.
+**(1 + 2 + 2) × 2 = 10 tests** (~0.25 by chance at t > 1.96). Costs §180. Validation per §426, 2.
+
+## 565. Family-162: the US index after the cash close — 0 of 10 carried (S1)
+
+**N 1,489 (no trial).** `reports/d162_discovery.json` (module `reporting/d162_spxafter.py`). Of note (not carried): NKD following the S&P's
+16:00 → 19:55 ET move on strong evenings, 2010–20 +11.7 (t 2.8), 2021–24 +8.3 (t 1.8) — consistent, below threshold.
+
+## 566. D-series family 163 protocol: yesterday's move on unusual volume (owned CME daily bars), current regime (S1)
+
+**No trial spent; N 1,489. Written and committed BEFORE any statistic is computed.** Owned GLBX ohlcv-1d bars (`daily_bars`): total volume
+across a root's outrights per bar; volume ratio = that bar's volume / mean of the previous 20 bars. Predictor: the sign of the held return
+on that bar, on **high-volume bars** (ratio above its 2021–24 median) or **low-volume bars** (below). Pairs: **NQ → MNQ**, **GC → gold's London
+window**, **CL → CL's session**, **6E → the DAX and NKD windows** (the dollar theme, volume-conditioned). Timing: a bar dated d runs
+00:00 → 24:00 UTC (≈ 20:00 ET d−1 → 20:00 ET d), so it ends before every next-day window except CL's (opens 18:00 ET) — **CL uses the
+bar before** (lag 2). Follow/fade fixed on 2021–24. **5 × 2 = 10 tests** (~0.25 by chance at t > 1.96). Costs §180. Validation per §426, 2.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —
