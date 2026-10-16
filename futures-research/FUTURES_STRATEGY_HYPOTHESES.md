@@ -3540,3 +3540,147 @@ Data-derived (D-series family 161). `hypotheses.yaml` (D706) · `decisions.md` �
 ## D707 — Dax Fades Kc F 5D All  *(REJECT — t01489)*
 
 Data-derived (D-series family 161). `hypotheses.yaml` (D707) · `decisions.md` §563
+
+## D708 — Cl Fades Cl On Low Volume Days  *(WATCHLIST — t01490)*
+
+Data-derived (D-series family 163). `hypotheses.yaml` (D708) · `decisions.md` §567
+
+## D709 — Dax Fades 6E On High Volume Days  *(CONFIRM — t01491)*
+
+Data-derived (D-series family 163). `hypotheses.yaml` (D709) · `decisions.md` §567
+
+## D710 — Cl Fades Gc On High Volume Days  *(REJECT — t01492)*
+
+Data-derived (D-series family 164). `hypotheses.yaml` (D710) · `decisions.md` §570
+
+## D711 — Cl Fades Hg On Low Volume Days  *(REJECT — t01493)*
+
+Data-derived (D-series family 164). `hypotheses.yaml` (D711) · `decisions.md` §570
+
+## D712 — Cl Follows 6E On Low Volume Days  *(REJECT — t01494)*
+
+Data-derived (D-series family 164). `hypotheses.yaml` (D712) · `decisions.md` §570
+
+## D713 — Dax Fades Oil Gold 5D Strong  *(REJECT — t01495)*
+
+Data-derived (D-series family 165). `hypotheses.yaml` (D713) · `decisions.md` §572
+
+## D714 — Mnq Fades Oil Gold 5D Strong  *(WATCHLIST — t01496)*
+
+Data-derived (D-series family 165). `hypotheses.yaml` (D714) · `decisions.md` §572
+
+## D715 — Mnq Follows Copper Oil 5D All  *(WATCHLIST — t01497)*
+
+Data-derived (D-series family 165). `hypotheses.yaml` (D715) · `decisions.md` §572
+
+## D716 — Dax Fades Oil Gold 5D All  *(REJECT — t01498)*
+
+Data-derived (D-series family 165). `hypotheses.yaml` (D716) · `decisions.md` §572
+
+## D717 — Cl Follows 6L F 1D Strong  *(WATCHLIST — t01499)*
+
+Data-derived (D-series family 166). `hypotheses.yaml` (D717) · `decisions.md` §574
+
+## D718 — Mnq Vb05 Intraday Strategy  *(WATCHLIST — t01500)*
+
+Data-derived (D-series family A50). `hypotheses.yaml` (D718) · `decisions.md` §585
+
+## D719 — Mnq Fh Intraday Strategy  *(WATCHLIST — t01501)*
+
+Data-derived (D-series family A50). `hypotheses.yaml` (D719) · `decisions.md` §585
+
+## D720 — Cl Follows Attention To Nikkei 225 5D Strong  *(WATCHLIST — t01502)*
+
+Data-derived (D-series family 167). `hypotheses.yaml` (D720) · `decisions.md` §589
+
+## D721 — Dax Fades Attention To Nasdaq 5D Strong  *(WATCHLIST — t01503)*
+
+Data-derived (D-series family 167). `hypotheses.yaml` (D721) · `decisions.md` §589
+
+## D722 — Zs Fades Attention To Bank Run 1D All  *(REJECT — t01504)*
+
+Data-derived (D-series family 167). `hypotheses.yaml` (D722) · `decisions.md` §589
+
+## D723 — Mnq Fades Attention To Gold As An Investment 5D All  *(WATCHLIST — t01505)*
+
+Data-derived (D-series family 167). `hypotheses.yaml` (D723) · `decisions.md` §589
+
+## D724 — Dax Fades Attention To Nasdaq 1D All  *(REJECT — t01506)*
+
+Data-derived (D-series family 167). `hypotheses.yaml` (D724) · `decisions.md` §589
+
+## D725 — Nkd Fades Attention To Recession 1D Strong  *(REJECT — t01507)*
+
+Data-derived (D-series family 167). `hypotheses.yaml` (D725) · `decisions.md` §589
+
+## D726 — Walk Forward Yearly Rule Reselection  *(WATCHLIST — t01508)*
+
+Data-derived (D-series family 169). `hypotheses.yaml` (D726) · `decisions.md` §593
+
+## D727 — Mgc Fades Its Own 60D Trend All  *(WATCHLIST — t01509)*
+
+Data-derived (D-series family 171). `hypotheses.yaml` (D727) · `decisions.md` §599
+
+## D728 — Mgc Fades Its Own 60D Trend Strong  *(WATCHLIST — t01510)*
+
+Data-derived (D-series family 171). `hypotheses.yaml` (D728) · `decisions.md` §599
+
+## D729 — Mgc Fades Its Own 250D Trend Strong  *(REJECT — t01511)*
+
+Data-derived (D-series family 171). `hypotheses.yaml` (D729) · `decisions.md` §599
+
+## D730 — Dax Nkd Fade Zc F 5D Strong  *(WATCHLIST — t01512)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D730) · `decisions.md` §601
+
+## D731 — Dax Nkd Follow Xop 1D All  *(WATCHLIST — t01513)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D731) · `decisions.md` §601
+
+## D732 — Dax Nkd Follow Fxi 5D All  *(REJECT — t01514)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D732) · `decisions.md` §601
+
+## D733 — Dax Nkd Follow Eem 5D All  *(REJECT — t01515)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D733) · `decisions.md` §601
+
+## D734 — Dax Nkd Fade 6S F 1D Strong  *(REJECT — t01516)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D734) · `decisions.md` §601
+
+## D735 — Dax Nkd Fade 6B F 1D All  *(WATCHLIST — t01517)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D735) · `decisions.md` §601
+
+## D736 — Dax Nkd Follow 6B F 5D All  *(REJECT — t01518)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D736) · `decisions.md` §601
+
+## D737 — Dax Nkd Follow Eem 5D Strong  *(WATCHLIST — t01519)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D737) · `decisions.md` §601
+
+## D738 — Dax Nkd Fade Zc F 5D All  *(CONFIRM — t01520)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D738) · `decisions.md` §601
+
+## D739 — Dax Nkd Follow Zb F 5D Strong  *(WATCHLIST — t01521)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D739) · `decisions.md` §601
+
+## D740 — Dax Nkd Follow Zn F 5D Strong  *(REJECT — t01522)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D740) · `decisions.md` §601
+
+## D741 — Dax Nkd Follow Zn F 5D All  *(WATCHLIST — t01523)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D741) · `decisions.md` §601
+
+## D742 — Dax Nkd Fade Vix3M 5D All  *(REJECT — t01524)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D742) · `decisions.md` §601
+
+## D743 — Dax Nkd Follow Xlf 5D All  *(REJECT — t01525)*
+
+Data-derived (D-series family 172). `hypotheses.yaml` (D743) · `decisions.md` §601

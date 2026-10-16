@@ -9,7 +9,9 @@ free 1-minute prices after its window closes, traded or not.
 
 Commands (in the configured channel; start with ! or mention the bot, e.g. "@Bot eod MNQ 50850"):
   !eod <PRODUCT> <balance>       the account balance once that product's ticket has closed (any time - filed under the
-                                 ticket's trading day); a ticket already issued is reissued
+                                 ticket's trading day); a ticket already issued is reissued. Checked first against a 1-minute
+                                 replay from the exact entry: if it hit the other bracket, nothing is booked until you resend
+                                 with `confirm` at the end (!eod MNQ 49000 confirm) or send the matching balance
   !took <PRODUCT> / !skipped <PRODUCT>   mark whether you placed the latest ticket
   !results [n]                   finished tickets and how they played out (all, or the last n)
   !ticket                        the tickets issued at the last alert
@@ -38,7 +40,7 @@ from accounts import PRODUCTS, Book
 import daxdollar
 import json
 
-from schedule import ALERT, CT, ET, ORDER, Tickets, alert_parts, clock, eod_day, last_trading_day, needs_eod, ticket_post
+from schedule import ALERT, CT, ET, ORDER, Tickets, alert_parts, clock, eod_check, eod_day, last_trading_day, needs_eod, ticket_post
 
 HERE = Path(__file__).resolve().parent
 
@@ -204,27 +206,39 @@ async def fdxm_recheck(ch, now: dt.datetime) -> None:
         return
     rec = recs[-1]
     res = await asyncio.to_thread(daxdollar.preopen_side, now)
-    if res is None:
-        rec["prechecked"] = True; tix.save(); return
+    old = rec["ticket"]["side"]
+    if res is None:                                   # every re-check posts its own message (decisions.md 581)
+        rec["prechecked"] = True; tix.save()
+        await ch.send(f"FDXM re-check ({clock(now, False)} CT): no EUR/USD data - the 4:30 PM side ({old.upper()}) stands; staged order unchanged.")
+        return
     side, why = res
-    if side != rec["ticket"]["side"]:
+    if side != old:
         alert_day = dt.datetime.fromisoformat(rec["issued"]).date()
         new = tix.issue(book, "FDXM", alert_day, now, side_override=(side, why))
         new["prechecked"] = True; tix.save()
-        await ch.send(f"**FDXM side changed to {side.upper()}** for the 2:00 AM CT entry - {why}. The board is updated.")
+        em = discord.Embed(title=f"FDXM re-check: side changed {old.upper()} → {side.upper()}",
+                           description="**Change your staged FDXM order before the 2:00 AM CT entry.**\n\n" + ticket_post(new)[:3800],
+                           color=0xE67E22)
+        await ch.send(content=f"<@{USER_ID}>" if USER_ID else None, embed=em)
     else:
         rec["prechecked"] = True; rec["ticket"]["note"] = (rec["ticket"].get("note", "") + f" | {why} (unchanged)").strip(" |"); tix.save()
+        await ch.send(f"FDXM re-check ({clock(now, False)} CT): side unchanged - {old.upper()}; staged order stands. ({why})")
     await refresh_boards(ch, {"FDXM"})
 
 
 @bot.command(name="eod")
-async def eod_cmd(ctx, product: str, balance: float):
+async def eod_cmd(ctx, product: str, balance: float, confirm: str = ""):
     if not _allowed(ctx):
         return
     p = _product(product)
     now = dt.datetime.now(ET)
     day = eod_day(tix, p, now)                      # the trading day of the ticket that just ended
     pnl = round(balance - book.s[p]["balance"], 2)  # the day's actual P&L, before eod() may reset the account
+    if confirm.lower() not in ("confirm", "yes", "force"):    # cross-check against the exact-entry replay first (decisions.md 577)
+        warn = await asyncio.to_thread(eod_check, tix, p, pnl, now)
+        if warn:
+            await send(ctx.channel, warn)
+            return
     msgs = book.eod(p, balance, day)
     a = book.s[p]
     out = [f"{p}: closed ${balance:,.2f} ({day}) recorded. Peak ${a['peak']:,.2f}, best day ${a['best']:,.0f}." if a["phase"] != "dead" else ""]

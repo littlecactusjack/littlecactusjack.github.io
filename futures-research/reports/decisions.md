@@ -12937,6 +12937,703 @@ window**, **CL → CL's session**, **6E → the DAX and NKD windows** (the dolla
 00:00 → 24:00 UTC (≈ 20:00 ET d−1 → 20:00 ET d), so it ends before every next-day window except CL's (opens 18:00 ET) — **CL uses the
 bar before** (lag 2). Follow/fade fixed on 2021–24. **5 × 2 = 10 tests** (~0.25 by chance at t > 1.96). Costs §180. Validation per §426, 2.
 
+## 567. Family-163: volume-conditioned moves — 2 of 10 carried; D709 CONFIRMED (the DAX–dollar theme on heavy euro volume) (S1)
+
+**N 1,491.** `reports/d163_discovery.json` (module `reporting/d163_volume.py`):
+- **D708** CL fades CL on low-volume days: **WATCHLIST** +26.58 (t +1.49), placebo 92th, 2025 +14.9, 2026 +43.6
+- **D709** DAX fades 6E on high-volume days: **CONFIRM** +14.02 (t +2.04), placebo 98th, 2025 +8.4, 2026 +22.4
+
+**D709** is the deployed DAX–dollar theme restricted to sessions after a high-volume 6E bar: +14.02 bps in 2025–26 (2025 +8.4, 2026 +22.4),
+about double the every-day rule's sealed edge; 2010–20 context +4.38. Next: FDXM account replay of volume-conditioned variants against the
+deployed rule (A46). D708 (crude fades its own low-volume days) WATCHLIST, positive both years.
+
+## 568. A46: D709 in the FDXM account — no reliable gain over the deployed rule; not proposed (S1)
+
+**No trial; N 1,491.** `reports/a46_daxvol.json` (module `reporting/a46_daxvol.py`), 60 random-flip draws each:
+- deployed (DX every day): post-2021 +$3,720 (beats 95%); 2025 starts **+$5,616** (P(payout) 92%, beats 98%); pre-2021 +$3,144 (93%).
+- heavy-6E-volume days follow the euro's bar, else DX: post-2021 +$3,779 (97%); 2025 starts **+$6,521** (93%, beats 100%); **pre-2021 +$2,417** (63%).
+- heavy-volume days only, else long: 2025 starts +$2,325 (69%) — trading half the days loses the account value.
+The variant's +$905 on 2025 starts is from ~400 sessions, it is equal on all post-2021 starts, worse before 2021, and its form was chosen
+after seeing 2025–26. **Not proposed**; the deployed rule stays. D709 stands as confirmation that the theme strengthens on heavy euro volume.
+
+## 569. D-series family 164 protocol: volume-conditioned moves, every owned market into every plan window (S1)
+
+**No trial spent; N 1,491. Written and committed BEFORE any statistic is computed.** Family 163's construction (owned GLBX daily bars;
+high- / low-volume bars by the 20-bar volume ratio vs its 2021–24 median; sign of the held return) for all six owned roots **NQ, GC, HG, CL,
+ZN, 6E** into all six plan windows, excluding family 163's ten cells and same-market pairs already there; CL target uses the bar before (lag 2).
+Follow/fade fixed on 2021–24. **6 × 6 × 2 − 10 = 62 tests** (~1.6 by chance at t > 1.96). Costs §177/§180. Validation per §426, 2; a CONFIRM
+then needs an account replay against the deployed rule of its market (or the plan where none).
+
+## 570. Family-164: volume-conditioned, all pairs — 3 of 62 carried (≈ 1.6 by chance); validated (S1)
+
+**N 1,494.** `reports/d164_discovery.json` (module `reporting/d164_volall.py`):
+- **D710** CL fades GC on high-volume days: **REJECT** -7.06 (t -0.41), placebo 36th, 2025 +6.9, 2026 -32.9
+- **D711** CL fades HG on low-volume days: **REJECT** -29.02 (t -1.48), placebo 8th, 2025 -3.5, 2026 -69.3
+- **D712** CL follows 6E on low-volume days: **REJECT** -1.70 (t -0.10), placebo 49th, 2025 +8.4, 2026 -16.7
+
+## 571. D-series family 165 protocol: commodity ratios as growth signals, current regime (S1)
+
+**No trial spent; N 1,494. Written and committed BEFORE any statistic is computed.** Spreads of Yahoo open → close moves: **copper/gold**
+(HG − GC, the classic growth gauge), **oil/gold** (CL − GC), **silver/gold** (SI − GC), **copper/oil** (HG − CL). Previous weekday's sign
+(1-day) and previous 5 weekdays' sum (5-day) into the six plan windows (a target's own market's ratios excluded: CL ratios not into CL,
+GC ratios not into MGC); forms all / strong; follow/fade fixed on 2021–24. **≈ 4 × 2 × 6 × 2 − excluded = 80 tests** (~2 by chance at
+t > 1.96). Costs §177/§180. Validation per §426, 2.
+
+## 572. Family-165: commodity ratios — 4 of 76 carried (≈ 1.9 by chance); validated (S1)
+
+**N 1,498.** `reports/d165_discovery.json` (module `reporting/d165_ratios.py`):
+- **D713** DAX fades oil_gold 5d (strong): **REJECT** -9.99 (t -1.73), placebo 3th, 2025 -6.5, 2026 -14.6
+- **D714** MNQ fades oil_gold 5d (strong): **WATCHLIST** +13.19 (t +1.45), placebo 91th, 2025 +17.9, 2026 +7.1
+- **D715** MNQ follows copper_oil 5d (all): **WATCHLIST** +8.65 (t +1.51), placebo 94th, 2025 +14.5, 2026 -0.2
+- **D716** DAX fades oil_gold 5d (all): **REJECT** -6.49 (t -1.57), placebo 6th, 2025 -6.7, 2026 -6.2
+
+No CONFIRM. D714 (MNQ fades a strong week of oil outrunning gold) is a near miss — positive both years (+17.9 / +7.1), t 1.45, placebo 91st
+— watchlist only.
+
+## 573. D-series family 166 protocol: the Brazilian real (6L) every day into soybeans and the plan windows, current regime (S1)
+
+**No trial spent; N 1,498. Written and committed BEFORE any statistic is computed.** D122 used only 2σ real shocks (§418: 6L positive in
+every period but small). Every-day form: **6L=F** (CME, open → close, closes before 18:00 ET) previous weekday's sign (1-day) and previous
+5 weekdays' sum (5-day) into the six plan windows; forms all / strong; follow/fade fixed on 2021–24. **2 × 6 × 2 = 24 tests** (~0.6 by
+chance at t > 1.96). Costs §177/§180. Validation per §426, 2; a ZS CONFIRM then needs the ZS account replay.
+
+## 574. Family-166: the real every day — 1 of 24 carried (≈ 0.6 by chance) (S1)
+
+**N 1,499.** `reports/d166_discovery.json` (module `reporting/d166_real.py`):
+- **D717** CL follows 6L=F 1d (strong): **WATCHLIST** +4.64 (t +0.19), placebo 60th, 2025 -17.0, 2026 +42.1
+
+Soybeans take nothing from the real's everyday moves (best ZS cell +7.0, t 1.15); only its shocks mattered (D122).
+
+## 575. A47 protocol (user request 2026-10-15): the book with more accounts on the dollar rules (S8)
+
+**No trial; N 1,499.** The user asked for exact numbers on moving the MGC and MCL accounts onto the working rules. A36's construction (§463:
+50K Daily, drift removed, 84-day attempts, common start dates) for: **A** the deployed book (MNQ D68, NKD dollar-week, FDXM DAX-dollar, MGC
+and MCL plan); **B** 2 × NKD + 2 × FDXM + MNQ (D68); also **C** 3 × NKD + 2 × FDXM (no MNQ), as the extreme. Duplicate accounts take the same
+tickets, so their results are identical per start — the book counts them twice. Read per period (2010–20, 2021–26, 2025 starts): mean,
+P(book net > 0), p10, p5, and P(an account of each market ends a start negative). Descriptive; no new rule.
+
+## 576. A47 results: more accounts on the dollar rules (S8)
+
+**No trial; N 1,499.** `reports/a47_book.json` (module `reporting/a47_book.py`). Book net per 84-day attempt sequence (common starts):
+
+| book | 2025 starts (298) | 2021–26 (1,040) | 2010–20 (689) |
+|---|---|---|---|
+| A deployed (MNQ, MGC, MCL, NKD, FDXM) | +$17,492, P>0 100%, p5 +$6,115 | +$15,008, 96%, p5 +$1,673 | +$10,494, 85%, p5 −$2,232 |
+| B 2×NKD + 2×FDXM + MNQ | **+$26,119**, 100%, p5 +$7,981 | **+$21,324**, 94%, p5 −$212 | +$13,088, **82%**, p5 −$3,072 |
+| C 3×NKD + 2×FDXM | +$32,043, 100%, p5 +$8,972 | +$25,663, 93%, p5 −$334 | +$14,452, 83%, p5 −$3,528 |
+
+Per account (2021–26): NKD +$6,197 (negative 11% of starts), FDXM +$3,537 (19%), MGC +$2,329 (33%), MNQ +$1,857 (38%), MCL +$1,088 (60%).
+Concentrating raises the mean in every period (+$8.6k on 2025 starts for B) but widens the bad tail outside 2025–26: P(book net > 0) falls
+96 → 94% (2021–26) and 85 → 82% (2010–20); the 2021–26 p5 goes from +$1,673 to about −$200. Duplicates are perfectly correlated, so B's
+two NKD accounts breach together. For the user's decision; no change made.
+
+## 577. The 2026-10-15 MNQ misread, corrected; `!eod` now cross-checks against an exact-entry replay (S8)
+
+**No trial.** The user recorded the 10-15 MNQ ticket as a stop (−$1,000, breaching the eval) at 10:10 ET; re-read with take/stop set from
+the exact 09:30:00 entry it was the take (+$1,000). At the user's request the droplet state was corrected (backup-2026-10-15-mnqfix):
+MNQ back to its first eval, balance $50,000, evals bought 1, the ticket's `user_pnl` +1,000, and the demo log's breach + NEW_EVAL rows
+replaced by one corrected EOD row (noted as the user's correction). Yahoo 1-minute bars agree: from entry 29,745.50 the take
+(29,871.75) was hit at 10:41 ET; at 10:10 neither bracket had been touched (last 29,861).
+
+**Bot change (deployed 2026-10-15 ~11:50 ET on the user's OK; backup-2026-10-15b; files verified by checksum):** `schedule.eod_check` replays the ticket being documented on
+1-minute bars from its exact entry to now. If the sent P&L implies a take but the replay hit the stop (or the reverse), or the window is
+still open and the replay has touched neither bracket, the bot books nothing and says so; `!eod <P> <balance> confirm` books it anyway.
+Agreement, a time exit, missing data or any error never block. FDXM's replay is the DAX index proxy (§492), named in the warning.
+Tests: tests/test_bot_ticket.py::test_eod_check_flags_a_take_read_as_a_stop.
+
+## 578. A48: a forward tracker for the deployed dollar rules (the §463 review trigger, made runnable) (S8)
+
+**No trial.** `reporting/a48_forward.py` pulls the bot's tickets.json (read-only), and for every NKD dollar-week / FDXM DAX-dollar ticket
+replays its window on Yahoo 1-minute bars for the rule's side and the opposite side with the ticket's brackets (FDXM on the DAX proxy),
+caching window bars under data/cache/forward (Yahoo keeps ~30 days of 1-minute history: run it at least every few weeks). It reports the
+signed window move, rule-side minus other-side bracket P&L, the recorded results, and the §463 trigger (revert if the first 40 rule
+sessions' signed window moves sum negative). First run (2 rule sessions): NKD 10-14 short, window +225.5 bps the rule's way but both sides
+stopped; FDXM 10-15 long, take +$1,202 vs −$747 the other way. Trigger: pending (2 of 40).
+
+## 579. The 10-25 review in one command; the user's execution constraint (S8)
+
+**No trial.** The user (2026-10-15): Tradeify gives no API access before a live account, so no automated orders during evaluations; the user
+can be awake to place the **FDXM and MGC** entries (03:00 ET) **Monday–Wednesday** only; a bot health check is not wanted now; Tradeify's
+rules are unchanged; paid data waits until after a first payout.
+
+`python -m futuresres.reporting.a18_demo_check --review` now also reports: (a) **reading vs replay** — tickets whose recorded outcome
+differs from the 1-minute replay (the execution-gap table previously compared the recorded result with itself, since §492 the recorded
+result replaces the shadow; it now uses the raw replay P&L); (b) **the dollar rules' forward record** (A48, §578) with the §463 trigger;
+(c) **the executable subset** — FDXM and MGC tickets entered Monday–Wednesday; (d) the review's four decisions. First run (2026-10-15):
+20 recorded tickets, 2 disagreements (both FDXM, the DAX-index proxy); dollar rules 2 sessions, trigger pending; executable subset
+6 tickets, −$3,050.
+
+## 580. The executable subset in the account: FDXM and MGC placed Monday–Wednesday only (S8)
+
+**No trial.** A23 replay (50K Daily, 84 sessions, drift removed); Thursday/Friday entries skipped (`skip`: the account sits, no cost):
+
+| account | every day: all post-2021 / 2025 starts | Mon–Wed only: all post-2021 / 2025 starts | 2010–20 every day → Mon–Wed |
+|---|---|---|---|
+| FDXM + DAX-dollar | +$3,720 (P(payout) 85%) / **+$5,616 (92%)** | +$1,134 (48%) / **+$1,659 (64%)** | +$3,144 (85%) → +$1,130 (53%) |
+| MGC (plan) | +$2,248 (77%) / +$800 (66%) | +$1,716 (49%) / +$2,014 (47%) | +$2,075 (81%) → +$1,045 (46%) |
+
+Trading three days of five roughly halves the chance of a payout inside four months (fewer bracket days to reach the target and
+to qualify for payouts) and cuts FDXM's mean by ~70%. A hand-placed Mon–Wed schedule is still positive but much weaker than the plan.
+
+## 581. Scheduled bracket orders: every window is placeable; the FDXM re-check now always posts (S8)
+
+**No trial.** The user (2026-10-15) can use **scheduled bracket orders** with a release time to close manually — so every ticket can be
+staged at the 4:30 PM CT alert and the every-day replays apply (not §580's Mon–Wed subset). The alert embed already carries what is staged
+(side, contracts, entry/exit time CT, take/stop): no separate staging card. The one thing a staged order cannot follow is the 1:45–1:58 AM CT
+FDXM re-check (§490); the account estimates (§447: 2025 starts +$5,616) already use the 4:30 PM reading, so a missed flip costs nothing
+against them. **Bot change (the user asked for it; deployed 2026-10-15, backup-2026-10-15c, checksum verified):** the re-check now posts its
+own message every time — a side flip as an orange embed that @mentions the user with the full new ticket ("change your staged FDXM order
+before the 2:00 AM CT entry"); an unchanged side or missing data as a one-line note (before, only a flip posted, as plain text).
+
+## 582. A49: the watchlist forward-tested on data after the sealed window (S8)
+
+**No trial.** `reporting/a49_watchlist.py`: the 22 near misses of families 141–166 positive in both sealed years with placebo ≥ 90th
+(D708 left out: owned volume data does not update) re-scored from **2026-09-01** — data no test has seen — with each family's own rows().
+Targets whose research caches end in August (MNQ, MGC London, NKD Tokyo, DAX, MNQ night) are rebuilt from Yahoo 5-minute bars (kept
+~60 days; accumulated in data/cache/forward/targets.json — run at least every six weeks). Overlap check (August): correlation with the
+research targets 0.94–1.00, sign agreement 85–100%. First reading (2026-09-01 → 10-14, 8–31 sessions each): 14 of 21 positive (≈ half
+expected by chance); best D411 (MNQ night fades sterling, +20.3, t 1.45), D408, D545; worst D659 (gold follows USD/CNY, −43.2, t −2.44),
+D569, D489, D536. Nothing is near a forward confirmation yet; the record accumulates. Run with the 10-25 review and monthly after.
+
+## 583. The real-money launch checklist (S8)
+
+**No trial.** `reports/launch_checklist.md`: the decisions for the 10-25 review (dollar rules, which accounts — A47's options — and the
+buying order: NKD and FDXM first), the 50K Daily rules as modelled (stop and re-run if Tradeify changes them), the daily routine with
+scheduled bracket orders (§581: stage at the 4:30 PM CT alert; release times; every close before 4:00 PM CT; the FDXM re-check), what to
+do on a breach / pass / payout / missed ticket / missing alert, and the stop-and-review triggers (A48 dollar-rule trigger, fills worse than
+the replay by > ~$50 a ticket over 20+, monthly review + A49 watchlist, any rule change). Slippage stress left for later at the user's
+call (only ZS's 20–40-tick brackets would be hurt badly by a few ticks, and ZS is not planned for live).
+
+## 584. The user widens the search to any strategy; A50 strategy library batch 1 protocol (MNQ intraday) (S1)
+
+**No trial spent; N 1,499. Written and committed BEFORE any statistic is computed.** The user (2026-10-15): the search need not stay with
+direction rules for the plan's windows — any strategy that holds up in a prop-firm setting is worth as much as the demo. Constraints kept:
+no position through the 17:00–18:00 ET break, one direction per product, no cross-product hedges, every entry placeable by scheduled order.
+
+**Evaluation (the A50 simulator).** A strategy = per session: entry minute, direction (or none). Paths run from the entry minute to the
+window's end on owned 1-minute closes (one contract, roll-safe), REAL (drift kept — a strategy may live on drift). Read in three ways:
+(i) per-trade net bps and t (cost §180); (ii) **the account with the plan's solver brackets** from the strategy's entry (A23 replay,
+non-trade days skipped) — §165: a strategy's own exits cannot carry an evaluation unless its Sharpe is extreme; (iii) the same with
+**random directions on the same entries** (100 draws) — the calibration. Discovery 2021–24 picks each strategy's variant; validation
+2025–26 once (§426, 2; placebo = random directions on the same entries); account replay on 2025 starts.
+
+**Batch 1 — MNQ, RTH 09:30 → 16:00 and night 18:00 → 09:30 (owned NQ/MNQ minutes):**
+- **ORB:** opening range of the first 15 / 30 minutes; the first close beyond it after the range enters in that direction (one a day).
+- **Volatility breakout:** first touch of open ± k × the previous RTH range, k ∈ {0.3, 0.5}.
+- **First-hour momentum:** at 10:30, the sign of 09:30 → 10:30.
+- **Overnight long:** every night 18:00 → 09:30, long.
+Variants: ORB15, ORB30, VB0.3, VB0.5, FH, ON = **6 tests**; carried at net > 0, t > 1.96 on 2021–24.
+
+## 585. A50 batch 1 (MNQ intraday): 2 of 6 carried; both WATCHLIST (S1)
+
+**N 1,501.** `reports/a50_discovery.json` (module `reporting/a50_stratlib.py`). Discovery, net bps a trade 2021–24 (2010–20): ORB15 +1.08
+(−1.57); ORB30 +3.55 (−5.72, t −3.1); VB0.3 +3.41 (+0.55); **VB0.5 +7.08, t 2.04** (+2.22); **FH +7.25, t 2.47** (−2.88); **overnight
+long +0.26, t 0.11 (2010–20 +4.01, t 3.47) — the 'night effect' in NQ, strong before 2021, has gone.** Validated once:
+- **D718** MNQ VB0.5: **WATCHLIST** +5.87 (t +1.25), placebo 91th, 2025 +9.5, 2026 +0.2
+- **D719** MNQ FH: **WATCHLIST** +2.53 (t +0.55), placebo 77th, 2025 +3.0, 2026 +1.9
+
+No account replay (neither confirmed). Classic MNQ intraday breakout / momentum rules carry nothing tradable in the current regime.
+
+## 586. A51 protocol: strategy library batch 2 — the same intraday rules on eight more markets (S1)
+
+**No trial spent; N 1,501. Written and committed BEFORE any statistic is computed.** Batch 1's rules (ORB15, ORB30, VB0.3, VB0.5, FH;
+the overnight rule is MNQ-specific) on each market's main session, minute closes: **MGC** London 03:00 → 11:30 ET (owned trades);
+**DAX** 09:00 → 17:30 Berlin, **NKD** 09:00 → 15:00 Tokyo, **6E / 6B / 6A / 6J** 08:00 → 16:00 London, **SI** 08:25 → 13:25 ET (A21's
+HistData window paths; their within-era linear drift adjustment is a few bps over a window — negligible for these signals, disclosed).
+Costs (bps a round trip): MGC 0.8, DAX 0.3, NKD 0.2, 6E 0.3, 6B 0.5, 6A 0.6, 6J 0.5, SI 0.5. **8 × 5 = 40 tests** (~1 by chance at
+t > 1.96); validation and account replay as §584.
+
+## 587. A51 batch 2: intraday breakout / momentum rules on eight markets — 0 of 40 carried (S1)
+
+**N 1,501 (no trial).** `reports/a51_discovery.json` (module `reporting/a51_stratlib2.py`). No cell reaches t 1.96 on 2021–24. Gold, silver
+and the currencies are flat or negative under every rule (silver VB0.5 −8.9, t −2.1). Of note (not carried, not a test): **NKD breakouts
+lean positive in both periods** — VB0.5 +3.75 (t 1.57) 2021–24, +8.60 (t 3.48) 2010–20; VB0.3 +2.99 / +8.47; ORB15 +3.85 / +2.94 — the
+Nikkei's intraday trend persistence, weaker since 2021. With batch 1 (§585): classic mechanical intraday rules (opening-range and
+volatility breakouts, first-hour momentum, overnight drift) carry nothing tradable on the plan's markets in the current regime.
+
+## 588. D-series family 167 protocol: public attention (Wikipedia pageviews) as every-day predictors, current regime (S1)
+
+**No trial spent; N 1,501. Written and committed BEFORE any statistic is computed.** New data class: daily English-Wikipedia pageviews
+(Wikimedia REST API, user agents, from 2015-07; cached data/cache/wiki, gitignored) for 20 articles: Recession, Stock market crash,
+Inflation, Bitcoin, Gold as an investment, Federal Reserve, Stagflation, Unemployment, Nasdaq, Nikkei 225, Price of oil, Market trend,
+Short (finance), VIX, Bank run, Tariff, Yield curve, Hyperinflation, Gold, Cryptocurrency. **Attention shock** on UTC day d =
+log(views_d) − log(mean of the previous 20 days); **5-day form** = the mean shock over the 5 weekdays ending d. Timing: a UTC day's views
+publish within hours of 00:00 UTC, so **MNQ** (opens 13:30 UTC) uses the previous weekday; every window opening before ~08:00 UTC —
+**DAX, MGC, NKD, CL, ZS** — uses the weekday before that (lag 2). Six plan windows; forms all / strong (|shock| above its 2021–24 median);
+follow/fade fixed on 2021–24; context 2016–20. **20 × 2 × 6 × 2 = 480 tests** (~12 by chance at t > 1.96). Costs §177/§180. Validation
+per §426, 2; a CONFIRM then needs §446/§453 stress tests and an account replay.
+
+## 589. Family-167: Wikipedia attention — 6 of 480 carried (below the ≈ 12 expected by chance); validated (S1)
+
+**N 1,507.** `reports/d167_discovery.json` (module `reporting/d167_attention.py`):
+- **D720** CL follows attention to Nikkei_225 5d (strong): **WATCHLIST** +22.83 (t +1.18), placebo 83th, 2025 +12.5, 2026 +35.1
+- **D721** DAX fades attention to Nasdaq 5d (strong): **WATCHLIST** +3.77 (t +0.64), placebo 74th, 2025 +2.1, 2026 +6.3
+- **D722** ZS fades attention to Bank_run 1d (all): **REJECT** -0.11 (t -0.02), placebo 52th, 2025 +7.4, 2026 -11.4
+- **D723** MNQ fades attention to Gold_as_an_investment 5d (all): **WATCHLIST** +3.18 (t +0.57), placebo 76th, 2025 -2.6, 2026 +11.9
+- **D724** DAX fades attention to Nasdaq 1d (all): **REJECT** -0.22 (t -0.06), placebo 50th, 2025 +2.9, 2026 -4.9
+- **D725** NKD fades attention to Recession 1d (strong): **REJECT** -8.20 (t -1.21), placebo 12th, 2025 -13.3, 2026 -0.7
+
+## 590. D-series family 168 protocol: cross-sectional relative strength among the six plan markets, current regime (S1)
+
+**No trial spent; N 1,507. Written and committed BEFORE any statistic is computed.** Families 134–135 used fixed sibling pairs. Here each
+plan market's Yahoo session move (NQ=F, GC=F, NKD=F, ^GDAXI, CL=F, ZS=F; open → close), scaled by its 2021–24 median absolute move, minus
+the mean of the six scaled moves = its **relative strength**; summed over h = 1, 5, 20 weekdays ending the previous weekday. The target
+window follows or fades its own relative strength (fixed on 2021–24); forms all / strong. **6 × 3 × 2 = 36 tests** (~0.9 by chance at
+t > 1.96). Costs §177/§180. Validation per §426, 2; a CONFIRM then needs §446/§453 and an account replay.
+
+## 591. Family-168: cross-sectional relative strength — 0 of 36 carried (S1)
+
+**N 1,507 (no trial).** `reports/d168_discovery.json` (module `reporting/d168_xsec.py`). Best 2021–24: CL fades a strong 5-day relative
+week +18.8 (t 1.69); every |t| < 1.96. Of note: before 2021 NKD reversed its own relative strength strongly (1-day strong −13.7, t −3.3) —
+gone since. Relative strength among the plan's markets carries nothing.
+
+## 592. D-series family 169 protocol: walk-forward re-selection — do recently strong cross-market rules persist one more year? (S1)
+
+**No trial spent yet; N 1,507. Written and committed BEFORE any statistic is computed.** Many edges here are regime-bound (strong before
+2021 and gone, or born after). One meta-hypothesis instead of fixed rules: **each calendar year Y (2013 → 2026), for each plan window,
+select the single best rule on the trailing three years Y−3 … Y−1** from the family-119/120 universe (family 111's predictors with its
+eligibility and timing rules; sign of the previous weekday's move, h = 1 or 5 days; forms all / strong; follow or fade fixed in training);
+best = highest training t, required t > 2 and net > 0 (else that window keeps the plan — no rule that year). **Trade it out of sample in
+year Y.** Statistic: the pooled out-of-sample net bps over all windows and years (costs §177/§180), t over sessions; by year, by window.
+**One trial (D726):** CONFIRM if the pooled out-of-sample 2014–2026 net > 0 with t > 1.645, positive in ≥ 9 of the 13 years, and positive
+over 2025–26; placebo: the same selection with each training year's target returns shuffled (500 draws) — real ≥ 95th percentile.
+A CONFIRM then needs the account replay (each year's rule as the window's direction).
+
+## 593. Family-169 / D726 (t01508): walk-forward re-selection — WATCHLIST: works for a decade, not in 2025–26 (S1)
+
+**N 1,508.** `reports/d169_walkforward.json` (module `reporting/d169_walkforward.py`). Each year, each window trades its best trailing-
+three-year rule. **Pooled out of sample 2014–2026: +2.45 bps a trade (t +1.88, n 12,114), positive in 10 of 13
+years, placebo 100th** (random selections on shuffled training returns) — but **2025–26 -1.11** (2025 −1.99, 2026 +0.04),
+so the §592 rule's last condition fails. By year: 2014 +12.0, 2015 +2.6, 2016 +5.2, 2017 +0.7, 2018 +10.1, 2019 +3.8, **2020 −4.7, 2021 −2.8**,
+2022 +1.3, 2023 +3.4, 2024 +7.2. Per window OOS: MNQ +1.7, MGC +0.5, NKD +3.1, DAX +1.8, CL +4.7, ZS +3.0 (all t < 1.3).
+Read: recently strong cross-market relations do persist a year on average — a real, placebo-beating effect — but at ~2.5 bps a trade
+it is far below what moves a bracket account (§164: an edge must be large against the window's swing), and it broke at both regime turns
+(2020–21) and again in 2025. Not proposed; recorded as the programme's evidence that the regime, not the rule, is what persists.
+
+## 594. D-series family 170 protocol: the dollar theme intraday — the dollar's first hour into the rest of the window (S1)
+
+**No trial spent; N 1,508. Written and committed BEFORE any statistic is computed.** HistData minute grids (corrected clock), times taken
+in each exchange's local clock and converted to New York: **DAX** (grxeur) 10:00 → 17:30 Berlin, predictor EUR/USD 09:00 → 10:00 Berlin;
+**MGC** London window (owned trades) 04:00 → 11:30 ET, predictor EUR/USD 03:00 → 04:00 ET; **NKD** (jpxjpy) Tokyo afternoon 12:30 →
+15:00 JST, predictors EUR/USD and USD/JPY over the Tokyo morning 09:00 → 11:30 JST. Follow/fade fixed on 2021–24; forms all / strong.
+**4 × 2 = 8 tests** (~0.2 by chance at t > 1.96). Costs: DAX 0.3, MGC 0.8, NKD 0.2. Validation per §426, 2.
+
+## 595. Family-170: the dollar theme intraday — 0 of 8 carried (S1)
+
+**N 1,508 (no trial).** `reports/d170_discovery.json` (module `reporting/d170_intradollar.py`). The dollar's first-hour move says nothing about
+the rest of the DAX, gold or Nikkei window (best: NKD's afternoon fades the euro's Tokyo morning, +2.1 bps, t 1.84). The deployed rules'
+dollar effect works across sessions (the previous day / week), not within one.
+
+## 596. A52 protocol: contract count for the two rule accounts (S1)
+
+**No trial; N 1,508. Written and committed BEFORE any replay is run.** The plan's sizes (1 NKD, 2 FDXM; §137–138) were set for a zero-edge
+market against the $2,000 drawdown; with a rule, more contracts put more of the edge behind the same dollar brackets. A23 replay with the
+deployed rules: NKD n ∈ {1, 2, 3}, FDXM n ∈ {1, 2, 3, 4}; the plan's bracket policy; read on 2021–24 starts (choice) and once on 2025 starts
+and 2010–20, with 60 random-flip draws at each n. Adopt only if the 2021–24 choice also beats the deployed size on 2025 starts and does
+not lower 2025-start P(payout) by more than 3 points.
+
+## 597. A52: contract count for the rule accounts — the deployed sizes stay (S1)
+
+**No trial; N 1,508.** `reports/a52_size.json` (module `reporting/a52_size.py`). NKD on 2021–24 starts: n=1 +$5,454 (P(payout) 92%), n=2
++$3,687, n=3 +$3,964 → the deployed 1 is the choice (2025 starts: 1 → +$8,040, 2 → +$9,575, 3 → +$5,872). FDXM on 2021–24 starts: n=1 +$645,
+2 +$2,903, 3 +$2,239, **4 +$3,586** (95%) → chosen 4, but on 2025 starts +$4,908 (90%) vs the deployed 2's **+$5,616 (92%)** — fails §596.
+Before 2021 FDXM preferred 3 (+$5,093 vs +$3,144). No size is better across periods; the plan's sizes stay.
+
+## 598. D-series family 171 protocol: long-horizon time-series momentum on each plan market, current regime (S1)
+
+**No trial spent; N 1,508. Written and committed BEFORE any statistic is computed.** Own-past families stopped at 20 days (117, 121);
+W04 tested trend only inside a six-market portfolio. Here each plan window follows (or fades — fixed on 2021–24) the sign of its own
+market's trend over the previous **60, 120 or 250 weekdays** (sum of Yahoo session moves: NQ=F, GC=F, NKD=F, ^GDAXI, CL=F, ZS=F, ending the
+previous weekday); forms all / strong (|trend| above its 2021–24 median). **6 × 3 × 2 = 36 tests** (~0.9 by chance at t > 1.96). A trend sign
+changes rarely, so a carry must also hold on monthly sums (t > 1.96). Costs §177/§180. Validation per §426, 2 (placebo: monthly blocks of
+signs shuffled; *amended before any validation ran: circular shifts of the sign series — a trend sign spans months unevenly, so
+blocks of unequal length cannot be swapped*); a CONFIRM then needs an account replay.
+
+## 599. Family-171: long-horizon own trend — 3 of 36 carried (≈ 0.9 by chance), all gold fading its trend; validated (S1)
+
+**N 1,511.** `reports/d171_discovery.json` (module `reporting/d171_tsmom.py`; placebo: circular shifts of the sign series):
+- **D727** MGC fades its own 60d trend (all): **WATCHLIST** +5.21 (t +0.99), placebo 92th, 2025 +0.1, 2026 +13.1
+- **D728** MGC fades its own 60d trend (strong): **WATCHLIST** +7.60 (t +1.11), placebo 100th, 2025 +2.4, 2026 +13.9
+- **D729** MGC fades its own 250d trend (strong): **REJECT** -3.89 (t -0.73), placebo 0th, 2025 -6.0, 2026 -0.5
+
+No market's window follows its own long trend in 2021–24 (time-series momentum is absent at the window level).
+
+## 600. D-series family 172 protocol: pooled foreign-index signals (DAX + NKD windows together), current regime (S1)
+
+**No trial spent; N 1,511. Written and committed BEFORE any statistic is computed.** Both rules that hold act on the non-US index windows.
+A predictor that drives foreign equities should move both: each family-111 predictor (eligible for both targets; spot currencies excluded
+— NKD opens before they close; the deployed dollar series 6E=F and DX-Y.NYB excluded as already validated) → **the DAX and NKD windows
+pooled** (each window's sessions scaled by its own 2021–24 SD so neither dominates), one direction for both, previous weekday's sign 1-day /
+5-day, forms all / strong, follow/fade fixed on 2021–24. Carried at net > 0, t > 1.96 pooled AND the same sign in each window separately.
+Costs DAX 0.3, NKD 0.2. Validation per §426, 2 (pooled; placebo shuffled signs); a CONFIRM then needs account replays on both.
+
+## 601. Family-172: pooled foreign-index signals — 14 of 204 carried (≈ 5.1 by chance); D738 CONFIRMED but it is the known NKD–corn link (S1)
+
+**N 1,525.** `reports/d172_discovery.json` (module `reporting/d172_foreign.py`; units 1/100 of each window's SD; cost 0.3 in those units for the pooled
+validation, ≈ the windows' 0.2–0.3 bps):
+- **D730** DAX+NKD fade ZC=F 5d (strong): **WATCHLIST** +5.78 (t +0.98), placebo 85th, 2025 +5.3, 2026 +6.5
+- **D731** DAX+NKD follow XOP 1d (all): **WATCHLIST** +3.39 (t +0.92), placebo 84th, 2025 +4.9, 2026 +1.1
+- **D732** DAX+NKD follow FXI 5d (all): **REJECT** -1.09 (t -0.30), placebo 43th, 2025 -4.7, 2026 +4.3
+- **D733** DAX+NKD follow EEM 5d (all): **REJECT** -1.91 (t -0.52), placebo 31th, 2025 -5.9, 2026 +4.1
+- **D734** DAX+NKD fade 6S=F 1d (strong): **REJECT** -1.96 (t -0.37), placebo 40th, 2025 -6.0, 2026 +4.5
+- **D735** DAX+NKD fade 6B=F 1d (all): **WATCHLIST** +2.10 (t +0.57), placebo 74th, 2025 +0.5, 2026 +4.5
+- **D736** DAX+NKD follow 6B=F 5d (all): **REJECT** -0.07 (t -0.02), placebo 52th, 2025 -1.2, 2026 +1.7
+- **D737** DAX+NKD follow EEM 5d (strong): **WATCHLIST** +2.34 (t +0.44), placebo 62th, 2025 -0.5, 2026 +5.3
+- **D738** DAX+NKD fade ZC=F 5d (all): **CONFIRM** +7.03 (t +1.92), placebo 98th, 2025 +4.3, 2026 +11.1
+- **D739** DAX+NKD follow ZB=F 5d (strong): **WATCHLIST** +6.43 (t +1.01), placebo 85th, 2025 +12.9, 2026 -8.4
+- **D740** DAX+NKD follow ZN=F 5d (strong): **REJECT** -0.19 (t -0.03), placebo 49th, 2025 +11.4, 2026 -26.3
+- **D741** DAX+NKD follow ZN=F 5d (all): **WATCHLIST** +1.59 (t +0.43), placebo 70th, 2025 +4.9, 2026 -3.5
+- **D742** DAX+NKD fade ^VIX3M 5d (all): **REJECT** -1.99 (t -0.54), placebo 31th, 2025 +0.4, 2026 -5.6
+- **D743** DAX+NKD follow XLF 5d (all): **REJECT** -3.32 (t -0.90), placebo 20th, 2025 -5.8, 2026 +0.5
+
+**D738 (both windows fade corn's 5-day move) stress:** NKD fades ZC=F 5d +5.8 (t 2.2) 2021–24 / +9.6 (t 2.1) 2025–26 — the NKD–corn theme
+already confirmed (D343, §505) and shown to add nothing to the NKD account over dollar-week; **the DAX alone is weak** (+3.1 / +2.0, t ≤ 1.0;
+on the CORN ETF +3.7 / +5.9, t ≤ 1.4; joint with the DAX–dollar sign: corn t 0.5 in 2025–26 vs DX t 1.8). Nothing new for FDXM; not proposed.
+
+## 602. D-series family 173 protocol: US index futures lead the foreign afternoon, within the session (S1)
+
+**No trial spent; N 1,525. Written and committed BEFORE any statistic is computed.** NQ trades round the clock; does its move while Tokyo or
+Frankfurt trade the morning lead their afternoon? Predictors from the owned NQ/MNQ night grid (roll-safe minute closes): **NQ over the Tokyo
+morning** (09:00 → 11:30 JST) → **NKD Tokyo afternoon** (12:30 → 15:00 JST, jpxjpy); **NQ over the Frankfurt morning** (09:00 → 13:00
+Berlin, before the US pre-market) → **DAX afternoon** (13:00 → 17:30 Berlin, grxeur); and gold (HistData xau-free: MGC owned Asia grid) over the Tokyo
+morning → NKD afternoon; NQ over the Frankfurt morning → MGC 08:30 → 11:30 ET. Follow/fade fixed on 2021–24; forms all / strong.
+**4 × 2 = 8 tests** (~0.2 by chance). Costs DAX 0.3, NKD 0.2, MGC 0.8. Validation per §426, 2.
+
+## 603. Family-173: US futures lead the foreign afternoon — 0 of 8 carried (S1)
+
+**N 1,525 (no trial).** `reports/d173_discovery.json` (module `reporting/d173_usleads.py`; the plan text's "xau-free" means gold from the
+owned MGC grids). Best: the DAX afternoon follows NQ's Frankfurt-morning move, +3.6 bps (t 1.91; 2010–20 −1.1). Within-session leads from
+US futures carry nothing.
+
+## 604. D-series family 174 protocol: finer positioning — CFTC TFF and disaggregated reports, current regime (S1)
+
+**No trial spent; N 1,525. Written and committed BEFORE any statistic is computed.** Family 133 used only the legacy report. New: **Traders in
+Financial Futures** (leveraged funds; asset managers) for NASDAQ mini (209742) → MNQ, E-mini S&P (13874A) → MNQ, Nikkei USD (240741) →
+NKD, Euro FX (099741) → the DAX and NKD (the dollar link), Japanese yen (097741) → NKD; **Disaggregated** managed money for gold (088691) →
+MGC London, WTI (067651) → CL, soybeans (005602) → ZS (data/cot/tff, data/cot/disagg; gitignored). Net = (long − short) / open interest.
+Kinds: **flow** (the week's change) and **crowding** (52-week z of the net beyond ±1.5; inside = no trade). A report (Tuesday positions)
+applies to the sessions after its Friday 15:30 ET release through the next release. Follow/fade fixed on 2021–24; **(6 × 2 + 3) × 2 = 30
+tests** (~0.75 by chance at t > 1.96; carried also needs week-clustered t > 1.96). Costs §177/§180. Validation per §426, 2 (placebo: circular
+shifts of the weekly sign series).
+
+## 605. Family-174: finer positioning (TFF, disaggregated) — 0 of 30 carried (S1)
+
+**N 1,525 (no trial).** `reports/d174_discovery.json` (module `reporting/d174_cotfine.py`). No cell reaches the week-clustered bar (best: crude
+fades managed-money crowding +26.6, t 2.00, weekly 1.76 — and the opposite sign, −30.2, t −2.4, in 2011–20). Leveraged-fund, asset-manager and
+managed-money positioning set no direction for the plan's windows; with family 133, the CFTC data is exhausted.
+
+## 606. A53 protocol: Tradeify's 50K Lightning (instant funded) for the two rule accounts (S1)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** Rules from Tradeify's help centre (fetched 2026-10-15; post-2025-09-12
+accounts): no evaluation; **$2,000 EOD trailing drawdown, enforced intraday** (modelled: breach when the intraday low reaches the floor;
+assumed to stop trailing at the $50,000 start once the peak is $52,000, as the 50K Daily funded account — not stated, disclosed);
+**daily loss limit $1,250 soft** (the day's loss capped at $1,250); 4 minis / 40 micros; **payout goals +$3,000, then +$2,000** of profit per
+cycle; **consistency 20% / 25% / 30%** of the goal for payouts 1 / 2 / 3+ (best day in the cycle ≤ that share); minimum $1,000, maximum
+**$2,000 a request (payouts 1–3), $2,500 after**; 90% split; the goal resets after each payout. **Price $492** (pricing reference; promotions
+vary). Replay (84 sessions, the deployed rules' side, A21/A23 minute paths, drift removed): fixed brackets take ∈ {400, 500, 600} × stop ∈
+{300, 400, 600, 800} (take ≤ $600 keeps day one inside the 20% rule); a breach buys a new account ($492). **Chosen on 2021–24 starts per
+market (NKD 1, FDXM 2 contracts), read once on 2025 starts** against the 50K Daily accounts (§447/§454: +$5,616 / +$8,040). Reported to the
+user only if Lightning beats the Daily account on 2025 starts per dollar of fees AND in mean net.
+
+## 607. A53: the 50K Lightning is much worse than the 50K Daily for the rule accounts (S1)
+
+**No trial; N 1,525.** `reports/a53_lightning.json` (module `reporting/a53_lightning.py`). Chosen on 2021–24 starts: NKD take $500 / stop
+$800 → 2025 starts **+$2,248** (P(payout) 94%) vs the Daily account's **+$8,040**; FDXM take $400 / stop $800 → **+$666** (92%) vs **+$5,616**.
+The 20–30% consistency rule caps a day's win near $500–600, the $492 price is six evaluations, and a breach costs a full account. The
+Daily 50K stays the account for every market. (Sources: Tradeify help centre — Lightning Funded Accounts, Lightning payout policy, pricing
+reference — read 2026-10-15.)
+
+## 608. A54 protocol: Tradeify's Growth 50K for the two rule accounts (S1)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** Rules (Tradeify help centre, read 2026-10-15): **$145** one-time;
+evaluation target +$3,000, $2,000 EOD trailing drawdown, $1,250 soft daily loss limit, **no evaluation consistency**; funded: payouts need the
+balance ≥ $53,000, **5 profitable days ≥ $150** per cycle, a 35% consistency rule, first payout cap $1,500. Modelled with A23's Flex machinery
+(winning-day count, threshold $150): Spec(start 50,000, fee 145, target 30, dd 20, cons 1.0, f_cap 15, f_daily 12, flex_thr 150, e_daily 12)
+with two bounds for the engine's single funded-drawdown/payout-buffer parameter — f_dd = 20 (drawdown right, buffer too small) and 30
+(buffer right, drawdown too loose); both flatter Growth, and the 35% funded consistency rule is not modelled (also flattering). Replay with
+the deployed rules (NKD 1, FDXM 2 contracts), its own solved bracket policy, 2025 starts and all post-2021 starts, vs the 50K Daily.
+Reported to the user only if Growth beats the Daily account.
+
+## 609. A54: Growth 50K is worse than the Daily 50K even on flattering bounds (S1)
+
+**No trial; N 1,525.** `reports/a54_growth.json` (module `reporting/a54_growth.py`). 2025 starts / all post-2021 starts (P(payout)):
+NKD Daily **+$8,040** (95%) / +$6,136 (92%) vs Growth +$2,861–5,067 / +$1,617–2,757; FDXM Daily **+$5,616** (92%) / +$3,720 (85%) vs Growth
++$3,270–3,563 / +$1,827–1,853. The five-winning-day payout cycle and the $1,500 cap slow payouts more than the missing evaluation consistency
+helps. With A53 (Lightning) and §145 (100K/150K Daily and Flex): **the 50K Daily (Select Daily) remains the best Tradeify account** for the plan.
+
+## 610. A55 protocol: Treasury futures (ZB, ZN) as the fifth account instead of MCL (S1)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** §140's candidate list had no rates. Zero-edge plan accounts on **ZB**
+(30-year, $1,000 a point) and **ZN** (10-year, $1,000 a point): Yahoo daily session bars (ZB=F, ZN=F) as 3-point paths (A22's rule, drift
+removed per era), contracts by the $2,900 daily-swing rule within Tradeify's 50K cap of 4 minis, round trip $4.5. Read: alone (P(payout),
+mean net, both eras), daily correlation with MNQ / MGC / NKD / FDXM / MCL, and **the five-account book with ZB or ZN in MCL's place** (A47's
+construction, common starts; 2025 starts, 2021–26, 2010–20). Reported to the user only if the book improves in every period.
+
+## 611. A55: ZB in MCL's slot steadies the book over 2010–26 but trails slightly on 2025 starts — an option, not a finding (S1)
+
+**No trial; N 1,525.** `reports/a55_rates.json` (module `reporting/a55_rates.py`). Alone (4 contracts, daily swing ≈ $2.5–2.8k): **ZB** P(payout)
+80% / 83%, mean +$3,039 / +$2,585 (2010–20 / 2021–26); ZN +$1,196 / +$1,797. Five-account book, common starts (mean, P(net > 0), 10th pct):
+
+| period | now (MCL) | ZB for MCL | ZN for MCL |
+|---|---|---|---|
+| 2010–20 (687) | +$10,462, 85%, −$829 | **+$13,117, 92%, +$558** | +$11,740, 93%, +$1,023 |
+| 2021–26 (1,040) | +$15,008, 96%, +$4,148 | **+$16,274, 99%, +$6,245** | +$15,602, 98%, +$5,702 |
+| 2025 starts (298) | **+$17,492**, 100%, +$8,228 | +$17,008, 100%, +$7,705 | +$15,836, 100%, +$8,194 |
+
+MCL averaged only +$652 / +$1,088 in the first two periods but +$2,994 on 2025 starts; ZB +$3,307 / +$2,354 / +$2,511. §610's rule
+(improve in every period) is not met — by $484 on the 2025 starts — so this is not reported as a finding; it is recorded for the 10-25 review's
+account decision as the steadier long-run fifth market (bonds are uncorrelated with the other four). Note: needs Tradeify to permit ZB
+(CBOT, likely) and a ZB ticket in the bot.
+
+## 612. A56 protocol: the best zero-edge fifth market — every feasible candidate in MCL's slot (S1)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** A55's construction for every Tradeify-permitted candidate with Yahoo
+daily history since 2010: **ZB, ZN, 6E, 6J, 6A, 6B** (CME FX), **SI**, **PL**, **MNG** (micro natural gas), **MHG** (micro copper, owned bars),
+**ZC, ZW, LE, HE**; contracts by the $2,900 daily-swing rule within 4 minis / 40 micros; round trip $4.5 (minis) / $3.32 (micros). A
+candidate qualifies only if the five-account book with it in MCL's place has a higher mean in **all three** periods (2010–20, 2021–26,
+2025 starts). Qualifiers are reported with P(net > 0) and the 10th percentile.
+
+## 613. A56: two markets beat crude for the fifth account — live cattle (robust on the checks) and silver (fragile) (S1)
+
+**No trial; N 1,525.** `reports/a56_fifth.json` (module `reporting/a56_fifth.py`). Five-account book, MCL's slot replaced (mean; P(net > 0); 10th pct):
+
+| fifth market | 2010–20 | 2021–26 | 2025 starts |
+|---|---|---|---|
+| MCL (now) | +$10,479; 85%; −$828 | +$15,008; 96%; +$4,148 | +$17,492; 100%; +$8,228 |
+| **LE, 4 live cattle** | **+$13,630; 94%; +$1,642** | **+$16,703; 99%; +$6,904** | **+$18,105; 100%; +$9,160** |
+| SI, 1 silver (daily bars) | +$14,537; 91%; +$463 | +$19,161; 98%; +$6,813 | +$22,640; 100%; +$15,585 |
+| SIL, 3 micro silver (daily bars, sized) | +$13,214; 89%; −$394 | +$17,587; 100%; +$6,509 | +$18,998; 100%; +$10,303 |
+| SI on minute paths (COMEX 08:25–13:25) | +$10,172; 90%; −$92 | +$16,494; 98%; +$6,036 | +$16,598; 100%; +$6,096 |
+| ZB (A55) | +$13,117; 92%; +$558 | +$16,274; 99%; +$6,245 | +$17,008; 100%; +$7,705 |
+
+Every other candidate fails at least one period (ZN, 6E, 6J, 6A, 6B, PL, MNG, MHG, ZC, ZW, HE). **Silver is fragile**: its daily-bar advantage
+disappears on minute paths (worse than MCL in 2010–20 and on 2025 starts) and it shares losing runs with MGC (both negative on 11–35% of
+starts). **Live cattle holds on the checks available**: Yahoo LE=F session SD 50–132 bps by year with no regime break, 56 of 4,240 opens
+gap > 3% and one session > 5% (no roll artefacts of note); alone P(payout) 85% / 80%, mean +$4,142 / +$2,768 (MCL +$652 / +$1,088); book
+gain over MCL positive in every start year 2016–2025 (+$0.9k to +$7.4k), negative for 2026 starts (−$7.9k, few starts); per-start
+correlation with MNQ / MGC / NKD / FDXM −0.25 to +0.28. Caveats: daily-bar paths (no minute data to cross-check, as MCL); a zero-edge
+market substitution, not a new edge; Tradeify must list LE (CME livestock, 8:30 AM – 1:05 PM CT) and the bot needs an LE ticket.
+
+## 614. Correction to §613: at Tradeify's real LE commission live cattle no longer qualifies (S1)
+
+**No trial; N 1,525.** Tradeify lists LE (CME livestock) as permitted, with a **round trip of $11.20** (help centre: Supported Trading Products;
+Trading Commission Fees, read 2026-10-15) — A56 assumed $4.50. Re-run at $11.20 (4 LE): alone P(payout) 81% / 82%, mean +$3,346 / +$2,194;
+book with LE for MCL: 2010–20 +$10,479 → **+$13,084** (P 85 → 92%, p10 −$828 → +$279); 2021–26 +$15,008 → **+$16,121** (96 → 99%, +$4,148 →
++$6,519); **2025 starts +$17,492 → +$17,211** (100%, p10 unchanged). Fails §612 on the 2025 starts, like ZB (§611): both are steadier long-run
+fifth markets that do not beat crude on the recent starts. The ZB and every other candidate's round trips were also assumed ($4.50 /
+$3.32) and should be checked against Tradeify's fee list before any switch. Recorded as options for the 10-25 review, not a finding.
+
+## 615. Tradeify's commission schedule is cheaper than the models assume — the estimates are conservative (S8)
+
+**No trial.** Tradeify's help centre (Trading Commission Fees, via search 2026-10-15; the page itself refused a direct fetch): **MNQ $1.82,
+MGC $2.12, MCL $2.12** a round trip (exchange, NFA, clearing and commission; free membership); NKD not listed; LE $11.20 (§614). The models
+use MNQ $2.32, MGC / MCL $3.32 (A23 `MARKETS`) — $0.50–1.20 a contract too high, about $2 / $10 / $12 a traded day for 4 MNQ / 8 MGC / 10
+MCL. Every dollar estimate here (the book's +$17.5k per four months on 2025 starts, the A47 options) is therefore somewhat conservative;
+the comparisons between markets that use the same costs stand, and crude's real cost makes §614's case for replacing it weaker still.
+Not re-run (no decision turns on it); the user can confirm the live schedule on their platform.
+
+## 616. A49 watchlist: D727–D728 added; their early forward lead is one position, not 27 trades (S8)
+
+**No trial.** The forward tracker now includes gold's London window fading its own 60-day trend (D727 all days, D728 strong days). First
+forward reading (2026-09-01 → 10-14, unseen): D728 +33.67 bps a session (t 2.77, n 27), D727 +24.63 (t 1.68, n 30). The 60-day trend sign
+did not change in that span, so this is one short-gold stance through a pullback — a single block, not 27 independent trades; the t is not
+meaningful until the trend has flipped several times forward. D718 (MNQ volatility breakout) is not tracked (needs minute data beyond
+Yahoo's 5-minute bars). 16 of 23 watchlist rules positive forward so far.
+
+## 617. D-series family 175 protocol: gold's other sessions against its own long trend, current regime (S1)
+
+**No trial spent; N 1,525. Written and committed BEFORE any statistic is computed.** Family 171: gold's London window fades its 60-day trend
+(D727–D728, watchlist). Do gold's **Asia session** (18:00 → 03:00 ET) and **New York afternoon** (11:30 → 16:55 ET) — owned MGC minute grids,
+roll-safe — follow or fade the same trend (GC=F's Yahoo session moves summed over the previous 60 / 120 / 250 weekdays)? Follow/fade fixed
+on 2021–24; forms all / strong. **2 × 3 × 2 = 12 tests** (~0.3 by chance; carried also needs monthly t > 1.96). Cost 0.8. Validation per
+§426, 2 (placebo: circular shifts); a CONFIRM then needs an MGC account replay on that session.
+
+## 618. Family-175: gold's Asia and New York sessions take nothing from its long trend — 0 of 12 (S1)
+
+**N 1,525 (no trial).** `reports/d175_discovery.json` (module `reporting/d175_goldsess.py`). Every cell |t| < 1.2 in 2021–24. The London fade
+(D727–D728) is London-specific; the other sessions neither follow nor fade the trend. No session switch for the MGC account.
+
+## 619. A57 protocol: conviction sizing on the NKD account (S1)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** Direction stays the deployed dollar-week sign. Agreement signals (each
+NKD-confirmed or near-confirmed; their signs are known before the 20:00 ET entry): corn fade 5-day (D343/D738), ASX follow 1-day (D653), ITB
+follow 5-day (D551). Rule: **2 NKD when at least k of the 3 agree with dollar-week, else 1**, k ∈ {1, 2, 3}; plus the variant "3 NKD when all
+3 agree". A23 replay (nvec), 50K Daily. **Chosen on 2021–24 starts** (mean net, P(payout) within 3 points of the deployed 1-NKD); read once on
+2025 starts and 2010–20. Disclosed: the agreement signals were validated on 2025–26, so 2025 starts favour them; 2010–20 is the honest
+check. Adopt only if the choice beats the deployed account on 2021–24 AND 2010–20 starts AND 2025 starts.
+
+## 620. A57: conviction sizing on NKD — the best variant is steadier but not better on 2025 starts; not adopted (S1)
+
+**No trial; N 1,525.** `reports/a57_conviction.json` (module `reporting/a57_conviction.py`). On 2021–24 starts: deployed 1 NKD +$5,454 (92%);
+**2 NKD when corn, ASX and ITB all agree with dollar-week** (16% of days) **+$5,607 (94%)** — the choice; 2 when ≥ 2 agree +$5,149; 3/2/1 ladder
++$5,393 (98%); 2 when ≥ 1 agrees +$2,868. The choice before 2021: +$3,801 (88%) vs +$3,258 (79%); **2025 starts +$7,837 (94%) vs +$8,040 (95%)** —
+fails §619 by $203. (The ≥ 2 rule reaches +$10,169 on 2025 starts but P(payout) 84% and is worse on 2021–24.) Not adopted; the agreement
+signals add little once the dollar-week side is fixed.
+
+## 621. A58 protocol: Apex Trader Funding 50K against Tradeify's 50K Daily (user request, 2026-10-15) (S1)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** Rules as the user gave them: **$25 evaluation, $120 activation on
+passing**; 4 minis / 40 micros; target +$3,000; $2,000 trailing drawdown (taken as Tradeify's: end-of-day trailing, breached if touched
+intraday); **no evaluation consistency** (no evaluation daily loss limit assumed); funded: **5 winning days (≥ $250) per payout, 50% consistency**
+(best day in the cycle ≤ 50% of the cycle's profit), **100% split**, minimum $500, **payout caps $1,500 / 1,500 / 2,000 / 2,500 / 2,500 / 3,000,
+then the account closes** (a new evaluation is bought). Assumed (Apex's usual design, not stated): the funded drawdown trails to a peak of
+$52,100 and then locks at $50,100, and payouts may only draw the balance down to $52,100. Replay: all five accounts with the deployed rules
+(MNQ D68, NKD dollar-week, FDXM DAX-dollar; MGC, MCL plan), 84 sessions, A23 paths; **the same fixed-bracket grid for both firms** (take ∈
+{600, 800, 1,000, 1,200} × stop ∈ {500, 600, 800, 1,000}) chosen per market on 2021–24 starts, plus Tradeify's solved policy as the
+reference. Read once on 2025 starts and 2010–20; per account and as the five-account book.
+
+## 622. A58: Apex 50K loses to Tradeify's 50K Daily wherever the rules work — stay with Tradeify (S8)
+
+**No trial; N 1,525.** `reports/a58_apex.json`, modules `reporting/a58_apex.py` (fixed brackets, both firms) and `a58b_apex_policy.py` (Apex
+with its own solved A23 policy — an UPPER bound: the engine cannot model Apex's rising caps and closure after six payouts or its 50%
+funded consistency; 100% split and $120 activation per pass applied; `a23.replay` now also returns evaluations passed). Five-account book
+with the deployed rules, per four months (mean; P(net > 0); 10th pct):
+
+| | 2010–20 | 2021–26 | 2025 starts |
+|---|---|---|---|
+| Apex, fixed brackets (best on 2021–24) | +$5,298; 81%; −$1,415 | +$4,610; 80%; −$1,750 | +$2,559; 65%; −$2,060 |
+| Tradeify Daily, fixed brackets | +$5,567; 84%; −$260 | +$6,350; 86%; −$720 | +$6,047; 82%; −$1,046 |
+| **Apex, solved policy (upper bound)** | **+$11,254; 97%; +$3,039** | +$9,801; 97%; +$1,395 | +$11,213; 95%; +$1,616 |
+| **Tradeify Daily, solved policy (the plan)** | +$10,494; 85%; −$826 | **+$15,008; 96%; +$4,148** | **+$17,492; 100%; +$8,228** |
+
+Apex's cheap evaluations ($25) help before 2021, when the rules lose and failures are frequent; once the rules carry an edge (2021–26),
+Tradeify's daily payouts realise it faster than Apex's five-winning-day ($250) cycles — Tradeify +$5.2k a four-month run better on all
+2021–26 starts and +$6.3k on 2025 starts, even against Apex's flattering bound. Biggest gap: NKD (+$6.2–7.3k Tradeify vs +$3.1–3.8k Apex).
+
+## 623. A59: what a four-month run looks like on Tradeify's 50K Daily, account by account (user request) (S8)
+
+**No trial.** `reports/a59_detail.json` (module `reporting/a59_detail.py`; `a23.replay` now also returns payouts, evaluation failures, funded
+failures and the pass day). The plan with the deployed rules, 84 sessions per run, common start dates. **2025 starts (298 runs)** per account
+(evaluations bought; funded accounts reached / lost; payouts; median day of first payout; net): MNQ 12.6; 3.8 / 3.5; 2.2; day 28; +$1,333 —
+MGC 14.4; 3.8 / 3.6; 2.1; day 26; +$771 — MCL 12.9; 3.1 / 2.8; 3.2; day 32; +$2,994 — **NKD 12.8; 4.0 / 3.6; 6.6; day 27; +$7,257** — **FDXM
+11.7; 3.5 / 3.2; 6.0; day 21; +$5,135**. Book: **64 evaluations bought (~$5,150), ~20 payouts (~$22,600 after the 90% split), net +$17,492**;
+every run positive; worst +$3,568. 2021–26: 64 evaluations, 18.6 payouts, net +$15,008 (P(net > 0) 96%); 2010–20: 62 evaluations, 15.8 payouts,
++$10,494 (85%). The plan is a fast-churn staking game: ~13 evaluations per account per four months (a new one every ~6–7 sessions), an account
+passes in ~10–18 sessions, almost every funded account is eventually lost, and each funded account pays 0.6–1.7 times (average payout
+~$900–1,300 after the split, against the $1,250 cap). Operational implication for live trading: about 16 evaluation purchases a month across
+five accounts at $80 each — the user should confirm Tradeify allows re-buying at that pace and price.
+
+## 624. A60 protocol: the five-account book under Tradeify's live-account rules (user, 2026-10-15) (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** The user's rules (Tradeify does not publish them; the only official
+article found is an expired pre-November version): **move to live** when one funded account has 3 payouts or the book has 10 payouts since
+the start (or since the last live failure); at that moment every funded account with ≥ 1 payout on its current funded account moves to
+live (≤ 5) and every other account (evaluations, funded without a payout) is **closed**. **Live**: starts at $0 trading capital; trailing
+drawdown $2,000 until the peak reaches +$2,000, then locked at $0; no daily loss limit; 4 minis / 40 micros; withdrawals daily, any amount
+above trading capital, **80% split**, no cap; **no new evaluations while any live account is open**; when the last live account fails, a
+**cool-off of up to four weeks** (modelled as 20 sessions) with no trading, then five new evaluations. A joint simulation of the five
+accounts (MNQ D68, MGC, MCL, NKD dollar-week, FDXM DAX-dollar) on their common sessions, each sim account under the plan's solved policy
+as A23; live accounts trade fixed brackets (take, stop) ∈ {(600, 600), (800, 800), (1,000, 1,000), (1,200, 1,000)} with a withdrawal
+cushion C ∈ {$2,000, $4,000} (withdraw everything above C once locked), chosen on 2021–24 starts; horizons 84 sessions (the plan's four
+months) and 252 (a year). Read on 2025 starts, all 2021–26 starts, 2010–20; against A47/A59's book without live rules.
+
+## 625. A60: Tradeify's live-account rules cut the plan's book by about 70% (S8)
+
+**No trial.** `reports/a60_live.json` (module `reporting/a60_live.py`; joint simulation on the union calendar — a market without a session
+sits — validated: with the live rules off it equals the sum of A23 replays on the same calendar to the dollar, +$13,683 on 2021–26 starts;
+the shared-calendar version was rejected after the check, §624's design otherwise unchanged). Live brackets chosen on 2021–24 starts:
+take $1,200 / stop $1,000, cushion $2,000 (84 sessions) or $4,000 (252). Book per run (mean; P(net > 0); 10th pct):
+
+| | without live rules | **with live rules** |
+|---|---|---|
+| 84 sessions, 2025 starts | +$17,925; 100%; +$7,687 | **+$5,491; 100%; +$2,615** |
+| 84 sessions, 2021–26 | +$13,683; 95%; +$2,462 | **+$4,327; 91%; +$218** |
+| 84 sessions, 2010–20 | +$6,692; 87%; −$599 | **+$3,306; 85%; −$813** |
+| 252 sessions, 2025 starts | +$50,733; 100% | **+$14,166; 100%; +$9,059** |
+| 252 sessions, 2021–26 | +$44,273; 100% | **+$13,342; 100%; +$6,951** |
+
+Mechanism: the five accounts reach 10 payouts in ~16–30 sessions; at the move **62% of the time only one account goes live** (34% two,
+2% three) and the rest are closed (≈ 5–6 accounts closed per four months); the live account, starting with only $2,000 of room, is usually
+lost soon; then the 20-session cool-off (≈ 27 of 84 sessions on 2025 starts). Live accounts pay little (≈ $1.1–4.3k per run); most money
+is still the simulated payouts before each move. Every live bracket / cushion choice gives a similar result (2021–24 grid +$3.0–3.9k
+per 84 sessions). The plan's dollar estimates elsewhere in this file ignore these rules and overstate what the user would receive.
+
+## 626. A61 protocol: playing to Tradeify's live rules — payout timing, account mix, live play (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** A60's joint simulation with three levers, chosen in stages on
+2021–24 starts at 84 sessions (the plan's horizon), each stage keeping the previous choice; read once on 2025 starts and 2010–20, and at
+252 sessions for the final configuration.
+1. **Payout gating** k ∈ {none, 2, 3, 4, 5}: an account may always take its FIRST payout (to qualify for live), but further payouts are held
+   (profit stays in the account) until at least k accounts of the book hold a payout on their current funded account — so the 10-payout
+   move takes several accounts live instead of one.
+2. **Account mix** (five slots): now (MNQ, MGC, MCL, NKD, FDXM); 2 × NKD + 2 × FDXM + MNQ; 3 × NKD + 2 × FDXM.
+3. **Live play before the +$2,000 lock**: (take, stop) ∈ {(500, 500), (800, 800), (1,200, 1,000)}, after the lock A60's chosen (1,200,
+   1,000) with the $2,000 cushion.
+Adopt only levers that improve the 2021–24 mean and do not lower 2025 starts or 2010–20; report all.
+
+## 627. A61: under the live rules, put all five slots on NKD and FDXM; hold no payouts; keep the live brackets (S8)
+
+**No trial.** `reports/a61_liveplay.json` (module `reporting/a61_liveplay.py`; reproduces A60 exactly with the same settings). 84 sessions,
+mean net (P(net > 0)):
+- **Payout gating hurts** — holding later payouts until k accounts hold one: none +$3,914 (2021–24) / +$5,491 (2025 starts) / +$3,306 (2010–20);
+  k = 2 +$3,823 / +$5,796 / +$2,447 (68%); k = 3 +$3,260 / +$4,048 / +$2,014; k = 4–5 near zero. Profit left in a simulated account is lost
+  with it more often than it buys a bigger move to live. **Not adopted.**
+- **Account mix — adopted on §626's rule**: now (MNQ, MGC, MCL, NKD, FDXM) +$3,914 / +$5,491 / +$3,306; 2×NKD + 2×FDXM + MNQ +$6,503 / +$8,728 / +$6,005;
+  **3×NKD + 2×FDXM +$8,431 / +$12,041 / +$6,734** (P(net > 0) 90% / 100% / 83%). Duplicates trade together, so they also reach live together:
+  2–5 accounts go live at a move (59% three) instead of one (62% one, now).
+- **Live play before the lock**: (500, 500) +$6,749 and (800, 800) +$7,758 vs the default (1,200, 1,000) +$8,431 on 2021–24 — the default stays.
+**One year (252 sessions)**: chosen +$31,734 (2025 starts), +$27,113 (2021–26, p10 +$16,480), +$19,049 (2010–20, 98%) vs the current mix
++$18,128 / +$13,349 / +$10,035. Caveats: five accounts on two products and one theme (the dollar rules) — if the dollar effect ends, every
+account is a zero-edge account (2010–20 above is that case, still positive); identical trades in several accounts (copy-trading) must be
+allowed by Tradeify — to confirm; still a simulation of rules the user described, not Tradeify's published text.
+
+## 628. A62 protocol: all five edge accounts live together, then build the live accounts up with smaller risk (user idea) (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** The user: with only edge accounts (3 NKD + 2 FDXM), move all five to live
+together, build the live accounts up with the edge (smaller risk, no early withdrawals), then withdraw normally. A61's simulation:
+(A) **gate** none vs 5 (later payouts held until all five accounts hold one, so the move takes all five); (B) **live risk** (take, stop) the
+same before and after the lock ∈ {(300, 300), (500, 500), (800, 800), (1,200, 1,000)} × **withdrawal cushion** (withdraw only above it, once
+locked) ∈ {$2k, $5k, $10k, $20k}. Chosen on 2021–24 starts at **252 sessions** (A first, then B with A's choice); read on 2025 starts and
+2010–20; the chosen and the A61 configuration also at **504 sessions** (2021–24 starts only — the data end there). Cash received and
+equity left in live accounts at the end are reported separately; the choice is on cash.
+
+## 629. A62: building live accounts up works over two years — with the normal size and a $20k cushion, not with smaller risk (S8)
+
+**No trial.** `reports/a62_buildlive.json`, `reports/a62b_twoyear.json` (modules `reporting/a62_buildlive.py`, `a62b_twoyear.py`); 3 NKD + 2 FDXM.
+- **All five live together (gate 5) hurts**: one year, 2021–24 starts, cash +$19,992 vs +$26,219 (no gate). Not adopted.
+- **Smaller live risk earns less** at every cushion (one year, cash + equity left in live accounts): (300, 300) $16.8k + $0.5k … $9.9k + $12.3k;
+  (500, 500) $20.4k + $0.5k … $12.5k + $13.1k; (800, 800) $21.7k + $0.2k … $13.8k + $14.6k; **(1,200, 1,000)** $26.2k + $0.1k (C $2k),
+  $26.6k + $1.3k (C $5k), $23.0k + $2.8k (C $10k), **$18.3k + $14.5k (C $20k)**. Smaller sizes do not reach the +$2,000 lock more often
+  enough to pay for the slower growth.
+- **Two years (504 sessions, 2021–24 starts), (1,200, 1,000)**: cushion $2k cash **+$51,802** (p10 +$40,729) + $92 left live; $10k +$48,441 +
+  $2,831; **$20k: cash +$46,610 (p10 +$32,035) + $24,966 left in live accounts** (live payouts $17,920 vs $12,588; 5.0 moves vs 6.6; cool-off 88
+  days vs 128); $40k: +$32,968 + $42,057. (800, 800) with $20k: +$35,084 + $22,319.
+Read: the user's idea pays if the money left in live accounts counts — it is withdrawable profit (80%): $20k cushion ≈ $46.6k + 0.8 ×
+$25.0k ≈ **$66.6k over two years vs $51.8k** (one year ≈ $29.9k vs $26.3k). It trades cash now for larger, longer-lived live accounts (fewer
+moves and freezes); the equity is at risk until withdrawn (a $20k fall from the peak, ~20 net losing days at this size). Choice for the
+user: withdraw above $2–5k (more cash sooner, steadier) or build to $20k (more total over two years).
+
+## 630. A63 protocol: other prop firms' 50K rules against Tradeify, in the same joint simulation (user request) (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** Rules read 2026-10-15 from the firms' help centres (sources in
+`reports/a63_firms.md`); comparison sites only to find firms. Modelled (the others have tighter caps, forced live after few payouts, or
+mandatory consistency that the plan's brackets cannot meet, per the survey table):
+- **Tradeify Select Daily** (baseline, A61's live rules).
+- **MyFundedFutures Rapid EOD 50K**: $157 one-time, target $3,000, $2,000 EOD trailing, eval consistency 30%, 4 days minimum, no DLL; funded
+  EOD trailing locking at +$100; payouts daily: first once profit ≥ $2,600 (down to the $2,100 buffer), then each +$500; no cap; 90%; **3
+  funded accounts max**; live only after a $10,000 day or at the risk team's discretion.
+- **Take Profit Trader PRO**: test ~$150 per attempt (price unconfirmed; tested at $100 and $200), target $3,000, $2,000 EOD trailing, 50%
+  eval consistency (not failing: trading continues until met), 3 days minimum; **PRO intraday trailing** $2,000 locking at the start;
+  withdraw anything above +$2,000 daily, no cap, **80%**; 5 accounts; PRO+ live by invitation.
+- **Lucid Daily**: eval as MFF's with 50% consistency (price ~$150, unconfirmed); funded **intraday trailing**, payouts daily above
+  +$2,100, no cap, 90%; live at the risk team's discretion; all sim accounts close on a move; live keeps the buffer as room; 2-week cooldown.
+Live triggers that are discretionary are swept: never, after 10, after 20 payouts. Products: FDXM (Eurex) is not offered by MFF or TPT
+(US exchanges only); NKD is listed by MFF, unconfirmed at TPT and Lucid — so non-Tradeify mixes use NKD, MNQ (D68), MGC, MCL only.
+Same plan policy (A23) for brackets; intraday trailing modelled from each day's path maximum before the exit. Horizon 84 sessions;
+2025 starts, 2021–26, 2010–20.
+
+## 631. A63: no other prop firm beats Tradeify for this plan, even after Tradeify's live rules (S8)
+
+**No trial.** `reports/a63_firms.md` (survey and sources), `reports/a63_firms.json`, `reports/a63_phidias.json` (modules `reporting/a63_firms.py`,
+`a63b_phidias.py`; the generic simulation reproduces A61 exactly under Tradeify's rules). Four-month book, 2025 starts (P(net > 0)):
+Tradeify 3 NKD + 2 FDXM **+$12,041 (100%)**, NKD×3 + MNQ + MGC +$11,405 (98%), current mix +$5,491 (100%); Take Profit Trader PRO +$6,886 (62%)
+or +$13,464 with NKD×5 (65%; 2021–26 +$10,575 at 56%, p10 −$10,500); Lucid Daily +$9,003 (63%) with no live move, +$3,231 if live after 10
+payouts; MyFundedFutures Rapid EOD −$3,304 (3%: its 30% evaluation consistency rarely lets the plan pass); Phidias Fundamental / Premium
+−$3,319 / −$3,892 (5 accounts) and worse with 15 (30% funded consistency blocks payouts); Apex below Tradeify (§622). The plan needs
+frequent payouts and no consistency cap on the best day; Tradeify Select Daily is the only firm with both, the lowest evaluation price,
+and Eurex. Caveat: other firms ran with Tradeify's solved bracket policy — a policy solved for each firm's rules could narrow the gap for
+TPT and Lucid, but their losing-run share (35–45%) comes from the fee load and intraday trailing, not the policy alone.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —
