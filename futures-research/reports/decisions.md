@@ -13634,6 +13634,389 @@ frequent payouts and no consistency cap on the best day; Tradeify Select Daily i
 and Eurex. Caveat: other firms ran with Tradeify's solved bracket policy — a policy solved for each firm's rules could narrow the gap for
 TPT and Lucid, but their losing-run share (35–45%) comes from the fee load and intraday trailing, not the policy alone.
 
+## 632. A64 protocol: Tradeify 100K / 150K Select Daily under the live rules (user request) (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** §145 chose 50K before the live rules were known. A63's simulation
+(reproduces A61) with A23's 100K / 150K Daily specs (§145: target $6k / $9k, drawdown $3k / $4.5k, funded payout cap $1,750 / $2,500, fee
+$185.50 / $258.30, contracts × 1.5 / × 2.25 rounded half up, each size's own solved bracket policy) and the user's live rules scaled by size:
+live room and lock at the size's drawdown ($3k / $4.5k), live brackets × the contract factor, 10-payout / 3-on-one trigger, 4-week
+cool-off, at most 5 accounts of any size. Books: 5 × 50K, 5 × 100K, 5 × 150K, each as 3 NKD + 2 FDXM and as the current mix. Read on 2025
+starts, 2021–26 and 2010–20 at 84 sessions.
+
+## 633. A64: under the live rules 5 × 100K (3 NKD + 2 FDXM) earns more than 5 × 50K, with more risk; 150K is worse (S8)
+
+**No trial.** `reports/a64_sizes_live.json` (module `reporting/a64_sizes_live.py`; the 50K row reproduces A61 exactly). Four-month book
+(mean; P(net > 0); 10th pct):
+
+| | 2025 starts | 2021–26 | 2010–20 |
+|---|---|---|---|
+| 5 × 50K, 3 NKD + 2 FDXM | +$12,041; 100%; +$6,135 | +$9,378; 90%; −$60 | +$6,734; 83% |
+| **5 × 100K, 3 NKD + 2 FDXM** (2 NKD / 3 FDXM each) | **+$17,582; 94%; +$3,897** | **+$12,206; 82%; −$6,690** | +$5,294; 68% |
+| 5 × 150K, 3 NKD + 2 FDXM | +$7,997; 67%; −$11,365 | +$9,767; 68% | +$4,059; 54% |
+| 5 × 50K / 100K / 150K, current mix | +$5,491 / +$4,917 / +$835 | +$4,327 / +$1,700 / +$1,810 | +$3,306 / +$1,550 / +$980 |
+
+The 100K adds ~+$5.5k (2025 starts) and ~+$2.8k (2021–26) a four-month run on the edge mix — larger payout caps and live room let the
+edge show — but its fees are 2.4× (≈ $8.2k), the losing-run share doubles (2021–26 18% vs 10%), the bad case is ~$6.6k worse, and it is worse
+than 50K before 2021 and worse on the zero-edge mix. Assumptions: live room / lock scaled to the size's drawdown (the user gave 50K's
+only); 100K fee $185.50 is §145's sale price. For the user's "faster profit" aim: 100K raises the mean at the cost of a wider tail.
+
+## 634. A65 protocol: slippage on the NKD / FDXM book, and funded-stage brackets under the live rules (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** The launch plan: 5 × 50K Tradeify, 3 NKD + 2 FDXM, live rules (A61).
+(1) **Slippage**: 0, 1, 2 ticks a side on entry and on every exit, added to each day's cost (NKD tick $25 a contract; FDXM tick 1 point × €5
+≈ $5.80 at EUR/USD 1.16) — a stop already fills at its price, so this charges entries and exits uniformly (takes too: conservative).
+(2) **Funded brackets**: the A23 policy was solved for an endless funded stage; under the live rules funded money stops at ~10 payouts a
+cycle. Take and stop scaled in the funded stage only, factors ∈ {0.75, 1.0, 1.25, 1.5} each (16 pairs), at 1 tick of slippage; **chosen
+on 2021–24 starts**, read once on 2025 starts and 2010–20; adopt only if it improves all three means.
+
+## 635. A65: slippage costs the launch book 7% at one tick and 38% at two; no funded-bracket change (S8)
+
+**No trial.** `reports/a65_slip_fund.json` (module `reporting/a65_slip_fund.py`). 5 × 50K Tradeify, 3 NKD + 2 FDXM, live rules; four-month
+book (2025 starts; 2021–26; 2010–20): **0 ticks** +$12,041 (100%, p10 +$6,135); +$9,378; +$6,734 — **1 tick a side** +$11,162 (100%, p10
++$3,184); +$7,991 (86%); +$5,346 — **2 ticks** +$7,479 (98%, p10 +$647); +$5,795 (81%); +$3,374. NKD's $25 tick dominates: two ticks a side
+is $100 a round trip on a ~$1,000 bracket. Staged entries are market orders at liquid opens (Tokyo 09:00 for NKD, Xetra 09:00 for
+FDXM), so ~1 tick is the working assumption; the demo's real fills (the review's execution table) will tell.
+**Funded brackets** (1 tick): grid on 2021–24 starts +$3,981 … +$9,064 (noisy; chosen take × 1.25, stop × 0.75); the choice gives 2025 starts
++$11,940 vs +$11,162 and 2021–26 +$9,818 vs +$7,991, but **2010–20 +$3,354 vs +$5,346** and the tail widens (2025 p10 +$1,726 vs +$3,184) —
+fails §634's rule; the solved policy stays.
+
+## 636. The bot can run several accounts per product (built and tested locally; not deployed) (S8)
+
+**No trial.** For the launch plan (3 NKD + 2 FDXM at 50K): `bot/accounts.py` reads **BOT_ACCOUNTS** (environment or the bot's `.env`), e.g.
+`NKD,NKD2,NKD3,FDXM,FDXM2`; an account name is its product plus an optional number (`base()`), each with its own state, tickets, `!eod`,
+`!new`, `!payout`; windows, policy, sides (dollar rules), shadow data and the proxy note come from the base product; tickets read
+"**NKD2** … SELL 1 NKD"; the 1:45 AM FDXM re-check now covers every FDXM account with one dollar reading and one message. Unset, the bot
+runs the demo's six products exactly as before. Tests: tests/test_bot_ticket.py (13 pass; the Discord-embed test also passes in a scratch
+environment with discord.py). Deploy only on the user's word, with the live accounts' starting balances set via `!set`.
+
+## 637. Mid-demo review (2026-10-16) and a near-miss tolerance for the `!eod` check (S8)
+
+**No trial.** Review after 26 tickets: outcomes 9 / 16 / 1 against an expected 11.1 / 13.7 / 1.2 (chi-square 0.81, p ≈ 0.67); replay P&L
+−$6,250 vs −$628 ± $5,244 (z −1.07) — an unlucky week inside the noise; no account has passed yet. Dollar rules: 4 sessions, signed window
++316 bps, bracket P&L −$2,258 vs the opposite side, recorded −$1,800; the 40-session trigger is pending. Watchlist 13 of 23 positive.
+The MGC 10-16 ticket: the user's chart reached the 153-tick take (154 too; 155 would have missed); the Yahoo GC=F replay (entry 4198.10)
+fell short by exactly one tick (high 4213.30 vs take 4213.40) and recorded a stop. The user's reading stands (recorded results override
+the replay, §492). **Change (deployed 2026-10-16 ~1:28 PM CT on the user's OK, with §636's multi-account code inactive — BOT_ACCOUNTS unset, the six demo products; backup-2026-10-16; checksums verified):** `schedule.eod_check` no longer warns when the replay
+came within `NEAR_TICKS = 3` of the bracket the user reported — at that distance the replay's data source cannot settle it. Tests extended.
+
+## 638. A66 protocol: a health monitor for the dollar rules — switch each off when its own recent record turns negative (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** The book now rests on two rules that did not work before 2021.
+For each rule (NKD dollar-week, FDXM DAX–dollar): its signed window result each session = the rule's side × the window's move (known
+after the session); the rule is ON for a session if the mean of its previous N signed results is > 0, else OFF (the account takes the
+plan's default long side). N ∈ {20, 40, 60, 120} sessions. A23 single-account replays (50K Daily, plan policy): always-on rule,
+monitored rule, plan. **N chosen on all starts 2010–24 (both eras pooled, mean net of the two accounts)**; read once on 2025 starts. Adopt
+only if it keeps ≥ 90% of the always-on rule's 2025-start result and improves 2010–20.
+
+## 639. A66: the dollar rules need no automatic switch-off — they did not hurt the NKD / FDXM accounts even before 2021 (S8)
+
+**No trial.** `reports/a66_monitor.json` (module `reporting/a66_monitor.py`). NKD + FDXM single accounts, mean net per four-month run
+(2010–20 | 2021–24 | 2025 starts): plan +$3,260 | +$4,837 | +$4,266; **rules always on +$6,403 | +$8,357 | +$13,656**; monitored N = 20
++$6,973 | +$7,151 | +$9,901; **N = 40 (chosen on 2010–24) +$5,999 | +$8,844 | +$14,056**; N = 60 +$6,775 | +$6,128 | +$13,786; N = 120
++$4,216 | +$9,527 | +$14,026. The chosen monitor keeps 103% of the 2025-start result but lowers 2010–20 (+$5,999 vs +$6,403) — fails §638's
+rule; not adopted. Reading: on these two accounts the rules roughly double the plan's mean in every period, including 2010–20 (+$6.4k vs
++$3.3k) — the "pre-2021 risk" seen in the five-account book (§463: its P(net > 0) fell) came from the book's tails, not from NKD/FDXM means.
+The 40-session forward trigger (§463) stays as the safeguard.
+
+## 640. Tradeify's answers (via the user, 2026-10-16): the launch plan's assumptions hold (S8)
+
+**No trial.** (1) **Copy-trading across one's own accounts is allowed** — 3 NKD + 2 FDXM with identical trades is permitted. (2) The live
+rules modelled since §624 are **verbatim from Tradeify's FAQ**. (3) A **100K live account starts at $0 with the evaluation's drawdown**
+($3,000) — A64's assumption (§633) holds. (4) **No limit** on how many evaluations, or how often, one buys. (5) Staged orders **survive
+overnight but may not survive the 5–6 PM ET close** — the alert posts at 4:30 PM CT (5:30 PM ET), inside that break, so orders are to be
+staged **after the 5:00 PM CT reopen** (NKD enters 7:00 PM CT, FDXM 2:00 AM CT). (6) Open: NKD / FDXM data packages and round-trip
+commissions (the models assume $4.00 a round trip for both; Tradeify's MNQ/MGC/MCL fees are below the models', §615).
+
+## 641. Tradovate's real NKD / FDXM costs leave the launch estimate unchanged (S8)
+
+**No trial.** The user trades Tradeify accounts on Tradovate. Tradovate's published all-in rates (commission + exchange + clearing + NFA,
+info.tradovate.com/pricing/commissions, read 2026-10-16), per contract per side (round trip) — Free / Monthly / Lifetime plan: **NKD $3.64
+($7.28) / $3.34 ($6.68) / $2.94 ($5.88); FDXM $1.78 ($3.56) / $1.08 ($2.16) / $1.02 ($2.04)**; for reference MNQ $0.94 / $0.84 / $0.64, MGC $1.29 /
+$1.19 / $0.99, MCL $1.09 / $0.99 / $0.79 (Tradeify's own published MNQ $1.82 and MGC/MCL $2.12 round trips sit between Tradovate's Free and
+Monthly, so prop accounts likely carry a negotiated rate). The models assumed $4.00 a round trip for NKD and FDXM. Re-run of the launch book
+(5 × 50K, 3 NKD + 2 FDXM, live rules, 1 tick a side) at the conservative Free rates: **2025 starts +$11,218** (100%, p10 +$3,175) vs +$11,162;
+2021–26 +$7,797 (84%) vs +$7,991; 2010–20 +$5,325 vs +$5,346 — NKD's higher fee and FDXM's lower one roughly cancel.
+
+## 642. A67 protocol: the launch's cash path — how much starting capital the plan needs (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** The launch plan (5 × 50K Tradeify, 3 NKD + 2 FDXM, live rules, 1 tick
+a side, Tradovate fees) spends on evaluations before payouts arrive. A63's joint simulation, day by day, records the trader's **cash**:
+−$80 at each evaluation bought (five at the start), + each payout when made (funded 90%, live 80%; paid the same day — Tradeify pays within
+days, so a slight flattering), and −$14 a month for Eurex data. Read per start date (2025 starts and all 2021–26): the lowest cash point in
+84 sessions (the capital at risk), the day of the first payout, the share of starts whose low point is worse than −$500 / −$1,000 / −$1,500
+/ −$2,000 / −$3,000, and the cash at day 84. The minimum safe starting capital is reported as the 95th / 99th percentile of the capital at risk.
+
+## 643. A67: the launch needs about $4,000–5,000 of capital for evaluations to be safe (S8)
+
+**No trial.** `reports/a67_cashpath.json` (module `reporting/a67_cashpath.py`; A63's simulation now also returns the cash path).
+Launch plan (5 × 50K, 3 NKD + 2 FDXM, live rules, 1 tick a side, Tradovate Free fees, Eurex data $14 a month), the trader's cash low point
+in the first 84 sessions (capital at risk):
+- **2025 starts (369):** median $1,268; **95th pct $3,288; 99th $3,680; worst $3,907**. Low point below −$1,000 on 61% of starts, −$2,000 on
+  27%, −$3,000 on 9%. First payout: median day 16, 90% by day 38. Cash at day 84: mean +$11,162, median +$10,388.
+- **All 2021–26 starts (1,407):** median $1,510; **95th $3,759; 99th $4,456; worst $4,776**; below −$2,000 on 34%, −$3,000 on 13%. First payout
+  median day 20, 90% by day 52; no payout within 84 sessions on 3% of starts. Cash at day 84: mean +$7,741.
+Read: $400 buys the first five evaluations, but a normal start dips about $1.3–1.5k before payouts outrun fees, and one in ten dips past
+$3,000. Starting capital of **$4,000** covers 95–99% of history; **$5,000** covers every start seen. With less, the plan has to pause
+re-buying in a bad stretch (which the replays do not model). Payouts are counted the day they are earned (a few days' delay in reality).
+
+## 644. A68: the user's cautious start — one NKD account until two payouts (S8)
+
+**No trial.** `reports/a68_single_start.json` (A63 simulation, one NKD account, dollar-week, 1 tick a side, Tradovate fees; 252-session
+horizon; starts 2021-01 → 2025-09, 1,239). The user will trade one 50K NKD account until it has two payouts, then start the five-account
+run. Time to the second payout: **median 42 sessions (~2 months)**, quartiles 22 / 84, 90th pct 127 (~6 months); every start reached it
+within a year. Evaluations bought by then: median 7, 90th pct 19. Cash low point before it: **median −$480, 95th pct −$1,360, worst −$1,760**.
+Interaction with the live rules (the 10-payout count runs from the first account bought): those two payouts count toward the 10, and
+**that NKD account's next payout is its third — which moves the trader to live at once**, closing every account that has not yet had a
+payout. If it is still funded when the five-account run starts, its third payout will most likely land before the four new accounts
+have passed and been paid.
+
+## 645. A69 protocol: the switch from one NKD account to five — take account #1's third payout, or hold it (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** State at the switch: NKD #1 funded with two payouts (balance at the
+$2,000 buffer), the book's payout count 2, four new $80 evaluations (NKD2, NKD3, FDXM, FDXM2). Options: **accept** (normal play: #1's third
+payout moves the book to live); **hold** #1's payouts until k ∈ {1, 2, 4} of the new accounts hold a payout (#1 keeps trading; its profit
+stays in the account, still exposed to its drawdown). A63's simulation (live rules, 1 tick, Tradovate fees), every start date, horizons
+84 and 252 sessions; read mean net, P(net > 0), accounts live at the first move, days to the first move.
+
+## 646. A69: at the switch, take account #1's third payout — holding it does not pay (S8)
+
+**No trial.** `reports/a69_switch.json` (module `reporting/a69_switch.py`; A63 still reproduces A61 after the changes). From the switch
+(NKD #1 funded with two payouts + four new evaluations), mean net (P(net > 0)):
+
+| | 84 sessions, all starts | 84, 2025 starts | 252 sessions, all starts | 252, 2025 starts |
+|---|---|---|---|---|
+| **accept** | **+$7,206 (89%)** | **+$9,762 (98%)** | **+$22,556 (100%)** | **+$27,457** |
+| hold until 1 (= 2) new accounts paid | +$6,933 (82%) | +$9,400 | +$22,041 | +$26,413 |
+| hold until all 4 new accounts paid | +$5,806 (82%) | +$8,530 | +$17,920 (97%) | +$22,642 |
+
+Holding #1's third payout means fewer moves to live and freezes (1.18 vs 1.55 in 84 sessions) and more live payouts, but #1's unpaid
+profit is lost with it often enough to cost more (as A61's gating). Holding until one and until two new accounts are paid are the same
+(the duplicates are paid together). **Advice: take #1's third payout normally**; going live with one account early is the better bet.
+
+## 647. A70 protocol: at the switch, park account #1 (no trades) until the others trigger the move to live (user idea) (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** The user: after its second payout, simply stop trading NKD #1 —
+it cannot lose its standing, it already qualifies for live (it holds a payout), and it goes live with whichever new accounts hold a
+payout when the trigger comes (one of them reaching three payouts, or the book reaching ten). A69's setup with #1 idle in the simulated
+stage (it trades again once live). Not modelled: an inactivity rule (to be confirmed with Tradeify; a small occasional trade would satisfy
+most).
+
+## 648. A70: parking account #1 at the switch also earns less than taking its third payout (S8)
+
+**No trial.** `reports/a69_switch.json` (re-run with the new option). Mean net (P(net > 0)): 84 sessions all starts — accept **+$7,206 (89%)**,
+#1 idle until the move +$6,386 (89%, p10 −$120 vs −$231); 2025 starts +$9,762 (98%) vs +$8,713 (100%); 252 sessions all starts **+$22,556** vs
++$19,028; 2025 starts **+$27,457** vs +$23,344. Parking cuts moves to live (1.04 vs 1.55 per 84 sessions) and cool-off days (16 vs 26) but
+gives up #1's third payout (~$1,100, usually within days) and delays the move until several new accounts are paid — the plan earns more by
+cycling sooner. Slightly steadier, ~$1k a four-month run poorer. Advice unchanged: take #1's third payout.
+
+## 649. A71 protocol: re-solve the bracket policy for the real game — renewal, the move to live, and the live account (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any policy is solved or replayed.** A23's policy (A01's game) maximises P(pass within
+21 days) in the evaluation and E[$ paid within 21 days] in an endless funded stage whose payout cap lifts after the 3rd payout; the live
+plan's live accounts use fixed brackets (take $1,200, stop $1,000, A60). The real game differs: a failed account is re-bought for $80 and
+starts again; an account's 3rd payout moves the book to live (its funded stage ends); live is $0 start, $2,000 trailing drawdown locking at
+$0, withdrawals above $2,000 at 80%. **The renewal game**, one account slot, per market (costs priced into the odds: p = (L − c)/(W + L)
+with c the market's round trip at 1 tick a side and Tradovate Free fees), all values in the trader's $, horizon H days, solved by backward
+induction: evaluation pass → the funded start's value; any breach → re-buy (−$80 + the evaluation start's value); each funded payout pays
+90%; the 3rd payout ends the slot with a terminal value R. **The live game**: max E[80% of withdrawals] within H days from $0 (state:
+balance, peak), costs priced, its stationary policy replacing the fixed live brackets. Candidates (each replayed with its H-day policy used
+as a stationary rule, as A23): H ∈ {21, 42, 84}; R ∈ {0, $1,000, $2,000, V_live (the live game's value at its start)}; live brackets
+fixed or solved — 24 candidates, plus the current policy. A63's joint simulation (5 × 50K, 3 NKD + 2 FDXM, live rules, 1 tick a side,
+Tradovate Free fees, Eurex data), 84 sessions; **chosen on 2021–24 starts by mean net**, read once on 2025 starts, 2021–26 and 2010–20;
+**adopt only if it beats the current policy's mean on 2025 starts and on 2010–20, with the 2025 10th percentile no worse than $1,000
+below the current one's** (A65's failure was a widened tail).
+
+## 650. A71: re-solving the whole policy for the real game does not pass — the current policy stays (S8)
+
+**No trial.** `reports/a71_realgame.json` (module `reporting/a71_realgame.py`; A63 gained per-market and live-policy hooks and still
+reproduces +$12,041). 1 tick a side, Tradovate Free fees. The 24 candidates on 2021–24 starts: +$5,152 … +$8,655 against the current
+policy's +$6,581 — only 3 beat it, and the best (H 84, R $0, live solved) stands alone (its neighbours +$5,639 … +$6,683): noise-like.
+Read once — mean (P > 0, p10): 2025 starts **+$11,234** (100%, p10 +$1,624) vs current **+$11,218** (100%, p10 +$3,175); 2021–26 +$9,331 vs
++$7,797; **2010–20 +$5,098 vs +$5,325**. Fails §649 on 2010–20 and on the 2025 tail (−$1,551). The policy solved for the real game is not
+better than A01's on the real data — the coin-flip game's optimum is flat, and the live rules' structure does not move it enough to show.
+One regularity, seen only in the selection data: the **solved live policy beat the fixed live brackets in all 12 matched pairs** (mean
++$730 on 2021–24) — a narrower change, tested on its own under §651.
+
+## 651. A72 protocol: the solved live-account policy alone (S8)
+
+**No trial; N 1,525. Written and committed BEFORE it is replayed.** Prompted by §650's 12-of-12 pattern (2021–24 data). The current
+evaluation and funded policy unchanged; live accounts use the live game's stationary policy (§649, costs priced, per market) instead of
+take $1,200 / stop $1,000. Fixed in advance: H = 84 (no choice is made; the H 21 / 42 versions are reported for context only). Read on 2025
+starts, 2021–26 and 2010–20; **adopt only if it beats the current mean on 2025 starts and on 2010–20, with the 2025 p10 no worse than $1,000
+below.** The 2021–24 figure is reported but is not out-of-sample.
+
+## 652. A72: the solved live policy is a near-miss — +$5.8k on 2025 starts, −$74 on 2010–20; not adopted, revisit at the first move to live (S8)
+
+**No trial.** `reports/a72_livepol.json` (module `reporting/a72_livepol.py`). The live game's policy is the same at H 21, 42 and 84: from
+$0, **take $3,000 / stop $1,000** (one trade clears the $2,000 lock and leaves ~$1,000 to withdraw); near the lock, a take sized to reach it
+($400–1,800, stop $500–1,000); once locked, $3,000 / $1,000 again. Mean (P > 0, p10; live payouts):
+
+| | 2025 starts | 2021–26 | 2010–20 | 2021–24 (not out-of-sample) |
+|---|---|---|---|---|
+| current (take $1,200 / stop $1,000) | +$11,218 (100%, +$3,175; $2,537) | +$7,797 (84%) | **+$5,325** (80%; $1,568) | +$6,581 |
+| **solved live policy** | **+$17,059** (100%, +$3,167; $8,671) | **+$10,741** (84%) | +$5,251 (80%; $1,458) | +$8,495 |
+
+Evaluation and funded play are untouched, so only live payouts change; the tail is identical. It **fails §651 by $74 on 2010–20** — the
+rule stands: not adopted. Read: the wide live take turns the dollar rules' 2021–26 drift into much more live money and is neutral where
+that drift is weaker (2010–20); its whole gain rides on the edge holding while live. Since the live-account plan is decided at the first
+move to live anyway (launch checklist §5), **this is the candidate to bring then**, with the forward dollar-rule record (a48) in hand.
+
+## 653. The solved live policy is adopted for live accounts, on the user's call after a zero-edge check (S8)
+
+**No trial.** The user: the −$74 on 2010–20 (§652) is negligible against +$5.8k on 2025 starts. The rule's purpose was to stop a change
+that only pays if the edge holds; that was checked directly. Sides randomised per session (zero edge), 6 seeds, A63 launch setup, mean net
+current → solved live policy: 2021–26 sessions **+$5,151 → +$5,561**, 2010–20 **+$3,514 → +$3,812**; 10th percentile identical; the solved
+policy ahead on 10 of 12 seeds. With no edge it is still slightly better (it is the coin-flip game's optimum for a live account and trades
+less, so pays less cost), so the downside the rule guarded against is absent. **Adopted for live accounts:** from $0, take $3,000 / stop
+$1,000; within reach of the $2,000 lock, the policy's smaller take to reach it; locked, $3,000 / $1,000 (per-state table:
+`a71_realgame.solve_live`, H 84). §651's rule is overridden here explicitly, not quietly; the evaluation and funded policy are unchanged.
+
+## 654. A73 protocol: 5 × 100K with the solved live policy (S8)
+
+**No trial; N 1,525. Written and committed BEFORE it is replayed.** A64 (§633) found 5 × 100K (3 NKD + 2 FDXM; 2 NKD / 3 FDXM contracts
+each) out-earning 5 × 50K under the live rules with a wider tail, both with the fixed live brackets. Now both with their live game solved
+(§649's live game, H 84, costs priced: 1 tick a side + Tradovate Free fees). 100K live: $0 start, $3,000 trailing drawdown locking at $0
+after +$3,000, withdrawals above $3,000 (50K: $2,000 / $2,000, as adopted in §653); A23's 100K evaluation / funded policy; fee $185.50.
+No choice is made; read on 2025 starts, 2021–26 and 2010–20 (mean, median, P > 0, p10, worst, fees) and with random sides (6 seeds per
+era). Purpose: whether to move up to 100K after the first payouts (launch stays 50K).
+
+## 655. A74 protocol: more contracts on live accounts (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** The user: live accounts have the same contract limit as the
+others (assumed 4 mini contracts on a 50K account — to confirm). Live accounts (5 × 50K launch plan, solved live policy §653) trade
+k × the plan's contracts, capped at 4: NKD k, FDXM min(2k, 4); k ∈ {2, 3, 4}; **when**: from the live start or only once the account has
+locked; **brackets**: the same $ take / stop (a closer price target) or the same price distances (take and stop × k, the stop still capped
+by the room left) — 12 candidates. 1 tick a side and Tradovate Free fees per contract. **Chosen on 2021–24 starts**; read once on 2025
+starts and 2010–20, and with random sides (6 seeds per era). **Adopt only if** it beats k = 1 on the 2025 mean, is no more than $250 worse
+on 2010–20 (§653's precedent, fixed now in advance), is not worse on the zero-edge mean in either era, and its 2025 p10 is no more than
+$1,000 below.
+
+## 656. A73: 5 × 100K with the solved live policy earns a little more on average with a far worse tail — stay at 50K (S8)
+
+**No trial.** `reports/a73_100k_live.json` (module `reporting/a73_100k_live.py`; A63 gained `live_cushion`, still reproduces +$12,041).
+1 tick a side, Tradovate Free fees, both sizes with their solved live policy. Mean (median; P > 0; p10; worst):
+
+| | 2025 starts | 2021–26 | 2010–20 | zero edge (2021–26 / 2010–20) |
+|---|---|---|---|---|
+| **5 × 50K** | +$17,059 (+$11,113; 100%; +$3,167; +$701) | +$10,741 (+$7,684; 84%; −$873) | +$5,251 (80%; −$2,760) | **+$5,561 / +$3,812** |
+| 5 × 100K | +$20,759 (+$10,445; 78%; −$9,127; −$12,428) | +$11,030 (+$6,458; 68%; −$9,625) | +$5,968 (66%; −$6,492) | +$2,680 / +$1,499 |
+
+100K's fees are ~2.4× ($8.8k a run) and its typical run is no better; the gain is all in the mean, from a few large live runs, while one run
+in five loses $9k or more and the zero-edge case halves. With costs and slippage (A64 had neither) **100K is not worth moving up to.**
+
+## 657. A74: live accounts trade 3× the contracts at the same price distances — adopted (S8)
+
+**No trial.** `reports/a74_live_contracts.json` (module `reporting/a74_live_contracts.py`; A63 gained `live_k`, `live_k_when`,
+`live_k_price`). 12 candidates on 2021–24 starts: +$6,966 … +$10,385 vs k = 1 +$8,495; both "from the start, same price distances" with
+k 3 and 4 lead (+$10,385, +$10,290); chosen **k 3, from the live start, same price distances**: NKD 3 contracts, FDXM 4 (the assumed
+4-contract limit). Read once — mean (median; P > 0; p10):
+
+| | 2025 starts | 2021–26 | 2010–20 | zero edge (2021–26 / 2010–20) |
+|---|---|---|---|---|
+| k = 1 (§653) | +$17,059 (+$11,113; 100%; +$3,167) | +$10,741 (+$7,684; 84%; −$873) | +$5,251 (+$4,719; 80%; −$2,760) | +$5,561 / +$3,812 |
+| **k = 3** | **+$23,020** (+$15,267; 100%; +$3,175) | **+$13,699** (+$8,724; 85%; −$612) | **+$6,336** (+$4,719; 79%; −$2,760) | **+$6,506 / +$4,291** |
+
+Passes every part of §655's rule, including with zero edge. Why: a live account costs the trader nothing to lose (no fee; its end only
+starts the cool-off), so its value is option-like — more variance per trade is worth more, edge or not. In practice, at k 3 the solved
+take × 3 is rarely reached (≈ hold to the window's close) and the stop is capped at the room left (≈ just inside the drawdown): a live
+account's first trade largely decides it. Caveats: the 4-contract limit is assumed (to confirm with Tradeify); evaluation and funded play
+unchanged; live tickets are given by hand until the bot models live accounts.
+
+## 658. The bot models live accounts (built and tested locally; not yet deployed) (S8)
+
+**No trial.** The user confirmed the 4-contract limit holds for live accounts (§657's assumption). So that a real account reaching live
+finds the bot ready: `bot/policy.json` gains the solved live tables per product (`a06_playbook.live_export`: A71's live game, H 84, the
+launch costs) and `LIVE_K` (NKD 3, FDXM 2 → 3 NKD / 4 FDXM); its evaluation and funded tables are unchanged. `bot/ticket.py`: phase
+"live" — $0 start, floor peak − $2,000 until the peak reaches $2,000, then $0; the solved bracket × k at the same price distance, the stop
+capped by the room left (from $0: 3 NKD, take ≈ $9,000 / stop $1,999). `bot/accounts.py`: the book's payout count since the cycle began;
+the **move-to-live notice** on the payout that meets Tradeify's trigger (3 on one account or 10 on the book), naming who goes live and
+who closes; **`!golive [ACCOUNT ...]`** once Tradeify confirms (live accounts start at $0, the rest "closed", pending tickets reissued);
+live `!eod` asks for withdrawals above $2,000 (80%); a live breach ends that account, and the last one starts the **cool-off** (notice
+with the latest restart date, 28 days); `!new` is refused while a live account is open and, during cool-off, until resent with
+`confirm`; the first new evaluation restarts the cycle. `!set` accepts live / closed. a18 skips the book-level record. Tests: 3 new
+(live tickets, the full move → golive → withdrawals → cool-off → restart path, the 10-payout trigger); 16 pass + the Discord tests.
+**Deployed 2026-10-16 ~19:20 ET** on the user's word (backup `backup-2026-10-16b`; droplet files matched the previous commit; dry run on a copy of the demo state first).
+
+## 659. A free 1-minute data collector runs on the droplet (S8)
+
+**No trial.** On the user's word (2026-10-16), with a hard size cap. `bot/collector/collect.py` (plain Python, no packages, separate from
+the trading bot): once a day (systemd `futures-collector.timer`, 22:30 UTC, after the 5 PM ET close; `MemoryMax=150M`, nice 10) it fetches
+Yahoo Finance 1-minute bars (Yahoo serves ~7 days) for 27 symbols — NKD=F, ^N225, ^GDAXI, NQ, ES, YM, RTY, GC, SI, HG, CL, NG, ZN, ZB, 6E,
+6J, 6B, DX-Y.NYB, ^VIX, ZS, ZC, ZW, BTC-USD, ETH-USD, ^STOXX50E, ^FTSE, ^HSI — and writes one gzip CSV per symbol per complete UTC day
+(`/opt/futures-data/1m/<symbol>/<date>.csv.gz`; utc_epoch, OHLC, volume), rewriting a day only if the new copy has more bars. **Cap 2 GB**:
+past it nothing is written and the report says so; nothing is deleted. Each run is appended to `runs.jsonl`. **Sundays**: a short
+Discord report (rows per symbol, missing weekdays, download failures, disk used) via the bot's channel (token read from the bot's .env,
+never printed). Size: a week's backfill is ~2 MB → ~100 MB a year. First run 2026-10-16 23:45 UTC: 2.1 MB, 7 days of 27 symbols, no
+failures. The record builds the minute-level history Yahoo does not keep, for research once it is long enough.
+
+## 660. A75 protocol: more contracts before live, and the account mix, under the adopted live plan (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any replay is run.** Base: the launch plan as now adopted (5 × 50K, 3 NKD + 2 FDXM,
+solved live policy at 3 NKD / 4 FDXM, §657; 1 tick a side, Tradovate Free fees). An evaluation, like a live account, costs little to lose
+($80), so more variance per trade may pay there too. **Part 1, contracts before live:** the plan's contracts × k, capped at 4 (NKD k,
+FDXM min(2k, 4)), k ∈ {2, 3, 4}; **where**: evaluation only, funded only, both; **brackets**: the same $ (closer prices) or the same price
+distances ($ × k, the stop still capped at the $1,000 daily loss limit and the room left) — 18 candidates. **Part 2, the mix** (with Part
+1's choice only if it is adopted): 5 NKD, 4 NKD + 1 FDXM, 3 + 2, 2 + 3. Each part **chosen on 2021–24 starts**, read once on 2025 starts
+and 2010–20 and with random sides (6 seeds per era); **adopt only if** it beats the base on the 2025 mean, is no more than $250 worse on
+2010–20, is not worse on the zero-edge mean in either era, and its 2025 p10 is no more than $1,000 below (§655's rule).
+
+## 661. A75: no change — more contracts before live hurt, and 3 NKD + 2 FDXM stays the mix (S8)
+
+**No trial.** `reports/a75_sim_contracts.json` (module `reporting/a75_sim_contracts.py`; A63 gained `sim_k`, `sim_k_where`,
+`sim_k_price`; reproduces +$12,041 and the adopted plan's +$23,020). Base (adopted plan) 2021–24 **+$10,385**. **Part 1**: none of the 18
+candidates beats it on 2021–24 (+$10,028 best, k 2 funded same price; evaluation with same price distances −$4.7k … −$6.2k: the $1,000 daily
+limit and the 40% consistency rule turn bigger days into failures). Read anyway: 2025 +$15,211 vs **+$23,020**, 2021–26 p10 −$4,240 vs −$612
+— not adopted. The evaluation is not a free option the way a live account is: its value is the funded account behind it, which a
+blow-up forfeits. **Part 2** (plan's contracts): 2021–24 5 NKD +$10,651, **4 NKD + 1 FDXM +$12,196**, 3 + 2 +$10,385, 2 + 3 +$8,832; 4 + 1 read
+once: 2025 mean +$25,799 vs +$23,020 but median +$11,895 vs +$15,267, P > 0 88% vs 100%, p10 −$281 vs +$3,175; 2010–20 **+$4,080 vs +$6,336**
+— fails. Diversification across two markets is what keeps the tail. **The plan stands as adopted.**
+
+## 662. A76 protocol: longer windows on live accounts (S8)
+
+**No trial; N 1,525. Written and committed BEFORE any path is built or replayed.** §657 found a live account is worth more the more each
+trade can swing; a longer window gives more swing. Evaluation and funded accounts keep their windows; **live accounts only**: same entry,
+later exit — NKD 09:00 Tokyo to 15:00 (now), **18:00** or **23:00** Tokyo; FDXM 09:00 Frankfurt to 17:30 (now) or **21:30** (Eurex trades to
+22:00; 21:30 stays before the 17:00 ET break even in the weeks when only one side of the Atlantic has changed its clocks; NKD's 23:00 Tokyo
+is 09:00–10:00 ET). 6 combinations. Paths built as A21 (HistData 1-minute, drift removed within each era, the dollar rules' sides as now),
+the adopted plan otherwise (§657; 1 tick a side, Tradovate Free fees). **Chosen on 2021–24 starts**; read once on 2025 starts and 2010–20
+and with random sides (6 seeds per era); adopt by §655's rule. Caveat fixed now: the dollar rules were found on the current windows; a
+longer window's sign is untested beyond these replays.
+
+## 663. A76: longer live windows do not help — NKD's later hours cost ~$3k, FDXM's are a wash; live windows unchanged (S8)
+
+**No trial.** `reports/a76_live_windows.json` (module `reporting/a76_live_windows.py`; A63 gained `live_paths`; the base reproduces the
+adopted plan's +$23,020). Longer windows swing more (NKD window SD 84 → 91 / 106 bps; DAX 85 → 96) with the same sessions (±3%). 2021–24
+mean: base **+$10,385**; FDXM to 21:30 +$10,522; any NKD extension **+$7,336 … +$7,470** (−$3k). Chosen (NKD 15:00, FDXM 21:30) read once:
+2025 +$22,988 vs **+$23,020**; 2021–26 +$13,791 vs +$13,699; 2010–20 +$6,323 vs +$6,336; zero edge +$6,549 / +$4,335 vs +$6,506 / +$4,291 —
+fails §655 (no better on 2025). Read: the dollar-week side holds for the Tokyo session, not after it — the extra swing in NKD's later
+hours runs against the side often enough to cost more than the variance is worth; FDXM's evening adds nothing either way. **Live windows
+stay as they are.** With A75, the account-play levers on the current data are exhausted.
+
+## 664. A new arena: Kalshi index markets. K-series family 1 protocol — the longshot bias in S&P and Nasdaq daily contracts (S9)
+
+**No trial spent; N 1,525. Written and committed BEFORE any outcome is examined** (the download, `futuresres/kalshi/download.py`, saves
+markets, results and hourly candles; nothing has been tabulated). The user (2026-10-17): search outside the Tradeify arena, per the
+2026-10-16 brief (fresh ideas, more income, autonomous bots, no paid data). Kalshi (CFTC-regulated, US) lists daily S&P 500 range
+(KXINX, 30 brackets), S&P above/below at the 4 PM close (KXINXU) and Nasdaq-100 range (KXNASDAQ100) contracts; settled history and hourly
+yes bid / ask / trade candles are public and free since 2022; trading has a full API (an autonomous bot is possible); fees are quadratic,
+taker ≈ 0.07 × p × (1 − p) a contract, rounded up per order. The best-documented bias in prediction markets is that **longshots are
+overpriced**. Hypothesis: buying NO on cheap YES contracts earns more than it pays, after the spread and fees.
+
+1. **Trade (fixed):** at the hourly candle ending 10:00, 12:00, 14:00 or 15:00 New York time on the settlement day, every contract of the
+   event whose yes mid ((bid + ask) / 2, candle close) is in a bucket — (1, 5], (5, 10], (10, 20] cents — and whose quote is live (bid > 0,
+   ask < $1, spread ≤ 10 cents): **buy NO at 1 − yes bid**, hold to settlement (payout $1 if the result is "no"). Fee: ceil(7 × q × (1 − q))
+   cents per 100 contracts at NO price q. P&L per contract net of fee.
+2. **Tests:** 3 series × 4 hours × 3 buckets = **36** (≈ 0.9 pass by chance at |t| > 1.96). Statistic per test: each day's mean net P&L
+   per contract over its qualifying contracts; t over days; monthly t over month sums.
+3. **Discovery: events settling before 2025-07-01. Sealed validation: 2025-07-01 → 2026-10-16** (asserted in code). **Carried:** t > 1.96,
+   mean > 0, monthly t > 1.96 (as family 175). At most 5 carried, by t.
+4. **Validation (once, sealed window):** CONFIRM if one-sided t > 1.645 on the daily series, beats ≥ 95% of a sign-randomisation placebo
+   on the daily P&L (2,000 draws), and the posterior mean is positive (zero-mean prior shown too) — §119 adapted: a bet's return has no
+   time-shift structure to shuffle, so the day-level sign flip is the null. Watchlist if net-positive but short of that (§133).
+   Capacity is reported (qualifying contracts' hourly volume), since a bias in a thin book cannot be scaled.
+5. **Caveats fixed now:** candle quotes are the hour's last quote, so fills at exactly that price are an assumption (to be checked
+   live with small size); Kalshi's fee schedule and rules are as published today; the user's tax and account eligibility are the user's.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —

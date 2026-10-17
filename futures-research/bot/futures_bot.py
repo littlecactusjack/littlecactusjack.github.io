@@ -17,8 +17,9 @@ Commands (in the configured channel; start with ! or mention the bot, e.g. "@Bot
   !ticket                        the tickets issued at the last alert
   !board                         re-post the latest alert's board (red until every traded ticket has its !eod)
   !payout <PRODUCT> <amount>     a payout received (the amount withdrawn, before the 90% split)
-  !new <PRODUCT>                 a new $50k evaluation bought
-  !set <PRODUCT> <eval|funded> <balance> <peak> [best_day] [payouts]   correct the state by hand
+  !new <PRODUCT> [confirm]       a new $50k evaluation bought (refused while a live account is open or in cool-off)
+  !golive [ACCOUNT ...]          Tradeify moved you to live: the accounts holding a payout (or those named) go live at $0, the rest close
+  !set <PRODUCT> <eval|funded|live|closed> <balance> <peak> [best_day] [payouts]   correct the state by hand
   !status                        all accounts
   !help                          this list
 
@@ -36,11 +37,11 @@ from pathlib import Path
 import discord
 from discord.ext import commands, tasks
 
-from accounts import PRODUCTS, Book
+from accounts import PRODUCTS, Book, base
 import daxdollar
 import json
 
-from schedule import ALERT, CT, ET, ORDER, Tickets, alert_parts, clock, eod_check, eod_day, last_trading_day, needs_eod, ticket_post
+from schedule import ACC_ORDER, ALERT, CT, ET, ORDER, Tickets, alert_parts, clock, eod_check, eod_day, last_trading_day, needs_eod, ticket_post
 
 HERE = Path(__file__).resolve().parent
 
@@ -84,8 +85,8 @@ def _save_boards(b: dict) -> None:
 def _field_name(r: dict) -> str:
     e = dt.datetime.fromisoformat(r["entry"]).astimezone(ET); x = dt.datetime.fromisoformat(r["exit"]).astimezone(ET)
     tk = r["ticket"]
-    side = ("LONG" if tk.get("side") == "long" else "SHORT") if tk.get("trade") else ("FAILED" if r["phase"] == "dead" else "NO TRADE")
-    mark = ("⏳" if needs_eod(r) else "✅") if tk.get("trade") and r["phase"] != "dead" else "▫️"
+    side = ("LONG" if tk.get("side") == "long" else "SHORT") if tk.get("trade") else ("FAILED" if r["phase"] == "dead" else "CLOSED" if r["phase"] == "closed" else "NO TRADE")
+    mark = ("⏳" if needs_eod(r) else "✅") if tk.get("trade") and r["phase"] not in ("dead", "closed") else "▫️"
     return f"{mark} {r['product']} · {side} · {clock(e)} → {clock(x)} CT"
 
 
@@ -107,7 +108,7 @@ def board_embeds(info: str, recs: list, when: str) -> list:
     if info:
         embeds.append(discord.Embed(title=f"{when} — results & notes", description=info[:4000], color=discord.Color.blurple()))
     if recs:
-        recs = sorted(recs, key=lambda r: ORDER.index(r["product"]) if r["product"] in ORDER else 99)
+        recs = sorted(recs, key=lambda r: ACC_ORDER.index(r["product"]) if r["product"] in ACC_ORDER else 99)
         open_ = sum(needs_eod(r) for r in recs)
         e = discord.Embed(title=f"{when} — tickets", color=discord.Color.red() if open_ else discord.Color.green(),
                           description=(f"**{open_} ticket{'s' if open_ != 1 else ''} still need `!eod`.**" if open_ else "**All tickets recorded.**"))
@@ -199,31 +200,42 @@ async def loop():
 
 
 async def fdxm_recheck(ch, now: dt.datetime) -> None:
-    """02:45-02:58 ET: re-read the dollar for the FDXM ticket entering at 03:00 (decisions.md 490); flip and reissue if it changed."""
-    recs = [r for r in tix.t if r["product"] == "FDXM" and r["status"] == "pending" and not r.get("prechecked")
-            and dt.datetime.fromisoformat(r["entry"]).astimezone(ET).date() == now.date() and r["ticket"].get("trade")]
-    if not recs:
+    """02:45-02:58 ET: re-read the dollar for the FDXM tickets entering at 03:00 (decisions.md 490); flip and reissue if it changed.
+    Every FDXM account (FDXM, FDXM2, ...) shares the one reading (decisions.md 635)."""
+    latest = {}
+    for r in tix.t:
+        if (base(r["product"]) == "FDXM" and r["status"] == "pending" and not r.get("prechecked") and r["ticket"].get("trade")
+                and dt.datetime.fromisoformat(r["entry"]).astimezone(ET).date() == now.date()):
+            latest[r["product"]] = r
+    if not latest:
         return
-    rec = recs[-1]
+    recs = [latest[k] for k in sorted(latest)]; names = ", ".join(sorted(latest))
     res = await asyncio.to_thread(daxdollar.preopen_side, now)
-    old = rec["ticket"]["side"]
+    old = recs[0]["ticket"]["side"]
     if res is None:                                   # every re-check posts its own message (decisions.md 581)
-        rec["prechecked"] = True; tix.save()
-        await ch.send(f"FDXM re-check ({clock(now, False)} CT): no EUR/USD data - the 4:30 PM side ({old.upper()}) stands; staged order unchanged.")
+        for rec in recs:
+            rec["prechecked"] = True
+        tix.save()
+        await ch.send(f"FDXM re-check ({clock(now, False)} CT): no EUR/USD data - the 4:30 PM side ({old.upper()}) stands for {names}; staged orders unchanged.")
         return
     side, why = res
-    if side != old:
-        alert_day = dt.datetime.fromisoformat(rec["issued"]).date()
-        new = tix.issue(book, "FDXM", alert_day, now, side_override=(side, why))
-        new["prechecked"] = True; tix.save()
-        em = discord.Embed(title=f"FDXM re-check: side changed {old.upper()} → {side.upper()}",
-                           description="**Change your staged FDXM order before the 2:00 AM CT entry.**\n\n" + ticket_post(new)[:3800],
-                           color=0xE67E22)
+    flipped = []
+    for rec in recs:
+        if side != rec["ticket"]["side"]:
+            alert_day = dt.datetime.fromisoformat(rec["issued"]).date()
+            new = tix.issue(book, rec["product"], alert_day, now, side_override=(side, why))
+            new["prechecked"] = True; flipped.append(new)
+        else:
+            rec["prechecked"] = True; rec["ticket"]["note"] = (rec["ticket"].get("note", "") + f" | {why} (unchanged)").strip(" |")
+    tix.save()
+    if flipped:
+        body = "\n\n".join(ticket_post(r) for r in flipped)[:3800]
+        em = discord.Embed(title=f"FDXM re-check: side changed {old.upper()} → {side.upper()} ({', '.join(r['product'] for r in flipped)})",
+                           description="**Change your staged FDXM order(s) before the 2:00 AM CT entry.**\n\n" + body, color=0xE67E22)
         await ch.send(content=f"<@{USER_ID}>" if USER_ID else None, embed=em)
     else:
-        rec["prechecked"] = True; rec["ticket"]["note"] = (rec["ticket"].get("note", "") + f" | {why} (unchanged)").strip(" |"); tix.save()
-        await ch.send(f"FDXM re-check ({clock(now, False)} CT): side unchanged - {old.upper()}; staged order stands. ({why})")
-    await refresh_boards(ch, {"FDXM"})
+        await ch.send(f"FDXM re-check ({clock(now, False)} CT): side unchanged - {old.upper()} for {names}; staged orders stand. ({why})")
+    await refresh_boards(ch, set(latest))
 
 
 @bot.command(name="eod")
@@ -241,7 +253,7 @@ async def eod_cmd(ctx, product: str, balance: float, confirm: str = ""):
             return
     msgs = book.eod(p, balance, day)
     a = book.s[p]
-    out = [f"{p}: closed ${balance:,.2f} ({day}) recorded. Peak ${a['peak']:,.2f}, best day ${a['best']:,.0f}." if a["phase"] != "dead" else ""]
+    out = [f"{p}: closed ${balance:,.2f} ({day}) recorded. Peak ${a['peak']:,.2f}, best day ${a['best']:,.0f}." if a["phase"] not in ("dead", "closed") else ""]
     out += msgs
     # reissue this product's ticket if the alert already went out and its entry is still ahead
     marked = tix.mark_eod(p, now)                   # the board turns this ticket green
@@ -305,16 +317,31 @@ async def payout_cmd(ctx, product: str, amount: float):
 
 
 @bot.command(name="new")
-async def new_cmd(ctx, product: str):
+async def new_cmd(ctx, product: str, confirm: str = ""):
     if _allowed(ctx):
+        why = book.can_buy()
+        if why and not (confirm.lower() in ("confirm", "yes", "force") and "cool-off" in why):
+            await ctx.send(why); return
         await ctx.send(book.new(_product(product)))
+
+
+@bot.command(name="golive")
+async def golive_cmd(ctx, *names: str):
+    if _allowed(ctx):
+        await ctx.send(book.golive([_product(n) for n in names] or None))
+        now = dt.datetime.now(ET)                         # reissue any pending ticket under the live plan
+        for p in PRODUCTS:
+            pend = [r for r in tix.t if r["product"] == p and r["status"] in ("pending", "none") and dt.datetime.fromisoformat(r["entry"]) > now]
+            if pend:
+                tix.issue(book, p, dt.datetime.fromisoformat(pend[-1]["issued"]).date(), now)
+        await refresh_boards(ctx.channel)
 
 
 @bot.command(name="set")
 async def set_cmd(ctx, product: str, phase: str, balance: float, peak: float, best: float = 0.0, payouts: int = 0):
     if _allowed(ctx):
-        if phase not in ("eval", "funded"):
-            raise commands.BadArgument("phase must be eval or funded")
+        if phase not in ("eval", "funded", "live", "closed"):
+            raise commands.BadArgument("phase must be eval, funded, live or closed")
         await ctx.send(book.set(_product(product), phase, balance, peak, best, payouts))
 
 

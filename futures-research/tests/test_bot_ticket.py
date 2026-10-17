@@ -260,3 +260,84 @@ def test_eod_check_flags_a_take_read_as_a_stop() -> None:
         assert sch.eod_check(t, "MNQ", -1000.0, late, fetch=flat) is None # closed as a time exit - no opinion on a stop
         assert sch.eod_check(t, "MNQ", -1000.0, now, fetch=boom) is None  # data failure never blocks
         assert sch.eod_check(t, "MNQ", 150.0, now, fetch=up) is None      # a time exit is not second-guessed
+        # within 3 ticks of the reported take: no warning (decisions.md 637)
+        tick = sch.policy()["PRODUCTS"]["MNQ"]["tick"]; reach = 126.25 - 2 * tick
+        nearly = lambda p, s, e: [(entry, 25000.0, 25000.0 + reach, 25000.0 - 130.0, 24880.0)]
+        assert sch.eod_check(t, "MNQ", 1000.0, late, fetch=nearly) is None
+
+
+def test_multi_account_names_share_their_product() -> None:
+    """decisions.md 635: accounts NKD, NKD2, NKD3, FDXM, FDXM2 - each its own state; product rules from the base name."""
+    import datetime as _dt
+    import os
+    import tempfile
+    from pathlib import Path as _P
+    from zoneinfo import ZoneInfo
+    import accounts as acc
+    import schedule as sch
+    import ticket as bt
+    assert acc.base("NKD2") == "NKD" and acc.base("FDXM") == "FDXM" and acc.base("mnq") == "MNQ"
+    old = os.environ.get("BOT_ACCOUNTS")
+    os.environ["BOT_ACCOUNTS"] = "nkd, NKD2,NKD3 ,FDXM,FDXM2"
+    try:
+        assert acc._accounts() == ("NKD", "NKD2", "NKD3", "FDXM", "FDXM2")
+    finally:
+        if old is None:
+            os.environ.pop("BOT_ACCOUNTS")
+        else:
+            os.environ["BOT_ACCOUNTS"] = old
+    a = bt.ticket("eval", 50_000.0, 50_000.0, 0.0, 0, "NKD2", "short"); b = bt.ticket("eval", 50_000.0, 50_000.0, 0.0, 0, "NKD", "short")
+    assert {k: v for k, v in a.items() if k != "product"} == {k: v for k, v in b.items() if k != "product"} and a["product"] == "NKD2"
+    text = bt.describe(a, "NKD2")
+    assert text.startswith("**NKD2**") and "SELL 1 NKD**" in text
+    et = ZoneInfo("America/New_York")
+    with tempfile.TemporaryDirectory() as d:
+        book = acc.Book(_P(d) / "s.json", _P(d) / "l.csv"); book.s["NKD2"] = acc.fresh("NKD2")
+        t = sch.Tickets(_P(d) / "t.json", _P(d) / "x.csv")
+        now = _dt.datetime(2026, 10, 14, 17, 30, tzinfo=et)
+        r2 = t.issue(book, "NKD2", now.date(), now, side_override=("short", "test"))
+        r1 = t.issue(book, "NKD", now.date(), now, side_override=("short", "test"))
+        assert r2["entry"] == r1["entry"] and r2["ticket"]["contracts"] == r1["ticket"]["contracts"] and r2["product"] == "NKD2"
+        assert len([r for r in t.t if r["product"] in ("NKD", "NKD2")]) == 2      # separate records
+
+
+def test_live_ticket_uses_the_solved_live_policy_at_three_times_the_contracts(both):
+    """decisions.md 653, 657: from $0 the solved live bracket is take $3,000 / stop $1,000; live trades 3 NKD / 4 FDXM at the same price
+    distances, the stop capped by the room left."""
+    bt, _ = both
+    t = bt.ticket("live", 0.0, 0.0, product="NKD2", side="short")
+    assert t["trade"] and t["contracts"] == 3 and t["take_net"] == 9_000 and t["stop_net"] == 1_999 and t["floor"] == -2_000
+    f = bt.ticket("live", 0.0, 0.0, product="FDXM", side="long")
+    assert f["contracts"] == 4 and f["take_net"] == 6_000
+    locked = bt.ticket("live", 2_000.0, 2_400.0, product="NKD")
+    assert locked["floor"] == 0.0 and locked["stop_net"] == 1_999
+    assert bt.ticket("live", -1_990.0, 0.0, product="NKD")["finished"]
+    assert "LIVE ACCOUNT FINISHED" in bt.describe(bt.ticket("live", -1_990.0, 0.0, product="NKD"), "NKD")
+
+
+def test_move_to_live_golive_withdrawals_and_cool_off(tmp_path, monkeypatch):
+    import accounts as ac
+    monkeypatch.setattr(ac, "PRODUCTS", ("NKD", "NKD2", "FDXM"))
+    bk = ac.Book(tmp_path / "s.json", tmp_path / "log.csv")
+    bk.set("NKD", "funded", 52_000, 52_000, 0, 2); bk.set("NKD2", "funded", 52_000, 52_000, 0, 1); bk.set("FDXM", "eval", 51_000, 51_000)
+    msg = bk.payout("NKD", 1_000)                     # the third payout on one account
+    assert "MOVE TO LIVE" in msg and "NKD, NKD2" in msg and "FDXM" in msg.split("close:")[1]
+    assert "MOVE TO LIVE" not in bk.payout("NKD2", 500)          # announced once
+    assert "no new evaluations" in bk.golive(day="2026-11-02").lower()
+    assert [bk.s[p]["phase"] for p in ("NKD", "NKD2", "FDXM")] == ["live", "live", "closed"]
+    assert bk.can_buy().startswith("A live account is open")
+    assert bk.floor(bk.s["NKD"]) == -2_000
+    m = bk.eod("NKD", 2_600); assert any("withdrawal of $600.00" in x for x in m) and bk.floor(bk.s["NKD"]) == 0.0
+    assert "you received $480.00" in bk.payout("NKD", 600)
+    m = bk.eod("NKD2", -2_100); assert any("LIVE ACCOUNT ENDED" in x for x in m) and not any("cool-off" in x for x in m)
+    m = bk.eod("NKD", 0.0, "2026-11-20"); assert any("cool-off" in x and "2026-12-18" in x for x in m)
+    assert bk.bk["mode"] == "cool" and bk.bk["payouts"] == 0
+    bk.new("FDXM"); assert bk.bk["mode"] == "sim" and bk.s["FDXM"]["phase"] == "eval"
+
+
+def test_ten_book_payouts_trigger_the_move(tmp_path, monkeypatch):
+    import accounts as ac
+    monkeypatch.setattr(ac, "PRODUCTS", ("NKD", "FDXM"))
+    bk = ac.Book(tmp_path / "s.json", tmp_path / "log.csv")
+    bk.set("NKD", "funded", 52_000, 52_000, 0, 0); bk.bk["payouts"] = 9
+    assert "the book has 10 payouts" in bk.payout("NKD", 300)

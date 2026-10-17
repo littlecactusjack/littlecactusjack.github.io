@@ -1,74 +1,94 @@
-# Real-money launch checklist
+# Real-money launch checklist — 5 × 50K Tradeify, 3 NKD + 2 FDXM
 
-For use after the 10-25 demo review. Everything here is what the demo and the replays already assume; if any of it can't be
-followed, the dollar estimates don't apply. (decisions.md 583)
+For use after the 10-25 demo review. Everything here is what the replays assume; if any of it can't be followed, the dollar estimates
+don't apply. (decisions.md 583; rewritten 2026-10-16 for the chosen plan, decisions.md 627–638.)
 
 Commands below run from the repo folder: `cd ~/futures-research` first (Claude runs them during reviews; you don't have to).
 
-## 1. Before buying anything — decide at the 10-25 review
+## 1. Tradeify's answers (2026-10-16, decisions.md 640)
+
+- [x] Copy-trading across your own accounts — **allowed** (3 NKD + 2 FDXM with identical trades is fine).
+- [x] Live-account rules — **as modelled** (verbatim from Tradeify's FAQ); a 100K live account starts at $0 with the evaluation's drawdown.
+- [x] Evaluation re-buys — **no limit** on how many or how often.
+- [x] Staged orders survive overnight but **may not survive the 5–6 PM ET close** → stage them **after 5:00 PM CT** (see section 4).
+- [x] Commissions (Tradovate's published all-in rates): NKD $5.88–7.28 and FDXM $2.04–3.56 a round trip per contract — checked against
+  the models: no change to the estimate (decisions.md 641).
+- [x] Real-time data: NKD already real-time; Eurex (FDXM) $14 a month (user, 2026-10-16).
+
+## 2. Before buying — decide at the 10-25 review
 
 - [ ] Demo review run: `.venv/bin/python -m futuresres.reporting.a18_demo_check --review`
-- [ ] Dollar rules: keep or revert? (review section "The dollar rules, forward"; revert if the first 40 rule sessions are negative)
-- [ ] Which accounts (up to 5 at once). Four-month replays **with Tradeify's live rules** (decisions.md 625, 627; the earlier
-  +$17.5k–$32k figures ignored them):
-  - **Now** (MNQ, MGC, MCL, NKD, FDXM): about **+$5,500** a 4-month run on 2025 starts (+$4,300 across 2021–26; 91% positive)
-  - **3×NKD + 2×FDXM**: about **+$12,000** on 2025 starts (+$9,400 across 2021–26; 90% positive) — needs copy-trading allowed
-- [ ] Fifth market: MCL or **ZB** (30-year bonds, 4 contracts)? ZB made the book steadier over 2010–26 (P(net > 0) 85 → 92% and
-  96 → 99%) but $484 less on 2025 starts (decisions.md 611). Needs Tradeify to permit ZB and a bot ticket. Live cattle (4 LE) is the other steadier option (decisions.md 614:
-  2010–20 P(net > 0) 85 → 92%; −$281 on 2025 starts at Tradeify's $11.20 round trip).
-- [ ] Buying order if not all at once: **NKD and FDXM first** (they carry the rules and pay out most often: NKD 95%, FDXM 92% of 2025
-  starts), then MNQ, then MGC and MCL. ZS stays demo-only.
-- [ ] Tradeify 50K Daily rules still as modelled (you confirmed 2026-10-15): $80 evaluation, target +$3,000, end-of-day trailing
-  drawdown $2,000, evaluation daily loss limit $1,000, consistency 40% (best day ≤ 40% of total profit); funded: drawdown $2,000
-  locking at $50,000, daily loss limit $1,000, payouts capped at $1,250 until the 3rd, 90% split. **If any of these change, stop and
-  have the models re-run first.**
+- [ ] Dollar rules: keep or revert? (the review's "dollar rules, forward" section; revert if the first 40 rule sessions are negative)
+- [ ] Tradeify's answers above match the models — if any rule differs, have the models re-run before buying.
+- [ ] Rules as modelled (50K Select Daily): $80 evaluation, target +$3,000, end-of-day trailing drawdown $2,000, evaluation consistency
+  40% (best day ≤ 40% of profit), funded drawdown $2,000 locking at $50,000, payouts daily capped at $1,250, 90% split.
 
-## 2. Every day
+**What to expect** (four-month runs; replays with the live rules and one tick of slippage a side; decisions.md 623–635):
+- about **+$11,000** on average for runs started in 2025 (all positive; bad case about +$3,000); about +$8,000 across all 2021–26 starts
+  (86% positive); if the dollar rules stop working, roughly +$5,000 (the 2010–20 case)
+- about **39 evaluations bought** (~$3,100), first move to live around **day 25**, 1–2 moves per four months, about **25 trading days in
+  cool-off**, about $12,600 of funded payouts and $2,500 of live payouts
+- most evaluations fail — that is how the plan works (a fast staking game), not a sign something is wrong
+- two ticks of slippage a side would cut the result by about 40% — watch the first weeks' fills
 
-**4:30 PM CT — the alert.** For each ticket in the embed, stage one **scheduled bracket order**:
+## 3. Launch day — set up the bot (Claude does this with you)
+
+**Your start (2026-10-16):** one NKD account until it has two payouts (typically ~2 months; ~7 evaluations; cash at risk ~$500, worst
+~$1,800), then the five-account run. At the switch, **take account #1's third payout normally** even though it moves you to live — holding
+it costs more than it saves (decisions.md 644–646).
+
+
+1. Claude backs up the demo's state, moves the demo files aside, adds `BOT_ACCOUNTS=NKD,NKD2,NKD3,FDXM,FDXM2` to the bot's `.env` on the
+   droplet and restarts it.
+2. For each account send `!set <ACCOUNT> eval 50000 50000` (e.g. `!set NKD2 eval 50000 50000`) so every account starts clean.
+3. The next 4:30 PM CT alert shows five tickets: NKD, NKD2, NKD3 (identical) and FDXM, FDXM2 (identical).
+
+## 4. Every day
+
+**4:30 PM CT — the alert; stage after 5:00 PM CT.** The alert comes during the 4–5 PM CT close, and orders placed then may not survive
+it — wait for the 5:00 PM CT reopen, then for each ticket stage one **scheduled bracket order** in that account (NKD enters at 7:00 PM, so
+there are two hours):
 
 | field | from the embed |
 |---|---|
-| product, side, contracts | as shown |
+| account, product, side, contracts | as shown (e.g. **NKD2**: SELL 1 NKD) |
 | release (entry) time | the ticket's entry time, CT |
-| take / stop | the ticket's take and stop distances (points), attached as a bracket to the fill |
+| take / stop | the ticket's take and stop distances in ticks, as a bracket on the fill |
 | close (release to flatten) | the ticket's exit time, CT |
 
-Current windows (CT, until the clocks change — **always use the times in the alert**; Europe's clocks change Oct 25 and the US's on Nov 1,
-so the FDXM and NKD times move by an hour around then):
+Current windows (CT — **always use the times in the alert**; Europe's clocks change Oct 25 and the US's on Nov 1, so these move by an
+hour around then):
 
 | product | entry | close |
 |---|---|---|
-| MCL | 5:00 PM | 3:55 PM next day |
-| NKD | 7:00 PM | 1:00 AM |
-| ZS (demo only) | 7:00 PM | 1:15 PM next day |
-| MGC | 2:00 AM | 10:30 AM |
-| FDXM | 2:00 AM | 10:30 AM |
-| MNQ | 8:30 AM | 3:00 PM |
+| NKD (3 accounts) | 7:00 PM | 1:00 AM |
+| FDXM (2 accounts) | 2:00 AM | 10:30 AM |
 
-- [ ] Every close time is **before 4:00 PM CT**. No position may cross the 4:00–5:00 PM break.
-- [ ] Never long and short the same product at once.
-- [ ] If a ticket says no trade (account failed / finished), stage nothing for it.
+- [ ] Every close is before 4:00 PM CT; never long and short the same product at once; no hedging across products or firms.
+- [ ] A ticket that says no trade (account failed / finished): stage nothing for it.
 
-**~1:45–1:58 AM CT — the FDXM re-check** posts every night. If it @mentions you with **side changed** and you're awake, change the staged
-FDXM order before 2:00 AM. If you're asleep, the 4:30 PM side stands — the estimates already assume it.
+**~1:45–1:58 AM CT — the FDXM re-check** posts every night. If it @mentions you with **side changed** and you're awake, change both
+staged FDXM orders before 2:00 AM; if asleep, the 4:30 PM side stands (the estimates assume it).
 
-**After each window — `!eod <PRODUCT> <balance>`** with the platform's balance. With real fills there's nothing to read off a chart. If the
-bot answers ⚠️ (its replay disagrees), check the fill; resend with `confirm` only if the platform really shows it.
+**After each window — `!eod <ACCOUNT> <balance>`** with the platform's balance (e.g. `!eod NKD3 50850`). If the bot answers ⚠️, check the
+fill; resend with `confirm` only if the platform really shows it (it stays quiet when its replay was within 3 ticks).
 
-## 3. When something happens
+## 5. When something happens
 
-- **Account breached:** buy a new $80 evaluation for that product, send `!new <PRODUCT>`. Don't change the plan after a loss —
-  the replays include the losing runs.
-- **Evaluation passed:** nothing to do — the bot sees it from your `!eod` and switches the account to the funded phase.
-- **Payout received:** `!payout <PRODUCT> <amount>` so the bot's balance and the review stay right.
-- **Missed a ticket** (order not staged, platform down): record it with `!skipped <PRODUCT>`; don't trade it late.
-- **Bot didn't post the 4:30 alert:** don't guess tickets — skip the day and tell me.
+- **Account breached:** buy a new $80 evaluation for it and send `!new <ACCOUNT>`. Don't change the plan after a loss — the replays
+  include the losing runs.
+- **Evaluation passed:** nothing to do — the bot sees it from `!eod`.
+- **Payout received:** `!payout <ACCOUNT> <amount>`.
+- **Moved to live:** tell Claude the same day — the bot does not model live accounts yet; the live-account plan (withdraw above $2k, or
+  build to a larger cushion first, decisions.md 629) is decided then. Live accounts trade **3 NKD / 4 FDXM** (decisions.md 653, 657) with the solved
+  live brackets at three times their price distance — in practice the stop sits just inside the drawdown left and the take is rarely
+  reached (Claude gives each bracket). Confirm the live account's contract limit (assumed 4) first.
+- **Missed a ticket:** `!skipped <ACCOUNT>`; don't trade it late. **No 4:30 PM alert:** don't guess tickets; skip the day and tell Claude.
 
-## 4. Stop / review triggers
+## 6. Stop / review triggers
 
-- [ ] **Dollar rules** — `.venv/bin/python -m futuresres.reporting.a48_forward` (at least every few weeks): first 40 rule sessions negative → propose reverting.
-- [ ] **Fills** — the review's execution table: if real results trail the replay by more than ~$50 a ticket over 20+ tickets, costs are
-  worse than modelled; re-run the replays with them (ZS first — its brackets are only 20–40 ticks).
+- [ ] **Dollar rules** — `.venv/bin/python -m futuresres.reporting.a48_forward` every few weeks: first 40 rule sessions negative → propose
+  reverting. (An automatic switch-off was tested and is not needed: the rules helped these accounts even before 2021, decisions.md 639.)
+- [ ] **Fills** — if real fills trail the tickets by more than ~1 tick a trade over 20+ trades, costs are worse than modelled; re-run.
 - [ ] **Monthly** — the review plus the watchlist forward test (`.venv/bin/python -m futuresres.reporting.a49_watchlist`).
 - [ ] **Any Tradeify rule or fee change** — stop and re-run before the next ticket.
