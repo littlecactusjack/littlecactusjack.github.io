@@ -14017,6 +14017,477 @@ overpriced**. Hypothesis: buying NO on cheap YES contracts earns more than it pa
 5. **Caveats fixed now:** candle quotes are the hour's last quote, so fills at exactly that price are an assumption (to be checked
    live with small size); Kalshi's fee schedule and rules are as published today; the user's tax and account eligibility are the user's.
 
+## 665. K-family 1: no longshot bias to sell — 0 of 36 carried; buying NO on cheap contracts loses (S9)
+
+**N 1,525 (no trial).** `reports/k1_discovery.json` (module `kalshi/k1_longshot.py`). Download complete (KXINXU 787, KXINX 1,112, KXNASDAQ100
+1,134 settled events; 6 failed on missing candles). Discovery (events before 2025-07-01, 2022-04 → 2025-06): **no cell carried**; 25 of 36
+are negative after the spread and fees, the Nasdaq range ones most clearly (10:00 1–5¢ −2.22¢ a contract, t −3.54; 12:00 10–20¢ −3.79¢,
+t −2.78; 10:00 10–20¢ −2.38¢, t −2.18; 12:00 1–5¢ −1.19¢, t −2.21). Read: Kalshi's index longshots are not overpriced by more than the
+spread; if anything the NO side is too dear. Capacity was modest anyway (median hourly volume of qualifying contracts ~200–3,000).
+
+## 666. K-family 1b protocol: the reverse — buying cheap Nasdaq YES contracts, one sealed test (S9)
+
+**No trial spent; N 1,525. Written and committed BEFORE the sealed window is read.** Suggested by §665's discovery data, so it can only
+be tested on data §665 did not use. Exactly the three Nasdaq range cells with discovery t < −2.1 on the NO side, now **buying YES at the yes
+ask** (taker fee at the YES price): KXNASDAQ100 10:00 1–5¢, 10:00 10–20¢, 12:00 10–20¢ (12:00 1–5¢, t −2.21, is included too: 4 cells).
+Same quote filter and statistic; **sealed window 2025-07-01 → 2026-10-16, read once**; CONFIRM per §664.4 (one-sided t > 1.645, ≥ 95%
+sign-randomisation placebo, positive posterior), each cell judged alone and reported against 4 tests; watchlist if net-positive.
+
+## 667. K-family 1b: buying cheap Nasdaq YES also loses — REJECT ×4; Kalshi's index longshots are priced within the spread (S9)
+
+**4 trials (t01526–t01529, sealed looks); N 1,529.** `reports/k1b_validation.json`. Sealed 2025-07-01 → 2026-10-16, buying YES at the ask:
+10:00 1–5¢ −2.05¢ a contract (t −1.83); 10:00 10–20¢ −0.57¢ (t −0.33); 12:00 10–20¢ −4.37¢ (t −2.41); 12:00 1–5¢ −1.54¢ (t −1.53) — all
+REJECT. Both sides of the cheap contracts lose by about the spread plus fees: no price-level bias to harvest by taking quotes. Any edge
+in this arena has to come from knowing the probability better than the quote, not from a blanket bias.
+
+## 668. K-family 2 protocol: S&P contracts priced by our own model against Kalshi's quotes (S9)
+
+**No trial spent; N 1,529. Written and committed BEFORE any model price is compared with any quote or outcome.** Model: at the candle
+ending hh:00 New York (hh ∈ 10, 12, 14, 15), the S&P level S = the HistData S&P CFD minute close (corrected clock, `hd_grid`) at hh:00,
+**plus the previous settlement day's basis** (Kalshi's recorded settlement value minus the CFD's 16:00 close that day — known before
+today); daily volatility σ = root-mean-square over the previous 20 sessions of each session's realised 1-minute variance 09:30–16:00;
+remaining variance σ² × (minutes to 16:00 / 390); zero drift, normal in log price. P(close ≥ K) = Φ(ln(S/K) / (σ√τ)); a range contract's
+probability is the difference of its two bounds. **Trade** a contract when model − ask − fee(ask) > θ (buy YES) or (1 − model) − (1 − bid)
+− fee(1 − bid) > θ (buy NO), quote filter as §664; hold to settlement. **Tests:** KXINXU (above/below at 4 PM) and KXINX (range) × 4 hours ×
+θ ∈ {3¢, 6¢} = **16** (≈ 0.4 by chance). Statistic, carried rule and validation as §664 (discovery before 2025-07-01; **sealed 2025-07-01
+→ 2026-09-30**, where the CFD minute data ends). The 2022 range-series naming (INX-…) and older above/below series are included where
+candles exist. Caveat: the CFD tracks the cash index with a basis that moves within the day; the previous day's basis is an approximation.
+
+## 669. K-family 2: our model does not beat Kalshi's S&P quotes — 0 of 16 carried (S9)
+
+**N 1,529 (no trial).** `reports/k2_discovery.json` (module `kalshi/k2_model.py`). Inputs checked first: settlement-minus-CFD basis median
++0.24 points (day-to-day SD 2.9, against 25-point brackets); σ ≈ 0.6% a day. Discovery 2022-12 → 2025-06: where the model disagreed with the
+quote by more than 3¢ / 6¢ after fees, trading its side lost in 12 of 16 cells (worst KXINXU 12:00 θ 6¢ −6.86¢, t −3.58); none carried.
+Read: Kalshi's S&P prices already hold what a price-and-volatility model knows, plus more (fat tails, intraday news); disagreeing with
+them is paying for it. **Kalshi index markets: two families, no edge; the arena is set aside** unless a genuinely informed signal (one the
+quotes cannot know) comes up. Its API remains the easiest route to a fully autonomous bot if one ever does.
+
+## 670. A77 protocol: our two confirmed edges in CFD prop accounts with a static drawdown (The5ers High Stakes) (S9)
+
+**No trial; N 1,529. Written and committed BEFORE any replay is run.** The user (2026-10-17) asked to search outside the Tradeify arena;
+§131's objection was ~$500 fees, and cheap CFD accounts now exist. Our confirmed edges (NKD dollar-week, DAX-dollar) were measured on
+HistData CFD prices — the instruments these firms list (JPN225, GER40). Rules as modelled (The5ers High Stakes, from its own page plus
+third-party summaries; **to be confirmed by the user before any purchase**): Step 1 +10%, Step 2 +5%, each needing ≥ 3 profitable days
+(closed profit ≥ 0.5% of the initial balance); **static maximum loss 10% of the initial balance**; daily loss 5%; no time limit, no
+consistency rule; funded: 80% of profit above the initial balance, paid every 14 calendar days (10 sessions) from funding, the floor
+staying at 90% of initial; no commission on indices; a failed account is re-bought (Classic prices: $5K $39, $10K $78; sizes scale
+linearly, so per-dollar results are reported on $10K). One trade a day per traded market, in its current window with its deployed
+side (A21 CFD paths; NKD 09:00–15:00 Tokyo, DAX 09:00–17:30 Frankfurt); costs: spread 2.2 bps (JPN225) / 0.6 bps (GER40) plus 1 bp
+slippage a round trip. Position size: the window's 2021–24 daily SD = r% of the initial balance, r ∈ {1, 2, 3}; stop at s × r% (s ∈ {1,
+2}; never more than the 5% daily limit or the room to the floor); take at k × stop, k ∈ {1, 2, none = hold to the window's end}; markets:
+NKD, DAX, or both in one account (two trades a day) — 3 × 2 × 3 × 3 = **54 candidates** per account. Back-to-back accounts from every
+start date, 84 sessions; net = 80% payouts − fees. **Chosen on 2021–24 starts** (mean net per $10K account); read once on 2025 starts and
+2010–20 and with random sides (6 seeds). Reported: mean, median, P > 0, p10; payouts; evaluations bought; and the allocation ceiling
+(three $5K + three $10K + one $25K + one $100K at once, New option). Not a trial (a computation on confirmed edges); a recommendation needs
+the user's go-ahead on a second firm (§131, "multi-firm deferred").
+
+## 671. A77: the edges in static-drawdown CFD accounts earn ~$500 per $10K a run, losing more often than not — not recommended (S9)
+
+**No trial.** `reports/a77_cfd_static.json` (module `reporting/a77_cfd_static.py`). Window SD 2021–24: NKD 81 bps, DAX 86 bps. Best of 54 on
+2021–24 (both markets in one account, size r 3%, stop at the per-trade daily cap 2.5%, hold to the window's end): **+$505** per $10K account
+per 84 sessions (median −$141, P > 0 44%); read once: 2025 starts +$552 (median −$234, 34%); 2021–26 +$517; **2010–20 +$66** (31%); zero edge
+−$106 / +$3. About 4 evaluations bought ($78 each) and ~1.3 payouts a run. The +15% across two steps before any payout eats most of the
+static floor's advantage, and every account would carry the same trades, so stacking the allowed ~$170K of allocation multiplies one
+mostly-losing outcome rather than diversifying it. Against Tradeify's ~$4,600 per 50K account a run (§657) it is not worth a second firm.
+
+## 672. K-family 3 protocol: Kalshi daily-high temperature contracts priced by the National Blend of Models (S9)
+
+**No trial spent; N 1,529. Written and committed BEFORE any forecast is compared with any quote or outcome.** §669: an edge on Kalshi
+needs information the quotes may not hold. The NWS National Blend of Models (NBM, text product NBS; free archive at the Iowa Environmental
+Mesonet) gives each station's daytime maximum (TXN) and its spread (XND) — a probabilistic forecast built from ~30 models. Markets: daily
+highs for **NYC (Central Park, KNYC), Chicago (Midway, KMDW), Miami (KMIA), Austin (KAUS), Los Angeles (KLAX), Denver (KDEN), Philadelphia
+(KPHL)**, settled on the station's climate report (2°F brackets plus two tails; "greater than x" = ≥ x + 1, "less than x" = ≤ x − 1;
+markets without a strike encoding are skipped). Fees quadratic, multiplier 1.
+
+1. **Decision points:** T1 = the candle ending 10:00 New York on the day **before**, with that day's 07Z NBM run; T2 = 10:00 New York **on
+   the day**, with that day's 07Z run (both runs are out by ~09Z). Forecast for local day D: TXN / XND valid D+1 00Z.
+2. **Model:** high ~ Normal(μ, σ); P(bracket [a, b]) = Φ((b + 0.5 − μ)/σ) − Φ((a − 0.5 − μ)/σ). **Variants:** raw (μ = TXN, σ = max(XND, 1))
+   and calibrated (per city: bias = mean(observed − TXN) and SD scale = SD(observed − TXN) / mean(XND), estimated on discovery days only,
+   then fixed; observed = Kalshi's recorded settlement value).
+3. **Trade:** model − ask − fee(ask) > θ → buy YES; (1 − model) − (1 − bid) − fee(1 − bid) > θ → buy NO; θ ∈ {5¢, 10¢}; quote filter as §664.
+4. **Tests:** 2 times × 2 variants × 2 θ = **8**, cities pooled (per-city results reported, not tested); daily statistic = the day's mean
+   net P&L per contract over all cities. **Discovery before 2025-07-01; sealed 2025-07-01 → 2026-10-16.** Carried / validation as §664.
+5. **Year-round** (the user's rule): every day of the year trades; a result carried by one season will be reported as such.
+
+## 673. K-family 3: the NBM edge on Kalshi weather is a near miss — day-of raw θ 10¢ +1.60¢ a contract, t 1.81; nothing carried (S9)
+
+**N 1,529 (no trial).** `reports/k3_discovery.json` (module `kalshi/k3_weather.py`; data: 7 weather series, ~8,000 settled events after a
+re-fetch of 566 transient failures; NBM 07Z runs for 7 stations, ~39k rows each). Calibration (discovery days): biases within ±0.6°F; the
+NBM's XND spread is too narrow by a factor 1.2–1.6 at every station. **T1 (10:00 the day before) is void** — the markets open at 10:00 New
+York the day before, so no quote exists then (a protocol error, not a result). T2 (10:00 on the day), discovery 2022-12 → 2025-06, ~880 days:
+raw θ 5¢ +0.34¢ (t 0.46); **raw θ 10¢ +1.60¢ (t 1.81, monthly 1.91)** — positive in 6 of 7 cities (MIA +4.5¢, LAX +5.5¢, PHIL +1.8¢, AUS +1.5¢,
+CHI +1.3¢, NY +1.1¢; DEN −4.9¢); calibrated θ 5¢ +0.24¢, θ 10¢ +1.28¢ (t 1.41). Below the carry bar (t > 1.96): **not validated**. Read: the
+NBM does know something the weather quotes miss when the disagreement is large, but not reliably enough in 2½ years to clear the bar.
+
+## 674. K-family 3b protocol: the day-before decision done right (S9)
+
+**No trial spent; N 1,529. Written and committed BEFORE it is run.** §673's T1 had no quotes. Day before at the candle ending **14:00 New
+York**, using that day's **13Z** NBM run (out by ~14:30Z), forecast valid D+1 00Z; raw and calibrated (§672's discovery calibration
+re-estimated for the 13Z run, discovery days only); θ 5¢ / 10¢ — **4 tests**. Disclosed: the same days' outcomes were read in §673 at a
+different decision time. Everything else as §672 (discovery before 2025-07-01, sealed after; carried / validation as §664).
+
+## 675. K-family 3b: the day-before weather edge carried in discovery and vanished in the sealed window — REJECT ×3 (S9)
+
+**3 trials (t01530–t01532); N 1,532.** `reports/k3b_discovery.json`, `reports/k3b_validation.json`. Discovery (2022-12 → 2025-06, ~820–870
+days): raw θ 5¢ +1.85¢ a contract (t 2.53), raw θ 10¢ +2.25¢ (t 2.29), calibrated θ 10¢ **+2.91¢ (t 2.96, monthly 2.74)** carried; calibrated θ 5¢
+(t 2.01, monthly 1.72) did not. **Sealed 2025-07-01 → 2026-10-16 (~307 days, 11 months with quotes): −0.49¢ (t −0.72), −0.07¢ (t −0.07),
+−0.39¢ (t −0.38) — all REJECT**; months positive 5 of 11. By city, Miami (+0.7 … +2.8¢) and Austin (+1.3 … +2.9¢) stayed positive in both
+windows while LA, Denver and NY turned clearly negative — a pattern seen after the fact, not a tested rule. Read: through mid-2025 the
+weather quotes under-used the NBM's day-before forecast; since then the market has caught up (more traders, more cities, probably forecast-
+driven bots). **Kalshi: three families, no confirmed edge; the arena is set aside** (the Miami / Austin observation is noted, not tracked).
+
+## 676. Polymarket cross-venue parked; S-series family 1 protocol — soccer value betting at Bet365 against Pinnacle's fair price (S10)
+
+**No trial spent; N 1,532. Written and committed BEFORE any return is computed** (the CSVs are being downloaded). The user (2026-10-17):
+keep searching arenas this programme has not studied — another income stream. **Kalshi × Polymarket arbitrage is parked:** Polymarket's
+US exchange (CFTC) opened only in December 2025 and its fees have changed several times (now quadratic like Kalshi's), so there is <1 year
+of history and the two venues' fees together take ~3.5¢ at even odds. **Sports:** football-data.co.uk publishes free match results and
+pre-match / closing odds for ~22 European leagues since 2012/13, including **Pinnacle** (the sharp market; its de-margined price is the
+standard fair-probability estimate) and **Bet365** (licensed in many US states). The documented strategy (Kaunitz, Zhong & Kreiner 2017)
+is to bet where a soft bookmaker's odds exceed the sharp fair price.
+
+1. **Rule:** fair p_i = (1 / PS_i) / Σ_j (1 / PS_j) from Pinnacle's pre-match 1X2 odds (proportional de-margining); value_i = B365_i × p_i − 1;
+   **bet one unit on outcome i at Bet365's pre-match odds when value_i > θ** (both prices from the same pre-match snapshot, so the rule is
+   executable at that time). Return B365_i − 1 if it wins, else −1.
+2. **Tests:** θ ∈ {2%, 4%, 6%} × outcome ∈ {home, draw, away, any} = **12**. Statistic: each match date's mean return per bet; t over dates;
+   monthly t. **Discovery: seasons 2012/13 → 2018/19. Sealed: 2019/20 → today** (asserted in code). Carried: t > 1.96, mean > 0, monthly t >
+   1.96; validation once, §664.4's rule (one-sided t > 1.645, ≥ 95% sign-randomisation placebo, positive posterior).
+3. **Reported beside validation:** closing-line value (Bet365 pre-match odds against Pinnacle's closing fair price, 2019/20 on), bets a
+   season, and the stake capacity a typical US account would allow.
+4. **Caveats fixed now:** Bet365's US odds can differ from the UK odds recorded; soft books limit accounts that win (a practical ceiling no
+   backtest can show); legality depends on the user's state; football-data's pre-match snapshot is taken Friday / Tuesday afternoons, so
+   later price moves are not seen.
+
+## 677. S-family 1: Bet365 rarely beats Pinnacle's fair price, and when it does the bets earn nothing reliable — 0 of 12 (S10)
+
+**N 1,532 (no trial).** `reports/s1_discovery.json` (module `sports/s1_value.py`; data: 22 leagues × 14 seasons, ~100k matches with both
+prices). Discovery 2012/13 → 2018/19: the rule bet 4,788 times at θ 2% (of ~53,000 matches) — Bet365's pre-match odds are rarely above
+Pinnacle's fair price; returns per bet −3.2% … +18% with |t| ≤ 0.81 in every cell (high variance, no signal). The Kaunitz result relied on
+the best price across ~30 books; a single US-licensed book does not reproduce it. Sports value betting set aside.
+
+## 678. K-family 4 protocol: Kalshi US gas-price contracts priced by the wholesale-to-retail lag (S10)
+
+**No trial spent; N 1,532. Written and committed BEFORE any model price is compared with any quote or outcome.** Mechanism: US retail
+gasoline follows wholesale (RBOB futures) with a lag of one to several weeks, faster up than down ("rockets and feathers"). Kalshi lists
+daily (KXAAAGASD), weekly (KXAAAGASW) and monthly (KXAAAGASM) contracts on AAA's US average regular price ("strictly greater than $x on
+date D"), each trading hundreds of thousands of contracts a day. Free inputs: Yahoo RB=F daily closes; EIA's weekly US regular retail price
+(1990 →); AAA's level on each day from Kalshi's own recorded settlement values (daily series, 2023-09 →).
+
+1. **Weekly model, fitted on EIA weekly 2010-01 → 2022-12 only (before any Kalshi gas market):** ΔR(t → t+1 week) = c + b0·ΔRB(week to t) +
+   b1·ΔRB(week to t−1) + b2·ΔRB(week to t−2) + g·(R_t − RB_t − M_t), M_t the trailing 52-week mean of R − RB; up and down RBOB moves get
+   separate b's (asymmetry); σ from residuals. Horizon h days: mean = weekly prediction × h/7, SD = σ·√(h/7); applied to AAA's level (AAA
+   and EIA move together; their level gap cancels in changes).
+2. **Daily model:** Δ(AAA, D−1 → D) = φ·(yesterday's AAA change) + (1 − φ)·(weekly prediction / 7); φ and σ_d fitted on **discovery days only**.
+3. **Decision points (12:00 New York candle):** weekly — 6 and 3 days before settlement; monthly — 14 days before; daily — the day before.
+   P(AAA_D > K) = 1 − Φ((K − μ)/sd). Trade as §668 (model − ask − fee > θ buys YES; the NO side likewise), θ ∈ {5¢, 10¢}.
+4. **Tests:** weekly × 2 points × 2 θ + monthly × 1 × 2 + daily × 1 × 2 = **8**. Daily statistic over settlement dates; carried / validation
+   as §664 (discovery before 2025-07-01; sealed 2025-07-01 → 2026-10-16). Year-round markets.
+
+## 679. K-family 4: Kalshi's gas markets are too young to test — uninformative (S10)
+
+**N 1,532 (no trial).** `reports/k4_discovery.json` (module `kalshi/k4_gas.py`). The weekly model fitted on EIA 2010–22 (656 weeks) is sensible
+(RBOB pass-through ≈ 0.20 + 0.17 + 0.10 over three weeks on rises, a gap term −0.11, σ 4.4¢ a week), but before 2025-07 there are only 73 weekly
+events (12:00 quote on ~half), 19 monthly (markets open 7 days before settlement, so the D−14 point never exists) and 24 daily (the daily
+series is mostly 2026). Trades: weekly 13–21 days per cell, all negative (−6.5 … −12.3¢, |t| ≤ 1.8); monthly none; daily 2. **Uninformative**
+— no split leaves enough history; set aside (a forward record would be the only way to test it).
+
+## 680. S-family 2 protocol: NFL totals and game-day weather (S10)
+
+**No trial spent; N 1,532. Written and committed BEFORE the data is examined.** nflverse (free, GitHub) records every NFL game since 1999
+with the closing total and spread, roof type, temperature and wind. Mechanism: wind and cold lower passing efficiency and scoring; the
+question is whether closing totals fully price it. **Bet the UNDER at −110** (win +0.909, loss −1, pushes void) in outdoor games
+(roof "outdoors" or "open") with wind ≥ 10 / 15 / 20 mph, or temperature ≤ 25 / 35°F; and the OVER in dome / closed-roof games
+(control-direction test) — **6 tests**. Statistic: per-week mean return over that week's bets; t over weeks. **Discovery: seasons 1999–2014.
+Sealed: 2015–2025** (the 2026 season so far is excluded: forecasts at bet time vs recorded game-time weather, see caveat). Carried / validation as
+§664.4. Caveats fixed now: nflverse weather is recorded at kickoff, while a bettor acts on a forecast hours earlier (forecasts of wind are good
+but not perfect — an upper bound); closing totals are the hardest number to beat, so passing here is meaningful; legality is per state.
+
+## 681. S-family 2: windy unders near-miss, cold unders lose — nothing carried (S10)
+
+**N 1,532 (no trial).** `reports/s2_discovery.json` (module `sports/s2_nfl_weather.py`; nflverse games, 1999–2014). Under at wind ≥ 15 mph:
+449 bets, **57.2% won, +9.3% a bet, weekly t 2.35, by-season t 1.52** (the carry rule needs both > 1.96); wind ≥ 20: 58.1%, +10.9%, t 1.74;
+wind ≥ 10: +1.2%, t 0.0. **Unders in the cold lose:** temp ≤ 35°F 46.3%, −11.5% (t −2.22), ≤ 25°F 40.2%, −23.2% (t −2.19) — the market seems
+to over-adjust totals down for cold. Dome overs: −0.1% (t 0.7).
+
+## 682. S-family 2b protocol: one sealed look at windy unders and cold overs (S10)
+
+**No trial spent; N 1,532. Written and committed BEFORE seasons 2015–2025 are read.** Suggested by §681 (the wind result is also the
+published hypothesis; the cold result is its mirror), so tested only on data §681 did not use: **under at wind ≥ 15 mph; over at temp ≤ 35°F;
+over at temp ≤ 25°F** (outdoor / open roof; −110; pushes void) — **3 tests**, each judged alone and reported against 3. Sealed seasons
+2015–2025, read once; CONFIRM per §664.4 (one-sided weekly t > 1.645, ≥ 95% sign-randomisation placebo on weekly returns, positive posterior);
+watchlist if net-positive. Season-by-season results reported.
+
+## 683. S-family 2b: windy NFL unders hold out of sample but are too sparse to confirm — WATCHLIST; cold overs REJECT (S10)
+
+**3 trials (t01533–t01535); N 1,535.** `reports/s2b_validation.json`. Sealed seasons 2015–2025: **under at wind ≥ 15 mph — 225 bets, 56.4% won,
++7.8% a bet** (discovery 57.2%, +9.3%), but weekly t 0.53, placebo 70% → **WATCHLIST** (positive in 6 of 11 seasons). Over at ≤ 35°F −6.7% a
+bet, over at ≤ 25°F −20.2% → REJECT (both sides of cold totals lose — the vig, not a mispricing). Read: the published wind effect persists
+at ~57% over 26 seasons, but it is ~20 bets a season — at $100 a bet about +$150 a season. Too small to be an income stream.
+
+## 684. A78 protocol: the staking game in a crypto prop with a static floor and on-demand payouts (Breakout Classic 1-step) (S10)
+
+**No trial; N 1,535. Written and committed BEFORE any game is solved or replayed.** The user (2026-10-17): other funded programmes — someone
+else's capital with rules we can model. Tradeify's game pays at zero edge through its rules; this asks whether Breakout's (Kraken-owned crypto
+prop) does too. Rules as modelled (Kraken's comparison page and third-party reviews; **to be confirmed by the user at checkout**): one-step
+target +10%; **static** maximum loss 6% of the starting balance; daily loss 3% of the day's starting balance; no time limit, no minimum days,
+no consistency rule; funded: **80% of any profit above the starting balance, withdrawable on demand**, floor stays at −6%; fee ≈ 1% of the
+account ($100 per $10K; $100K $800–999); fee refund on the first payout NOT assumed; trading fee assumed 0.05% of notional a side (taker)
+plus 0.02% slippage; leverage ≤ 5× (BTC).
+1. **The game (A01's method):** balance in 0.25% steps; each day one bracket on BTC — stop L ≤ 3% of the account (daily limit), take W from
+   a menu up to the target; win probability at zero edge p = (L − c)/(W + L) with c the round-trip cost of the notional needed for that
+   stop at a fixed stop distance in price; evaluation value = P(pass within H days) and funded value = E[80% of withdrawals within H days];
+   EV per attempt = P(pass) × funded value − fee. H = 84 and 252 days; reported per $10K.
+2. **Replay check:** the solved policy on real BTC-USD hourly paths (free Coinbase/Binance data), entry at 00:00 UTC, the bracket by the
+   policy, out at 23:00 UTC, **sides random** (zero edge, 6 seeds) — the game's EV must survive real paths and costs.
+3. **Read:** EV per attempt and per $10K a month, P(pass), payouts per funded account, evaluations bought, the cash low point; a positive
+   zero-edge EV that survives the replay makes this a candidate income stream needing no edge (as Tradeify), subject to the user's checks
+   (US eligibility, current fees, any prohibited-strategy clause). Not a trial (no edge is tested).
+
+## 685. A78: Breakout's structure is worth ~+0.6% an attempt in the idealised game but loses on real BTC paths — not an income stream as modelled (S10)
+
+**No trial.** `reports/a78_crypto_prop.json` (modules `reporting/a78_crypto_prop.py`, `a78_btc_data.py`; Coinbase BTC-USD hourly 2018-01 →
+2026-10, 3,206 days). Solved game (zero edge, costs priced): P(pass) 35.7%, funded value 4.49% of the account, **EV +0.60% an attempt**
+(+$60 per $10K) — the best play risks the full 3% daily limit for the whole 10% target, and once funded risks 0.5% for 10%. (A first solve
+let the policy skip trading at long horizons — waiting ties betting at zero edge — and was corrected to A01's always-trade rule.) **Replay,
+random sides (6 seeds), per $10K:** out at 23:00 UTC daily — 84 days −$145 (P > 0 5%), 252 days −$204 (14%); held to take or stop (crypto
+trades around the clock; added, disclosed; funding 0.03% a day) — 84 days −$101 (10%), 252 days −$64 (22%, p90 +$463). Why: the coin game
+ignores time — its long-odds brackets (take 20× the stop) need 60% BTC moves, so trades mostly end at the window's close while costs and
+funding accrue. A rough check with brackets that resolve in days: ~+0.8% gross minus ~0.5–0.7% costs ≈ zero. **The fee refund on the first
+payout (reported by some sources, denied by others) is what would make it positive (+~0.4% an attempt); without it, not worth doing.**
+Static-floor, on-demand programmes are the right shape; Breakout's fee (1% of the account) and crypto's costs leave too little.
+
+## 686. S-family 3 protocol: NFL point spreads in published situational spots (S10)
+
+**No trial spent; N 1,535. Written and committed BEFORE the tests are computed.** The user (2026-10-17): cover as many arenas as possible,
+report only a success. nflverse games (closing spread, rest days, division flag, weekday, kickoff time). Bets at −110 against the closing
+spread (pushes void); a home cover = home margin > spread_line (positive spread_line = home favoured). **Tests (each a published idea):**
+(1) home underdogs; (2) the team with ≥ 3 more days of rest (e.g. off a bye); (3) Thursday games — the home team; (4) divisional underdogs;
+(5) underdogs of 10+ points; (6) the under in prime time (kickoff ≥ 19:00 Eastern, any day) — **6 tests**. Statistic: weekly mean return; t
+over weeks; season t. **Discovery seasons 1999–2014; sealed 2015–2025.** Carried: t > 1.96, mean > 0, season t > 1.96; validation once per
+§664.4. Caveat: closing lines are the hardest to beat; a bettor gets an earlier line.
+
+## 687. S-family 3: NFL situational spreads — 0 of 6; closing spreads price every published spot (S10)
+
+**N 1,535 (no trial).** `reports/s3_discovery.json` (module `sports/s3_nfl_spots.py`). 1999–2014 at −110: home underdogs 50.1% (−4.3% a bet,
+t −1.75); rest edge ≥ 3 days 49.8% (−4.9%); Thursday home 51.9% (−0.9%); divisional underdogs 52.0% (−0.8%); 10+ point underdogs 53.5%
+(+2.1%, t 0.55); prime-time under 49.4% (−5.6%). None near the bar.
+
+## 688. K-family 5 protocol: Kalshi weekly TSA screenings priced by a nowcast from the days already published (S10)
+
+**No trial spent; N 1,535. Written and committed BEFORE any market is downloaded or any nowcast compared with a quote.** KXTSAW (since
+2021-07): "weekly average TSA screenings above X for the week ending Sunday"; opens Monday 10:00 New York, trades to Sunday 23:59. TSA publishes
+each day's count the next morning (data: tsa.gov's yearly tables via the Internet Archive, 2019-01-01 → 2026-10-15, complete). Mechanism: by
+mid-week several of the seven days are public; the question is whether quotes fully use them.
+1. **Nowcast at 12:00 New York on day t** (days through t−1 known, k = number known this week): each unknown day = the same weekday 364 days
+   earlier × r, r = (sum of the known days) / (sum of their 364-day-earlier days); with k = 0, r from the previous complete week. Weekly
+   average μ = (known + forecast)/7. Error: Normal with SD = σ_k × μ, σ_k = SD of (actual − nowcast)/actual over discovery weeks for each k.
+2. **Trade:** P(average > X) = 1 − Φ((X − μ)/(σ_k μ)); buy YES / NO when the edge over the ask after fee > θ, θ ∈ {5¢, 10¢}; quote filter as §664.
+3. **Decision days:** Tuesday (k = 1), Thursday (k = 3), Saturday (k = 5) — **6 tests**. Statistic: weekly mean net per contract; t over weeks;
+   monthly t. **Discovery: weeks ending before 2025-07-01; sealed: 2025-07-01 → 2026-10-11.** Carried / validation as §664.4.
+
+## 689. K-family 5: the TSA nowcast does not beat the quotes — 0 of 6 (S10)
+
+**N 1,535 (no trial).** `reports/k5_discovery.json` (module `kalshi/k5_tsa.py`; 243 of 274 weekly events, 31 transient download failures). The
+364-day-ratio nowcast's error (discovery weeks, 2020 included) is wide: SD 7.6% with Monday known, 6.6% with three days, 2.8% with five. Trades
+2023-01 → 2025-06: Tuesday −3.5¢ / −4.6¢ a contract (t ≈ −1.0 … −1.3); Thursday −1.6¢ / −2.4¢; **Saturday +4.6¢ / +4.5¢ (t 0.95 / 0.85,
+~50 weeks)** — none near the bar. The market already reads the published days at least as well as a simple seasonal ratio.
+
+## 690. K-family 6 protocol: Kalshi EUR/USD and USD/JPY 10:00 ranges priced by our own model (S10)
+
+**No trial spent; N 1,535. Written and committed BEFORE any model price is compared with any quote or outcome.** KXEURUSD / KXUSDJPY
+(since 2022-08): each day's range brackets on the rate at 10:00 New York; markets open 10:00 the day before. Model as §668 with the FX minute
+grid (HistData, corrected clock, `hd_grid`): level = the grid's last close at the decision minute plus the previous settlement's basis
+(Kalshi's recorded value − the grid at 10:00 that day); σ = RMS over the previous 20 days of the 24-hour realised 1-minute variance, scaled to
+the time left; zero drift, normal in log price; a bracket's probability = difference of its bounds. **Decision points:** 12:00 the day before
+(22 h left), 16:00 the day before (18 h), 08:00 on the day (2 h); θ ∈ {3¢, 6¢}; trade as §668 — 2 pairs × 3 points × 2 θ = **12 tests**.
+**Discovery before 2025-07-01; sealed 2025-07-01 → 2026-09-30** (the minute data's end). Carried / validation as §664.4.
+
+## 691. K-family 6: Kalshi FX ranges — 0 of 12, mostly too thin to trade; WTI skipped (S10)
+
+**N 1,535 (no trial).** `reports/k6_discovery.json` (module `kalshi/k6_fx.py`; 1,238 EUR/USD and 1,236 USD/JPY events). The model disagreed with
+a live quote by more than θ on only 0–51 days per cell before 2025-07 (the books are thin and wide: the quote filter removes most hours); every
+cell |t| < 1, means −10.6¢ … +6.0¢. Uninformative-to-null. **WTI (KXWTI) is not run:** the same model on oil has only 18 months of free minute
+data (HistData wtiusd), and FX shows the approach rarely finds a tradable disagreement; recorded as skipped, not tested.
+
+## 692. A new structural arena: Kalshi's Liquidity Incentive Program. A79 protocol — completing thin order books (S10)
+
+**No trial; N 1,535. Written and committed BEFORE the forward sampler runs.** Kalshi pays each incentivised market's pool ($1–1,000 a market a
+day; ~6,800 active programmes, ≈ $235,000 a day in total on 2026-10-17, from the public `incentive_programs` API) to resting orders: snapshots
+every second; a snapshot counts only if resting size reaches the **target (usually 1,000 contracts) on both the yes and the no side**; on each
+side an order's weight is its size × (discount factor ^ ticks below the reference price, the level where cumulative size reaches target/5),
+shares are normalised per side, a snapshot is worth at most 2.0, payout = period score × reward × (counted snapshots / all snapshots). US
+members eligible. A first snapshot of 300 active markets (`reports/lip_probe.json`): 87% of books already meet the target on both sides; in
+the rest one side is nearly empty — often the long-shot side of a contract far from the money (state daily gas, Rotten Tomatoes, mentions).
+**Strategy (fixed now):** for each active programme (≥ 12 h long) whose yes or no side is below target, post the missing side's target size at
+**1¢** (the lowest price: loss if filled and wrong ≤ 1¢ a contract; filled only if someone sells near-certain outcomes below 1¢'s odds). **Forward
+measurement (no money):** sample every active programme's book every 15 minutes for 3 hours (local machine only); for each, the share this order
+would earn per side and whether the snapshot would then count; estimated $ a day per market and per $ of collateral; persistence of the thin side
+across samples. **Read:** it is a candidate income stream if the estimated earnings stay large across samples; the live check (a few markets,
+real orders, small size, the user's go-ahead) comes after. Risks named now: other quoters doing the same (shares fall), programme changes or
+end (sources say January 2027), Kalshi treating it as abusive (its rules score size × distance and say nothing against far orders).
+
+## 693. A79: completing thin books in Kalshi's liquidity programme measures as a large, persistent gap — a live test is the next step (S10)
+
+**No trial (a measurement of the present, not an edge test).** `reports/lip_sampler.jsonl` (22 sweeps, two independent random samples of
+~500 active programmes — the afternoon run continued through the planned shutdown while a resumed run drew a fresh 500; split in
+`kalshi/lip_summary.py`), 2026-10-17 20:59Z → 2026-10-18 00:50Z. Posting the target size at 1¢ on every side below target would have earned
+(by the published scoring, given every other resting order seen): **sample A $1,578 a day (range $1,305–2,120) on $620 of collateral; sample B
+$1,380 a day ($1,063–1,746) on $554**; ~10–12% of sampled programmes are thin at any sweep; **96% / 90% of thin sides are still thin 15 minutes
+later**; the top 10 markets carry a third of the total; leading series: KXRAIN, KXRT (Rotten Tomatoes), state daily / weekly gas (KXAAAGASD…),
+mentions and weekly event markets. Scaled to all ~6,700 programmes: **~$18,500–21,600 a day — an upper bound** (no copycats, payout exactly
+as written). The official terms (CFTC filing, 2026-07-15) set no price restriction on qualifying bids and **exclude members with a Market
+Maker Agreement** — the likeliest reason the gap persists. **Caveats:** estimates, not payouts — Kalshi actually paying as written is
+untested; copycats split a side's share; the programme ends by 2027-01-01 at the latest and may end any time; Kalshi may revoke a participant
+judged "inconsistent with the purpose of the Program"; a filled 1¢ bid loses its 1¢ if the long shot does not happen (≤ $10 a market). **Next:
+a small live test** (≈10 persistent thin markets, 1,000 contracts at 1¢ each, ~$100 of collateral, 3–5 days) on the user's go-ahead and
+account; payouts compared with these estimates before any scale-up.
+
+## 694. The Kalshi liquidity bot: built, tested, running dry on the droplet; live test waits for the user's key (S10)
+
+**No trial.** The user (2026-10-17): use the droplet so it runs 24/7; **only programmes of two days or less** at first (faster payouts,
+faster scaling). Kalshi's terms (help centre): estimated earnings show per market in the app's Rewards popover; paid credits under Rewards and
+Account → Activity; scoring happens after a programme ends and payment follows in a later run; programme periods range from 15 minutes to
+weeks (~935 under a day, ~910 of 1–2 days among 6,800 active); no per-account cap is set. `kalshi_lip/` (separate from the futures bot):
+`kalshi_api.py` (Ed25519 / RSA-PSS request signing, V2 orders — single book, bid = yes, ask = no, price always the YES price — batch order
+books), `lip_bot.py` (every 5 minutes: short programmes → books → sides whose OTHER traders' size is below target → our target-size bid at 1¢,
+post-only, expiring at the programme's end; best 10 markets by estimated $ per $ of collateral within $150; cancels sides no longer needed;
+accrues an estimate from the published scoring; daily Discord summary; first live order read back and verified or everything is cancelled;
+STOP file kill switch). A unit test caught one scoring error (an order at a qualifying price level counts in full) — fixed. **Deployed in
+MODE=dry 2026-10-18 01:06Z** (`kalshi-lip.service`, /opt/kalshi-lip, MemoryMax 150M; Discord via the futures bot's token, read-only).
+First loops: ~1,826 short programmes, ~520 with a thin side; its chosen 10 would hold ~$96 of collateral for an estimated ~$9,000 a day,
+mostly **Miami hourly temperature markets ($100 an hour each, long-shot side empty)** — plausible by the rules, unproven until paid.
+
+## 695. The live test failed: thin sides are thin because informed sellers fill any 1¢ bid at once — bot stopped, ~$36 at risk (S10)
+
+**No trial.** Live 2026-10-18 01:46–01:57Z ($150 funded; programmes ≤ 2 days). Sequence: (1) orders defaulted to exchange shard 0 →
+"market not found" on a LigaPro match (sports shard 3) — fixed by routing per market; (2) **"post only cross" on many thin sides**: where
+the opposite side bids 99¢, a 1¢ bid crosses, so those sides can never rest — my sampler (§692–693) had counted them as earnable, inflating
+its estimates; fixed by requiring the opposite best bid < 99¢; (3) the first order's read-back ran before Kalshi listed it, the safety stop
+did not cancel an order it had not yet recorded, and systemd restarted the bot — three loops, two orphan orders (cancelled), and a **LigaPro
+in-play match bid filled 300 contracts at 1¢ ($3)**; fixed (retry + client-id match, record before verify, no restart on a safety stop,
+sports / match markets excluded); (4) the corrected bot placed 10 verified 1¢ bids on state daily gas markets (settling the next day) and
+**4 were filled within seconds** (≈2,800 contracts, ≈$33): someone sells the long shot to any 1¢ bid in markets whose outcome is nearly
+known. Each fill re-opens the side, so the bot would re-post and bleed ~$30–40 every loop — **stopped, disabled and all orders cancelled**.
+Positions: five long shots at 1¢ (≈$36.26 exposure; cash $113.74) — expected to expire worthless. **Read:** the "gap" is not free money:
+completable thin sides stay thin because resting there is filled by better-informed traders almost at once, so the reward accrues for
+seconds while each fill costs ~1¢ a contract. Short programmes (near resolution) are the worst case. The live test did its job: it found
+what no snapshot could. Whether longer programmes (outcome still uncertain, slower informed flow) behave differently is an open question;
+not pursued without the user's decision.
+
+## 696. A80 protocol: do longer liquidity programmes escape the adverse fills? — measured from public trades, no money (S10)
+
+**No trial; N 1,535. Written and committed BEFORE the measurement runs.** The user (2026-10-18): test longer programmes. Programmes lasting
+**≥ 6 days with ≥ 1 day left** (outcome further from known). For each: the book now; a side is **completable** if other traders' resting size
+is below target AND the opposite best bid is < 99¢ (so a 1¢ bid can rest). **Reward:** our share (scoring as §692, with the price-level rule
+of §694) × the programme's reward rate. **Fills:** the public trades of the last 72 hours (`GET /markets/trades`) at the 1¢ level on that
+side (taker selling the long shot: yes-price 1¢ with taker side no for a yes bid; yes-price 99¢ with taker side yes for a no bid); we would
+have been filled only after the size already resting at 1¢ ahead of us — fills to us = max(0, traded − ahead), per day. **Cost of a fill:**
+1¢ a contract (the long shot assumed to lose — informed sellers). **Net a day = reward − fills × $0.01.** Reported: markets measured, how
+many net-positive, total net a day per $ of collateral, and by series; the same computed for programmes ≤ 2 days as the control (it must
+show the failure §695 saw). **Read:** a candidate only if net stays clearly positive with the control behaving as observed live; then a
+forward check over days before any money.
+
+## 697. A80: historical trades cannot measure the fill risk — the control fails, so the longer-programme question stays open (S10)
+
+**No trial.** `reports/a80_lip_long.json` (module `kalshi/a80_lip_long.py`). Long programmes (≥ 6 days, ≥ 1 day left): 3,357 active, 71 with a
+completable thin side; reward $629/day, fill cost from 72 h of 1¢ trades $160/day, **net +$469/day** on $985 of collateral, 59 of 71 positive
+(KXBA, KXYTVIEWSW, KXDPZ lead; 52 of 71 show no 1¢ fills in 72 h). **Control (≤ 2 days): net +$8,869/day, 145 of 150 positive — but live
+(§695) 4 of 10 such bids were filled within seconds.** The method fails its control: before anyone bid 1¢ there was little to trade against,
+so past trades miss the sellers who wait for a bid. Fill risk is created by posting and can only be measured by posting. The longer-programme
+question is therefore unanswered by public data; the only test is a small live probe (user's decision).
+
+## 698. A81 protocol: a small live probe of longer liquidity programmes (user's go-ahead) (S10)
+
+**No trial; N 1,535. Written and committed BEFORE the probe starts.** The only way to measure fill risk (§697). Programmes **≥ 6 days long
+with ≥ 1 day left**; completable thin sides (others below target, opposite best bid < 99¢); 1,000-contract bids at 1¢; **at most 5 markets
+and $50 of collateral**; sports / match markets excluded; **a side that has been filled is never re-posted**; every fill logged and posted to
+Discord; **hard stop if fill cost exceeds $20** (cancel all, exit, no restart). Run 24–48 hours. Read: fills per market per day against the
+break-even of ~1 full fill a day (§697 table); the rewards estimate in each market's Kalshi popover; then, once a programme ends, the paid
+credit against the estimate. Decision after: scale within the fill rate observed, or close the arena.
+
+## 699. A81 started: five long-programme probes resting, none filled on placement (S10)
+
+**No trial.** Before starting, the dry plan showed that a long *programme* can sit on a market settling tomorrow (KXTRUMPSAY-26OCT19, a YouTube
+week ending today) — the near-certain case again — so a **market-close condition was added: the market must close ≥ 3 days ahead**
+(`MIN_MARKET_DAYS`). Live from 2026-10-18 02:10Z: 1,000 at 1¢ on KXWEEKSNUM1-26DEC26-TAYL-5 (no), KXAAAGASMINM-26OCT31-4.30 (no),
+KXSUPERBOWLHEADLINE-27-EDS (yes), KXWNBAFINALSMVP-26-THAYES15 (yes), KXTRUMPSAYMONTH-26NOV01-NEWS (no); $50 collateral; all five verified
+resting; **no fill on placement** (the short gas markets filled within seconds). Estimated reward ~$30 a day. Stop rule $20 of fill cost.
+
+## 700. The user's canary idea, live: 1-contract probes find the waiting sellers; long probe capped at 8-day periods (S10)
+
+**No trial.** The user (2026-10-18): payouts follow each programme *period* (the held markets' periods: 7, 7 and 14 days; first ends 10-21), so
+the long probe's periods are capped at **8 days** for roughly weekly payouts; and the user's idea — **test a market with a 1-contract order
+before committing**. The sellers who filled the gas bids (§695) were not resting (a resting seller would have made our bid cross); they arrive
+after a bid appears, so they are invisible in the book but a canary flushes them for 1¢. Built as a **separate instance** (`kalshi-lip-short`,
+own env / state / log / stop file; short programmes ≤ 2 days, no market-close condition, ≤ 5 markets, $50, **stop at $10 of fills**):
+each new side gets **1 contract, then 100, then the full size**, a loop (5 min) apart; a fill at any step drops that side for good.
+Fixes on the way: the order check now looks an order up by id and accepts "executed" (a canary filled within seconds is a valid order and a
+detected seller); fills are rebuilt each loop from Kalshi's records using the fill's `outcome_side` (an earlier guess from side/action read a
+1¢ NO fill as YES at 99¢) and matched to each instance's own order ids. **First results: Miami hourly temperature canaries were filled
+within seconds (3 of the first ~6, 1 contract each, 3¢ in all); state daily gas canaries are being tried; the long probe: no fills.**
+
+## 701. Discord: only the important messages (S10)
+
+**No trial.** The user (2026-10-18): limit embeds to the important ones. Sent now: **✅ canary passed** (a side reached its full size after
+1 and 100 rested unfilled), **🏁 reward period completed** (an order rested through its period unfilled — with its estimated reward; the
+long-programme success), **🟢 daily results** (per bot, named; estimated rewards, orders, fills, cash, and the canary counts tried / swept /
+passed), **🟠 large fill** (a fill costing ≥ $5 — a real loss), **🔴 stopped** (fill limit, failed check or kill switch). Dropped: every
+small (canary) fill — counted in the daily results instead — and start messages on routine restarts (only a fresh start posts). Rewards now
+accrue in the estimate only while every needed side holds its full size (a canary alone completes nothing).
+
+## 702. Seven improvements to both liquidity bots (the user: apply all now) (S10)
+
+**No trial.** Deployed 2026-10-18 03:13Z to `kalshi-lip` and `kalshi-lip-short`. (1) **Stay unless it stops paying** — a held order is kept
+while its projected reward to the period end (share now × reward rate × time left) is ≥ $1, instead of leaving the moment another trader
+completes the side; (2) **re-entry skips the canary** for a side that passed it today; (3) **series blacklist** — a series whose canaries are
+swept twice in a day is skipped for the rest of the day; (4) **enter only if the projected reward to the period end is ≥ $3** (Kalshi pays
+nothing under $1 a period; the New Jersey order rested 15 minutes and showed $0.00); (5) **price 1–3¢** and (6) **size = the shortfall or the
+full target**, per side, whichever maximises projected reward − worst-case fill cost (size × price) — e.g. with 700 resting at 2¢, a 1,000
+bid at 3¢ takes the whole side under the scoring (bids below the target cut-off do not qualify); (7) **canary steps wait a real 5 minutes by
+the clock**. Unit-checked and dry-run on both configurations first. A dry check showed most long programmes (6–8 days) sit on markets closing
+within 3 days, so the long probe currently has few candidates (the market-close rule is doing its job).
+
+## 703. The liquidity bots post to their own Discord bot and channel (S10)
+
+**No trial.** The user created a separate Discord bot and channel so the futures demo channel is not flooded. `/opt/kalshi-lip/discord.env`
+(token and channel id, entered by the user, 600; never read or printed); both bots' env files set `DISCORD_ENV` to it; a test embed was sent
+and both bots restarted (2026-10-18). The futures demo bot is unchanged.
+
+## 704. Held orders are judged with their fill risk; one order pinned at the user's request (S10)
+
+**No trial.** The user asked why the short bot posted a full order at 22:09 CDT for a period ending 22:59 (Georgia daily gas): it was the old
+step-up logic (§702 deployed 22:13); there is no minimum holding time — rewards accrue per one-second snapshot, with Kalshi's $1 minimum per
+period. It exposed a flaw in §702: a held order was valued as risk-free to keep, but a resting order keeps its fill risk, and short markets'
+final stretch is when informed sellers are most active. **Now a held order is valued like a new one — projected reward to the period end minus
+the worst-case fill cost** — and leaves when that turns negative (with 50 minutes left on a $100 / 16 h pool, a 1,000 at 1¢ is worth −$7.40;
+with 10 hours left +$21). **Pinned at the user's request** (`PIN_KEYS`): KXAAAGASDGA-26OCT18-3.7750 yes, 1,000 at 1¢, kept to its period end
+(22:59 CDT) to watch what happens.
+
+## 705. The pinned Georgia order was filled 25 minutes before its period ended (S10)
+
+**No trial.** KXAAAGASDGA-26OCT18-3.7750 yes (Georgia daily gas, settling 10-18): canary 1 → 100 → full 1,000 at 22:09 CDT (old step logic),
+pinned at the user's request at 22:33; **filled in full at 1¢ at 22:34 CDT (maker), 25 minutes before the period end** — the final-stretch
+informed seller §704 anticipated; $10 at risk (pays ~$990 only if the long shot happens). Its estimated reward over ~25 minutes at full size
+was about $1–2. To keep the user's one-day canary test running, **a pinned order's fills are reported but not counted toward the bot's stop
+limit** (the short bot stood at $3.06 + $10 = $13.06 against a $10 stop). Lesson for short programmes: even a canary that passes is filled
+before the period ends when the outcome is nearly known; §704's rule (leave when reward to the end < worst-case fill) covers it.
+
+## 706. Short programmes keep failing; the user lifts the short bot's stop to run the test to the end of its money (S10)
+
+**No trial.** After Georgia (§705), both executive-order canaries that passed (KXEOWEEK-26OCT10-1 / -3, 670 at 1¢ each) were filled in full
+(cash $100.68 → $80.67). The user: "if it does we know not to use short positions anymore" — then: let the short bot continue with **no hard
+stop** until the balance runs out, for the test. `MAX_FILL_COST=1000` in short.env (above the account) at 2026-10-18 03:39Z; the
+collateral cap ($50 for that bot) still bounds its resting size, and orders simply fail once cash is gone. The long probe is unchanged
+($20 stop). Read so far: across Miami temperature, state gas, Georgia and executive orders, short programmes are filled by informed
+sellers before their periods end even after a canary passes.
+
+## 707. The long probe is paused until the short test has run to Sunday night (S10)
+
+**No trial.** The user: run the long bot only after seeing how the short bot does by tomorrow night. `kalshi-lip` stopped via its kill switch
+(orders cancelled) and **disabled** 2026-10-18 03:46Z. The kill switch returned exit code 0, which `Restart=always` treated as a crash and
+began restarting the bot; it was stopped by hand, and the kill switch now exits with code 2 (`RestartPreventExitStatus=2`). Only
+`kalshi-lip-short` runs (stop lifted, §706). Re-enable the long probe after the Sunday-night readout on the user's word.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —
