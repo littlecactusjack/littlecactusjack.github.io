@@ -14847,6 +14847,467 @@ Data: every public trade in YES-resolved KXTRUMPMENTION markets (`mention/m0_dow
    1.2 s, company 0.9 s). Truth Social returns 403 (Cloudflare) to plain requests from here. A sub-second incumbent for ~$6k a month: not
    worth the race. Closed.
 
+## 735. Screen: Kalshi's OpenRouter AI-share markets — public intra-week tally, but the market already follows it (S10)
+
+**No trial.** Ranking of data-publication series (`kalshi/a86_rank.py`, 3,300 series in Entertainment / Science & Tech / Companies / …;
+settled since 2026-08-19): Kalshi combos (MVE) 20-40M contracts, Rotten Tomatoes 16.9M (23 movies), YouTube views 1.2-4.8M, Netflix ranks
+1.6-1.8M, AI market share 1.3-1.9M per series. **AI share (`kalshi/a87_aishare.py`):** the weekly markets settle on OpenRouter's public
+`/api/frontend/v1/rankings/author-market-share?metric=requests&modality=text`, which reproduces Kalshi's settled values exactly (one-week
+label shift) and shows the current week partially (updated within the week); no daily history exists. 621 settled markets, 73 events
+(~9 weeks): the winner was 10-90¢ in 43% / 39% / 34% / 19% of hourly candles 96-72 / 72-48 / 48-24 / 24-0 h before close, BUT that late
+uncertainty sits at strikes near the final — 12-0 h: none > 0.3 pt away; 48-24 h: 3% of it > 1 pt away (hindsight ceiling $2.9k in ~9
+weeks); 72-48 h: 10% > 1 pt away ($9.4k). The running tally is already priced; the residue is too small. Closed.
+
+## 736. R-family 1 protocol — Rotten Tomatoes score drift on Kalshi (KXRT): is YES on the upper strikes overpriced? (S10)
+
+**No trial spent. Written BEFORE any KXRT price is compared with any outcome.** Screen (loosened §717): Kalshi's biggest data-publication
+series (16.9M contracts in 23 movies since 2026-08-19; 58 more Jan-Aug 2026 under /historical). Each event: "Tomatometer above K on the
+Monday after wide release at 10:00 ET", 10-19 strikes. The film-watcher folk rule: early (festival / embargo-day) reviews run kinder, so
+scores drift down as the rest arrive. Hypothesis: Kalshi anchors on the current score, so YES on strikes near it is overpriced days before
+settlement. Why isn't everyone doing it? A niche retail market; the drift is lore, not a posted number; it needs per-movie patience.
+1. **Trade (fixed):** at the hourly candle ending 72 h and 48 h before the close, every strike whose yes mid ((bid + ask) / 2) is in
+   [0.30, 0.70] with a live quote (bid > 0, ask < 1, spread ≤ 10¢): **buy NO at 1 − yes bid**, hold to settlement; Kalshi's taker fee
+   ceil(7 × q × (1 − q)) ¢ at NO price q. **2 tests** (72 h, 48 h).
+2. **Statistic:** each event's mean net per contract over its qualifying strikes; t over events. Also reported: the market-implied median
+   (where the strikes' yes mids cross 0.5) minus the final score, per horizon.
+3. **Discovery: events closing before 2026-06-01. Sealed: 2026-06-01 → 2026-10-19** (asserted in code). Carried: t > 1.96, mean > 0.
+   Validation once as §664.4; watchlist per §133.
+4. **Caveats fixed now:** candle quotes are the hour's last quote (fills assumed); strikes are correlated within an event (hence t over
+   events, not strikes); capacity = the qualifying strikes' hourly volume.
+
+## 737. R-family 1: no drift to sell — the market's implied median is the final score (S10)
+
+**N 1,536 (no trial).** `reports/r1_discovery.json` (module `rt/r1_drift.py`). Implementation notes (not tuning): candles exist only for
+hours with activity, so each horizon uses the last candle at or before it (within 6 h); /historical candles name prices `close`; older
+markets store a label, so each event's final score is bracketed from its strike results. Discovery (closes before 2026-06-01): **72 h:
+25 events, 30 strikes, +2.14¢ (t 0.23); 48 h: 13 events, 15 strikes, −18.81¢ (t −1.48)**; market-implied median − final **+0.41 pt
+(t 0.79) / −0.34 pt (t −1.12)**, n 31. Not carried; no validation. Kalshi's RT markets already price the drift. Closed.
+
+## 738. Screen: Kalshi daily-high brackets after the temperature passes them — taken before the public 5-minute reading (S10)
+
+**No trial.** `weather/w1_cross.py`, `reports/w1_cross.json`: IEM 5-minute ASOS (MDW, MIA, AUS, LAX, DEN, PHL) × Kalshi trades, settled since
+2026-08-20. A first pass used the 30 h before the close and so mixed in the previous afternoon (apparent $32k prize, 5 h to collapse, 97%
+signal) — a bug; the NWS climate day is local STANDARD time. Fixed: a 5-minute reading ≥ the bracket top + 0.5 F → settled NO in **818 of
+818** brackets (a perfect signal), but only **18** brackets were still ≥ 15¢ when it arrived, the price fell to ≤ 5¢ in a **median 1.3
+min** (p90 3.1), the prize after the reading was **$1,718 in two months**, and 8,921 NO contracts were bought at ≤ 85¢ in the 30 min
+BEFORE it — others watch faster data. Closed.
+
+## 739. F-family 3 protocol — ForecastEx Nasdaq contracts (FNQ) in their last 15 minutes against the futures price (S10)
+
+**No trial spent. Written BEFORE any FNQ trade is compared with any futures price or settlement.** Screen (loosened §717): an **access**
+edge — ForecastEx is reachable only through IBKR, and its FNQ contracts ("will lead-month Nasdaq-100 futures settle above K?", ~16,000
+a day, trading to 15:00 CT, settled on CME's daily settlement) are quoted by retained market makers for IBKR retail. In the last minutes
+the outcome is nearly fixed by where the futures trade. Why isn't everyone doing it? It needs both an IBKR ForecastEx account and a
+futures feed; the window is minutes a day. Against it: retained MMs hedge with futures and may already price it.
+1. **Signal (fixed):** each FNQ trade (pair) between 14:45 and 15:00 CT on its contract date; the lead-month MNQ 1-minute close for the
+   last minute ending at least 1 minute before the trade (latency allowance); distance d = (F − K) / F. **YES if d ≥ +0.25%, NO if
+   d ≤ −0.25%**, else no signal.
+2. **Trade:** where the signalled side printed at ≤ 90¢, buy it at the printed price + 1¢ slippage + 1¢ fee; hold to settlement.
+3. **One test.** Statistic: each contract date's quantity-weighted mean net per contract; t over dates; signal hit rate reported.
+4. **Discovery: contract dates before 2026-03-01. Sealed: 2026-03-01 → 2026-10-09** (the end of the futures data; asserted in code).
+   Carried if t > 1.96 and mean > 0; validation once as §664.4; watchlist per §133. Capacity: qualifying contracts a day.
+
+## 740. F-family 3 discovery: carried, and its source is the futures ROLL; F-family 4 registered before the sealed look (S10)
+
+**N 1,536 (no trial yet).** `reports/f3_discovery.json` (module `forecastex/f3_fnq.py`). Implementation fix before reading the result:
+the first pass took the lead month as the day's highest-volume MNQ contract, which rolls a week before expiry (hit rate 17%); §739
+says lead month, which ForecastEx defines as the nearest contract until its final settlement — fixed to that (hit rate 100%).
+**Discovery (2025-05 → 2026-02): 48 trades, 21,921 contracts, +16.9¢ a contract, t 3.53 over only 4 dates, $5,362 → CARRIED**, but
+it is concentrated: **2025-12-16 (13,500 contracts, +$4,150) and 12-17 (7,920, +$1,167), 3 and 2 days before the December expiry**,
+plus 2025-09-19 (expiry day, $209) and two small trades. Reading: in roll week FNQ trades as if it referenced the NEXT quarterly contract
+(~0.5-1% higher), while it settles on the expiring lead month — e.g. 12-16: lead 25,180 vs strike 25,300, NO traded at 48-54¢.
+**F-family 4 (registered now, from that reading, before any sealed data is opened):** same as §739 (signal from the LEAD month,
+latency 1 min, printed price ≤ 90¢, +1¢ slip +1¢ fee) but (a) only on **roll days** — trading days on which a later quarterly MNQ
+contract out-trades the lead month while the lead month is unexpired — (b) window **13:00-15:00 CT**, (c) threshold **|d| ≥ 0.40%**.
+One test; sealed window as §739 (2026-03-01 → 10-09: the March, June and September 2026 rolls); same carry/validation rules (here the
+sealed run is the only run). Both F3 (as registered) and F4 are now validated once on the sealed window.
+
+## 741. F-families 3 and 4: the December 2025 roll mispricing did not repeat — rejected (S10)
+
+**N 1,538 (two trials, t01537-t01538).** Sealed 2026-03-01 → 10-09 (the March, June, September rolls). **F3 (§739 as registered): 17
+dates, 63 trades, 19,426 contracts, hit rate 81%, −4.85¢ dated mean, −$401, t −0.48, placebo 31% → REJECT. F4 (§740, roll days): 7
+dates, 81 trades, 7,526 contracts, hit rate 86%, +6.24¢ dated mean but −$1,124 in dollars, t 0.61, placebo 72% → WATCHLIST by the letter
+of §133 (dated mean > 0), but net-negative in money: treated as no edge and not forward-tracked.** The 2025-12-16/17 episode was a
+one-off. ForecastEx's index contracts are priced off the right contract in its rolls now. Closed.
+
+## 742. C-family 1 — Kalshi combos (RFQ parlays): the sellers' margin, and a protocol to price them from their legs (S10)
+
+**No trial. Screen (loosened §717): structural + access.** Combos (MVE) are created on request (RFQ); makers answer with a yes bid and
+a no bid for the full size, the requester takes the best; quotes are private; any member may quote via the API per Kalshi (Sportico),
+onboarding unverified; Oddpool (2026-05, 270 test RFQs) saw ~5 combo-only makers, 2.7-3.7 quoting each request, responses < 300 ms,
+**inside combo spread 40.5¢**. Why isn't everyone doing it? It needs a multi-leg pricing engine, a live WebSocket/REST quoting bot and
+capital, against a few incumbents. **Calibration (`combo/c1_calib.py`; 149,754 settled combos, 204M contracts, the latest ~30k in each
+of five MVE series):** sellers kept **$1.97M on $11.44M of premium (17%)**; by price band the seller earned 1.6¢ (2-5¢ band), 3.4¢
+(5-10¢), **5.9¢ (10-20¢), 7.5¢ (20-35¢)** a contract; 35-65¢ about fair; 65-95¢ the buyer +4-5¢ (sellers underprice favourites).
+**C-family 1 protocol (fixed now, before any leg price is looked up):** a stratified sample of settled combos in
+KXMVESPORTSMULTIGAMEEXTENDED and KXMVECROSSCATEGORY whose legs are all in **different events** (no two legs share an event_ticker:
+treated as independent). Fair value = the product over legs of each leg's own Kalshi mid (side-adjusted) at the last 1-minute candle
+before the combo opened. Report (a) executed price ÷ fair (the incumbents' markup) by price band, (b) calibration of FAIR against
+results (is the product unbiased?), (c) the P&L of a seller who quotes YES at max(fair × 1.15, fair + 1¢) and wins every combo where
+that undercuts the executed price — net of Kalshi's fee. Descriptive (no trial); a positive (c) with (b) unbiased means a forward
+shadow test on live RFQs (no orders) is next, which needs the user's Kalshi API key (on the droplet) — the user's call.
+
+## 743. C-family 1 result: the leg-product cannot price combos historically; the sellers' margin is real but band-specific (S10)
+
+**No trial.** `combo/c2_legs.py`, `reports/c2_legs.json` (1,336 of 1,500 sampled combos priced). First pass took empty books (bid 0 /
+ask 1 → a fake 50¢ mid) and stale candles — fixed to a real two-sided quote (spread ≤ 10¢) ≤ 5 min old; the result is still unusable:
+by band the leg product misses the outcome by 4-46 points (65-95¢: product 0.50 vs YES rate 0.96). Two reasons, seen by hand: (1)
+crypto 15-minute legs in one window (BTC/ETH/HYPE/… "down") are one bet, not independent — six legs at ~75% multiply to 17% while the
+combo trades at 81% and wins; (2) many combos are built in play, when legs are nearly decided. Takers (150 sampled combos): **85% of
+contracts are YES buys** — so §742's calibration is the parlay buyers' result: they **overpay on 2-35¢ combos (sellers +1.6 to +7.5¢)
+and are underpriced on 65-95¢ in-play combos (buyers +4-5¢)**. Quoting at fair × 1.15 on the (wrong) product loses $34k — a statement
+about the product, not about quoting. A quoter needs a correlation-aware, live pricing engine; only a live shadow test (RFQs on the
+authenticated WebSocket, our would-be quote vs the executed price vs settlement, no orders) can measure it. Pending the user's decision
+on API access.
+
+## 744. C-family 1 forward shadow test deployed on the droplet (user-approved 2026-10-19; read-only, no orders) (S10)
+
+**No trial.** `kalshi_lip/rfq_shadow.py` runs as systemd `kalshi-rfq-shadow` in /opt/kalshi-lip (venv + `websockets` added), with the
+user's existing Kalshi key (only KALSHI_KEY_ID / KALSHI_KEY_PATH exported; the key is never read by us). It subscribes to the
+authenticated `communications` channel and NEVER creates RFQs or quotes. **Observed: > 1,000 RFQs a second** (73,282 created and 71,778
+deleted in one minute; most $10 target-cost requests withdrawn within the minute) — so it logs a deterministic 0.1% hash-sample of RFQ
+ids (~36 a minute, ~300 MB a day): the RFQ (legs, size, created_ts), each leg's top of book at that moment (batch orderbooks, ≤ 4 req/s),
+and the RFQ's deletion; it stops writing below 10 GB free disk. Analysis (to write once data accrues): join each sampled RFQ's combo
+ticker to its public trades (executed price, taker side) and settlement; price it from the leg books (crypto legs in one window
+grouped as one bet; in-play combos flagged); measure a would-be quoter's wins and P&L after fees, by price band.
+**Parked (user, 2026-10-19):** new strategies must start on ~$100-200. Combo quoting is capital-bound (a 15¢ parlay ties up 85¢ until
+settlement): $200 sells ~$35 of premium a cycle, ~$3-7 at a 10-20% edge — a test, not income. The sample's seller margin is also noisy
+by window (KXMVESPORTSMULTIGAMEEXTENDED Aug 17-30: 0.4% of premium; cross-category windows 38-71%). The read-only shadow logger keeps
+running ~2 days so the evidence exists for later; then it is stopped. Revisit once another stream funds the capital.
+
+## 745. Screens: no riskless structure on Kalshi; K-family 9 protocol — base rates across ALL mention series (S10)
+
+**No trial. (1) Riskless structure (`arb/a1_scan.py`, `arb/a2_cross.py`), 2026-10-19 17:04Z:** 12,907 open events — mutually exclusive
+sets (sum of YES bids > $1 after fees): **0**; one-sided threshold ladders (lower-K ask < higher-K bid after fees; first two passes had
+false positives from mixing teams / players, fixed by grouping on the ticker stem): **0**; 702 "above K" markets against the sum of their
+range brackets (INXU/INX, NASDAQ100U/NASDAQ100, BTCD/BTC, ETHD/ETH): **0**. Repeated 12 times 17:06-18:17Z (12,905-13,027 events):
+**0 every time.** Kalshi's riskless structure is policed.
+**(2) K-family 9 protocol (written BEFORE any of the new series is downloaded).** Under the $100-200 rule (user, 2026-10-19), the
+closest miss so far was §721 (Trump mention base rates, θ 10¢: +6.76¢, t 1.78, 61 events). Same mechanism, every OTHER mention series:
+all series matched by `mention/m4_series.py` (458) except KXTRUMPMENTION (family 8's data), downloaded with `kalshi/download.py`
+(settled history incl. /historical, hourly candles). **Design identical to §720:** base rate of a normalised word label = share of
+EARLIER events **of the same series** in which it resolved Yes (≥ 5 earlier occurrences); price = the hourly candle ending 1 h after the
+market opened, quote filter bid > 0, ask < 1, spread ≤ 10¢; buy Yes if base − ask − fee > θ (and ≥ the No edge), buy No if
+(1 − base) − (1 − bid) − fee > θ; θ ∈ {5, 10, 15}¢ — **3 tests, pooled over series**. **Discovery: events closing before 2026-06-01;
+sealed: 2026-06-01 → 2026-10-19.** Statistic: each event's mean net per contract; t over events; carried t > 1.96, mean > 0; validation
+once per §664.4; watchlist per §133. Capacity reported (qualifying contracts' hourly volume at the 1 h candle).
+**(3) Post-speech window (screen, no trial):** for the 10-13/16/17 rallies, the trade tapes of the 58 words NOT said (43,090 trades):
+from 30 min after each rally's last said-word sweep to the close, **0 contracts printed at YES ≥ 3¢** (two events' markets closed within
+an hour of the speech). Buying NO on dead words after the speech is already done by others. Closed.
+**K9 status:** its download was stopped part-way (user: a more important download may preempt it; K9 is depth-capped and so below
+the user's scale bar, §745 note in memory) — the discovery run waits; it may be resumed later (the downloader resumes).
+
+## 746. Screen: Kalshi NFL in-play races — the prize is gone within ~10 s of the snap; public feeds cannot reach it (S10)
+
+**No trial.** `sports/s4_inplay.py`: ESPN play-by-play `wallclock` (the snap) for scoring plays and turnovers × Kalshi public trades of
+the home team's winner market, 11 games of 2026-10-18 (two had no matching market), 51 plays moving ≥ 3¢ (median 6.7¢). Stale-side
+taker volume priced against the 50-70 s VWAP, after fee, still available X s after the snap: **3 s $37,748; 6 s $15,562; 10 s $3,970;
+15 s $693; 20 s $440; 30 s $101.** A play lasts 3-8 s and TV / streams / ESPN's feed lag the stadium by further seconds, so a public-feed
+bot arrives after ~15-20 s; the winners use stadium-speed data feeds. The pool is large but not reachable without a paid low-latency
+feed (and even 3-6 s figures partly count plays still unfolding). Closed.
+
+## 747. M-family 2 protocol — in-speech decay: is YES on still-unsaid words overpriced mid-speech? (S10)
+
+**No trial. Written BEFORE any unsaid-word price is compared with any result.** Screen (§717 loosened; user's scale + $100-200 rules):
+not a speed race — a hazard question. While Trump speaks, an unsaid word's YES should fall as time runs out; retail holding YES "in
+hope" would leave NO cheap. Capacity: ~20 unsaid words an event at thousands of contracts each, ~16-19 events a month; capital recycles
+nightly. Why isn't everyone doing it? It needs per-word hazard judgement while live; mention traders are fans of a word, not of NO.
+Data: every public trade of KXTRUMPMENTION markets — said words (`mention_trades/<event>.json`) and unsaid words (`<event>.no.json`,
+`mention/m0_download.py --no`).
+1. **Clock:** speech start = the event's first jump (m1: the first taker sweep of a said word) — what a live bot sees.
+2. **Rule (fixed):** at τ ∈ {15, 30, 45} min after the start, every market of the event that has not yet jumped (no trade ≥ 90¢ so far)
+   and whose last YES print is in [0.10, 0.60]: **buy NO at 1 − last YES print + 1¢ slippage**, Kalshi taker fee, hold to settlement.
+   **3 tests.** Statistic: each event's mean net per contract; t over events; also the hit rate and the next-10-min volume (capacity).
+3. **Discovery: events closing before 2026-06-01; sealed: 2026-06-01 → 2026-10-19.** Carried t > 1.96, mean > 0; validation once per
+   §664.4; watchlist per §133.
+4. **Caveats fixed now:** the last print is not the NO ask (1¢ slippage is the allowance); "start" can lag the true start (it errs late,
+   which is conservative for a decay trade); words said during the speech jump and are excluded only from τ on.
+**Withdrawn before any test (user, 2026-10-19):** its capacity estimate (~$50-300 an event, ~$1-5k a month, depth-capped) is below the
+user's scale bar, so it is not worth the download. No trial spent; the module stays unrun. Rule going forward: the capacity screen
+comes BEFORE any download.
+
+## 748. Screens: ForecastEx retainers (no); prediction-market PROP FIRMS — the Tradeify structure on Kalshi/Polymarket (lead) (S10)
+
+**No trial.** (1) ForecastEx Liquidity Retainer Programs (NTM 226 hourly temps, 253 oil/energy): fixed daily payments for meeting
+spread/size/presence on EVERY strike of 1-21 products, max **3 market makers** a program, a Market Maker Agreement needed, amounts in a
+confidential appendix, programs ending 2026-10-31 — needs inventory capital far above $100-200 and approval: not for us.
+(2) **Prediction-market prop firms (lead; user's scale + $100-200 rules):** firms fund traders on Polymarket/Kalshi with simulated
+evaluations — the same structure as Tradeify (other people's capital supplies the scale). **Funding Predicts** (fundingpredicts.com,
+Polymarket): trailing-EOD accounts 10K $85 … 50K **$209** (target $3,000, DD $2,000, daily $1,000) … 100K **$359** ($6,000 / $3,750 /
+$2,000), 150K $535; static accounts 50K **$375** ($6,000 / $2,500 static / $1,500), 100K **$700** ($12,000 / $5,000 / $3,000); split
+80-90%, weekly payouts, **$100k lifetime payout cap per trader**. **PropMarket** (prop.market, Polymarket + Kalshi): $59+ evaluation,
+20% target, 10% trailing equity DD, markets 20-80¢ resolving ≤ 60 d, 10%-per-market consistency, 70/30 (90/10 add-on). Rough zero-edge
+Monte Carlo (`reporting/a88_pm_prop.py`: fair 50¢ bets, 1¢ spread a contract, one fixed stake a day, weekly withdrawal, 26 funded
+weeks; consistency and caps ignored): P(pass) 21-25%; EV an attempt **50K trailing −$49, 100K trailing −$79, 50K static +$68, 100K
+static +$183** (funded EV $0.7-3.6k). Break-even at zero edge with a crude policy; an optimised policy (as A71 did for Tradeify) and any
+real per-contract edge both add. Open before any money: the exact funded-payout / drawdown interaction, the fill model (ask? size caps:
+'max shares per event'), Texas/US eligibility, and counterparty risk (new firms, crypto/fiat payouts).
+**Update (2026-10-19):** user: Texas allowed; Funding Predicts says it is backed by My Funded Futures (PropFirmMap: "directly backed and
+invested in by MyFundedFutures", $180M+ paid since 2023) — counterparty risk much lower. But the funded rules (PropFirmMap, checked
+2026-07-19): **max $150,000 active funded capital per user; bots / automation / copy trading prohibited; no overnight holding; prices
+≤ 85¢ with ≥ $250 depth within 7¢; real Polymarket books and taker fees**; 5 trading days a 7-day payout cycle, 35% daily consistency
+(50% on 10K), $100 min / $10k max a payout, drawdown locks at the start once a payout is requested; 20 open positions max. At zero
+edge the $150k cap allows ~one 100K + one 50K static account ≈ $5.5k in 26 weeks ≈ **$0.9k a month** (≈ $1.2k at a 5% per-bet edge):
+below the user's scale bar; real books keep depth caps. **Parked** until a same-day, manually tradable Polymarket edge exists.
+**PropMarket fees** (PropFirmMap / polymarketpropfirms reviews): $5K $59, $10K $119, $25K $279, $50K $549, **$100K $1,099**; 70/30 (90/10 a
++30% add-on); founded 2026-05, assessments via "Prop Account, LLC", no payout history. Zero-edge 100K: P(pass) ≈ e^-2 ≈ 13.5% × funded
+≈ 0.7 × $10k = $945 vs $1,099 → **negative** (≈ +$286 once with a 40%-off first-evaluation code). Closed.
+
+## 749. Screens: publication races on Kalshi's chart markets — closed by design (S10)
+
+**No trial.** Kalshi closes these markets BEFORE the source publishes: Netflix Top 10 (KXNETFLIXRANK*) close 23:59 ET Monday, the chart
+posts Tuesday; Billboard Hot 100 #1 (KXTOPSONG) closes before the chart week ends; album units (KXALBUMEQUIV) close at the Luminate value
+time itself (10:00 ET Sunday). No window between publication and close. Also noted: the laptop's Linux container restarted ~16:00Z
+2026-10-19 and killed the scheduled rally recorder; restarted 20:44Z (wall-clock scheduler, ready for 21:30Z).
+Also: Polymarket US lists no mention markets (500 active events: 394 sports, 67 politics, …) — no less-contested venue for the mention
+race; RSBN's Rumble stream returns 403 to automated access (YouTube-only recording tonight).
+
+## 750. Lead: PolyFundr (Polymarket prop firm) — the most generous structure found; unverified, crypto counterparty (S10)
+
+**No trial.** PolyMart's roundup (affiliate links; unverified): **PolyFundr** 10K **$125**, 25K $300, 50K **$500** ($100K "coming soon");
+target **30%**, total drawdown **20% trailing from peak equity**, daily 10% of the day's start, max risk 5% of start a trade, consistency
+30% of profit a day (40% in funded payout windows), 14-day inactivity, **90% split**, "no KYC", real Polymarket prices. Also listed:
+FundedPoly (one payout per account, then closed — poor), Funding Predicts (§748), PropMarket (§748). Zero-edge Monte Carlo
+(`reporting/a89_polyfundr.py`: fair 50¢ bets at the 5% risk cap, 1¢ spread, one bet a day best, weekly withdrawal lowering the peak, 26
+funded weeks): **P(pass) ~20%; EV an attempt 10K +$133 (1.1× fee), 25K +$348, 50K +$762 (1.5× fee)**; a 3% per-bet edge roughly doubles
+it. The 20% drawdown vs 30% target is the source (Funding Predicts ~3.75% vs 6%; PropMarket 10% vs 20%). Risks: its site rate-limits
+automated reads (terms unconfirmed from the source); Trustpilot 8 reviews, 2 mention a payout; payments in USDT on BSC, no KYC →
+offshore crypto counterparty; payout cadence/caps and account limits unknown. Next (user): confirm terms in a browser; a 10K ($125)
+evaluation would test rules and payouts end to end.
+**Closed (user, 2026-10-19):** no KYC + crypto-only + 8 reviews = a grey-area firm; a site that blocks automated reads likely blocks bots too.
+Rule: only legitimate, KYC'd, established counterparties.
+
+## 751. Screens: prediction-market tool businesses (crowded); White House stream (YouTube); new sports venues mirror Kalshi (S10)
+
+**No trial.** (1) Selling tools/data to prediction-market traders: 288 tools listed (GitHub directory); mention tools charge ~$199-200 a
+month (Mention Metrix, Mention Market Analyzer), arbitrage alerts $59-299, analytics $9-30 — people pay, but it is a crowded business,
+not an edge; kept as a later option. (2) Since 2026-09 the network TV pool skipped some events and the White House streams its own
+24/7 feed ("TRUMP TV", whitehouse.gov/live) — it embeds the White House YouTube stream, already in tonight's recording; free-to-air
+satellite pool feeds: no evidence found. (3) New CFTC sports venues reportedly open to Texans (FanDuel Predicts/CME, DraftKings
+Predictions/Railbird, Gemini Predictions, Crypto.com/OG, Underdog): Gemini's public API (`arb/a3_gemini.py`) — tonight's MNF 49ers
+78/79¢ on both Gemini and Kalshi (Gemini volume $47k vs Kalshi $5.2M); **51 game-winner markets (NFL/NBA/NHL) paired team-vs-other-team
+across the two venues: 0 combinations under $1 after fees** (a first pass paired the same team — bug, fixed). The new venues' market
+makers quote off Kalshi; the others publish no prices to check. Closed.
+(4) Productising the Tradeify prop-firm EV/policy machinery: free Monte-Carlo pass-probability calculators already exist (Phoenix Planner,
+Trader's Second Brain, One Trade Journal); prop-firm affiliate commissions ~10-20% of evaluation fees (Track360 estimates) with
+established comparison sites (PropFirmMap, Track360). A marketing business against free tools — not an edge. Not pursued.
+
+## 752. E-family 1 protocol — earnings-call mention markets: the press release is public before the call (S10)
+
+**No trial. Written BEFORE any Kalshi earnings-mention price is compared with any press release or result.** Screen (user rules:
+legitimate, small start, scale; capacity first): companies file the earnings press release (8-K, Exhibit 99.1; EDGAR records the
+acceptance time to the second) ~30-60 min before the call, and executives largely read its highlights. Words in the release should be
+near-certain to be said. Capacity: 191 Kalshi earnings-mention series; 71 settled events 2026-08-19 → 10-19 (off-season) with 5.4M
+contracts (~76k an event); earnings season (late Oct-Nov) is several times busier — a rough ceiling of ~$5-20k a month at full capture
+if the gap exists. Why isn't everyone doing it? It needs an EDGAR watcher + word matching within minutes, per company; mention traders
+watch the call, not the filing. Data: Kalshi markets (live + /historical) and public trades; EDGAR submissions + filing documents.
+1. **Clock:** t0 = the EDGAR acceptance time of the company's 8-K whose exhibit is the earnings press release, filed within the 36 h
+   before the market's close; trade time = t0 + 5 min (read + order latency).
+2. **Rule (fixed):** for each word market of the event, if any form of the word (Kalshi's label split on "/", case-insensitive, whole
+   word) appears in the press release text AND the last YES print before t0 + 5 min is ≤ 85¢: **buy YES at that print + 1¢ slippage**,
+   Kalshi taker fee, hold to settlement. **One test.** Also reported (descriptive): the same for words NOT in the release (buy NO when
+   YES ≥ 15¢ is NOT a test); hit rates; contracts traded in the 30 min after t0 (capacity).
+3. **Statistic:** each event's mean net per contract; t over events. **Discovery: events closing before 2026-06-01; sealed:
+   2026-06-01 → 2026-10-19.** Carried t > 1.96, mean > 0; validation once per §664.4; watchlist per §133.
+4. **Caveats fixed now:** the last print is not the ask (1¢ allowance); some releases may not match the speaker or the exact word form;
+   events whose 8-K cannot be matched are excluded and counted.
+
+## 753. E-family 1: Kalshi already prices the earnings press release — not carried (S10)
+
+**N 1,538 (no trial).** `earnings/e0_download.py` (191 series, 450 settled events, 192 MB of trades), `earnings/e1_edgar.py`,
+`earnings/e2_rule.py`, `reports/e1_discovery.json`. Count markets excluded (as fixed in the code before data). **Clock caveat found:**
+EDGAR acceptance often LAGS the newswire release — Apple's 8-K for its 2026-04-30 call was accepted 2026-05-01 00:30Z, two hours after
+the call; the release itself went out on the wire at 16:30 ET. So 251 of 450 events had no 8-K before the market closed (unmatched);
+for the 199 matched, the EDGAR time is no earlier than the true release — the test trades late, i.e. conservatively. **Discovery
+(closes before 2026-06-01): 124 events with a release, 88 traded, 244 markets: −5.49¢ a contract, t −2.26, hit rate 49%.** Descriptive:
+words in the release YES 79.4% at a mean price 78.5¢; words not in it YES 41.2% at 45.9¢ — the market prices the release correctly,
+and in-release words still ≤ 85¢ are exactly the ones executives skip. Not carried; no validation. Closed.
+
+## 754. M-family forward test (Wichita rally, 2026-10-19): every public stream hears the word AFTER Kalshi's sweep — closed (S10)
+
+**No trial.** `mention/m3_record.py` + a URL recorder (the channel handle @RSBNetwork was wrong; RSBN is @RSBN — fixed at 23:09Z, after
+6 words had been said) recorded RSBN, Real America's Voice, FOX 10 Phoenix, KMBC 9, CBS 13 (from 23:09Z) and ABC, LiveNOW, Fox News;
+`mention/m7_feedrace.py` (faster-whisper base.en, NTP-corrected chunk times) transcribed the windows around each jump; it stopped after
+3 jumps (likely memory on the 2 GB laptop), but the verdict is unambiguous (`reports/m7_wichita.json`): **lead = sweep − heard on the
+stream: RSBN −5.1 / −3.3 / −4.8 s (NATO / Kamala / Cattle); Real America's Voice −6.5 / −5.7 / −6.2; FOX 10 −7.4 / −12.2; Fox News
+−10.0 / −11.4; KMBC −13.2 / −12.4 / −8.8** (ABC, LiveNOW, CBS: not heard / not carried). §734's bar was lead ≥ +1.5 s on ≥ 60% of jumps:
+**0%; the fastest public stream is 3-5 s late before any transcription or order latency** — consistent with the recorded-timeline
+measurement (§734.2). The public-feed route to the mention race is closed. A cable/satellite capture would have to gain > 5 s on RSBN's
+YouTube feed; not proposed without evidence that any consumer feed does.
+
+## 755. C-family 1 shadow result: incumbent combo makers price within ~6% of fair — no room for a new quoter; logger stopped (S10)
+
+**No trial.** 12 h of the droplet's 0.1% RFQ sample (104,227 RFQs, 96,473 with leg books; Kalshi saw 54M RFQs that day).
+`combo/c3_shadow.py` (two-pass streaming; the first in-memory load was OOM-killed on the 2 GB laptop), `combo/c3b_fills.py`,
+`combo/c3c_price.py`. Combo tickers are SHARED across requesters (a market's volume is not one RFQ's fill), so a fill = a trade on the
+combo within 30 s of the RFQ: **528 of 3,000 sampled RFQs (17.6%)**; 2,884 of the 3,000 were sports combos (filled 475, ~2,900
+contracts each). **Independent pre-game sports combos (legs in different games, every leg quoted 5-95¢ with spread ≤ 10¢), YES fills:
+145; executed ÷ leg-product fair: median 1.06 (quartiles 1.02 / 1.14).** Settled 82: YES 11.4% (contract-weighted) vs fair 8.8% vs
+executed 9.1%; sellers −$2,808 on $10,760 premium that day (noise). A quoter at fair × 1.05 would have won 6 of 82, × 1.10 one, × 1.20
+none. §742's 17% historical margin sits in long-shot / in-play / correlated combos, where the incumbents' models beat a leg product.
+**Closed.** `kalshi-rfq-shadow` stopped and disabled on the droplet (data kept: /opt/kalshi-lip/rfq).
+
+## 756. K-family 10 protocol — favourite/long-shot bias in Kalshi game-winner markets (autonomous session, 2026-10-20) (S10)
+
+**No trial spent. Written BEFORE any game-winner price is compared with any result.** Screen (user rules): legitimate venue (Kalshi);
+small start; capacity is the deepest on the exchange (millions of contracts a game); no keys needed to test (keys only to trade —
+tabled until the user is back). K-family 1 found no long-shot bias in index brackets (§665), but sports books are known for it and
+Kalshi sports are retail-heavy. Why isn't everyone doing it? If it exists, it would be eaten by makers — this is a check that the
+market is calibrated, cheap to run on public data.
+1. **Data:** settled KXNFLGAME, KXNBAGAME, KXMLBGAME, KXNHLGAME (+ KXNCAAFGAME, KXNCAABGAME where present) via `kalshi/download.py`
+   (live + /historical, hourly candles).
+2. **Price (fixed):** the hourly candle ending 6 h before the market's close (pre-game for every sport; games end ≤ ~4 h after
+   start), quote filter bid > 0, ask < 1, spread ≤ 5¢; one market per game (the team listed first in the event's markets, to avoid
+   counting both sides of one game).
+3. **Trades (fixed), Kalshi taker fee ceil(7·q(1−q))¢ at price q:** (a) long-shot side: YES mid ≤ 25¢ → **buy NO at 1 − YES bid**;
+   (b) favourite side: YES mid ≥ 75¢ → **buy YES at the ask**. **2 tests per sport, pooled across sports = 2 tests** (sport-level shown,
+   not tested). Statistic: per-game net per contract; t over games; monthly sign shown.
+4. **Discovery: games closing before 2025-10-01. Sealed: 2025-10-01 → 2026-10-19.** Carried t > 1.96, mean > 0; validation once per
+   §664.4; watchlist per §133. Capacity reported (volume at the 6 h candle).
+
+## 757. F-family 5 protocol — favourite/long-shot bias across every ForecastEx product (autonomous session) (S10)
+
+**No trial. Written BEFORE any ForecastEx price is compared with any settlement in this family** (families 1-4 used only UH*/HRU*/FNQ
+late windows). Data on disk: every trade (`forecastex/pairs_all`, 810 days) and every settlement (`prices_all`). ForecastEx is IBKR's
+retail venue — where a long-shot bias is most plausible. Trading would need the user's IBKR/TWS session → tabled if it passes.
+1. **Trades (fixed):** every pair priced at least 24 h before its contract's expiration: (a) yes ≤ 15¢ → **buy NO at the pair's NO
+   price + 1¢**; (b) yes ≥ 85¢ → **buy YES at the pair's YES price + 1¢**; 1¢ ForecastEx fee; hold to settlement. **2 tests.**
+2. **Statistic:** each contract-expiry event's (product + expiration date) quantity-weighted mean net per contract; t over events;
+   product categories shown, not tested.
+3. **Discovery: expirations before 2026-03-01; sealed 2026-03-01 → 2026-10-19.** Carried t > 1.96, mean > 0; validation per §664.4.
+
+## 758. F-family 5: no long-shot bias on ForecastEx — both sides lose; not carried (S10)
+
+**N 1,538 (no trial).** `forecastex/f5_longshot.py`, `reports/f5_discovery.json`. Discovery (expirations before 2026-03-01, trades ≥ 24 h
+before expiry): **long-shot NO −4.38¢ a contract (2,451 events, 160M contracts, t −7.76); favourite YES −3.22¢ (2,548 events, t −6.11).**
+Contract-weighted by category, Economic/Elections/Government/Technology/Sports looked positive (+2 to +7¢) while Environmental and
+Financial were negative; checked at the event level inside discovery before registering anything: that subset is **NO −2.42¢ (t −2.52),
+YES −0.98¢ (t −1.15)** — the positive weighting came from a few large NFL game-winner trades. No hypothesis registered. Closed.
+
+## 759. Screen: requesting correlated same-game combos — makers price the correlation; buyers lose (S10)
+
+**No trial.** Idea: the requester gets the cheapest quote, so one maker pricing correlated legs as independent would underprice
+positively-correlated parlays. Shadow sample (`combo/c3d_samegame.py`): 1,933 of 3,000 sampled RFQs had same-game legs (mostly NFL props
++ game), 332 filled. **Sports same-game YES fills 226: executed ÷ independent product median 1.23 (makers add for correlation); settled
+208: YES 1.0% vs executed 2.1% vs independent 1.4%; buyers −$12,546 on $12,576.** Crypto same-window: ×2.56, buyers −$669 on $1,032.
+No requester edge. Closed.
+
+## 760. K-family 11 protocol — single player props on Kalshi (anytime TD, rushing yards, NHL goals) (autonomous session) (S10)
+
+**No trial. Written BEFORE any prop price is compared with any result.** Screen: the deepest retail markets found — KXNFLTD had
+71.6M contracts on its first 1,000 settled markets (YES rate 7.4%), KXNFLRSHYDS 15.8M (YES 32.8%), KXNHLGOAL ~1M (YES 8.4%). Sports
+books are known for "over"/YES over-betting on props; Kalshi props are retail-heavy. Keys needed only to trade (tabled).
+1. **Data:** settled KXNFLTD, KXNFLRSHYDS, KXNHLGOAL (live + /historical, hourly candles) via `kalshi/download.py`.
+2. **Price (fixed):** the hourly candle ending 6 h before the market's close (pre-game), quote filter bid > 0, ask < 1, spread ≤ 5¢.
+3. **Trades (fixed), Kalshi taker fee:** (a) YES mid ≤ 35¢ → **buy NO at 1 − YES bid**; (b) YES mid ≥ 65¢ → **buy YES at the ask**.
+   **2 tests, pooled over the three series** (series shown, not tested). Statistic: each game's (event's) mean net per contract; t
+   over games.
+4. **Discovery: games closing before 2026-03-01 (the 2025-26 seasons); sealed 2026-03-01 → 2026-10-19.** Carried t > 1.96, mean > 0;
+   validation per §664.4; watchlist per §133. Capacity reported.
+
+## 761. Screens: Kalshi rebate programs 2026 (institution-only); early demo read (autonomous session) (S10)
+
+**No trial.** Kalshi launched perpetual futures in 2026; its Temporary Perpetual Fee Rebate Program (CFTC filings 2026-06-25, updated
+2026-09-24 for 2026-10-08) rebates fees only to **Self-Clearing Members**, and never beyond fees paid (makers net ~0.3 bps on crypto
+perps) — a fee holiday for institutions, not a payment. The 2026-02 Sportsbook Hedging Rebate waives fees for sportsbooks only. Not
+for us. **Early demo read** (`a18_demo_check --review`, read-only): 35 tickets, TAKE 11 / STOP 23 vs 15.1 / 18.3 expected; shadow
+−$11,007 vs −$814 ± $6,076 (z −1.68); every product negative; execution matches (median gap $2.56). Logged for the 10-25 review.
+
+## 762. K-family 10 discovery: thin (sports volume came after the split); favourite-YES near miss → K-family 10b registered (S10)
+
+**N 1,538 (no trial yet).** `kalshi/k10_sports_fl.py`, `reports/k10_discovery.json`; download: NFL 474, NHL, NBA, NCAAF 1,770, MLB 4,494
+events (427 candle requests failed and were skipped). Discovery (games before 2025-10-01, spread ≤ 5¢ at the 6 h candle) is thin
+because Kalshi's sports volume arrived later: **long-shot NO −1.19¢ (155 games, t −0.51); favourite YES +3.84¢ (114 games, t 1.69,
+4 of 6 months positive)** — not carried. **K-family 10b (registered now, before the sealed window is opened):** the favourite-YES rule
+of §756 (YES mid ≥ 75¢ at the 6 h candle, buy at the ask, taker fee) as ONE test on the sealed window 2025-10-01 → 2026-10-19, all five
+series pooled; per-game t; CONFIRM per §664.4, watchlist per §133.
+**K-family 10b sealed (t01539): 556 games, favourite YES −1.74¢ a contract, t −1.15, 5 of 13 months positive → REJECT. N 1,539.**
+Kalshi's game-winner lines are calibrated at both ends. Closed.
+
+## 763. A90: zero-edge value of each prop firm — Tradeify, Lucid and TPT are positive with NO edge (autonomous session) (S10)
+
+**No trial.** `reporting/a90_zero_edge_firms.py`: each firm's A63 rules and natural mix, sides randomised every session (A73 seeds), mean
+net per 84-session run (fees as stored in A63 on 2026-10-16, Tradeify at today's $116): **Tradeify Select Daily (3 NKD + 2 FDXM)
++$5,523 on 2021-26 paths / +$3,783 on 2010-20 (fees $5,549); Lucid Daily (NKD×3, MNQ, MGC) +$3,428 / +$2,881 (fees $10,024); TPT PRO
++$2,531 / +$2,194 (fees $10,037); MFF Rapid EOD −$2,904 / −$1,878; Phidias Fundamental −$4,495 / −$2,765; Premium −$4,570 / −$2,904.**
+(A85's live-rule figure for Tradeify, +$4,582, is the more exact one; A63's simulator here is the same for every firm.) Three
+legitimate firms pay a structural option with no market edge: together ≈ +$11.5k a run (≈ $2.9k a month; ≈ $2.2k on 2010-20 paths) —
+the scale route that does not depend on the demo's edges. Caveats: Lucid and TPT churn ~$10k of evaluation fees a run (cash buffer
+and drawdown before payouts need an A67-style check); fees and rules must be re-verified at current prices; outcomes across firms are
+correlated if the same sides are traded (the mean adds, the variance grows); the user had deferred a second firm ("months away").
+**Update at current prices** (web, 2026-10-20: LucidPro 50K ≈ $129.50; TPT 50K test $170 a MONTH + $130 activation → modelled $200):
+**Lucid +$4,798 / +$3,667; TPT −$815 / +$275 (drops out).** Tradeify + Lucid ≈ +$10.3k a run (2021-26) ≈ $2.6k a month (≈ $1.9k on
+2010-20). **Cash (`reporting/a90b_cash.py`, 3 seeds, zero edge):** Tradeify P(net>0) 71%, cash low median −$2,552, 5% −$7,424, worst
+−$10,788; Lucid P(net>0) 57%, low median −$3,496, 5% −$8,418; both: net mean +$10,513, P(>0) 67%, p10 −$8,264, cash low median −$6,715,
+5% −$13,646, worst −$18,946. The structural route needs a ~$7-14k bankroll — not a $100-200 start; for the user to weigh.
+**LucidPro's 2026 terms** (proptradingvibes, 2026-10-11 summary): EOD trailing $2,000 MLL locking at $50,100; no evaluation
+consistency; funded payouts min $500, max $2,000 (then $2,500), leave $52,100, 40% best-day cap; optional DLL; 90/10. A63 had modelled
+Lucid with an INTRADAY drawdown and 50% evaluation consistency. Re-run with EOD drawdown, no evaluation consistency, $2,000 payout cap
+at $129.50 (the funded 40% best-day cap not modelled): **zero edge +$9,114 / +$5,944 a run; cash (3 seeds): net mean +$9,555, P(net>0)
+73%, p10 −$4,642, cash low median −$2,590, 5% −$6,993, worst −$9,972** — a profile like Tradeify's. Lucid sits between ~+$4.8k and
+~+$9.1k a run at zero edge depending on the unmodelled payout consistency. Tradeify + LucidPro ≈ +$10-15k a run (≈ $2.5-3.6k a month)
+with zero edge; needs real terms verification and a bankroll; the user's call.
+Mix: LucidPro (2026 terms) with **NKD×5: zero edge +$10,995 / +$7,889 a run** vs +$9,114 / +$5,944 for NKD×3+MNQ+MGC — NKD's
+bracket/volatility profile carries the most option value (the 5 accounts move together, as simulated).
+
+## 764. A90 extended: more firms at zero edge — TradeDay positive; Topstep, Alpha negative (autonomous session) (S10)
+
+**No trial.** Rules from PropFirmMap firm pages (third-party, checked 2026-09/10; verify at checkout) translated into A63's
+simulator (a `pay_frac` option added to the "growth" payout scheme, default 1.0 — earlier results unchanged); all NKD×5, sides
+randomised, 6 seeds. **Topstep 50K** ($85/mo + $149 activation ≈ $130 an attempt; EOD $2,000; 50% evaluation consistency; 5 winning
+days ≥ $150; ≤ 50% of profit and ≤ $5k a payout; 90%): **−$676 / −$631.** **Alpha Futures Standard 50K** ($129/mo; EOD $2,000;
+50% evaluation, 40% funded consistency; 5 winning days ≥ $200; 90%): **−$4,384 / −$3,021** (−$1,396 at a 50%-off code).
+**TradeDay Quick Pay EOD 50K** ($79/mo sale price; EOD $2,000; payouts from day 1, no buffer, ≥ $250; split 50/50 under $4k net
+profit then 80/20): **+$6,164 / +$3,900 with a flat 50% split, +$9,593 / +$6,038 at a 65% blend; cash (3 seeds, 50% split): net mean
++$6,843, P(net>0) 80%, p10 −$5,135, cash low median −$1,975, 5% −$5,925, worst −$8,295.** Positive at zero edge: Tradeify (+$5.5k),
+LucidPro (+$9.6-11.0k), TradeDay (+$6.2-9.6k) ≈ +$21-26k a 4-month run ≈ $5-6.5k a month with no market edge — scaling across
+established firms (each capped at ~5 accounts). Model fidelity is the main risk: each firm's rules are translated from summaries
+(lock levels, monthly billing, payout timing); the signs are more reliable than the dollars. For the user: verify terms, bankroll.
+More firms (same method, assumptions stated): **Bulenox 50K EOD** ($175; $2,500 EOD; weekly ≥ $1,000 payouts, 40% consistency, assumed
+$2,600 reserve; 100% of first $10k): **−$4,708 / −$2,874.** **Elite Trader Funding 50K EOD** (min 5 days; payouts every ~8 qualified
+days, ≤ $2,000; keep 100%): **−$7,816 / −$4,537 at the $347 list price; +$4,905 / +$2,994 at the 70%-off promo ($104)** — positive
+only on a promotion (fragile).
+**Funded Futures Family Prime 50K** ($179/mo; EOD $2,000; 40% consistency; 3 days ≥ $200; funded: winning days ≥ $200 (7 required,
+modelled as 5 — generous), 40% consistency, 100% of first $10k): **−$6,524 / −$4,391.** **Top One Futures Elite Access 50K** ($74
+all-in; EOD $2,000; payouts ~every 10 days, assumed $2,000 buffer, $500-1,500 a payout, 40% consistency; founded 2025): **−$2,892 /
+−$1,856.** **Summary of the zero-edge survey (12 firm/plan models): positive — Tradeify Select Daily, LucidPro (2026 terms), TradeDay
+Quick Pay EOD (and Elite Trader Funding only on a 70% promo); negative — MFF Rapid, TPT PRO (at today's monthly price), Phidias,
+Topstep, Alpha, Bulenox, FFF, Top One.** What separates them: low fee, EOD drawdown, payouts without a large buffer or consistency
+gate, high split.
+
+## 765. A90c: the three positive firms together at zero edge — +$22.8k a run on average, wide tail, ~$10-25k bankroll (S10)
+
+**No trial.** `reporting/a90c_portfolio.py`: Tradeify Select Daily (3 NKD + 2 FDXM, $116), LucidPro 2026 terms (NKD×5, $129.50),
+TradeDay Quick Pay EOD (NKD×5, $79, 50% split) on the SAME randomised sides (3 seeds) — the accounts move together. **2021-26 paths:
+net mean +$22,783 a run (Tradeify +$5,502, Lucid +$10,438, TradeDay +$6,843), median +$16,103, P(net>0) 74%, p10 −$18,134, p90
++$62,511; joint cash low (sum, conservative) median −$9,271, 5% −$22,483, worst −$30,596. 2010-20 paths: mean +$15,838, median +$4,171,
+P(net>0) 60%, p10 −$10,926, p90 +$55,990; cash low median −$6,128, 5% −$17,616.** ≈ $4-5.7k a month on average with no market edge —
+clears the user's scale bar on the mean, but the variance is large (one NKD signal drives 15 accounts) and it needs a ~$10-25k
+bankroll; 26-40% of 4-month runs lose. A real edge would add to this; diversifying the traded market across firms would cut the tail.
+With **independent sides per firm** (as if each firm traded a different rule set): 2021-26 mean +$20,688, median +$18,084, P(net>0)
+79%, **p10 −$6,598** (vs −$18,134 correlated), cash low median −$10,272, 5% −$18,093; 2010-20 mean +$10,850, median +$5,552, P(net>0)
+70%, p10 −$5,102. Practical form: give each firm a different deployed rule / market (NKD dollar-week, FDXM DAX-dollar, MNQ D68, …).
+
+## 766. CORRECTION to §763-765: with their real consistency rules, TradeDay and LucidPro are NEGATIVE at zero edge — only Tradeify stands (S10)
+
+**No trial.** Two rules left out of the earlier models reverse the result. **TradeDay 2.0** (relaunched 2026-05; reviews 2026-06/07):
+Quick Pay has a **5-day minimum and a 30% evaluation consistency cap**; with them (fee $87 with code): **−$2,861 (50% split) / −$2,475
+(80%) a run.** **LucidPro**: funded payouts need the best day ≤ **40% of the cycle's profit** (modelled with the "cycle" scheme:
+cycle_days 1, cons_f 0.40, buffer $2,100, min $500, max $2,000): **−$5,236 / −$3,376** (was +$9-11k without it). The bracket game's
++$1,200 winning days rarely sit below 40% (or 30%) of the needed profit, so consistency rules destroy the option value. **So §764's
+TradeDay and §763-765's LucidPro figures, and §765's three-firm / two-firm portfolios, are WITHDRAWN.** The zero-edge survey now reads:
+**positive — Tradeify Select Daily only (+$5.5k a run; its rules confirmed with the user); negative or unproven — every other firm
+modelled.** Lesson: consistency and payout-gating rules dominate a firm's structural value; only a firm with verified rules counts.
+(Elite Trader Funding's promo-price result also omits its "active trade days" rule — treat as negative.)
+Smaller size at LucidPro (to fit the 40% rule): sim size ×0.3 / ×0.5 / ×0.7 → **−$1,130 / −$2,062 / −$3,149** a run — still negative
+(small size rarely reaches the $3,000 target before fees pile up). Lucid closed.
+LucidFlex (no funded consistency; 50% evaluation consistency; 5 winning days ≥ $150; ≤ 50% of profit and ≤ $2,000 a payout): **−$1,409
+($130) / −$3,589 ($175).** Firm thread closed: **Tradeify Select Daily is the only modelled firm whose structure pays with no edge** —
+worth knowing when choosing a second firm later (an edge would be required elsewhere).
+Tradeify mixes at zero edge ($116): **NKD×5 +$5,929 / +$3,797; 3 NKD + 2 FDXM (the plan) +$5,523 / +$3,783; 2 NKD + 3 FDXM +$5,213 /
++$3,692; the demo's five-product mix +$2,524 / +$1,574.** The planned mix is near the zero-edge best and adds FDXM's independent signal
+— no change needed whether or not the edges hold.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —
