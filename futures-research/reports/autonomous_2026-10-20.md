@@ -77,3 +77,92 @@ whether the structure pays; Tradeify's Select Daily is unusual in passing.
   firm (of ~14 plan models) whose structure pays with zero edge.** A second firm would need a real edge to be worth it.
 - Tradeify mix at zero edge: NKD×5 +$5.9k ≈ the plan's 3 NKD + 2 FDXM +$5.5k > 2+3 +$5.2k ≫ the demo's 5-product mix +$2.5k.
   The planned launch mix is right even if the edges are zero.
+
+### 8. (2026-10-21) Deployed dollar rules forward since 2026-09-01 (A91, §768) — encouraging
+D171 DAX-fades-pound +5.8 bps (n 34), D174 DAX-follows-dollar +20.5 (n 14), D175 DAX-fades-Aussie +4.4 (n 10), D227 NKD-follows-euro
+week +5.4 (n 34) — all four positive, near research size; none significant alone yet. The demo's −$11k is mostly bracket noise plus
+products the launch plan doesn't use.
+
+### 9. (2026-10-21) More screens — all closed
+- Kalshi crypto perps funding carry (§767): ≈ 11-33% a year funding, ~15% a year on capital → capital-bound.
+- Tradeify account cap: 5 funded in any mix (+ ≤ 15 evals / 30 days) — no extra structural room.
+- Limit entries one tick better (A92, §769): lose to market entries (adverse selection > saved tick) → keep market entries.
+- LucidPro with real rules loses even WITH the plan's edges (§770): −$5.6k a run → no second firm without checking consistency rules.
+- FanDuel Predicts sports moved to Crypto.com (no public prices, 2% fee); NFL props for non-playing players settle at fair price, not
+  NO (no inactive-list edge).
+- Player props (K11, provisional, §771): the "retail over-bets overs" idea is wrong in sign; cheap rushing-yards props (20-35¢) hit
+  more than priced (+6.7¢, n 320) — narrow; registered as K11b (buy cheap YES) for one sealed test after the download.
+- Review prep written: `reports/review_2026-10-25_prep.md`.
+
+### 10. (2026-10-20 afternoon) K11c registered (§772) + three screens closed
+- Cheap-YES props, discovery after costs (NFL rushing yards, 6 h lead): +3.0¢ a contract per game, t 0.91 — weaker than the
+  mid-based calibration (+6.7¢); fades by 3 h before close; NHL goals negative. K11c (all sports, year-round) downloading now.
+- Prop-ladder monotonicity arbitrage (bid on a higher strike above the ask on a lower one, same hour): 11 hits in 1.08 M pairs, almost
+  all < 1¢ → closed.
+- Near-certain in-game contracts (ask 90-99¢, last 4 h): game winners fair (−1.8¢ to +1.8¢, no t > 1.6); prop asks at 90-99¢ are
+  stale quotes on markets that settle NO → closed.
+- Novig (CFTC DCM, June 2026; zero pre-game fees) — site behind an AWS CAPTCHA, GraphQL allow-listed → no automated reads; ProphetX
+  API needs keys → tabled (needs the user's login; capacity also unverified).
+- A93 (§773) running: Kalshi × Polymarket US on the same NBA player props (124 matched on the first game; first sweep best net −0.3¢,
+  books near-identical → likely the same market makers on both venues). Result after ~6 h of sweeps.
+- Polymarket US internal consistency (NBA/NHL/NFL, all open events): winning-margin / exact-margin / race-to buckets — sum of asks
+  1.14-2.20, sum of bids ≤ 0.98; no prop-ladder violations → no riskless structure. Closed.
+- K13 (§774-775, esports favourite/underdog before start) registered; amended before outcomes after finding Kalshi's listed start
+  times can be hours wrong (KC-C9 market closed before its own listed start). Provisional discovery (LoL/CS2/Dota): favourite_YES
+  −2.4¢ (t −0.87), underdog_YES −1.7¢ — fair pricing minus costs; rest of the titles downloading.
+- Esports in-play (A94, §776): stale-price value swept in fast moves on LoL matches median $427 / mean $1.3k / max $5.3k a match;
+  one historical alignment: Kalshi's sweep 6.0 s after Riot's frame time. Live recorder scheduled for 2026-10-22 12:00Z (EMEA
+  Masters) and 2026-10-23 17:00Z → (Worlds, 8 matches).
+- Pinnacle (guest odds API) vs Kalshi esports pre-match: 52 matched sides; Kalshi within ~1¢ of Pinnacle's no-vig on the big LoL
+  matches; only 2 sides > 2¢ after fee, both on thin books (≈ $1-2k volume) → a few dollars a day. Closed.
+- Polymarket US has no price history or trades endpoint (closed events only) → no backtests there.
+- (afternoon, after a laptop restart wiped the scratchpad: all jobs resumed detached; recorder scheduler recreated)
+- K14 (§777-778) closed at discovery: following Valorant in-play moves −2.48¢ after costs (t −3.95), −0.36¢ before costs — the
+  screen's positive value came from choosing moves by their later size.
+- Market-making markout (Valorant, 610 matches): makers lose BEFORE fees pre-match (−3.0¢ > 1 h before, −1.3¢ last hour; in-play
+  −0.24¢) — informed takers pick off quotes. Closed.
+- Pinnacle vs Kalshi soccer (909 Pinnacle 1X2 matchups × 817 Kalshi 3-way events → 960 matched sides): 6 sides > 2¢ after fee, the
+  large ones mismatched markets (Pinnacle margin 10-11%). Kalshi soccer — small leagues included — sits on the sharp line. Closed.
+- Pinnacle vs Kalshi NBA player props (main lines, 198 matched, 171 with ≤ 5¢ spread): Kalshi mid − Pinnacle no-vig −0.15¢ mean,
+  0.00¢ median; no side > 2¢ after fee. Kalshi props sit on the sharp main line; the cheap alternate rungs (K11c) have no Pinnacle
+  counterpart. Closed for main lines.
+- Infrastructure: the laptop container restarted twice (scratchpad wiped, jobs killed). Background jobs now live in
+  `scripts/jobs/*.sh` and run as systemd user services `futres-{k11c,k13,a93,a94}` (lingering on → they start with the container).
+- Kalshi × Polymarket US midterm races (19 Senate/governor sides matched by slug): best combined net +0.7¢ (Georgia R), locked to
+  2026-11-03 — capital-bound, tiny. Prices near identical (e.g. Texas 63/64 vs 62/63). Closed.
+- A93 matching bug fixed (Polymarket's 2-letter team codes); tonight's two games now match 245 props; the only > 0 nets sit on dust
+  (0.08-contract offers).
+- A95 closed (§781): BTC 15-min last-minute takers net ≈ −$1.1k a market (median), taker edge −0.1…−0.7¢; book tracks BRTI better than a
+  Coinbase proxy ($4 median error) — the firms there run BRTI replicas.
+- K13 closed (§780). K11c listing now cached on disk (restarts were re-listing MLB forever).
+- Alternate prop rungs vs a Poisson fit to Pinnacle's main line (NBA REB/AST/3PT, 413 rungs): Kalshi tails sit 1-2¢ above Poisson on
+  cheap rungs and 2.6-3¢ below on dear ones — the expected sign of over-dispersion, so model-dependent; outcomes (K11c) decide.
+- (CORRECTED §788: the "$526k matched" figure was resting liquidity, not trades.)
+- **LEAD — A96 (§782-783): ProphetX vs Pinnacle.** ProphetX (CFTC DCM, 48 states incl. TX per reviews; 2% of net winnings) has a
+  keyless public order-book API. Snapshots after the 2% fee: a handful of sides +2-8% vs Pinnacle's no-vig (mostly NCAAF underdogs,
+  some NFL favourites), $15-950 behind each; NFL spreads/totals ($250k-1.3M staked a game) near fair so far. Forward paper bets
+  scored on closing-line value now recording (service futres-a96, every 20 min); first evaluation once ≥ 150 bets have closed.
+- A93 closed (§784). Other TX venues: DraftKings Predictions 403, Fanatics Markets and OG behind Cloudflare challenges → skipped
+  (user rule: blocked automated reads).
+- Kalshi vs Pinnacle, days ahead: NCAAF median −2.13% (§785), tennis median −2.27% (198 sides; > +2% only on name collisions with
+  tournament-winner markets) — Kalshi's sports books sit on the sharp line everywhere checked. ProphetX is the outlier.
+- K11b retired unrun (§785). K11c / K13 jobs gated: sealed downloads only if discovery carries.
+- K11c closed (§789): cheap props −1.13¢ after costs (522 games); only MLB/WNBA lean positive.
+- Maker side of Kalshi NFL game markets (§790): makers lose vs the pre-game closing price in every size bucket → quoting (incl. fee-free
+  Polymarket US) closed.
+- ProphetX: "totalStake" is resting liquidity, not volume (§788 corrects §786). Soccer "moneyline" there is 2-way (no draw) — not
+  comparable with Pinnacle 1X2 without more mapping; dropped (10 sides).
+- Running (systemd user services): futres-a96 (ProphetX vs Pinnacle paper bets, closing-line value), futres-a97 (ProphetX websocket
+  +EV episodes: lifetime/capacity), futres-a94 (LoL race recordings 10-22 / 10-23).
+
+### 11. (overnight 2026-10-21, user away; ≤ 3 small runs at a time)
+- ProphetX NBA player props vs Pinnacle main lines (614 offers): median −6.3%, 3 offers ≥ +2% ($487) → closed.
+- ProphetX alternate spreads/totals vs Pinnacle's own alternate lines (748 offers, NFL/NBA/NHL): median −3.3%, none ≥ +2% → closed.
+  ProphetX's softness is confined to a few long-shot moneylines; A96 likely small even if its closing-line value is positive.
+- Reality-TV elimination markets (Big Brother, DWTS, AGT, Love Island): only Aug-Oct on Kalshi, ~1-4 M contracts a month total →
+  seasonal (user rule) → closed without data.
+- Golf matchups (ProphetX vs Pinnacle): Pinnacle had not posted this week's matchups yet — retry before Thursday's round 1.
+- A94 readout script written (`esports/a94_analyse.py`). Review prep refreshed: A91 to 10-20 (D227 weaker), demo 41 tickets.
+- ProphetX × Kalshi riskless pairs (56 moneyline pairs, same event, both fees): best −1.9% → none. Closed.
+- ProphetX tennis by tier (A96 rows): median EV ATP −2.2%, WTA −2.6%, Challenger −3.5%, ITF −12.3%; only ~19 distinct sides ever ≥ +2%.
+  A96's first 3 closed paper bets (tennis): closing-line EV +7.9% — n far too small. A97 now streams tennis too (§791).

@@ -15308,6 +15308,288 @@ Tradeify mixes at zero edge ($116): **NKD×5 +$5,929 / +$3,797; 3 NKD + 2 FDXM (
 +$3,692; the demo's five-product mix +$2,524 / +$1,574.** The planned mix is near the zero-edge best and adds FDXM's independent signal
 — no change needed whether or not the edges hold.
 
+## 767. Screen: Kalshi crypto perpetuals funding carry — capital-bound ~15% a year; closed (S10)
+
+**No trial.** Kalshi's CFTC-regulated perps (launched 2026-05-29; BTC on BRTI; funding at 00/08/16 ET, capped ±2% per 8 h; ~6x leverage;
+~$8 minimum). Kalshi's research note: BTC funding persistently positive, 0.01-0.03% per 8 h (≈ 11-33% a year); an aggregator showed
++17.9% a year on 2026-10-16; ETH around zero; total perp open interest ~$18-33M. Short perp + long spot carry ≈ 15% a year on capital
+before fees — $30 a year on $200: capital-bound, below the user's scale bar (needs a large bankroll). Closed. Gold watchlist rule
+D727/D728: user asked to re-check in ~a month (~2026-11-20).
+Also checked: Tradeify caps 5 funded accounts in any mix (plus ≤ 15 evaluations per 30 days); Select Flex vs Daily is a payout choice
+after passing, not a separate allowance — no extra structural room inside Tradeify.
+
+## 768. A91: the deployed dollar rules forward (2026-09-01 → now, Yahoo-patched targets) — all four components positive (S10)
+
+**No trial.** `reporting/a91_deployed_forward.py` reuses A49's Yahoo 5-minute targets after the research caches end: **D171 DAX fades
+6B (all) +5.75 bps (n 34, t 0.58; research +7.56); D174 DAX follows DXY (strong) +20.53 (n 14, t 1.66; +10.94); D175 DAX fades 6A
+(strong) +4.35 (n 10, t 0.26; +11.27); D227 NKD follows 6E week (all) +5.38 (n 34, t 0.34; +5.93).** 4 of 4 the right sign at about the
+research size — none significant alone (7 weeks). The demo's adverse −$11k (§761) is mostly bracket noise and the four products the
+launch plan does not use (MNQ, MGC, MCL, ZS). For the 10-25 review.
+
+## 769. A92: limit entries one tick better lose to the plan's market entries — adverse selection beats the saved tick (S10)
+
+**No trial.** `reporting/a92_limit_entry.py`: A21 minute paths from the entry, the plan's brackets (NKD 1 contract +$1,200/−$1,000,
+tick $25; FDXM 2 contracts, per contract +$600/−$500, tick ≈ $1.08), random sides (adverse selection is a property of the path),
+same-minute stop/take → stop. $ a ticket: **NKD 2021-26 market −8.2 vs limit (wait 1/5/15/30 min) skip −38/−31/−32/−28, else market
+−38/−20/−22/−30 (fills 85-94%); NKD 2010-20 market −53 vs −54 … −88; FDXM 2021-26 market −0.4 vs −13 … −21; 2010-20 −17 vs −26 … −30.**
+Fills come on sessions that keep going against the position and the misses are the clean winners. Market entries stay.
+
+## 770. LucidPro with its real 2026 rules loses even WITH the plan's edges — A63's Lucid figure (§631) is superseded (S10)
+
+**No trial.** Launch paths (the deployed rules, 1 tick slippage), A63 simulator: **Tradeify Select Daily ($116, 3 NKD + 2 FDXM) +$6,181
+(P(net>0) 76%, p10 −$2,651) on 2021-26, +$3,834 (72%) on 2010-20; LucidPro 2026 terms (EOD, no evaluation consistency, funded best day
+≤ 40% of cycle profit, ≤ $2,000 a payout, $129.50; NKD×3 + MNQ + MGC) −$5,629 (P(net>0) 1%) / −$3,620 (1%).** A63's "Lucid Daily
++$9.0k (63%)" (§631) modelled an intraday drawdown and no funded consistency; with the funded 40% rule the bracket game cannot pay.
+For a future second firm: check consistency/payout gating first — it decides the answer.
+
+## 771. K-family 11 provisional discovery: cheap props are UNDER-priced (the reverse of the hypothesis) → K-family 11b registered (S10)
+
+**No trial.** `kalshi/k11_props.py` on the data downloaded so far (KXNFLTD started with the 2026 season → no discovery rows; KXNFLRSHYDS,
+KXNHLGOAL), games before 2026-03-01: **cheap_NO (YES mid ≤ 35¢, buy NO) −4.72¢ a contract (129 games, 561 markets, t −1.79; rushing
+yards −6.5¢ on 525, NHL goals +1.8¢ on 36); dear_YES −4.02¢ (80 games, t −0.97).** Not carried. The over-betting hypothesis is wrong
+in sign: cheap props hit more often than priced. Two sidelines checked: FanDuel Predicts' sports moved from CME to Crypto.com (2026-08;
+no public prices; 2% fee on payout) — closed; NFL props for players who do not play settle at "the fair market price before game
+start", not NO — no inactive-list edge. **K-family 11b (registered now, before any sealed row is looked at):** buy YES at the ask on
+props with YES mid ≤ 35¢ at the 6 h candle (taker fee), pooled KXNFLTD + KXNFLRSHYDS + KXNHLGOAL, ONE test on the sealed window
+2026-03-01 → 2026-10-19 once the download is complete; per-game t; §664.4 / §133. Discovery is re-run on the complete data first and
+reported as is.
+
+## 772. K-family 11c registered: buy YES on 20-35¢ player props across every sport — the year-round version of K11b (S10)
+
+**No trial at registration; N 1,539. Written BEFORE any outcome in the new series is looked at.** Why: the only provisional sign in
+K11 sits in 20-35¢ rushing-yards props (YES 34.7% vs 28.0% priced, n 320, discovery calibration); NFL is Sep-Feb only, and the
+user wants year-round strategies. Capacity screened first (outcome-free): 20-35¢ rushing-yards props traded ≈ $100-320k a week in the
+last 24 h before close in the 2026 season; NBA points props trade 14-22 M contracts a month (May-Jun), MLB home-run props 7-43 M
+(Aug-Oct) — capacity is not the constraint. Data: new `kalshi/lean.py` keeps only the candle traded on (batch endpoint after the
+2026-08-19 cutoff, one by one before it); the old full-history download was stopped (rate-limited, 50+ failures).
+- **Universe (fixed):** KXNBAPTS, KXNBAREB, KXNBAAST, KXNBA3PT, KXWNBAPTS, KXMLBHIT, KXMLBHR, KXMLBKS, KXMLBTB, KXNHLPTS, KXNHLAST,
+  KXNHLGOAL, KXNFLRSHYDS, KXNFLRECYDS, KXNFLPASSYDS, KXNFLTD.
+- **Rule:** last hourly candle ending 9 h → 6 h before the market's close; spread ≤ 5¢; YES mid in [0.20, 0.35] → buy YES at the
+  ask, taker fee ceil(7·p(1−p))¢. Statistic: per-event (game) mean P&L a contract, t over events.
+- **Discovery:** markets closing before 2026-08-20, 150 random events a series (seeded by the series name). Proceed to the sealed test
+  only if the pooled discovery mean is > 0 with t > 1.645 AND it is > 0 in at least two of the four sports outside the NFL.
+- **Sealed:** every market closing 2026-08-20 → 2026-10-19, run once (`kalshi/k11c.py validate`); §664.4 rule (t > 1.645, sign-flip
+  placebo ≥ 95th, positive posterior, PRIOR_SD 0.02); seed 772; §133 watchlist otherwise. The sealed window overlaps K11b's for
+  KXNFLTD/KXNFLRSHYDS/KXNHLGOAL; K11b stays registered and is run on its own rule.
+
+## 773. A93 protocol: Kalshi × Polymarket US on the same PLAYER PROPS — a live, no-money measurement (S10)
+
+**No trial; N 1,539. Written BEFORE any price is sampled.** A84 (§714-715) compared game winners only (deep, priced within the fees).
+Polymarket US also lists full player props (NBA points/rebounds/assists/threes, ~300 a game on its public gateway, `bestBidQuote` /
+`bestAskQuote`, no key); Kalshi lists the same lines (KXNBAPTS/REB/AST/3PT, "Name: N+"). Props books are thinner, so gaps may be wider.
+- **Match:** same game, player full name, stat, threshold ("at least N" ↔ "N+").
+- **Net of fees, both legs taker:** buy YES on one venue at its ask and NO on the other (1 − its YES bid); net = 1 − cost − Kalshi
+  0.07·p(1−p) − Polymarket feeCoefficient·p(1−p). Size = the smaller top-of-book quantity (books fetched only for net > 0).
+- **Sweep** every 5 minutes, NBA games starting within 12 h, ~6 hours. **Pass (fixed now):** ≥ 5 distinct positive-net pairs a day
+  with a median top size ≥ $50 and median net ≥ 1¢ → worth an account conversation (both venues need the user's KYC; Polymarket US
+  allowed in TX per §714). Otherwise closed.
+
+## 774. K-family 13 registered: favourite / underdog mispricing in Kalshi ESPORTS match winners, before the scheduled start (S10)
+
+**No trial at registration; N 1,539. Written BEFORE any esports price or outcome is looked at.** Why esports: year-round (daily
+matches across titles), large and growing volume (outcome-free screen, settled contracts: LoL match winner ≈ 10.5 M Aug / 50 M Sep /
+26 M Oct-to-date; CS2 map ≈ 8 M Oct; Dota 2 ≈ 8 M a month; R6 ≈ 2.5 M Sep; Valorant total maps ≈ 0.3-0.4 M), and plausibly fewer
+professional market makers anchoring prices than the major leagues (K10, §756, found the majors fair). Esports markets close at the
+match's END, so the entry is anchored to the scheduled start in the event ticker (`lean.py --start`).
+- **Universe (fixed):** KXLOLGAME, KXCS2GAME, KXDOTA2GAME, KXVALORANTGAME, KXR6GAME, KXRLGAME, KXOWGAME, KXCODGAME, KXMLBBGAME.
+- **Entry (amended in §775: 4 h → 1 h before):** last hourly candle ending in the 3 h before the scheduled start; spread ≤ 5¢; one market an event — the side with the
+  higher mid. **favourite_YES:** its mid ≥ 0.70 → buy YES at its ask. **underdog_YES:** the other side's mid ≤ 0.30 → buy that side's
+  YES at its ask. Taker fee ceil(7·p(1−p))¢. Unit: the event (one bet each); t over events.
+- **Discovery:** matches starting before 2026-08-20, 300 random events a series (`--sample 300`, seeded by series). A test is carried
+  only with discovery t > 1.96 and mean > 0; at most one direction can be.
+- **Sealed:** matches starting 2026-08-20 → 2026-10-19, every event; ONE look at the carried test with the §664.4 rule (seed 774),
+  §133 watchlist otherwise. Capacity reported as contracts traded in the entry candle and over the market's life.
+
+## 775. K-family 13 amended BEFORE any outcome: Kalshi's esports start times can be wrong by hours (S10)
+
+**No trial; N 1,539.** Checked against Riot's public schedule (esports-api.lolesports.com) while screening in-play capacity:
+KXLOLGAME-26OCT151900KCC9 says "scheduled Oct 15 7:00 PM EDT" (23:00Z) but KC-C9 started 18:00Z and the market CLOSED 22:49Z, before
+its own listed start (Kalshi swapped KC-C9 and MVK-FUR). With §774's window (3 h → 0 h before the listed start) such matches would be
+entered in play. **Amended:** the entry candle is the last one ending in the window **4 h → 1 h before the listed start** (a 1 h
+buffer against small errors), and an event is **dropped if its market closed < 20 min after the listed start** (impossible as
+scheduled). Everything else in §774 unchanged. The partial download (0 rows written) was discarded and restarted with this window.
+
+## 776. A94 protocol: LoL in-play — does Riot's public livestats feed beat Kalshi's sweep? (live, no money) (S10)
+
+**No trial; N 1,539. Written BEFORE any live data is recorded.** Outcome-free capacity screen (12 recent DCGI/Worlds matches on
+KXLOLGAME): fast moves (≥ 15¢ within 60 s) leave value swept at stale prices of median $427, mean $1.3k, max $5.3k a match (trades
+in the move's direction within 20 s, valued at the 1-5 min later median). Kalshi's LoL match markets trade 10-50 M contracts a month;
+LoL runs ~10 months a year (Worlds → off-season Nov-Jan); CS2/Dota/Valorant lack a comparable free live feed (HLTV is Cloudflare-
+gated, Dota spectating is delayed 2+ min). Historical frames: the one usable alignment so far (MVK-FUR, 2026-10-15) shows an
+inhibitor in Riot's frames at 23:46:09.2Z and Kalshi's first move trade at 23:46:15.1Z (+6.0 s) — but frame timestamps are game-server
+times, not publication times, so only a live recording answers the question.
+- **Recorder:** `esports/a94_lolrace.py` (Riot frames with first-received time, every 1 s; Kalshi trades on the live match, every
+  1 s; NTP offset). Runs: EMEA Masters 2026-10-22 12:00Z; Worlds 2026-10-23 17:00Z → ~03:00Z (8 matches).
+- **Jump:** a Kalshi move ≥ 15¢ within 60 s; its first trade ≥ 5¢ from the pre-move price = the sweep time. The game event = the last
+  Riot state change (kills, towers, inhibitors, barons, dragons, game end) before the sweep. **Lead = sweep time − our receive time
+  of that frame** (NTP-corrected).
+- **Pass (fixed now):** lead ≥ 1.5 s on ≥ 60% of ≥ 10 jumps, AND the value still available after receive + 1.0 s (stale-price trades
+  after that time, valued as above) has a median ≥ $300 a match. Otherwise closed. A pass is still only a measurement: trading needs
+  the user's Kalshi API key (tabled until they are back), and a §119-style forward test.
+
+## 777. K-family 14 registered: in-play under-reaction in Kalshi VALORANT match markets — follow a fast move, no game feed (S10)
+
+**No trial at registration; N 1,539. Written BEFORE any rule P&L is computed.** Screen (outcome-free price paths, 15-19 recent
+matches a title with > 50k contracts): buying in a fast move's direction X s after its first trade, valued at the 60-120 s later
+median, net of fee and counting losers: **Valorant +$449 / +$393 / +$334 / +$133 a match at 2 / 5 / 10 / 20 s; LoL +$234 / +$114 /
++$47 / +$43; CS2 −$34 / −$48 / −$61 / −$55.** (A first version counting only positive trades overstated all three — corrected.) If
+Valorant prices under-react for 10+ s, a bot needs no game data: Kalshi's own trades are the signal. Valorant was picked from that
+screen, so the sealed test is FORWARD only.
+- **Data:** every KXVALORANTGAME event's trades (one market an event; `kalshi/k14_valmom.py download`).
+- **Signal (causal):** a trade whose price is ≥ 10¢ from the median of the market's trades 120 s → 10 s before it (≥ 3 trades
+  there); no other signal in the previous 120 s. Direction = the move's.
+- **Entry:** the first trade ≥ 5 s after the signal whose taker side is the move's direction, at its price + taker fee (a taker
+  arriving 5 s late). **Exit:** VWAP of the market's trades 60-120 s after the signal, minus 1¢ (half a spread) and the taker fee.
+  Unit: the signal; per-match mean P&L, t over matches.
+- **Discovery:** every match settled before 2026-10-20 20:00Z (including the 16 screened). Carried with discovery t > 1.96, mean > 0,
+  AND positive in ≥ 2 of the 3 calendar-quarter blocks the data spans.
+- **Sealed = forward:** matches starting after 2026-10-20 20:00Z, evaluated once at ≥ 60 matches with signals (or 2026-12-31,
+  whichever first); §664.4 rule (seed 777); §133 otherwise. Trading itself needs the user's Kalshi API key (tabled until they are back).
+
+## 778. K-family 14 discovery: following Valorant in-play moves loses — no under-reaction once the move is defined causally (S10)
+
+**No trial (not carried).** `kalshi/k14_valmom.py` on the first 334 downloaded matches (194 with signals, 1,150 signals, all before
+the cut): **−2.48¢ a contract after costs (t −3.95)**, negative in every quarter (2026Q2 −2.1¢ on 173 matches, Q3 −5.5¢ on 20).
+Before fees and the half-spread: **−0.36¢** (2,214 signals) — no follow-through at all. §777's screen was positive only because it
+picked moves by their later size (≥ 15¢ within 60 s), which a live bot cannot know. Closed; download stopped. Also: K13 provisional
+discovery on 5 titles (341 events) favourite_YES −2.70¢ (t −1.26), underdog_YES −1.11¢ — fair pricing minus costs.
+
+## 779. A95 protocol: Kalshi BTC 15-minute markets in their averaging minute — does the book lag the partly-known average? (S10)
+
+**No trial; N 1,539. Written BEFORE any price is recorded.** KXBTC15M (≈ 3 M contracts ≈ $1.5 M a market, every 15 minutes, all
+year) resolves on the simple average of the 60 one-second BRTI prints before the close, against the same average before the open
+(`floor_strike`); trading runs to the close. In the last minute part of the average is already fixed and the rest is narrow, so the
+fair price is computable from public exchange data. Surely bot-contested; the question is whether a residue above fees is left.
+- **Recorder** (`kalshi/a95_btc15.py`): every second from 120 s before each close to the close: Coinbase BTC-USD ticker (public REST,
+  BRTI proxy), Kalshi's current KXBTC15M order book top (bid/ask/size), receive times. ~3 hours (12 markets) to start.
+- **Fair value:** known part = mean of the recorded proxy prints already inside the window; remaining k seconds: proxy now plus a
+  Brownian average with σ from the last 15 min of 1 s returns; P(YES) = Φ((mean_known·(60−k)/60 + S·k/60 − strike) / (σ_S·√(k³/3)/60)).
+  Proxy basis vs BRTI (Coinbase ≠ BRTI by a few dollars) is estimated per market from the open-average vs floor_strike and removed.
+- **Pass (fixed now):** median over markets of the best executable edge (fair − ask − fee, or bid − fair − fee) ≥ 2¢ on ≥ $100 of top
+  size in the last 60 s, in ≥ 50% of markets. Otherwise closed (bots already price it). Trading would need the user's API key.
+
+## 780. K-family 13 discovery: esports pre-match prices are fair — not carried; closed (S10)
+
+**No trial.** `kalshi/k13_esports.py` on the full discovery sample (8 titles; MLBB had no usable rows): **favourite_YES −0.87¢ a
+contract (786 events, t −0.65); underdog_YES −3.01¢ (789, t −2.25)** — LoL +0.6 / −3.4, CS2 +2.4 / −8.0, Dota −5.0 / +0.8, Valorant
+−2.2 / −1.4, R6 −5.4 / +0.4, OW +1.2 / −3.8, CoD −1.3 / −3.5. Matches the outcome-free Pinnacle check (Kalshi esports within ~1¢ of
+Pinnacle's no-vig). The sealed download was not run (job gated on carrying). Closed.
+
+## 781. A95: Kalshi's BTC 15-minute books price the averaging minute — a public single-exchange proxy cannot beat them; closed (S10)
+
+**No trial.** Historical supplement `kalshi/a95h_btc15_hist.py` (30 recent markets with ≥ $1k of last-minute risk; Coinbase trades
+rebuilt to 1 s as the BRTI proxy): **last-minute takers' net median −$1,093 a market; median taker edge −0.1¢ to −0.7¢ in almost
+every market**. The proxy settles $0.6-13.8 away from Kalshi's expiration_value (median |err| $4.1) — in a close contest's last
+seconds that error is larger than any edge, and the few big positive totals (+$80.8k, +$56.7k, +$21.9k) are exactly the markets
+with $4-7 proxy errors, i.e. the model's error, not the book's. Last-minute capacity is real ($50-180k of risk in close
+contests) but the book tracks BRTI; an edge would need a live BRTI replica from every constituent exchange's order book — what the
+crypto firms in these markets already run. The live recorder (§779) caught one market before a container restart; not resumed.
+Closed. Also: the laptop container restarted a third time — the futres-* services came back on their own.
+
+## 782. A96 protocol: ProphetX offers vs Pinnacle — forward paper bets scored on closing-line value (no money) (S10)
+
+**No trial at registration (one when evaluated); N 1,539. Written BEFORE any paper bet is recorded.** ProphetX (CFTC DCM since
+2026-06; peer-to-peer exchange; reviews: 48 states, not MN/NV → Texas served, to confirm in-app; fee 2% of net winnings, 1% on
+NBA/NCAAB per one source — 2% used throughout) publishes its order book on a keyless public API (`/trade/public/api/v1/events`,
+`/v2/events/{id}/markets`: best back odds per side with the stake behind them). One outcome-free snapshot (2026-10-20 ~23:00Z,
+185 two-way moneyline sides matched to Pinnacle's guest API): **19 sides EV > 0 after the 2%, 7 > +2%, $7.3k of stake at EV > 0**;
+mostly NFL favourites days before kick-off (DAL −166 vs no-vig 65.3% → +3.8% on $228; HOU −315 +3.6%; LAR −172 +3.2%).
+- **Recorder** (`sports/a96_prophetx.py`, service futres-a96): every 10 min, ProphetX events starting within 7 days (tennis, NFL/NCAAF,
+  NHL, NBA, MMA, esports, MLB) × Pinnacle pre-match moneylines; both logged.
+- **Paper bet:** a side whose best ProphetX back price has EV ≥ +2% vs Pinnacle's proportional no-vig after the 2% fee, with ≥ $25
+  behind it; size = min(available, $100); at most one paper bet per side per 6 h.
+- **Score:** closing-line EV = p_close·(D−1)·0.98 − (1 − p_close), p_close = Pinnacle no-vig in the last snapshot before the start.
+  Outcomes recorded too (secondary; too noisy to decide at this size).
+- **Pass (fixed now):** ≥ 150 paper bets; mean closing-line EV ≥ +1.0% with t > 1.645 (per bet) and > 0 in ≥ 3 of 4 sport groups
+  present; AND capacity: the expected value of the week's qualifying stake (Σ size × closing EV) ≥ $500 a week → toward the user's
+  $2k/month bar. Otherwise closed. Betting is manual-capable (days-ahead NFL), so no API key is needed to act.
+
+## 783. A96 amended before any paper bet is scored: spreads and totals added; gentler recorder (S10)
+
+**No trial.** ProphetX's money is not in moneylines: Patriots-Bears had $69.5k on the moneyline but **$485k on the spread and $348k
+on the total** ($250k-1.3M per NFL game across all markets). The first recorder also picked the first market typed "moneyline",
+which on NFL events can be a touchdown-scorer prop (ProphetX types those "moneyline" too) — now selected by `subType`.
+**Amended:** paper bets also on full-game spreads and totals, only at the line equal to Pinnacle's main line for that side (Pinnacle
+proportional no-vig of that market); everything else in §782 unchanged (EV ≥ 2% after the 2% fee, ≥ $25 behind it, size ≤ $100,
+closing-line EV score, pass rule incl. ≥ 3 of 4 sport groups and ≥ $500 a week). Tennis spreads/totals excluded (ProphetX's are in sets,
+Pinnacle's in games — a first sweep showed +12…+37% "edges" from that alone); names shorter than 8 characters must match exactly
+(esports tags mis-paired). Recorder: ~1.5 s between requests, 60 s pause on a
+403 (the CDN rate-limits bursts — a second sweep at 0.4 s spacing was refused), events within 4 days, every 20 minutes.
+
+## 784. A93: Kalshi × Polymarket US player props — gaps are dust or sub-cent; fails §773; closed (S10)
+
+**No trial.** 33 sweeps with matches (3 NBA games, 123-245 matched props a sweep; a team-code bug — Polymarket's NY/SA vs Kalshi's
+NYK/SAS — fixed after the first game). **14 distinct positive-net pairs; the big ones (+2.9…+5.0¢) sit on 0.05-0.08-contract
+Polymarket offers; those with real size are +0.5…+0.7¢.** Median net < 1¢ → fails the pass rule. The two venues show near-identical
+prop books (same market makers). Closed.
+
+## 785. K-family 11b retired unrun in favour of K11c; Kalshi NCAAF days ahead is fair (S10)
+
+**No trial.** K11b (§771: buy YES on ≤ 35¢ props, KXNFLTD + KXNFLRSHYDS + KXNHLGOAL, sealed 2026-03-01 → 10-19) was registered but
+never run; its sealed data were never looked at. K11c (§772) tests the same mechanism on a superset of series, year-round, with its
+own discovery gate — running both would spend two trials on overlapping sealed rows. Retired; K11c is the test. Also: Kalshi's
+NCAAF moneylines days ahead vs Pinnacle no-vig (91 sides): median −2.13% (fair minus costs); the large "edges" were cross-date
+event mismatches. Closed.
+
+## 786. Screen: ProphetX's flow is large; quoting it needs its market-maker programme — tabled for the user (S10)
+
+**No trial.** A96's recorder now logs each market's matched stake. Between two sweeps (00:35Z → 00:54Z, a Tuesday evening):
+**$526k matched — NFL spreads $298k, NFL totals $71k, NBA spreads/totals $85k, NFL moneylines $32k** (≈ $1.5 M an hour even if
+the figure counts both sides). Taking stale offers is small (A96: ~$1k a sweep at EV ≥ 2%); quoting against that flow is not.
+But: (1) the public websocket channels carry only best-line / liquidity / score changes — matched wagers are private, so the flow's
+adverse selection (soft vs sharp) cannot be measured from outside; (2) ProphetX's official fee page (v1.3, 2026-10-12) charges 2%
+of net gains on straight trades; its market-maker page offers onboarding (zero-fee high-frequency API per its marketing) by contact
+only. A 2%-fee user quoting at the best price cannot be +EV against zero-fee professional quoters (the books already sit ~0-2%
+from Pinnacle before fees). **Tabled until the user is back:** an approach to ProphetX's market-maker programme (terms, capital,
+API) is the only route; then a shadow quote test with their private fill feed. A96 (taking) keeps recording.
+
+## 787. A97 protocol: ProphetX positive-EV offer episodes in real time — capacity and competition for A96 (no money) (S10)
+
+**No trial; N 1,539. Written BEFORE any episode is recorded.** ProphetX's public Pusher websocket (`ws.prophetx.co`, key from its
+public `/pusher/public/connection-config`; channel `public-broadcast-service=1-device_type=1-event={id}`) pushes every liquidity change
+with the line's full current ladder (6 NBA games: 1,433 updates a minute). A96's 20-minute snapshots only see offers that survived;
+A97 measures how much positive-EV stake appears and how fast it is taken.
+- **Recorder** (`sports/a97_pxstream.py`, service futres-a97): subscribes to NFL / NCAAF / NBA / NHL events starting within 3 days
+  (refreshed hourly); full-game moneyline / spread / total market ids from one REST call per event (props share the "total" type);
+  Pinnacle no-vig refreshed every 2 min (same matching and lines as A96, §783). An **episode** = the best back offer on a side has EV ≥
+  +2% after the 2% fee; logged: start, end, odds, stake behind it at start and its minimum, end reason (EV < 2% because the offer was
+  taken / pulled / Pinnacle moved).
+- **Readout** (after ≥ 3 days incl. a weekend): +EV stake appearing per day by sport; median episode lifetime; share of episodes
+  ending in < 10 s (contested). Feeds A96's ≥ $500-a-week capacity criterion — a lifetime of seconds means a bot race, hours means
+  manual-capable. Outcome-free; no trial.
+
+## 788. CORRECTION to §786: ProphetX's "totalStake" is RESTING liquidity, not matched volume — the $526k figure is not flow (S10)
+
+**No trial.** Checked over 8 minutes on 4 NFL events: the REST `totalStake` of a market fell by $36,000 while the websocket's summed
+`traded_value` for it was −$36,033 (moneyline −$4,476 vs −$6,027+1,551; total −$5,401 vs −$4,564+64). `totalStake` is the stake
+resting on the book and `traded_value` its change (posts and pulls); neither is matched volume. §786's "$526k matched in 20 minutes"
+counted only increases in resting stake — liquidity being posted, not trades. **ProphetX's traded volume is not public**; the
+maker-route capacity is unknown, and the adverse-selection question remains unanswerable from outside. §786's tabling stands
+(it needs the user and ProphetX's market-maker programme); the "large flow" premise is withdrawn. Also: market ids are per
+market TYPE (shared across events) — A96 keys by (event, market), so its records are unaffected.
+
+## 789. K-family 11c discovery: cheap player props are fairly priced after costs — not carried; closed (S10)
+
+**No trial.** `kalshi/k11c.py` on the full discovery sample (16 series, 60 random events each before 2026-08-20; resumed runs added
+a few extra events): **cheap_YES (20-35¢ mid, buy at the ask) −1.13¢ a contract (522 games, 1,500 markets, t −0.80)** — NBA −4.4¢
+(points −6.7, assists −6.2), NHL −4.4¢, WNBA +4.7¢, MLB +2.9¢ (hits +4.6, HR +7.9, Ks +1.6, TB +0.9), NFL +2.3¢ (rushing yards
++6.7 — the series the idea came from, in-sample; receiving −0.6). Fails the carry rule (pooled t > 1.645 and ≥ 2 positive non-NFL
+sports needed both). The sealed download was not run (job gated). Closed; K11b was retired in its favour (§785).
+
+## 790. Screen: quoting Kalshi/Polymarket NFL game markets loses — takers are informed at every size (S10)
+
+**No trial.** Idea: Polymarket US charges makers nothing and its game books mirror Kalshi's, so quoting there would scale if takers
+lose before fees. Kalshi public trades, 23 recent NFL games (≈ 35 M pre-game contracts): **maker markout against the pre-game
+closing price (median of the last 20 trades 4 h before close), before fees: > 24 h out −1.44¢ (big trades −2.11¢), 2-24 h −0.35¢,
+last 2 h −0.58¢; small (≤ 50) trades −0.16…−0.28¢ — negative in every bucket; per game > 24 h −1.12¢ (t −2.22).** Takers move the
+price their way; a quoter is picked off before any fee. Markout to settlement was too noisy on 23 games (±50¢ a game). Consistent
+with Valorant (§778's markout) and the Pinnacle-anchored pricing everywhere on Kalshi. Closed (NBA download stopped).
+
+## 791. A97 amended: tennis moneylines added (S10)
+
+**No trial.** A96's first three closed paper bets are tennis (closing-line EV +7.9%, n = 3 — no inference); tennis is ProphetX's
+largest category (274 events) and year-round. A97 now also streams tennis moneylines (not handicaps/totals: ProphetX's are in sets).
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —
