@@ -15590,6 +15590,712 @@ with Valorant (§778's markout) and the Pinnacle-anchored pricing everywhere on 
 **No trial.** A96's first three closed paper bets are tennis (closing-line EV +7.9%, n = 3 — no inference); tennis is ProphetX's
 largest category (274 events) and year-round. A97 now also streams tennis moneylines (not handicaps/totals: ProphetX's are in sets).
 
+## 792. A96 caveat (no rule change): its tennis "edges" are a proportional-devig artifact on extreme long shots (S10)
+
+**No trial; the §782 pass rule is unchanged and will be applied as registered — this entry is how to read it.** Almost every tennis
+side A96 flags at EV ≥ +2% is a long shot at +600…+4,300 (e.g. +4,000 at 2.4% implied vs Pinnacle 3.15% proportional no-vig).
+Proportional devig spreads Pinnacle's margin evenly, which over-states long shots — most where margins are widest (lower-tier
+tennis, ITF median −12%). A power-devig sensitivity (raw Pinnacle prices logged since ~06:00Z 2026-10-21, `a96_prophetx.power`):
+on the first 6 closed paper bets **closing-line EV +13.3% proportional vs −19.2% power**. Unless that sign survives at n ≥ 150, a
+proportional "pass" would be the method's bias, not an edge — the morning brief and the final A96 verdict report both. A97's
+"pinnacle_moved" endings are mostly Pinnacle shifting its main line (the old line's fair disappears), not Pinnacle moving to
+ProphetX's price; start/end fair prices are now logged to separate the two.
+
+## 793. A96 amended before any spread/total paper bet has closed: score spreads/totals at the bet's own line (S10)
+
+**No trial.** §783 enters spread/total bets only at Pinnacle's main line, but scored them only if that same line was still Pinnacle's
+main line at the close — when Pinnacle shifts its line (common), the bet went unscored, a selection bias. Now every sweep also logs
+every Pinnacle full-game spread/total line (main and alternate, proportional no-vig) for the matched events (`lines_*.jsonl`), and a
+spread/total bet is scored at its own line from the last Pinnacle snapshot before the start. Moneylines unchanged. No spread/total
+paper bet had closed when this was written (2026-10-21 ~12:40Z).
+
+## 794. A98 protocol: steam lag — does Kalshi's game-line book lag Pinnacle's moves? (live, no money) (S10)
+
+**No trial; N 1,539. Written BEFORE any price is recorded.** Every book checked sits on Pinnacle's price (§785, §790); the open
+question is TIMING. When Pinnacle moves a moneyline (news, sharp money), Kalshi's market makers must follow; if they lag, Kalshi's
+stale side can be taken. Kalshi game books are deep (tens of millions of contracts a game), so a real lag has capacity.
+- **Recorder** (`sports/a98_steam.py`, ≈ 20 s cadence): Pinnacle guest-API moneylines (proportional no-vig; near-even prices dominate)
+  for NBA / NHL / NFL / NCAAF games starting within 24 h; Kalshi top of book (yes bid/ask) for the matched KXNBAGAME / KXNHLGAME /
+  KXNFLGAME / KXNCAAFGAME markets (one public listing call per series). Both logged with receive times.
+- **Move:** Pinnacle no-vig changes ≥ 2 percentage points between consecutive polls. **Opportunity at +20 / +40 / +60 / +120 s:**
+  new fair − Kalshi ask − fee (up-moves) or Kalshi bid − new fair − fee (down-moves).
+- **Pass (fixed now):** over ≥ 3 days with ≥ 20 moves: median opportunity at +20 s ≥ +1¢ AND ≥ 1¢ on ≥ 50% of moves. Otherwise closed
+  (Kalshi follows Pinnacle within one poll). Trading would need the user's Kalshi API key.
+
+## 795. K-family 15 registered: favourite / long-shot bias in Kalshi's NON-sports, non-index markets (S10)
+
+**No trial at registration; N 1,539. Written BEFORE any price is joined to any outcome.** K1 (§665) covered only S&P/Nasdaq brackets
+and K10 (§756) sports — both sit on a sharp anchor. The literature reports the bias elsewhere: Kalshi contracts < 20¢ under-perform and
+> 80¢ out-perform their prices (Becker, trade-level); political markets compressed toward 50% (arXiv 2602.19520). Non-sports markets have
+no Pinnacle-style anchor, so a bias could survive there.
+- **Universe:** settled markets closing 2026-06-01 → 2026-10-20, event category in {Politics, Elections, Economics, Climate and Weather,
+  World, Entertainment, Science and Technology, Companies, Health, Social, Culture} (not Sports, Financials, Crypto, Exotics), market
+  volume ≥ 1,000 contracts (`kalshi/k15_nonsports.py`).
+- **Entry:** last hourly candle ending 27 h → 24 h before the close; spread ≤ 5¢. **favourite_YES:** mid ≥ 0.80 → buy YES at the ask;
+  **longshot_NO:** mid ≤ 0.20 → buy NO at 1 − bid; taker fee. Unit: the event (mean over its qualifying markets); t over events.
+- **Discovery:** closes 2026-06-01 → 2026-08-31 (≤ 4,000 markets sampled by event, seeded). Carried: t > 1.96, mean > 0 and > 0 in ≥ 2
+  categories. **Sealed:** 2026-09-01 → 2026-10-20, once, carried tests only; §664.4 rule (seed 795); §133 otherwise.
+- **Capacity:** volume in the entry candle and the market's life, per category, reported before any sealed look.
+
+## 796. K-family 16 registered: sell long shots as a MAKER in Kalshi's non-sports markets (zero maker fee) — trade-level markout (S10)
+
+**No trial at registration; N 1,539. Written BEFORE any trade is joined to an outcome.** Becker's Kalshi trade study (gross of fees): makers
++1.12% a contract overall, but Media +3.64%, World Events +3.66%, Entertainment +2.40%, Weather +1.29% (Sports +1.12%, Finance +0.08%);
+the gap is driven by takers buying cheap YES (at 1¢ takers −57%, makers +57%). Kalshi's fee check (2026-10-21): almost every non-sports
+series is fee type `quadratic` — **takers only; makers pay nothing** (2,589 of 2,596 Entertainment, all 143 World, 458 Climate, 2,257 of
+2,264 Politics). So a resting offer that sells cheap YES (= buys NO) in these categories keeps the whole markout. Our own NFL markout
+(§790) was negative — sports flow is informed; the question is whether non-sports flow is not.
+- **Data:** public trades of the K15 universe (§795) markets (same sample), `kalshi/k16_makerls.py`.
+- **Fill = every trade where the TAKER bought YES at ≤ 20¢** (a resting YES-sell / NO-buy filled at that price). Maker P&L a contract =
+  price − (1 if YES else 0); no fee. Also reported: 20-35¢, and by time to close (> 7 d, 1-7 d, 6-24 h, < 6 h — late fills are where
+  news sweeps resting quotes).
+- **Unit:** the event (contract-weighted mean of its fills); t over events. **Discovery:** closes 2026-06-01 → 08-31; carried with
+  t > 1.96, mean > 0, > 0 in ≥ 2 categories. **Sealed:** 2026-09-01 → 10-20, once (seed 796); §664.4; §133 otherwise.
+- **Capacity:** contracts traded at ≤ 20¢ by takers buying YES, per category per week — the pool a quoter could share. Acting needs the
+  user's Kalshi API key (tabled until confirmed).
+
+## 797. K-family 17 registered: political favourites a week before the outcome is known — the underconfidence finding (S10)
+
+**No trial at registration; N 1,539. Written BEFORE any political price is joined to an outcome.** arXiv 2602.19520 (353 M trades): Kalshi
+politics is UNDER-confident at nearly every horizon (calibration slope up to 1.83; pooled horizon factor 0.99 at < 1 h → 1.32 beyond a
+month); e.g. a 70¢ political contract a week out maps to ≈ 83%. Race markets close at CERTIFICATION, weeks after election night, so
+"days before close" is meaningless; the anchor is the price's own resolution.
+- **Universe:** settled markets of Elections/Politics series whose tickers are races or nominations (regex `^(KX)?(SENATE|HOUSE|GOV|PRES|
+  MAYOR|ECVOTE|POPVOTE|SENATEPARTY|GOVPARTY|PRESPARTY)` or containing `NOM`), volume ≥ 5,000 contracts (`kalshi/k17_politics.py`).
+- **Anchor R:** the first day whose daily close is ≥ 0.97 or ≤ 0.03 and stays beyond it to the close. **Entry:** the daily candle 7 days
+  before R; spread ≤ 5¢. **Test (one):** favourite_YES — mid in [0.60, 0.95] → buy YES at the ask, taker fee.
+- **Unit and clustering:** races resolve together (one national error), so t is computed over **resolution weeks** (mean P&L of the
+  week's qualifying markets), not markets.
+- **Discovery:** R before 2026-01-01 (2024 cycle, 2025 races). Carried with week-clustered t > 1.96 and mean > 0. **Sealed:** R 2026-01-01
+  → 2026-10-20 (2026 primaries and specials, many separate dates), once (seed 797); §664.4; §133 otherwise. The 2026-11-03 general is a
+  forward look only after a confirm. Capacity: race-market volume (millions of contracts per major race).
+
+## 798. K15/K16 amended before any outcome is joined: the "Mentions" category added (S10)
+
+**No trial.** Kalshi files mention markets under their own event category "Mentions" (seen in a settled-events page: Sports 49,
+Elections 35, Politics 32, Economics 23, Financials 21, Mentions 15, …), which §795's list omitted — likely Becker's "Media" bucket
+(makers +3.64%). Added to K15's universe (and therefore K16's sample); the listing was restarted from scratch (no outcome had been joined
+to any price). Everything else unchanged.
+
+## 799. K15/K16 split amended before any outcome is joined: Kalshi's events listing starts at its history cutoff (S10)
+
+**No trial.** The settled-events listing (`/events?status=settled&min_close_ts=…`) returns nothing closing before 2026-08-15 (two full
+passes: earliest close 2026-08-15T03:59Z; Aug 1.2 k, Sep 2.8 k, Oct 21.7 k markets so far) — older markets live only under
+`/historical/markets`, which has no category. §795's discovery window (06-01 → 08-31) would hold two weeks. **Amended:** discovery =
+closes 2026-08-15 → 2026-09-20; sealed = 2026-09-21 → 2026-10-20 (K15 and K16 alike; K16 imports K15's constants). The discovery
+sample stays ≤ 4,000 markets by event. Everything else unchanged.
+
+## 800. K-family 17 discovery: political favourites a week before resolution — not carried; closed (S10)
+
+**No trial.** `kalshi/k17_politics.py`: 1,440 race/nomination markets with ≥ 5,000 contracts (673 series); with the price-resolution
+anchor, a daily candle 7 days earlier, spread ≤ 5¢ and mid 0.60-0.95, only **61 markets qualified (24 resolution weeks): +1.55¢ a
+market, but −9.91¢ a week, t(weeks) −1.36** — not carried. The published underconfidence (arXiv 2602.19520, trade-weighted, all
+horizons) does not survive the ask, the fee and the correlation of races resolving together. Closed; the 2026 general is not touched.
+
+## 801. K-family 15 discovery: no taker-side favourite / long-shot edge 24 h out in non-sports Kalshi — not carried (S10)
+
+**No trial.** `kalshi/k15_nonsports.py`, discovery (closes 2026-08-15 → 09-20; 3,913 sampled markets, 24 h candle, spread ≤ 5¢):
+**favourite_YES +2.42¢ (61 events, 112 markets, t +1.09); longshot_NO −0.93¢ (190 events, 482 markets, t −0.66)** — not carried.
+By category the only large cell is Mentions long-shot NO +7.9¢ (32 markets), which is the taker version of K16's maker question.
+Most markets fail the ≤ 5¢-spread filter 24 h out (wide books), so taker entry is the binding cost. Sealed candles not fetched (job gated).
+
+## 802. K-family 16 discovery: selling long shots as a maker is "picking up pennies" — negative per event; not carried; closed (S10)
+
+**No trial.** `kalshi/k16_makerls.py`, discovery (581 events, 3,913 markets, closes 2026-08-15 → 09-20): maker P&L on taker-YES fills
+at ≤ 20¢, **event-weighted −3.03¢ a contract (t −2.89)** — not carried. Contract-weighted it is +5.5¢ (≤ 20¢) / +11.9¢ (20-35¢), but
+that is one market: KXFEDDECISION-26SEP carries 46.1 M of Economics' 47.1 M contracts (+7.0¢); Elections' +5.2¢ is 79% one event
+(KXSCRSENS-26). Most events are positive for the seller (Economics 62/74, Elections 34/37, Weather 295/362, Mentions 21/27,
+Entertainment 31/43) but the long shot that hits costs more than the many small wins — the insurance-seller profile; by category
+contract-weighted: Weather +0.3¢, Mentions +1.6¢, Entertainment −0.6¢, Politics −0.9¢. Becker's trade-weighted maker profits are
+dominated by a few giant markets. Closed; sealed trades not fetched.
+
+## 803. A97 episodes against Pinnacle's latest pre-start price: the NBA "edges" were Pinnacle lagging ProphetX (interim) (S10)
+
+**No trial (descriptive; A96's registered verdict still waits for ≥ 150 bets).** `sports/a97_clv.py` joins each A97 +EV episode to
+Pinnacle's no-vig at the same line in A96's last Pinnacle snapshot before the start (`lines_*.jsonl`, §793). At 2026-10-21 ~15:45 CT,
+before tonight's tip-offs (so "latest", not yet closing): **NBA spreads 9 episodes, entry +2.54% → now −2.61% (3/9 positive); NBA totals
+18 episodes, +2.75% → −1.97% (6/18)**; NFL total 1: +2.0% → −9.2%; NHL total 1: +2.9% → +3.9%. Pinnacle moved TO ProphetX's prices —
+ProphetX's makers were ahead, and the "edges" were Pinnacle's stale lines. With §792 (long shots = devig artifact) this leaves the
+ProphetX taking lead with nothing. Final closing-line readout after tonight's games.
+
+## 804. A99 protocol: does Kalshi's NBA moneyline lag ProphetX's moves? (live, no money) (S10)
+
+**No trial; N 1,539. Written BEFORE any price is recorded.** §803: on NBA lines ProphetX's makers moved before Pinnacle. If they also lead
+Kalshi, Kalshi's stale side (deep books) can be taken after a ProphetX move.
+- **Recorder** (`sports/a99_pxlead.py`, tonight + following nights, pre-tip only): ProphetX public websocket, NBA moneylines → ProphetX fair =
+  proportional devig of the two best back prices (both sides needed); Kalshi KXNBAGAME top of book polled every ~3 s (one listing call).
+- **Move:** ProphetX fair changes ≥ 2 points within 60 s. **Opportunity at +3 / +10 / +30 / +60 s:** new ProphetX fair − Kalshi ask − fee
+  (up) or Kalshi bid − fair − fee (down).
+- **Pass (fixed now):** ≥ 20 moves; median opportunity at +10 s ≥ +1¢ and ≥ 1¢ on ≥ 50% of moves → then a closing-line check (do those
+  Kalshi fills beat Pinnacle's close?). Otherwise closed. Trading would need the user's Kalshi API key.
+
+## 805. CORRECTION: Tradeify Select Daily V2 payout rules — the plan's dollar estimates were too high (A100) (S10)
+
+**No trial.** Official help article (help.tradeify.co 12853966, read 2026-10-21) and the user (2026-10-21) for V2 50K accounts (bought
+after 2026-09-01): a request is at most **min($1,250, 2 × the profit since the last payout, balance − the $2,100 buffer)**, ≥ $250, and the
+profit since the last payout must be > 0 (user's example: at $54k, +$500 today → up to $1,000; +$500 on two days → capped at $1,250).
+The A63 simulator's "cap" payout (buffer $2,000, no 2× rule, no minimum) let any payout to $1,250 through above the buffer. New payout kind
+"daily" in `reporting/a63_firms.py` (state: balance after the last payout). `reporting/a100_official_payouts.py`, same setup as A85
+(5 × 50K, 3 NKD + 2 FDXM, $116, live rules), mean net per 84-session run:
+
+| | model so far | **V2 official** |
+|---|---|---|
+| 2025 starts (median, P>0, p10) | +$21,306 (+13,186, 95%, +1,290) | **+$11,930 (+7,800, 89%, −147)** |
+| 2021-26 (P>0) | +$11,988 (76%) | **+$7,958 (74%)** |
+| 2010-20 (P>0) | +$4,791 (72%) | **+$3,391 (68%)** |
+| zero edge 2021-26 / 2010-20 | +$4,582 / +$2,692 | **+$4,157 / +$2,431** |
+| 2021-26 funded paid / live paid / fees | $10,036 / $7,463 / $5,511 | $9,000 / $4,517 / $5,558 |
+
+The 2× rule slows payouts, so accounts reach the 3-payout live move later — most of the loss is live money. The zero-edge value (the
+structural reason the plan pays) drops only ~9%. **Every earlier dollar figure for Select Daily (A60-A92, §625-§770, the launch
+checklist, the review prep) used the old payout model and is too high — the 2025-start headline by ~80%.** Plan choices (5 × 50K, mix,
+live policy) were not re-solved under V2; that is the next check.
+
+## 806. A101: under V2 payouts, 2 NKD + 3 FDXM edges out the planned 3 NKD + 2 FDXM — for the user's review (S10)
+
+**No trial.** `reporting/a101_v2_mix.py` (V2 payouts §805, $116, live rules), mean net per 84-session run:
+3 NKD + 2 FDXM (plan) 2025 +$11,930 (89%, p10 −$147) | 2021-26 +$7,958 | 2010-20 +$3,391 | zero edge +$4,157;
+**2 NKD + 3 FDXM 2025 +$13,075 (96%, p10 +$2,537) | 2021-26 +$7,902 | 2010-20 +$4,568 | zero edge +$4,244**;
+4 NKD + 1 FDXM +$11,566 (89%) | +$8,442 | +$2,021 | +$4,355; NKD × 5 +$5,960 (p10 −$9,280) | +$7,341 | −$1,016 | +$5,892.
+2 + 3 is better in 2025 starts and 2010-20 and in the tail; 2021-26 a tie. Not adopted (the user decides at the 10-25 review; the first
+account is NKD-only by the user's launch choice anyway).
+
+## 807. A102: the user's launch (one NKD account to two payouts) is barely changed by V2 (S10)
+
+**No trial.** `reporting/a102_v2_launch.py` (A85 setup, $116, one NKD account, 252 sessions, 2021-26 starts): sessions to the 2nd
+payout p25/median/p75/p90 **old 22/42/83/127 → V2 24/46/86/133**; all starts reach it within 252 sessions; cash low before it median
+−$787 → **−$837**, 95th pct −$2,157 both, worst −$2,640 both; fees by then median $812. The V2 cost (§805) falls on the five-account /
+live phase, not the launch.
+
+## 808. A103: 50K stays — under V2 the 100K book loses its structural value (S10)
+
+**No trial.** `reporting/a103_v2_100k.py` (official V2 table read 2026-10-21: buffer / cap 25K $1,100/$600, 50K $2,100/$1,250, 100K
+$2,600/$1,750, 150K $3,600/$2,500; min $250; 2× profit since last payout), 3 NKD + 2 FDXM, live rules, mean net per 84-session run:
+50K V2 ($116) 2025 +$11,930 (89%) | 2021-26 +$7,958 | 2010-20 +$3,391 | zero edge +$4,157; **100K V2 ($186 stored fee) 2025 +$9,092
+(72%, p10 −$9,243) | 2021-26 +$5,221 | 2010-20 +$250 | zero edge −$2,296** (old model: +$20,759 / +$11,030 / +$5,968 / +$2,680). The 2×
+rule bites harder on the larger account (bigger buffer, fewer payouts relative to fees). 50K remains the choice. Also noted: the
+official drawdown locks at start + $100 (e.g. $50,100); the model locks at $50,000 — minor.
+
+## 809. A104: under V2, request a payout every eligible day — waiting for bigger requests loses (S10)
+
+**No trial.** `reporting/a104_v2_paytiming.py` (50K V2, 3 NKD + 2 FDXM, $116), requesting only when the allowed amount reaches X:
+**$250 (every eligible day) 2025 +$11,930 | 2021-26 +$7,958 | 2010-20 +$3,391 | zero edge +$4,157**; $625 +$6,423 / +$5,123 / +$3,201 /
++$4,058; $1,000 +$9,249 (p10 +$813) / +$7,864 / +$4,040 / +$3,023; $1,250 (full cap only) +$2,437 / +$3,018 / +$708 / +$143. Fewer,
+larger payouts delay the 3-payout move to live. Operating rule: request the maximum the 2× rule allows whenever it is ≥ $250.
+
+## 810. A105: Select Flex loses to Select Daily even under V2 — Daily stays (S10)
+
+**No trial.** `reporting/a105_flex.py`. Flex (official, after 2026-09-01): a payout every 5 winning days (≥ $150), ≤ 50% of total profit,
+cap $2,500, min $250, no 2× rule / buffer / consistency / daily loss limit, same $2,000 EOD drawdown (modelled with A63's "growth"
+kind; Daily's brackets kept). Mean net per 84-session run, 3 NKD + 2 FDXM: **Daily V2 +$11,930 / +$7,958 / +$3,391, zero edge +$4,157;
+Flex +$3,914 / +$596 / −$1,148, zero edge −$1,748** (2 + 3: Daily +$13,075 / +$7,902 / +$4,568 / +$4,244; Flex +$3,780 / +$926 / −$744
+/ −$1,258). Flex pays too slowly — live paid ~$400 vs ~$4,500. Not re-tuned for Flex (no daily loss limit), but the gap is too wide.
+
+## 811. A106: under V2, a tighter funded stop (0.75×) helps when the rules have an edge — candidate for the review, not adopted (S10)
+
+**No trial.** `reporting/a106_v2_fscale.py` (V2 payouts, 3 NKD + 2 FDXM, $116; funded-stage bracket factors (take, stop); zero edge on 3
+seeds): current (1, 1) 2025 +$11,930 (89%, p10 −$147) | 2021-26 +$7,958 | 2010-20 +$3,391 | zero edge +$4,090; **(1, 0.75) +$19,143 (95%,
+p10 +$1,619) | +$11,432 | +$3,065 | +$3,766**; (1.25, 1) +$12,932 / +$9,202 / +$4,320 / +$2,835; (1.5, 1) +$10,280 / +$6,974 / +$3,653 /
++$2,245; (1.25, 1.25) +$10,388 / +$9,493 / +$4,851 / +$3,468; (0.75, 0.75) +$2,245 / +$2,831 / +$2,234 / +$1,757. The tighter stop gains
+only where the deployed rules have an edge (2025, 2021-26) and gives a little back without one (2010-20, zero edge); best of six variants,
+so part of it is selection. Under the old payout model A65 rejected funded scaling. **For the user at the 10-25 review; not adopted.** A107 (`reporting/a107_v2_combo.py`, zero edge on all 6 seeds): 3 + 2 with the
+0.75× funded stop 2025 +$19,143 (95%, p10 +$1,619) | 2021-26 +$11,432 | 2010-20 +$3,065 | **zero edge +$4,194 (≈ current +$4,157)**;
+2 + 3 at 1× +$13,075 / +$7,902 / +$4,568 / +$4,244; 2 + 3 at 0.75× +$14,182 / +$9,188 / +$5,056 / +$3,807. Leading candidate: 3 + 2 with the
+0.75× funded stop (better with the edge, no worse without it except 2010-20 by ~$330). **By start year (`a107b_years.py`): the 0.75× stop gains in 5 of 6
+years 2021-26 (2021 −$1,728; 2026 +$14,372) but in only 3 of 11 years 2010-20** — it is a bet that the deployed rules keep their edge.
+
+## 812. Select Daily (V2) still beats Lightning and Growth (S10)
+
+**No trial.** Lightning's official rules (help article 10495932, read 2026-10-21) are as A85 modelled ($3,000 then $2,000 goals; 20/25/30%
+consistency; caps $2,000 ×3 then $2,500; min $1,000), so A85's figures stand; Growth unchanged. Mean net per 84-session run (2025 starts |
+2021-26 | 2010-20 | zero edge 2021-26 / 2010-20): **Daily V2 $116 +$11,930 (p10 −$147) | +$7,958 (p10 −$2,790) | +$3,391 | +$4,157 / +$2,431**;
+Lightning $344 +$6,110 (p10 −$12,408) | +$8,067 (p10 −$7,464) | +$1,501 | +$1,492 / +$1,945; Growth $102 −$3,560 | −$3,596 | −$3,496 |
+−$4,181 / −$3,337. Daily stays: equal 2021-26 mean to Lightning with a far smaller tail and 3× the zero-edge value.
+
+## 813. Bot V2 payout suggestions DEPLOYED (user-approved 2026-10-21) (S10)
+
+**No trial.** `bot/accounts.py` (commit eb26aba; tests pass): funded payout suggestions now follow Tradeify Select Daily V2 — min($1,250,
+2× profit since the last payout, balance − $52,100), shown only when ≥ $250 and the profit since the last payout is > 0; `!payout` records
+the post-payout balance. Droplet: before-image identical to the repo's previous version; backup `/opt/futures-bot/backup-2026-10-21/
+accounts.py`; deployed 2026-10-21 22:10Z, sha256 a0c9861f… matches the repo; service active, Discord connected. Rollback: copy the
+backup over `accounts.py` and restart `futures-bot.service`.
+
+## 814. A108: under V2 a tighter funded stop is broadly better (0.6-0.9× all beat 1.0×); ~0.7× best — review candidate (S10)
+
+**No trial.** `reporting/a108_v2_stopshape.py` (V2, 3 NKD + 2 FDXM, $116; funded stop factor, take unchanged), mean net per 84-session run
+2025 starts | 2021-26 | 2010-20: 0.60× +$18,910 (78%) | +$11,622 | +$3,383; **0.70× +$19,872 (94%) | +$13,274 | +$4,306**; 0.75×
++$19,143 (95%) | +$11,432 | +$3,065; 0.80× +$14,601 | +$8,346 | +$3,389; 0.90× +$18,649 | +$11,315 | +$2,956; **1.00× (current)
++$11,930 (89%) | +$7,958 | +$3,391**. Not a single lucky point: every factor in 0.6-0.9 beats 1.0 in 2025 and 2021-26; 2010-20 is
+roughly flat (0.7× better). Non-monotone steps are tick/contract rounding. Why under V2: a smaller funded stop keeps more cushion above
+the locked floor between payouts while the 2× rule meters withdrawals. Candidate for the review: funded stop ≈ 0.7×; not adopted. **Zero edge (`a108b_v2_stop_zero.py`, 6 seeds): 0.7× +$4,769 / +$2,998 vs
+1.0× +$4,157 / +$2,431 (2021-26 / 2010-20 paths)** — better with AND without an edge, i.e. a structural improvement under V2, unlike §811's
+edge-dependent reading of 0.75×. Recommended at the review.
+
+## 815. Funded stop 0.7× DEPLOYED to the bot (user-approved 2026-10-21) (S10)
+
+**No trial.** `bot/ticket.py`: `FUNDED_STOP = 0.7` multiplies the policy's stop (USD, before costs and the room cap) on FUNDED tickets only —
+evaluation and live tickets unchanged; take and contracts unchanged (as A108's `fscale=(1, 0.7)`). Example at $52,500: NKD stop $1,000
+(200 pts) → $700 (140 pts); FDXM $1,000 (89 pts) → $700 (62 pts). Tests: the playbook comparison runs with the factor at 1.0; a new test
+checks the funded scaling and unchanged evaluation tickets (17 passed). Droplet: before-image identical to the repo's previous version;
+backup `/opt/futures-bot/backup-2026-10-21/ticket.py`; deployed 2026-10-21 22:31Z; sha256 952020b3… matches; service active. The demo
+checker (a18) scores each ticket by its own recorded take/stop, so the review statistics stay valid.
+
+## 816. A109: with the 0.7× stop, keep the funded take at 1.0× and the 3 + 2 mix — but a take cliff needs explaining (S10)
+
+**No trial.** `reporting/a109_v2_take.py` (V2, $116, funded stop 0.7×; zero edge 6 seeds). 3 NKD + 2 FDXM by funded take factor:
+0.8× +$4,987 | +$5,617 | +$1,712 | z +$2,298; **0.9× +$4,334 | +$5,675 | +$2,313 | z +$2,947; 1.0× +$19,872 | +$13,274 | +$4,306 | z
++$4,769**; 1.1× +$20,133 | +$12,967 | +$5,305 | z +$4,668; 1.25× +$18,397 | +$10,022 | +$2,671 | z +$3,990 (2025 | 2021-26 | 2010-20 | zero
+edge). Mixes at take 1.0 / stop 0.7: 4 + 1 +$23,461 | +$14,544 | +$2,362 | z +$5,611; 2 + 3 +$15,649 | +$11,639 | +$6,288 | z +$4,053.
+Keep take 1.0 and 3 + 2 (no mix dominates). **Warning:** the drop from take 1.0× to 0.9× (+$19.9k → +$4.3k) is a cliff, not a slope —
+the simulator is very sensitive to the funded bracket size near some threshold; checked next (§817) before relying on §814-815.
+
+## 817. CORRECTION / caveat to §814-816: the funded-bracket differences are within the replay's noise; 0.7× kept (no harm found) (S10)
+
+**No trial.** The take cliff (§816) is live-account money: 2021-26 at stop 0.7×, take 0.90× / 0.95× / 1.00× / 1.05× → live paid $3,785 /
+$8,148 / $8,896 / $8,598 (moves to live 0.84-0.98), funded paid $6.8-10.1k (`a110_cliff.py`). Small funded changes shift when accounts
+reach live, and 84-session live returns hinge on a few big moves; overlapping start windows make the effective sample small. **Zero
+edge on a finer grid (`a110b_cliff_zero.py`, 6 seeds): stop 1.0 / 0.9 / 0.8 / 0.7 / 0.6 → +$4,157 / +$4,320 / +$3,109 / +$4,769 / +$4,017,
+each with a seed range of ~$5k (SE of a 6-seed mean ≈ $0.8k)** — indistinguishable. §814's "better with AND without an edge" overstated
+the zero-edge side. What holds: no measurable harm at zero edge, and every stop 0.6-0.9× beat 1.0× in the edge runs (shared paths, so
+weak evidence). The 0.7× deployment (§815, user-approved) is kept — no downside found, plausible upside — but treat its "+$8k a run" as
+uncertain; the demo/live record decides. The plan's dollar figures carry several-thousand-dollar noise between nearby settings.
+
+## 818. A111: paired test — the 0.7× funded stop beats 1.0× on 2021-26 paths (90% CI +$2.9k..+$7.4k a run) (S10)
+
+**No trial.** `reporting/a111_stop_ci.py`: both settings on the same start windows (V2, 3 NKD + 2 FDXM, $116), per-window difference
+0.7× − 1.0×, block bootstrap with 84-session blocks: **2021-26 mean +$5,316, 90% CI +$2,935 .. +$7,404, 60% of windows better; 2010-20
++$915, CI −$771 .. +$2,620, 58% better.** Paired, the improvement is clear in the regime the plan targets and neutral-to-positive before
+2021 — firmer than §817's unpaired reading. Model-internal (same simulator, same paths); the live record is the external check.
+
+## 819. A112: keep 3 NKD + 2 FDXM — paired tests show no mix dominates (S10)
+
+**No trial.** `reporting/a112_mix_ci.py` (V2, 0.7× funded stop, paired per start window, 84-session block bootstrap, 90% CI), vs 3 + 2:
+**4 + 1: 2021-26 +$1,270 (−$785 .. +$2,655), 2010-20 −$1,944 (−$2,894 .. −$1,226); 2 + 3: 2021-26 −$1,635 (−$3,026 .. +$453), 2010-20
++$1,982 (+$1,152 .. +$3,067).** Each alternative trades one era against the other; 3 + 2 is the balanced choice. The review's mix
+question (§806) is answered: keep 3 + 2.
+
+## 820. A99 extended to IN-PLAY (A99b protocol) before any in-play price is recorded; esports ProphetX vs Kalshi closed (S10)
+
+**No trial.** (1) Outcome-free snapshot, 8 ProphetX LoL/Worlds events vs Kalshi KXLOLGAME (16 sides): Kalshi sits on ProphetX's devigged
+price — best edge +0.2¢ after fee — closed. (2) **A99b:** the A99 recorder keeps ProphetX NBA moneyline updates after the start, tagged
+`inplay`; Kalshi polled every 3 s as before. Readout separate from A99's pre-match one: ProphetX in-play fair moves ≥ 5 points within
+30 s; Kalshi opportunity (new fair − ask − fee / bid − fair − fee) at +3 / +10 / +30 s. Pass: ≥ 20 moves, median at +10 s ≥ +2¢ and
+≥ 2¢ on ≥ 50%. Otherwise closed. A speed race — Kalshi's in-play makers are expected to be fast.
+
+## 821. K-family 18 registered: are Kalshi combo BUYERS at 65-95¢ under-charged? — trade-level, not last-price (S10)
+
+**No trial at registration; N 1,539. Written BEFORE any combo trade is downloaded.** §742's calibration found the buyer +4-5¢ in the
+65-95¢ band, but it used each combo's LAST trade price weighted by its WHOLE volume — late in-play last trades sit near the result, so it
+is not a buyer's P&L. Test it at trade level. Actionable without quoting: any member can request a combo (parlay) in Kalshi's app.
+- **Universe:** settled combos in the five MVE series (KXMVESPORTSMULTIGAMEEXTENDED, KXMVECROSSCATEGORY, …-SHARD1, KXMVECROSSCATEGORY0,
+  …0-SHARD1), listed newest first (`kalshi/k18_combobuy.py`); public trades of each.
+- **Fill = a trade whose taker bought YES at 0.65-0.95**; buyer P&L a contract = 1{YES} − price − taker fee. Unit = the combo
+  (contract-weighted mean of its qualifying fills); t over combos, also over settlement days (clustered).
+- **Discovery:** combos closing 2026-10-10 → 10-19 (≤ 6,000 sampled). Carried: t(days) > 1.96 and mean > 0. **Sealed:** closing
+  2026-10-20 → (download time), ≤ 6,000 sampled (seed 821), once; §664.4; §133 otherwise. Also reported: by legs, in-play share (fill after the first
+  leg's event started is not observable — reported by hours before close instead), 35-65¢ and 2-35¢ bands (descriptive).
+
+## 822. A99 / A99b closed: Kalshi's NBA books do not lag ProphetX — pre-match nor in-play (S10)
+
+**No trial.** `sports/a99_pxlead.py`, 2026-10-21 (9 NBA games). **Pre-match:** after ProphetX fair moves (≥ 2 points within 60 s; ~1,000),
+buying Kalshi's stale side loses: median opportunity +3 / +10 / +30 / +60 s = −1.81 / −2.07 / −1.87 / −1.53¢, ≥ 1¢ on only 4-13% → fails
+§804. **In-play (A99b):** 7 "moves" with +11.6¢ median "opportunity" are ProphetX artifacts — its in-play fair whipsaws when offers are
+pulled and reposted (Orlando 0.52 → 0.36 → 0.57 → 0.67 → 0.37 in three minutes, back to ~0.55 two minutes later) while Kalshi barely
+moves. Not information. Closed; service disabled. A98 (Kalshi vs Pinnacle) saw no Pinnacle move ≥ 2 points all day — disabled, inconclusive.
+
+## 823. K18 amended before any trade is fetched: list combos in two random short windows a day (S10)
+
+**No trial.** A full newest-first listing of the four active MVE series (~45k settled combos a day each) would take hours. Amended: per
+series and day from 2026-10-10, two random one-hour close windows (seed 823) via `min_close_ts` / `max_close_ts`; the discovery (10-10 →
+10-19) and sealed (10-20 →) samples of ≤ 6,000 are then drawn from those as registered. KXMVESPORTSMULTIGAMEEXTENDED has no combos after
+2026-10-10 (nothing listed). Everything else in §821 unchanged. **§824 (same day, still before any trade):** windows shortened to 5 minutes
+— a single series settles ~30,000 combos an hour (1,000 in two minutes), so one-hour windows were hundreds of pages.
+
+## 825. A96 retired unevaluated (no trial): ProphetX taking cannot meet its own bar (S10)
+
+**No trial.** At 28 closed paper bets (2026-10-21 20:05 CT): closing-line EV +8.27% proportional — tennis 14 bets +18.0%, NBA 13 −1.2%,
+NHL 1 −4.9%; **power-devig sensitivity −8.1% (20 bets with raw prices)**; expected value of the qualifying stake **$173 a week vs the
+§782 bar of $500**. The tennis gain is the proportional-devig long-shot artifact (§792), the NBA spread/total "edges" were Pinnacle's
+stale lines (§803; at the close −1.6…−2.4%), and the stake behind real-looking offers is a few hundred dollars. Waiting for 150 bets
+could only confirm an artifact; recorder disabled (data kept in data/sports/a96/). The ProphetX taking lead is closed.
+
+## 826. K-family 18 discovery: combo buyers at 65-95¢ are not under-charged — not carried; closed (S10)
+
+**No trial.** `kalshi/k18_combobuy.py`, discovery (combos closing 2026-10-10 → 10-19, 6,000 sampled from 5-minute windows; only 152 had a
+taker-YES fill at 65-95¢): **buyer P&L −4.76¢ a contract per combo (t −1.36), t over 10 settlement days −0.16** — not carried. Contract-
+weighted the band is +6.7¢ (a few large wins; 1-6 h before close +10.9¢, > 6 h +20.0¢, < 1 h +0.9¢) — the same per-event-loss /
+volume-weighted-gain split as K16. §742's "buyers +4-5¢" came from last prices weighted by whole volume. Closed; the sealed download
+was stopped (no sealed look).
+
+## 827. A113: Tradeify Select 300K (V2) — small positive value per attempt, 3 per lifetime → about +$0.5k; optional (S10)
+
+**No trial.** Official 300K article (16497699, read 2026-10-21): V2 300K accounts are held **on top of** the 5 standard funded accounts
+(up to 8 sim funded), 3 purchases per lifetime (failures count), no resets; evaluation $349, target $14,000, EOD drawdown $8,000, daily
+loss $4,000, 40% consistency, min 3 days; funded Daily: drawdown $6,000 (locks at $300,100 once at $306,100), buffer $6,100, ≤ $4,000 a day,
+50% of each payout new profit (= the 2× rule), no consistency, 90% split. `reporting/a113_300k.py` (quarter-size virtual account ×4 —
+the full policy solve is ~5 M states a step, too big for 2.7 GB; one NKD account, 252 sessions, no live phase modelled): **value per
+$349 attempt +$181 (2021-26) / +$73 (2010-20); zero edge +$143 / +$201**; with $6,000 for the evaluation too (pessimistic) −$103. Three
+lifetime attempts → roughly +$0.5k expected; not material beside the 50K plan. Optional for the user. Also fixed: `a63_firms.simulate`
+had `TGT = …` stranded in a comment by an uncommitted edit (would have broken every run); `dd_f` (separate funded drawdown) kept.
+
+## 828. A114: the evaluation brackets are already right — every scaling is significantly worse (S10)
+
+**No trial.** `reporting/a114_eval_scale.py` (new `escale` in `a63_firms`; V2, funded stop 0.7× as deployed; paired, 84-session block
+bootstrap, 90% CI) — evaluation-stage (take, stop) factor minus the policy: 2021-26 (1, 0.85) −$4,299 (−7,562..−1,132); (1, 0.7) −$6,015
+(−9,508..−2,326); (1.15, 1) −$10,716 (−13,110..−6,907); (0.85, 1) −$9,877 (−13,322..−4,810); 2010-20 −$1,690 / −$2,392 / −$3,598 / −$3,634, all
+CIs below zero. The pass-probability solver's evaluation brackets stay; only the funded stage had slack (§814-818).
+
+## 829. A115 registered: funded stop factor per product (NKD vs FDXM) under V2 — paired vs the deployed 0.7× for both (S10)
+
+**No trial** (plan tuning on the same simulator). `reporting/a115_stop_by_product.py` (new `fscale_by` in `a63_firms`): (NKD, FDXM) funded stop
+factors (0.7, 1.0), (1.0, 0.7), (0.6, 0.8), (0.8, 0.6) minus (0.7, 0.7); V2, $116, live rules, mix 3 NKD + 2 FDXM, 84-session windows,
+paired block bootstrap 90% CI, both eras. **Change rule (fixed now):** recommend a per-product stop only if its 2021-26 CI is wholly above
+zero AND its 2010-20 mean is ≥ 0; otherwise the uniform 0.7× stays. Any change goes to the user for approval before the bot is touched.
+
+
+## 830. A115: keep the funded stop at 0.7× for both products — the gain is mostly NKD's (S10)
+
+**No trial.** `reporting/a115_stop_by_product.py` (new `fscale_by` in `a63_firms`; V2; paired vs 0.7× for both, 90% CI): 2021-26 NKD 0.7 /
+FDXM 1.0 −$1,178 (−3,169..+573); **NKD 1.0 / FDXM 0.7 −$4,721 (−6,782..−2,360)**; NKD 0.6 / FDXM 0.8 −$1,670 (−4,502..+1,624); NKD 0.8 / FDXM
+0.6 −$4,204 (−6,823..−2,458); 2010-20 −$335 / −$838 / −$30 / −$1,548. Nothing beats the deployed setting; the tighter NKD stop carries
+most of the improvement.
+
+## 831. Screen: newly launched Kalshi series — the young-series pool is mostly state daily gas (already rejected); closed (S10)
+
+**No trial; no outcome looked at.** Idea: series in their first weeks may be mispriced before makers arrive. From K15's settled listing
+(events from 2026-08-14): 110 recurring series (≥3 events) first appear from 2026-09-01; their first three events hold 2,344 markets (median
+volume 2,000 contracts). 45 of 110 are Economics — almost all the 50 state `KXAAAGASD*` daily-gas series, the arena A82/A83 (§708-712)
+already tested and rejected; the remaining ~60 are heterogeneous (weather, entertainment, politics) with only K15's 228 priced samples,
+too few for a per-age calibration test. Not registered.
+
+## 832. Screen: Novig (CFTC exchange since 2026-08) and Sporttrade — no anonymous data; not worth a login; closed (S10)
+
+**No trial.** Novig relaunched 2026-08-04 as a CFTC-designated sports exchange (Ludlow Exchange; TX allowed). Its web app reads all market
+data through Hasura (`api.novig.us/v1/graphql`) with an allow-list ("query is not allowed" for anonymous requests, including the app's own
+query texts) and a token from an Auth0 login (`/nbx/v1/auth/hasura_token`); there is no public REST. Screening it would need the user's
+account; the nearest analogues (ProphetX taking vs Pinnacle §803/825, quoting Kalshi/PM game markets §790) found no edge, so this is not
+worth asking for. Sporttrade's CFTC application (2026-02-04) is still pending → not available in Texas.
+
+## 833. Screens: Robinhood's Rothera exchange; prediction-market prop firms — nothing new; closed (S10)
+
+**No trial.** Rothera (Robinhood × Susquehanna DCM, contracts self-certified from 2026-05-20) carries Robinhood's retail flow with SIG as
+the house maker; no public real-time data, trading only in the Robinhood app (login) — a Kalshi × Rothera gap test would need the user's
+account and manual execution, against a professional maker; not pursued. Prediction-market prop firms: still only PropMarket / Funding
+Predicts (parked, §750 and memory: ~$1k/month structural cap, no bots, no overnight).
+
+## 834. Screen: sweepstakes sportsbooks (Fliff and peers) — app-only, winners limited; closed (S10)
+
+**No trial.** Fliff Cash is redeemable in Texas (KYC at first redemption; $50 min, ~$1,000/week and ~$5,000/month caps per review sites).
+The angle would be value-betting its house lines against Pinnacle's no-vig price, but (1) lines are app-only — no public feed to measure
+(same reason Underdog UDX was tabled), and (2) house books limit winning accounts, so capacity is not dependable; sweepstakes betting is also
+being banned state by state. Not pursued.
+
+## 835. K-family 19 registered: follow LARGE takers in Kalshi's non-sports markets — is the tape's informed flow under-priced? (S10)
+
+**No trial at registration; N 1,539. Written BEFORE any trade is fetched.** Why: §790 found takers informed at every size (makers' markout
+negative); §695 found informed sellers fill thin bids at once. If large takers' information is only partly absorbed, copying them from the
+public trade tape pays — a structural, public, low-capital rule. Never tested (K14 followed price MOVES in esports, not trades).
+- **Universe:** K15's settled non-sports listing (same categories), volume ≥ 5,000 contracts. Random sample (seed 835) of 3,000 discovery
+  markets (close 2026-08-14 → 09-20) and 3,000 sealed (09-21 → 10-20). Trades from `/markets/trades` (≤ 20 pages a market).
+- **Signal:** the FIRST taker trade in the market whose taker-side notional (count × taker-side price) ≥ $250, taker-side price 10-90¢, more
+  than 10 minutes before the close.
+- **Entry:** the first trade ≥ 60 s after the signal, at that trade's price for the signal's side + 1¢ slippage + the taker fee; held to
+  settlement. One entry per market. Markets without a later trade are skipped.
+- **Decision (discovery):** carried if mean P&L per contract > 0 and t over close-days > 1.96. **Sealed:** strict §664.4 (t over days >
+  1.645, sign-flip placebo ≥ 95th, posterior > 0 with PRIOR_SD 0.02) → CONFIRM; else WATCHLIST if mean > 0, else REJECT. One trial if
+  validated. Reported, not decided on: $1,000 notional threshold; 300 s lag; by category.
+- **Amended before any trade is fetched:** rain series (`KXRAIN*`) are dropped from the universe before sampling — the user excludes
+  rain markets. Block trades (`is_block_trade`) never count as the signal.
+
+## 836. A116: a "steady" (keep-accounts-alive) version of the plan loses — the edge does not cover the trading cost at small brackets (S10)
+
+**No trial.** The user asked (2026-10-21) whether the edge should be traded as a steady prop strategy instead of churning evaluations.
+`reporting/a116_steady.py`: brackets (take, stop) x0.5 and x0.33 in BOTH stages (funded stop keeps the 0.7x) vs the deployed policy; V2,
+$116, live rules, 3 NKD + 2 FDXM, paired 84-session block CI.
+
+| | 84 sessions 2021-26 | 252 sessions 2021-26 | 84 s 2010-20 | 252 s 2010-20 | zero edge 252 s (21-26 / 10-20) |
+|---|---|---|---|---|---|
+| deployed | +$13,274 (43.6 evals, paid $18.3k) | +$40,960 (117.8 evals) | +$4,306 | +$13,353 | +$5,011 / +$13,430 |
+| steady x0.5 | −$2,345 (21.2 evals, paid $109) | −$6,306 | −$2,135 | −$5,549 | −$7,540 / −$5,560 |
+| steady x0.33 | −$1,907 (16.4 evals, paid $0) | −$4,910 | −$1,623 | −$4,016 | −$5,635 / −$3,937 |
+
+Every paired CI is far below zero. Why: NKD's smallest contract is $5 × Nikkei (one-session SD ≈ $2,850) against a $2,000 drawdown, and a
+round trip costs ≈ $57; shrinking the brackets shrinks the edge captured per trade but not the cost, so small-bracket trading bleeds to
+the drawdown anyway (still 14-55 evaluations a run) and rarely reaches the $3,000 target. The plan's value is the asymmetric bet (loss
+capped at $116, payouts kept); in 2010-20 it is ALL structure (+$13.4k with or without the edge). The deployed policy stays.
+
+## 837. K-family 19 discovery: copying large takers loses — not carried; closed (S10)
+
+**No trial.** `kalshi/k19_whales.py` (§835): 3,000 discovery markets, 859 entries — **−0.94¢ a contract, t over days −1.79 → not carried**.
+Reported only: $1,000 signal −1.54¢ (n 156); 300 s lag −1.08¢ (t −1.98). By category: weather −7.9¢ (t −2.57), mentions −4.1¢ (t −2.35),
+Science & Technology +14.1¢ (t +2.88, n 48), others within ±1.3 t — one of nine reported splits positive at that level is what chance
+gives; not followed up. Large takers' information is priced by the next trade. Sealed sample (3,000 markets) left unread. The readout now
+streams the 242 MB trade file (the first run was killed for memory).
+
+## 838. Screen: Gemini Predictions' non-sports markets — the venue is too small; closed on capacity (S10)
+
+**No trial; no prices compared.** Public API, 2026-10-21 22:50 CT, all 1,000 active events: 24-hour volume Sports $103,081, Crypto
+$22,932 (BTC/ETH daily price contracts, top event $5.9k), Economics $396, Politics $130, Weather $148, Commodities $39. Venue-wide ≈ $3.8M
+a month, its sports makers quote off Kalshi (§751). A cross-venue or quoting edge of a few percent on any realistic share cannot reach the
+$2k/month bar. Closed before any measurement.
+
+## 839. A117 + compliance: Tradeify's §6.5 "consistent trading plan" vs the state-dependent policy — a fixed-bracket plan keeps ~25-30% of the value; needs the user (S10)
+
+**No trial.** Tradeify Funded Trader Agreement (tradeify.co/funded-trader-agreement, "Last modified: October 2026"), §6.5: "The Trader must
+adhere to a consistent trading plan in terms of size, stops, and targets, avoiding maximum or larger contract sizes on single trades ...
+maintaining consistent trading sizes ... and demonstrating consistency in the trading plan." §4.4: payouts may be suspended pending review of
+suspected non-compliance with §6 and "are subject to forfeiture"; §6.10 audit at any time; §6.8 microscalping (≥ 50% of profit from trades
+held > 10 s). Help-centre pages (Select specifics) return 403 to automated reads. **Never assessed before.** The bot's policy (`bot/policy.json`)
+uses 72 (take, stop) pairs across evaluation states — most often take $100 / stop $500 (NKD: 4 ticks vs 20), up to take $3,000 / stop $1,000.
+Contract size is constant (1 NKD, 2 FDXM).
+
+`reporting/a117_fixed_brackets.py` (new `fixed` in `a63_firms`): one (take, stop) for both products in every evaluation and funded state, 84
+sessions, V2, paired vs deployed. Best fixed: **2021-26 take $800 / stop $1,000 +$4,218** (deployed +$13,274; −$9,056, CI −13,128..−3,487);
+$1,000 / $1,000 +$2,944; **2010-20 $1,000 / $1,000 +$1,194** (deployed +$4,306); $800 / $1,000 −$990. Small fixed brackets (≤ $500 take) all
+lose. A compliant single-bracket plan keeps roughly a quarter of the modelled value and is near zero in 2010-20.
+
+**For the user (review):** how strictly Tradeify reads §6.5 decides between the policy (more value, payout-review risk) and a fixed or
+few-bracket plan (lower value, safer). Asking Tradeify support whether state-dependent brackets with constant size are acceptable is the
+cheapest resolution. Nothing changed on the bot.
+
+## 840. V-family 1 protocol — reverse-split round-up arbitrage: a measurement of a structural stream (S11: new arenas)
+
+**No trial (a structural stream measured, like T-family 1 §731). Written BEFORE any price is fetched.** The user (2026-10-21) moved the search
+off prediction markets and the Tradeify plan. Mechanism: when a company reverse-splits 1-for-N and rounds fractional holdings UP to a whole
+share (some add "round-lot protection": holders of < 100 post-split shares get 100), one pre-split share bought before the effective date
+becomes ≥ 1 post-split share. Capacity is one position per brokerage account per event — the "why isn't everyone": many accounts, effort,
+broker handling, delayed share credit (~10 trading days).
+- **Events:** EDGAR full-text search (8-K, 6-K; 2025-10-01 → 2026-10-21) for "reverse stock split" with "rounded up" / "round up"; per company
+  and effective date, the announcing document is parsed for the ratio, effective date, and rounding language. Classes: **holder-level round
+  up** (1 share), **round-lot protection** (100 shares), **participant-level / DTC-participant rounding or cash in lieu** (excluded — the
+  broker, not the holder, gets it). Unparseable events are listed, not guessed.
+- **Per event, per account:** cost = raw close the day before the effective date (1 share); value = shares received × close 10 trading days
+  after the effective date (Yahoo daily, split-adjusted, un-adjusted with its split events); no commissions.
+- **Read:** qualifying events a month; median and total profit per account a month; dollars a month at 10 and 20 accounts. **A lead** if
+  ≥ $2,000 a month at ≤ 20 accounts in both halves of the year (10-2025→03-2026, 04→10-2026) — then broker handling is checked before anything
+  else. Otherwise closed.
+- **Added before any price is fetched (desk check):** SIFMA's Dec-2025 issuer best practice makes cash-in-lieu the default; the revRSS
+  tracker's author stopped in Nov 2024 after manipulation probes (shareholder-count jumps before splits) and retroactive switches from
+  round-up to cash-in-lieu that left SHORT positions in traders' accounts; broker handling varies (Fidelity free; some charge $38-50 a
+  reorganisation; Robinhood/tastytrade have deposited fractions instead). Even a passing V1 is a lead only after current broker handling
+  is confirmed; retroactive-change risk is reported as the share of events whose terms changed after announcement where visible.
+
+## 841. Screens: US cross-exchange crypto gaps (dust, stale) and spin-off round-ups (none) — closed (S11)
+
+**No trial.** (1) `xarb/x1_snapshot.py`, `x2_record.py`: top of book on every USD pair at Kraken, Binance.US, Bitstamp, Crypto.com, Gemini
+(public endpoints, base-tier taker fees). Large "gaps" are ticker collisions (ONE, LIT); real crossed books: ZIL Crypto.com→Binance.US +19%
+(walking the books: $267 deployable, $26 profit, persistent → transfers likely suspended), GRAM +3.8% ($83, $1.62), ZRC/2Z/USDG +0.2-0.9% on
+$0.01-$13 of size. The same stale gaps sit in every sweep; no new episodes. Venue-wide capturable ≈ $30 once. (2) Spin-off / distribution
+round-ups (EDGAR, 115 documents): the hits are equity-plan and option rounding; one microcap distribution rounds up registered holders only.
+
+## 842. Screens (new arenas, desk): IPO allocations, stock-dividend round-ups, US Mint flips, CS2 cash markets, bank conversions, horse racing — closed (S11)
+
+**No trial.** IPO allocations (Robinhood/SoFi): flipping inside 30 days bans access (Robinhood 60 days); fills are random, small and largest
+on weak deals (winner's curse); no allocation data → cannot reach the bar. Stock-dividend round-ups (EDGAR, 237 companies scanned): one real
+case (OTC microcap); the rest are warrant/conversion/rights-plan wording. US Mint limited releases: sold-price sources (eBay, 130point, PCGS,
+usmint.gov) all 403 → skipped. CS2 item cash markets: DMarket and CSFloat need a login; Skinport alone is not cash-to-cash. Mutual-bank
+conversions: 3-12 deals a year, Tier 1 prorated by deposits held 1-2 years before the record date → capital-bound, long lead. Online
+pari-mutuel wagering: illegal for Texas residents (track/simulcast only; TwinSpires ordered out in 2026).
+
+## 843. V-family 1: reverse-split round-ups are a real but small stream — ~$40-70 per account a month; fails the bar; closed (S11)
+
+**No trial.** `stocks/v1_revsplit.py` (§840): 2,173 EDGAR documents → 348 reverse splits 2025-10 → 2026-10 with a matched filing (holder-level
+round-up 221, participant-level 33, round-lot 3, unmatched 91; 23 skipped: another split within 60 days or an ambiguous price jump). Prices
+from Yahoo, split adjustment inferred from the jump across the split and later splits undone (the first two readouts were wrong: inverted
+and then un-undone later-split scaling). One share per account, value 10 trading days after:
+- 10-2025 → 03-2026: 77 qualifying, $471 per account ($79/month), median $2.66 an event; without AREB's one round-lot event (+$217) ~$42/month.
+- 04 → 10-2026: 133 qualifying, $2,564 per account, median $3.17; without BRRN (1-for-100,000 — a cash-out split's shape, +$2,100) ~$70/month.
+- At 20 accounts: ~$0.8-1.4k a month **before** broker reorganisation fees ($0-50 an event), brokers that keep the round-up or pay cash,
+  and retroactive cash-in-lieu switches (§840). Fails "≥ $2,000 a month at ≤ 20 accounts in both halves". Closed.
+
+## 844. X3 protocol — Coinbase new-listing openings vs Kraken: is there a HEDGED cross-venue gap at the open? (S11)
+
+**No trial (a structural stream measured). Written after a crude screen and BEFORE the contemporaneous measure is computed.** Crude screen
+(`xarb/x3_listings.py`, 109 Coinbase USD listings since 2025-03 of assets already on Kraken): Coinbase's first-30-minute VWAP vs Kraken's
+last trade BEFORE the open, net of base-tier takers (1.2% + 0.4%), showed +4-27% on several (TRIA, BLEND, UP, ZKP, DRV, PROMPT) — but that
+mixes the listing pump (unhedged) with any cross-venue gap. **The tradeable stream:** tokens deposited on Coinbase during its transfer-only
+phase are sold at the open while the same amount is bought on Kraken at the same time (inventory unchanged).
+- **Measure, per listing:** for each of the first 30 one-minute Coinbase candles with volume: Coinbase close vs Kraken VWAP of the same
+  minute (Kraken public trade history; minute skipped if Kraken has no trade). Net gap = Coinbase / Kraken − 1 − 1.6%. Capacity per listing
+  = Σ over positive-gap minutes of min(10% of Coinbase minute volume, 10% of Kraken minute volume) × net gap (a 10% participation cap).
+- **Read:** listings a month; median and total capturable dollars a month; first and second halves of the sample (to 2025-12-31, from
+  2026-01-01). **A lead** if ≥ $2,000 a month in BOTH halves at 10% participation; then the deposit / transfer-only timing and inventory
+  price risk are checked before anything else. Otherwise closed.
+
+## 845. X3: Coinbase listing openings — the crude gaps were the listing pump; hedged capacity ~$300/month in 2026; closed (S11)
+
+**No trial.** §844 measure, 88 listings with Kraken trades in the same minutes: most minutes are negative after 1.6% of taker fees; capturable
+at 10% participation **2025 (52 listings) $17,414 = $1,877/month, of which RLS alone $13,402 (median per listing $0); 2026 (36) $2,707 =
+$301/month (median $4)**. Fails "≥ $2,000 a month in both halves". The crude +4-27% gaps (§844) were Kraken repricing with Coinbase at
+the open. Closed.
+
+## 846. Screen: Coinbase delistings vs Kraken — forced-seller discounts are rare and small; closed (S11)
+
+**No trial.** 328 delisted Coinbase products; 11 USD delistings since 2025 also on Kraken (~0.6 a month; several in one batch 2026-08-07).
+Final-week daily closes, net of 1.6% taker fees: mostly −1 to −4%; a final-day discount appears on about a third (FIS +18.7%, IDEX +10.7%,
+OMNI +6-35% on < $6k volume) with $3-56k of Coinbase volume that day → ~$1-3k on a good event, ≈ ≤ $500 a month, before withdrawal timing.
+Fails the bar. Closed.
+
+## 847. Screen: event-ticket resale — data needs keys; tabled (S11)
+
+**No trial.** Resale is legal in Texas with no price cap and starts at one ticket. Data: Ticketmaster Discovery API needs an API key (401),
+SeatGeek needs a client id (403), StubHub/SeatGeek pages block automated reads, Vivid Seats returns a page shell. Face value vs resale price
+cannot be measured without the user's free developer keys, and the access edge (presale codes, Verified Fan) is not measurable from public
+data. Tabled for the user (keys), not pursued unattended.
+
+## 848. Screens: DRIP optional-cash discounts (capital-bound) and classic DFS (needs the user) — closed / tabled (S11)
+
+**No trial.** (1) Discounted optional cash purchases: TELUS moved OCPs to 100% of market (2026-04); Omega's 1% applies to reinvested dividends
+only; remaining plans allow ≤ 3% on ≤ $10,000 a month (more only by waiver). ~1-3% a month on capital → about $6 a month on $200; fails the
+small-start/scale rule. (2) Classic DFS (DraftKings/FanDuel contests) is the only betting-type arena left in Texas outside prediction
+markets; sharp-prop-based projections are the obvious edge but pros already use them, results/ownership are not public, and a test needs
+entered contests on the user's account; close to the user's PrizePicks exclusion. Tabled, not pursued.
+
+## 848b. Screen: Amazon/Walmart retail arbitrage — legit effort business, unmeasurable without paid data; tabled (S11)
+
+**No trial.** Starts at $200-1,000, guides cite 10-20% net margins after fees (clearance markdowns, mostly Walmart); measuring it needs Keepa or
+BrickSeek (paid data plans — excluded) and Amazon/Walmart block automated reads. An effort business rather than an edge we can verify. Tabled.
+
+## 849. X4 protocol — Kraken new listings of assets already on Coinbase: the §844 measure mirrored (S11)
+
+**No trial. Written before any X4 price is fetched.** Same measure and bar as §844 with the venues swapped: inventory deposited on Kraken
+before its open is sold on Kraken while the same amount is bought on Coinbase in the same minute; net of 1.6% taker fees; 10% participation
+cap; ≥ $2,000 a month in both halves (to 2025-12, 2026) = a lead. Listing time = Kraken's first public trade.
+
+## 850. X4: Kraken listing openings — ~$340/month in 2026; closed (S11)
+
+**No trial.** §849 measure, 39 Kraken USD listings since 2025-03 with Coinbase minutes: to 2025-12 $9,688 = $1,116/month (MON alone $9,527);
+2026 $3,015 = $338/month. Extremes (KAT +1,079%, VELO −77%, SUP −47%) look like ticker collisions, so even these are upper bounds. Fails the
+bar. Listing-opening gaps on US KYC'd venues are closed in both directions.
+
+## 851. X5 protocol — minute-level cross-venue gaps, Coinbase vs Bitstamp, all common USD pairs, random 2026 days (S11)
+
+**No trial. Written before any candle is fetched.** Snapshots (§841) and listing openings (§845, §850) found no capacity; the open question is
+transient gaps in ordinary minutes, especially volatile ones. Pairs: every USD pair on both Coinbase and Bitstamp. Days: 20 random 2026 days
+(seed 851, 2026-01-01 → 2026-10-20). Per minute with volume on both: gap = |CB close / BS close − 1|; tradeable net = gap − fees, at base-tier
+takers (CB 1.2% + BS 0.4% = 1.6%) and at volume-tier takers (≈ 0.8% combined). Capacity per minute = min(10% of each venue's minute USD
+volume) × net (inventory on both venues; rebalancing transfers ignored — optimistic). Closes are not simultaneous, so this is an upper bound.
+**A lead** if the volume-tier capacity ≥ $2,000 a month (scaled from the 20 days) AND ≥ $1,000 a month at base tier; then execution realism.
+
+## 852. H-family 1 protocol — after a small-cap LULD pause reopens: continuation or reversal? (S11, new arena: US small caps)
+
+**No trial at registration (N 1,539); written BEFORE any halt or price is fetched.** Arena: US-listed stocks in volatility (LULD, code
+LUDP) pauses — thin, retail-heavy, chaotic reopenings. Data: Nasdaq Trader halts RSS by date (all US listings' halts as published),
+Yahoo 1-minute bars (only the last ~30 calendar days exist). Cash-account friendly (one position at a time; starts at $100-200).
+- **Events:** every LUDP pause with a resumption trade time, 09:45-15:30 ET, price ≥ $1. Direction = sign of (last 1-min close before the
+  halt − close 5 minutes before that). One event per symbol per day (the first).
+- **Rules (4):** at the close of the first full minute after resumption, go WITH the direction or AGAINST it; exit at +15 or +30 minutes'
+  close. Cost 1.0% a round trip (small-cap spread + slippage; no commission).
+- **Split:** trading days in the window ordered by date; first half discovery, second half sealed. Carry if discovery mean > 0 and t > 1.96
+  (clustered by day); sealed: strict §664.4 (t over days > 1.645, sign-flip placebo ≥ 95th, posterior > 0 with PRIOR_SD 0.02 in return
+  units) → CONFIRM. Each carried rule validated is a trial.
+- **Capacity read** if confirmed: median 1-min dollar volume after resumption.
+
+## 853. H-family 2 protocol — the short-sale restriction (Rule 201) day: does a stock that triggered SSR drift up while it applies? (S11)
+
+**No trial at registration; written BEFORE any price is fetched.** Mechanism: a ≥ 10% intraday drop from the prior close triggers Rule 201
+for the rest of that day and all of the next — short sales only above the national best bid, a mechanical cut in selling pressure.
+- **Universe:** Nasdaq screener's current US common stocks (6,956), price ≥ $1 and 20-day median dollar volume ≥ $1M at the event.
+  **Survivorship caveat:** current listings only — stocks delisted after a crash are missing, which biases bounces UP; mitigated by a short
+  recent window and judged against that bias (a pass must survive excluding events within 60 days of the window end).
+- **Event:** day T low ≤ 0.90 × prior close (first trigger in 10 days per stock). Window 2025-07-01 → 2026-10-20 (Yahoo daily).
+- **Rules (3):** buy at T close → sell at T+1 open; T close → T+1 close; T+1 open → T+1 close. Cost 0.5% a round trip (liquid filter).
+- **Split:** discovery 2025-07 → 2026-02; sealed 2026-03 → 2026-10. Carry: mean > 0 and t (clustered by day) > 1.96; sealed strict §664.4.
+
+## 854. H-family 1 discovery: LULD reopenings — nothing carried; closed (S11)
+
+**No trial.** 75 discovery events (10 trading days, 2026-09-23 → 10-06; median $187k traded in the first minute after reopening): with the
+move +15m −2.50% (t −0.96), +30m −4.13% (t −1.81); against +15m +0.50% (t −0.16), +30m +2.13% (t +0.81), after 1% costs. A reversal tilt,
+not significant; Yahoo keeps only ~30 days of 1-minute bars, so the sample cannot grow historically. Sealed half unread. Closed.
+
+## 855. H-family 3 protocol — large opening gap-downs in liquid US stocks: does the open overshoot? (S11)
+
+**No trial; written BEFORE any of H2's daily bars are read** (H3 reuses them). Same universe, filters, window, survivorship caveat and
+split as §853. **Event:** open ≤ 0.85 × prior close (first in 10 days per stock). **Rules (2):** buy the open → sell the close; buy the
+open → sell the next open. Cost 1.0% a round trip (wide spreads on gappers at the open). Carry / sealed exactly as §853.
+
+## 856. H-family 4 protocol — new listings' first trading days: open → close, day 1 and day 2 (S11)
+
+**No trial; written BEFORE any H2 daily bar is read.** New listing = a symbol whose Yahoo daily series starts after 2025-07-01 (its first bar,
+volume > 0, open ≥ $1). **Rules (3):** day-1 open → day-1 close; day-2 open → day-2 close; day-1 close → day-5 close. Cost 1.0%. Survivorship
+caveat as §853 (failed listings delisted since are missing — biases up). Split, carry and sealed rule as §853.
+
+## 857. Desk screens: overnight stock sessions, odd-lot buyback programs, fully-paid lending, Texas tax-sale excess proceeds — closed / tabled (S11)
+
+**No trial.** (1) Overnight US-stock sessions (Blue Ocean ATS via Robinhood/Schwab/IBKR): no free history; the user's TWS (192.168.1.203:7497)
+is unreachable overnight; and with futures restricted to Tradeify the trade would be an unhedged reversion bet — tabled. (2) Odd-lot buyback
+programs with a premium: EDGAR hits are tender offers with odd-lot priority (already T-family 1) — none found. (3) Fully-paid lending of
+hard-to-borrow small caps: the fee compensates the expected decline; no free fee history — not pursued. (4) Texas tax-sale excess proceeds:
+fee capped at the lesser of 25% or $1,000 per claim (Tax Code §34.04(i)), non-attorneys reportedly may not charge, assignments capped at
+125% of the price paid — closed.
+
+## 858. H-family 5 protocol — large opening gap-ups ("gap and go"): buy the open (S11)
+
+**No trial; written BEFORE any H2 daily bar is read.** Mirror of §855: event = open ≥ 1.20 × prior close (first in 10 days per stock), same
+universe / filters / window / survivorship caveat / split. Rules (2): open → close; open → next open. Cost 1.0%. Carry / sealed as §853.
+
+## 859. X5: minute-level Coinbase vs Bitstamp gaps — $7 of capacity in 161 pair-days; stopped early, closed (S11)
+
+**No trial.** §851 measure, stopped after 161 pair-days (2026-01-11 and most of 01-14, 99 pairs) because the answer cannot change: capturable
+at volume-tier fees (0.8% combined) **$7 in total** (largest single pair-day $2), at base tier $1; liquid pairs (BTC, ETH, SOL, DOGE …) had
+no minute beyond either fee level. Even 100× for volatile days ≈ $350 a month as an upper bound with simultaneous-close optimism. US KYC'd
+crypto cross-venue arbitrage is closed (§841, §845, §846, §850, §859).
+
+## 860. H-families 2-5 discovery: buying small-cap stress (SSR days, gap-downs, gap-ups, new listings) loses — nothing carried; closed (S11)
+
+**No trial.** Yahoo daily bars for 6,574 current US listings (2025-07 → 2026-02 discovery; liquid filter ≥ $1, 20-day median ≥ $1M):
+- H2 SSR (≥ 10% intraday drop), 6,934 events / 167 days: close→next open −0.39% (t −2.07), close→next close −0.78% (t −4.62), next open→close
+  −0.85% (t −6.02).
+- H3 gap-down ≥ 15%, 669: open→close −1.51% (t −1.85), open→next open −1.36% (t −1.38).
+- H4 new listings, 352: day-1 open→close −0.88% (t −0.72), day-2 −2.55% (t −3.07), day-1→day-5 close −3.48% (t −1.48).
+- H5 gap-up ≥ 20%, 508: open→close −3.21% (t −3.33), open→next open −3.22% (t −3.20).
+All after costs and despite survivorship bias in their favour. (The "excl. last 60 days" check is moot in discovery.) The mirror images
+(short gap-ups / SSR names) are the known "short the gappers" trade — not registered, and it needs a margin account (≥ $2k; $25k for pattern
+day trading) and hard-to-borrow locates, so it fails the small-start rule. Sealed halves unread. Closed.
+
+## 861. Screen: collectible mystery packs with buyback (Courtyard, Arena Club) — closed (S11)
+
+**No trial.** Courtyard's API answers 403 and pack odds/values are not in its public pages; Arena Club blocks automated reads. The product is
+priced with a house margin (the ~90% FMV buyback is the operator's edge) and mystery-box sales face gambling challenges. Not measurable, low
+prior. Closed.
+
+## 862. Screens: Texas unclaimed-property locating (business, 10% fee cap) and shorting gap-ups (needs margin) — tabled / closed (S11)
+
+**No trial.** (1) Locators may charge at most 10% of the recovered value (Property Code §74.507 per secondary summaries); owners can claim
+free; the work is outreach, bulk lists need a Public Information Act request — a service business, not an edge; tabled. (2) Shorting
+≥ 20% gap-ups (the mirror of §860's H5): gross ≈ +2.2% open→next open, minus ~1% spread and ~1% hard-to-borrow fee ≈ +0.2%; needs a margin
+account (≥ $2k) and locates — fails the small-start rule; not registered.
+
+## 863. H-family 6 protocol — S&P SmallCap 600 deletions for size ("no longer representative"): rebound after the forced sale (S11)
+
+**No trial; written BEFORE any price is joined.** Mechanism: index funds tracking the S&P 600 (IJR, VIOO, SLY …) sell a deleted stock at the
+close before the effective date; deletions for size have no buyer index. Events: Wikipedia's "Recent and announced changes" table, removals
+whose reason says "no longer representative" (or equivalent: market cap / size), effective 2023-01-01 → 2026-10-20; acquisitions, spin-offs
+and moves to the S&P 400 excluded. Prices: Yahoo daily (cached in H2 where present, else fetched). **Rules (2):** buy at the close of the
+last trading day BEFORE the effective date; sell at the next close / the close 5 trading days later. Cost 0.5%. Split: discovery effective
+dates before 2025-01-01, sealed from 2025-01-01. Carry / sealed as §853 (t clustered by event date).
+
+## 864. H-family 6 discovery: S&P 600 size deletions do not rebound — not carried; closed (S11)
+
+**No trial.** 53 size deletions effective 2023-2024 (40 priced on Yahoo; the rest since delisted): buy the last close before the effective
+date → next close −1.33% (median −2.33%, t −0.80), → +5 closes −1.62% (median −2.26%, t −0.52), after 0.5%. Index-fund selling is absorbed
+without a tradeable overshoot. Sealed half unread. Closed.
+
+## 865. H-family 5s protocol — SHORT ≥ 20% gap-ups, tested once on H5's unread sealed half (for the user's margin-account decision) (S11)
+
+**Written BEFORE H5's sealed half (2026-03-01 → 10-20) is read.** Motivated by §860 (buying gap-ups lost −3.2%, t −3.3 in discovery); the
+short side was not registered then, so this is a fresh protocol tested once on sealed data. Outside the small-start rule (margin account
+≥ $2k; overnight holds are not day trades). Event as §858. **Rules (2):** short the open → cover at the close (a day trade: needs $25k under
+PDT); short the open → cover at the next open. Costs: 1.0% spread/slippage + hard-to-borrow fee 1.0% for the overnight rule (0.5% intraday).
+Strict §664.4 on the sealed half → CONFIRM / WATCHLIST / REJECT; one trial each. Locate availability is NOT modelled (optimistic).
+
+## 866. H-family 5s sealed: shorting ≥ 20% gap-ups — positive but not significant → WATCHLIST ×2 (t01540, t01541); N 1,539 → 1,541 (S11)
+
+Sealed 2026-03-01 → 10-20, 436 events / 138 days: short open→close **+0.55%** (median −0.09%, t +0.70, placebo 76th, posterior +0.47%);
+short open→next open **+0.62%** (median +0.14%, t +0.55, placebo 72nd) after 1% spread and 0.5-1% borrow, locates not modelled. Discovery's
+−3.2% for longs shrank to a thin, insignificant short edge. Not a lead even with a margin account. Watchlist only (§133 forward rule).
+
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —

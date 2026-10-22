@@ -166,3 +166,87 @@ products the launch plan doesn't use.
 - ProphetX × Kalshi riskless pairs (56 moneyline pairs, same event, both fees): best −1.9% → none. Closed.
 - ProphetX tennis by tier (A96 rows): median EV ATP −2.2%, WTA −2.6%, Challenger −3.5%, ITF −12.3%; only ~19 distinct sides ever ≥ +2%.
   A96's first 3 closed paper bets (tennis): closing-line EV +7.9% — n far too small. A97 now streams tennis too (§791).
+
+### 12. Morning brief (2026-10-21 ~14:00Z) — nothing profitable confirmed
+- **ProphetX taking (A96/A97) — the only live lead, now much weaker.** The long-shot "edges" (tennis, NCAAF +280…+4,300) are a
+  proportional-devig artifact: 8 closed tennis paper bets score +16.3% closing-line EV proportional but **−18.0% with power devig**
+  (§792). What remains is near-even-money NBA spreads/totals: A97 sees ≈ $15k + $26k a day of stake at ≥ +2% (EV×stake ≈ $360 +
+  $750/day, extrapolated from < 1 day), lifetimes minutes, a quarter taken within 10 s (contested). Their closing-line value is scored
+  from tonight at their own line (§793). Decision needs ≥ 150 bets (≈ 1-2 weeks).
+- Closed overnight: ProphetX NBA props (median −6.3%), ProphetX alternate lines (−3.3%), ProphetX × Kalshi riskless pairs (none),
+  ProphetX tennis by tier (−2…−12%), reality-TV markets (seasonal). Golf matchups: Pinnacle not posted yet.
+- Review prep refreshed: A91 deployed rules 4/4 positive to 10-20 but D227 (NKD) weaker (+1.8 bps); demo 41 tickets −$11,065
+  (z −1.55), NKD −$2,865, FDXM +$400.
+- Needs the user: ProphetX market-maker programme contact (§786/788) — only if the user wants it; A94 LoL race records 10-22/10-23.
+- Golf matchups: Pinnacle's guest API carries no golf matchups (only single top-N props) — no anchor; closed.
+
+### 13. (2026-10-21 afternoon, user back; ≤ 3 runs; desk research alongside)
+- K15 (§795/799/801) not carried: non-sports favourite_YES +2.4¢ (t 1.09), longshot_NO −0.9¢, 24 h out; wide books.
+- K16 (§796/802) not carried: maker long-shot sales −3.0¢ per event (t −2.89) — insurance-seller profile; the trade-weighted maker profits
+  in the literature are one giant market (Sep Fed decision, 46 M contracts).
+- K17 (§797/800) not carried: political favourites a week before resolution, 61 markets, −9.9¢ a week (t −1.36).
+- Fed decision markets: tails at 0-1¢ (nothing to sell); the hold/hike split is CME-anchored ("public data vs liquid market") — closed.
+- Kalshi fee check: almost every non-sports series charges takers only (makers free); Basic API tier 10 writes/s.
+
+### 14. (2026-10-21 late afternoon) Tradeify V2 payout correction and plan re-checks (§805-812)
+- V2 payouts (min($1,250, 2× profit since last payout, above the $2,100 buffer), ≥ $250): plan 2025 +$11.9k (was +$21.3k), 2021-26 +$8.0k
+  (was +$12.0k), zero edge +$4.2k (was +$4.6k). Launch (one NKD to two payouts) barely changed. 50K stays (100K zero edge negative), Daily
+  beats Flex / Lightning / Growth, request every eligible day. Review candidates: 2 NKD + 3 FDXM (§806); funded stop 0.75× (§811, A107:
+  3 + 2 / 0.75× 2025 +$19.1k, zero edge +$4.2k, but edge-dependent by year). Bot payout suggestions fixed for V2 locally (needs deploy OK).
+
+### Search backlog (open)
+- A98 Kalshi lag vs Pinnacle moves, A99 Kalshi lag vs ProphetX moves — evening data (NBA pre-tip); A97 NBA closing-line check tonight.
+- A94 LoL race — 10-22 06:45 CT (EMEA) and 10-23 11:45 CT (Worlds).
+- A96 ProphetX paper bets — running to 150 bets (lead mostly dead: §792, §803).
+- Tabled for the user: ProphetX market-maker programme; Novig (CAPTCHA); GRID esports data (application).
+- Bot V2 payout suggestions deployed (§813, user-approved).
+- Does ProphetX lead Pinnacle in general? (A96 20-min snapshots, pre-start moneylines): slope of Pinnacle's next move on the PX−Pinnacle
+  gap 0.01-0.18 (corr 0.09-0.26; NBA 0.18/0.26 on 748); gaps ≥ 2 pts close toward PX only ~10% of the time (tennis 532, NFL 66). Esports
+  slope 0.25, +4.3 pts after 79 big gaps — thin. No general lead; A99 (Kalshi vs ProphetX) still records tonight's NBA.
+- Esports: Kalshi KXLOLGAME vs ProphetX (8 Worlds events, 16 sides): on the price, best +0.2¢ → closed (§820).
+- NBA props when a player is ruled out: Kalshi settles inactive players at a fair price → no riskless NO → closed.
+- Kalshi NBA totals vs Pinnacle (36 lines matched via game codes): Kalshi mid − Pinnacle median 0.04¢, none positive after fees → closed.
+- A99b (in-play ProphetX vs Kalshi NBA) recording tonight; plan paired tests: 0.7× stop +$5.3k (CI +2.9..+7.4k) §818, keep 3+2 §819.
+- A99/A99b closed (§822): Kalshi's NBA books don't lag ProphetX pre-match (median −1.8…−2.1¢ after ~1,000 moves); in-play "moves" are
+  ProphetX liquidity artifacts. A98 inconclusive (no Pinnacle move ≥ 2 pts all day) → disabled.
+- A97 at the close (NBA, 27 episodes): spreads −1.55% (6/9 positive), totals −2.35% (4/18) — the ProphetX "edges" were not value.
+- ProphetX × Kalshi NFL prop arbitrage (367 pairs, over/under vs ladder, both fees): best −1.9% → none.
+- Old combo calibration decomposed: the 65-95¢ "buyer edge" (last-price) is sports combos (2-leg +8.5¢), crypto negative — K18 tests it at
+  trade level (listing running).
+- Favourite buyers at 80-95¢, non-sports, trade level (K16 discovery data, 593 events): event-weighted −3.75¢ (t −2.90), 79% of events
+  positive — the mirror image of K16 (rare large losses); contract-weighted gains are the Sep Fed market again. Weather flat (+0.5¢). Closed.
+- Review prep rewritten cleanly (deployed state, V2 table, four open decisions).
+- K18 (combo buyers, trade level) downloading: 39,903 combos listed via 5-minute windows (§823-824); 10,044 sampled.
+- ProphetX soccer as draw-no-bet vs Pinnacle 1X2 (power devig, 22 sides): median −3.0%, none ≥ +2% → closed.
+- CME event contracts (S&P ADV ~85k/day, Jan 2026): would need the user's own futures-broker account — conflicts with the Tradeify-only rule for futures-exchange trading → dropped without data.
+- A96 retired unevaluated (§825): $173/week at face value vs a $500 bar; tennis gain is the devig artifact (power −8.1%).
+- K18 not carried (§826): combo buyers at 65-95¢ −4.76¢ per combo (152 combos); §742's buyer edge was a last-price artifact.
+- A113 Select 300K V2 (§827): held on top of the 5-account cap, 3 per lifetime; ≈ +$180 per $349 attempt (2021-26), +$73 (2010-20) → ~+$0.5k
+  total; optional. Fixed a broken line in a63_firms.simulate (TGT stranded in a comment).
+- Underdog Exchange (UDX, CFTC, July 2026): no public API/fees found; app-only → tabled for the user. Odds aggregators (OpticOdds,
+  OddsPapi) need paid keys; ProphetX's direct API is partner-only.
+- Laptop: 2.7 GB RAM, VS Code ~1.5 GB → keep runs light (likely cause of the container restarts).
+
+## 2026-10-21/22 overnight (user redirect: new arenas only; no prediction markets; no Tradeify-plan work)
+Nothing profitable. Closed (decisions.md §836-862):
+- Plan questions answered first: A116 steady small-bracket plan loses (§836); A117 Tradeify §6.5 "consistent trading plan" risk — a fixed
+  bracket keeps ~25-30% of the value; ask Tradeify support (§839, review item 5).
+- Crypto on US KYC'd venues: snapshot gaps dust (§841); Coinbase/Kraken listing openings ~$300-340/month hedged (§845, §850); delisting
+  discounts ≤ $500/month (§846); minute-level Coinbase×Bitstamp $7 in 161 pair-days (§859). Gemini too small (§838).
+- US stocks: reverse-split round-ups ~$40-70/account/month (§843); LULD reopenings nothing (§854); buying SSR days / gap-downs / gap-ups /
+  new listings all lose (§860; the short mirror needs margin + borrow, fails small-start). Literature (Muravyev 2025): microcap anomalies are
+  short-side and vanish after borrow fees.
+- Desk: IPO allocations, bank conversions, DRIP discounts, stock-dividend/spin-off round-ups, odd-lot programs, excess proceeds ($1k cap),
+  unclaimed property (10% cap), horse racing (illegal in TX), sweeps books, Novig/Rothera (login), US Mint/eBay/CS2/Courtyard (blocked).
+- Tabled for the user (need keys/accounts): ticket resale (Ticketmaster/SeatGeek keys), classic DFS (account), retail arbitrage (paid data),
+  overnight stock sessions (TWS on), ProphetX MM programme (earlier).
+
+### Tabled items ranked by plausible upside (for the user's morning decision)
+1. **Shorting small-cap gap-ups / SSR names** — SEALED TEST DONE (§866): +0.55-0.62%, not significant → WATCHLIST, not a lead. Was: the only strongly significant effects tonight (H5 open→next open −3.2%, t −3.2; H2 −0.85%,
+   t −6.0 on the long side) — but needs a margin account (≥ $2k; ≥ $25k to day-trade) and hard-to-borrow locates; after ~1% borrow the
+   gap-up short nets ~+0.2%. Only worth a look if a margin account is acceptable — would need its own registered test with borrow data.
+2. **Classic DFS** (DraftKings/FanDuel; open in TX) — sharp-prop projections from the Pinnacle feed we already read; needs the user's account to
+   see results; competes with pros; close to the PrizePicks exclusion.
+3. **Ticket resale** — needs free Ticketmaster + SeatGeek developer keys to measure face vs resale; the real edge (presale access) is effort.
+4. **ProphetX market-maker programme** (sports exchange) — contact only; prediction-market-like, which the user has deprioritised.
+5. Overnight stock sessions (needs TWS on), unclaimed-property locating (business), retail arbitrage (paid data) — low.

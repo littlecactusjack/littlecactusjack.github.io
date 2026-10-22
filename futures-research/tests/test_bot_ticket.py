@@ -25,8 +25,9 @@ def both():
     return bt, pb
 
 
-def test_bot_ticket_matches_playbook(both):
+def test_bot_ticket_matches_playbook(both, monkeypatch):
     bt, pb = both
+    monkeypatch.setattr(bt, "FUNDED_STOP", 1.0)                   # the playbook is the unscaled policy (decisions.md 815)
     rng = np.random.default_rng(123)
     for _ in range(3000):
         phase = "eval" if rng.random() < 0.6 else "funded"
@@ -51,8 +52,15 @@ def test_book_rules(tmp_path):
     msgs = bk.eod("MNQ", 53_000)                     # profit 3,000, best day 1,200 <= 40% of 3,000 -> pass
     assert any("PASSED" in m for m in msgs) and bk.s["MNQ"]["phase"] == "funded"
     bk.eod("MNQ", 52_100); msgs = bk.eod("MNQ", 52_700)
-    assert any("payout of $700.00" in m for m in msgs)
-    bk.payout("MNQ", 700); assert bk.s["MNQ"]["balance"] == 52_000 and bk.s["MNQ"]["payouts"] == 1
+    assert any("payout of $600.00" in m for m in msgs)            # V2 (decisions.md 805): above the $2,100 buffer
+    bk.payout("MNQ", 600); assert bk.s["MNQ"]["balance"] == 52_100 and bk.s["MNQ"]["payouts"] == 1
+    msgs = bk.eod("MNQ", 52_600)                                  # +$500 since the payout -> 2x = $1,000, but only $500 above the buffer
+    assert any("payout of $500.00" in m for m in msgs)
+    bk.payout("MNQ", 500); msgs = bk.eod("MNQ", 54_100)          # +$2,000 since -> 2x $4,000, above buffer $1,900 -> cap $1,250
+    assert any("payout of $1,250.00" in m for m in msgs)
+    msgs = bk.eod("MNQ", 54_000)                                  # lost $100 since the last request? still +$1,900 since the payout -> 1,250
+    bk.payout("MNQ", 1_250); msgs = bk.eod("MNQ", 52_700)        # balance 52,750 after it; down $50 since -> nothing to request
+    assert not any("request a payout" in m for m in msgs)
     assert any("FAILED" in m for m in bk.eod("MGC", 47_990)) and bk.s["MGC"]["phase"] == "dead"
     bk.new("MGC"); assert bk.s["MGC"]["phase"] == "eval" and bk.s["MGC"]["evals_bought"] == 2
     assert (tmp_path / "log.csv").read_text().count("\n") >= 8
@@ -341,3 +349,16 @@ def test_ten_book_payouts_trigger_the_move(tmp_path, monkeypatch):
     bk = ac.Book(tmp_path / "s.json", tmp_path / "log.csv")
     bk.set("NKD", "funded", 52_000, 52_000, 0, 0); bk.bk["payouts"] = 9
     assert "the book has 10 payouts" in bk.payout("NKD", 300)
+
+
+def test_funded_stop_scaled(both, monkeypatch):
+    bt, _ = both
+    for product in ("NKD", "FDXM"):
+        for bal in (50_400.0, 51_000.0, 52_500.0, 53_200.0):
+            monkeypatch.setattr(bt, "FUNDED_STOP", 1.0); a = bt.ticket("funded", bal, bal, 0.0, 1, product)
+            monkeypatch.setattr(bt, "FUNDED_STOP", 0.7); b = bt.ticket("funded", bal, bal, 0.0, 1, product)
+            if a.get("trade") and b.get("trade"):
+                assert b["take_net"] == a["take_net"] and b["contracts"] == a["contracts"]
+                assert b["stop_net"] == pytest.approx(min(a["stop_net"] * 0.7, a["stop_net"]))
+            e1 = bt.ticket("eval", bal, bal, 300.0, 0, product); monkeypatch.setattr(bt, "FUNDED_STOP", 1.0)
+            assert e1 == bt.ticket("eval", bal, bal, 300.0, 0, product)   # evaluation tickets unchanged
