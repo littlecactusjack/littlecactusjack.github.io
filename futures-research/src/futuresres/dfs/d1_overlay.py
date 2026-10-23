@@ -1,0 +1,107 @@
+"""D-family 1 (decisions.md 869): DraftKings guaranteed-prize overlays at lock — public lobby recorder and readout. No account, no entries.
+
+    python -m futuresres.dfs.d1_overlay record HOURS
+    python -m futuresres.dfs.d1_overlay                # readout
+"""
+
+from __future__ import annotations
+
+import collections
+import datetime as dt
+import json
+import re
+import sys
+import time
+import urllib.request
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = ROOT / "data" / "dfs" / "d1.jsonl"
+SPORTS = ("NFL", "NBA", "NHL", "CFB", "MLB", "SOC", "GOLF", "MMA", "NAS", "TEN", "LOL", "CS", "CFL", "F1")   # 869 amendment: niche sports added
+
+
+def lobby(sport: str) -> list[dict]:
+    try:
+        d = json.loads(urllib.request.urlopen(urllib.request.Request(f"https://www.draftkings.com/lobby/getcontests?sport={sport}",
+                                                                   headers={"User-Agent": "Mozilla/5.0"}), timeout=60).read())
+        return d.get("Contests") or []
+    except Exception:
+        return []
+
+
+def cash(c: dict) -> float | None:
+    v = (c.get("pd") or {}).get("Cash")
+    return float(re.sub(r"[^\d.]", "", v)) if v and re.sub(r"[^\d.]", "", v) else None
+
+
+def record(hours: float) -> None:
+    OUT.parent.mkdir(parents=True, exist_ok=True); end = time.time() + hours * 3600
+    while time.time() < end:
+        t0 = time.time(); now_ms = time.time() * 1000; rows = []; seen = set()
+        for sp in SPORTS:
+            for c in lobby(sp):
+                if c["id"] in seen:
+                    continue
+                seen.add(c["id"])
+                st = int(re.search(r"\d+", c.get("sd", "0")).group(0))
+                if (c.get("attr") or {}).get("IsGuaranteed") != "true" or not 0 <= st - now_ms <= 45 * 60_000:
+                    continue
+                p = cash(c)
+                if p:
+                    rows.append({"id": c["id"], "sp": sp, "n": c["n"][:80], "start": st, "fee": c["a"], "prize": p, "entries": c["nt"], "max": c["m"], "mec": c.get("mec")})
+            time.sleep(1)
+        with open(OUT, "a") as f:
+            f.write(json.dumps({"t": dt.datetime.now(dt.timezone.utc).isoformat(), "rows": rows}) + "\n")
+        soon = any(r["start"] - time.time() * 1000 <= 6 * 60_000 for r in rows)
+        time.sleep(max(5, (30 if soon else 180) - (time.time() - t0)))   # 30 s near a lock: late entries matter
+
+
+def readout() -> None:
+    last = {}
+    for l in open(OUT):
+        s = json.loads(l); t = dt.datetime.fromisoformat(s["t"]).timestamp() * 1000
+        for r in s["rows"]:
+            if t <= r["start"]:
+                last[r["id"]] = r | {"snap_ms_before": r["start"] - t}
+    L = [r for r in last.values() if r["fee"] > 0 and r["entries"] > 0 and r["snap_ms_before"] <= 10 * 60_000]   # a lock state only
+    days = max(len({dt.datetime.fromtimestamp(r["start"] / 1000, dt.timezone.utc).date() for r in L}), 1)
+    ov = [r | {"overlay": r["prize"] - r["entries"] * r["fee"], "ev": r["prize"] / (r["entries"] * r["fee"])} for r in L if r["prize"] > r["entries"] * r["fee"]]
+    def best(r):                                       # our own k entries dilute it: k * prize / (n + k) - k * fee, k <= per-user cap and room
+        return max([k * r["prize"] / (r["entries"] + k) - k * r["fee"] for k in range(1, max(1, min(r["mec"] or 1, r["max"] - r["entries"])) + 1)] + [0.0])
+    cap = sum(best(r) for r in ov)
+    print(f"guaranteed contests at lock {len(L)} over {days} days; with overlay {len(ov)}; total overlay ${sum(r['overlay'] for r in ov):,.0f} "
+          f"(${sum(r['overlay'] for r in ov) / days * 30.4:,.0f}/month); one account at its per-user cap, field-average: ${cap:,.0f} → ${cap / days * 30.4:,.0f}/month")
+    for r in sorted(ov, key=lambda r: -r["overlay"])[:20]:
+        print(f"  {r['sp']:4} {r['n'][:50]:50} fee ${r['fee']:>6} prize ${r['prize']:>9,.0f} entries {r['entries']:>6}/{r['max']:<6} overlay ${r['overlay']:>7,.0f} EV x{r['ev']:.2f} "
+              f"(last snap {r['snap_ms_before'] / 60000:.0f} min before)")
+    print("by sport:", collections.Counter(r["sp"] for r in ov))
+
+
+if __name__ == "__main__":
+    record(float(sys.argv[2])) if sys.argv[1:2] == ["record"] else (None if sys.argv[1:2] == ["traj"] else readout())
+
+
+def trajectory() -> None:
+    """How much of the shortfall seen 45 / 20 / 10 / 5 minutes out is still there at the last pre-lock snapshot (late-entry risk)."""
+    snaps = collections.defaultdict(list)
+    for l in open(OUT):
+        s = json.loads(l); t = dt.datetime.fromisoformat(s["t"]).timestamp() * 1000
+        for r in s["rows"]:
+            if t <= r["start"]:
+                snaps[r["id"]].append(((r["start"] - t) / 60000, r))
+    out = collections.defaultdict(lambda: [0.0, 0.0, 0])
+    for cid, ss in snaps.items():
+        ss.sort(key=lambda x: x[0]); m_last, last = ss[0]
+        if m_last > 10:
+            continue
+        sf = lambda r: max(0.0, r["prize"] - r["entries"] * r["fee"])
+        for h in (45, 20, 10, 5):
+            early = [x for x in ss if x[0] >= h]
+            if early:
+                e = min(early, key=lambda x: x[0])[1]; out[h][0] += sf(e); out[h][1] += sf(last); out[h][2] += 1
+    for h, (a, b, n) in sorted(out.items(), reverse=True):
+        print(f"  shortfall {h:2} min out ${a:,.0f} → at lock ${b:,.0f} ({b / a:.0%} survives; {n} contests)" if a else f"  {h} min: none")
+
+
+if __name__ == "__main__" and sys.argv[1:2] == ["traj"]:
+    trajectory()

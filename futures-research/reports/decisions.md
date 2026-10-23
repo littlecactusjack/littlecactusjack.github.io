@@ -16295,6 +16295,295 @@ Sealed 2026-03-01 → 10-20, 436 events / 138 days: short open→close **+0.55%*
 short open→next open **+0.62%** (median +0.14%, t +0.55, placebo 72nd) after 1% spread and 0.5-1% borrow, locates not modelled. Discovery's
 −3.2% for longs shrank to a thin, insignificant short edge. Not a lead even with a margin account. Watchlist only (§133 forward rule).
 
+## 867. A94: the 2026-10-22 EMEA recording captured no Riot frames — recorder bug; amended for 10-23 (S10)
+
+**No trial.** `emea_1022`: the game (KXLOLGAME-26OCT220800SLYGAL, Riot game 117173205319911445, ~15:13-15:21Z) and 2,118 Kalshi trades were
+recorded, but `riot.jsonl` is empty: the recorder asked for windows 0-30 s old, and Riot's livestats answers windows that recent with
+400/204 (checked after the fact: a window 60 s old → 400; 15:20:00Z → 45 frames). **Amendment (before the 10-23 recording; analysis rule
+§776 unchanged):** poll windows 0-120 s back every 2 s, so a frame's first receive time measures how late the public feed makes it
+available. If the feed only serves frames ≥ ~40 s after the event, the race cannot be won (Kalshi sweeps within seconds) and A94 closes.
+
+## 868. Screen: going-private cash-out reverse splits — ~4 a year; closed (S11)
+
+**No trial.** EDGAR SC 13E3 (2023-01 → 2026-10) with reverse-split cash-out language: 13 companies (Ashford $5.00 under 10,000 shares;
+Mobivity $0.29 under 25,000; Tile Shop, LakeShore +15%, Cyanotech, Mymetics $0.01 …). ~4 events a year; after announcement the market
+trades to the cash-out price; many deals measure holders at the record level (Cede & Co.) so street-name beneficial owners may not be cashed
+out. Even at ~$1k an event per account it is ≈ $300/month. Closed (same family as T1 §732, V1 §843).
+
+## 869. D-family 1 protocol — DFS guaranteed-prize overlays on DraftKings: how much free money is left at lock? (S11)
+
+**No trial (a structural stream measured). Written BEFORE any snapshot is taken.** Mechanism: a guaranteed (GPP) contest pays its full
+prize pool even when it does not fill; if entries × fee < prize pool at lock, the shortfall ("overlay") is paid by DraftKings to the field.
+An average-skill entry then has EV = prize / entries > fee. Classic DFS is legal in Texas and starts at $0.25-$5 entries; "why isn't
+everyone": overlays are small, late, and in odd contests. Public lobby (`draftkings.com/lobby/getcontests?sport=…`, no login).
+- **Recorder** (`dfs/d1_overlay.py`): every 3 minutes, for NFL / NBA / NHL / NCAAF / MLB / CBB / SOC, all contests with
+  `attr.IsGuaranteed` and a cash prize (`pd.Cash`), starting within 45 minutes: id, start, fee, prize, entries, max entries. The last
+  snapshot before start is the lock state (DraftKings closes entry at start).
+- **Per contest:** overlay $ = max(0, prize − entries × fee); EV ratio = prize / (entries × fee). Fillable room = max − entries.
+- **Read after ≥ 3 days covering a weekend:** overlay contests a day; total overlay $ a day; the share of each overlay one person could
+  capture at the contest's max-entries-per-user (`mec`, entries × prize / entries); dollars a month for one account entering every overlay
+  contest at its per-user cap, assuming field-average results. **A lead** if ≥ $2,000 a month for one account at field-average results (the
+  user must then decide on a DraftKings account; skill and lineup tooling come after). Otherwise closed.
+- **Amended before any lock readout (2026-10-22 ~14:35 CT):** sports extended to GOLF, MMA, NAS, TEN, LOL, CS, CFL, F1 (niche slates are
+  where overlays should live); contests de-duplicated by id; CBB dropped (no such lobby code). Earlier snapshots stand.
+- **Readout arithmetic fixed (before any multi-day result):** one account's take = max over k ≤ min(per-user cap, room) of k·prize/(n+k) − k·fee
+  (own entries dilute the overlay); the first version overstated it. First slate (UEL soccer 10-22): 9 of 17 guaranteed contests in overlay,
+  $322 in total.
+- **Caveats fixed now:** (1) Texas legal status is grey — AG Paxton's 2016 opinion (nonbinding) calls paid DFS likely illegal gambling;
+  DraftKings kept operating in Texas, FanDuel agreed to leave (2016). The user decides before any account. (2) One account per person at
+  DraftKings → no scaling beyond one account. (3) Field-average results assumed; overlay contests may draw strong regulars.
+  (4) Ticket/seat-prize contests (~11% of the NFL lobby) are not valued (the lobby gives a ticket count, not its worth) → understates.
+  Side screens: FanDuel's lobby API needs a login (401); Splash Sports is mostly pick'em/survivor pools (excluded) with no open lobby.
+  Lock state = last snapshot ≤ 10 min before start (contests seen only earlier, e.g. during a recorder restart, are dropped).
+
+## 870. Screen: stablecoins below par with 1:1 redemption — none with depth; event-only (S11)
+
+**No trial.** 2026-10-22 14:40 CT, ask books for USDC, USDT, PYUSD, USDG, RLUSD, DAI, USD1, USDS on Bitstamp, Gemini, Crypto.com, Binance.US:
+every best ask 0.9986-1.0007 and **$0 of depth at ≤ $0.997** (Gemini USDG 0.99 is dust). Discounts with size exist only in depeg crises
+(USDC 2023-03) — a rare event, not a stream; a depeg alert could be kept later. Closed.
+
+## 871. Screen: Texas tax-sale redemption premiums — statutory 25%/50%, but capital-bound and bid away; closed (S11)
+
+**No trial.** Tax Code §34.21: homestead/agricultural owners redeem within 2 years paying the bid + costs + a premium of 25% (first year) or
+50% (second); other property has a shorter period with a 25% premium. Lots need thousands per bid (fails the $100-200 start), unredeemed lots
+leave the buyer with illiquid property and title risk, and sale-day bidding above the minimum shrinks the effective premium. Closed.
+
+## 872. Screen: Pokémon sealed product at MSRP vs TCGplayer market — break-even except hyped/preorder product; access is the whole edge; tabled (S11)
+
+**No trial.** tcgcsv.com daily TCGplayer dumps (public), 2026-10-22: 2026 sets after release — ETB $71-75 (ME03-ME05), booster bundles $35-40,
+booster boxes $174-184; indicative ETB MSRP $50-60. After ~13% marketplace fees and ~$5 shipping an ETB nets ≈ $57-60 → ≈ break-even.
+Margins exist only on hyped/preorder product (ME06 Delta Reign ETB $106 / bundle $66 before its 2026-11-06 release; ME02 ETB $149), where
+MSRP stock is what bots and scalpers compete for under per-customer limits. An effort/access business, not a measurable edge; capacity per
+person is set by retailer limits. Tabled (if pursued: preorder allocations at MSRP, sold before release).
+
+## 873. Screen: Magic singles buylist arbitrage (TCGplayer market → Card Kingdom cash buylist) — capital-bound, thin after tax/grading; closed (S11)
+
+**No trial.** Card Kingdom's public pricelist (152,788 rows, cash `price_buy`, `qty_buying`, Scryfall ids) joined to Scryfall's TCGplayer
+market prices: median CK cash buy = 0.65 × TCG market. 2,212 cards with buy ≥ market, but the large gaps are variant mismatches (e.g. Alpha
+Timber Wolves "$0.10") or vintage cards whose TCG "market" mixes played-condition sales while CK pays cash for Near Mint only. Affordable tier
+($5-30 buy, 1.15-2× market): 422 cards, naive $2,015 profit on $12.5k capital as a one-off snapshot — before ~8.25% Texas sales tax on
+purchases, per-seller shipping, CK's condition downgrades and promo-stamp mismatches. A few percent per 3-4-week cycle on capital: fails the
+small-start/scale rule. Closed.
+Side screen: textbook buyback arbitrage — BookScouter API needs a key (403), pages block bots → tabled.
+
+## 874. D1 interim (2026-10-22 15:05 CT): late entries fill most overlays; Madden slate $14 (S11)
+
+**No trial; interim, not the verdict (§869 reads after the weekend).** 22 guaranteed contests at lock: overlay $336 in total, $322 from one
+UEL soccer slate; the 15:00 CT Madden Stream slate (7 contests, $8.7k of guarantees across the lobby's Madden slates) ended with $14 —
+fill trajectory: 22% of the shortfall seen 20 min out survives to lock, 44% of 10-min-out, 74% of 5-min-out. Underfilled contests are mostly
+single-entry (cap 1). One account at field-average ≈ $24 so far. Pinnacle publishes NBA player props (92 live) → props-based DFS projections
+are buildable if the overlay base justifies it.
+
+## 875. Screen: data-science prize competitions (DrivenData/Kaggle) — skill contests, sporadic, compute-bound; tabled (S11)
+
+**No trial.** DrivenData's listing: one active prize competition (GEMS geothermal faults, $300,000, 699 joined, ends 2026-12-03); the others
+are closed or practice. Kaggle's list API needs the user's key. Winning needs ML work and GPU compute (this laptop: 2.7 GB RAM) against
+strong teams; prizes are lumpy, not a monthly stream. An effort option for the user, not a measured edge. Tabled.
+
+## 876. User relaxes four limits (2026-10-22); DFS data access mapped (S11)
+
+**No trial.** The user allowed: a DraftKings DFS account (accepting Texas's grey legal status), a margin brokerage account, free API keys
+(user signs up), and revisiting prediction markets. Data mapped for DFS without a login: DraftKings salaries are public
+(`draftkings.com/lineup/getavailableplayerscsv?contestTypeId=70&draftGroupId=…`: salary, roster position, AvgPointsPerGame); the
+`api.draftkings.com` draftables/contest/leaderboard endpoints are 403. Pinnacle prices NBA player props (2026-10-22: 92 markets — points 27,
+threes 22, rebounds 17, PRA 14, assists 12), i.e. stars only. A props-based projection edge over the field needs contest results (login) to
+measure; projection sites already use sportsbook props. Next with the account: enter small overlay contests at lock (D1) and log results.
+
+## 877. Kalshi LIP post-mortem by series, and a filtered live test (user: "go", 2026-10-22) (S10)
+
+**No trial.** Account reconciled (read-only API): $150 deposit + $41.66 rewards (paid as cash) − $162.07 of contracts that all settled at $0
+− $0.44 fee = $29.15. One fill was not the bots': a manual market order 2026-10-20 01:28Z, 25.13 YES KXRAIN-26OCT19-ABQ @ 46¢ ($12.00).
+Per-series rewards (user's Credits list) vs fill losses: AI share (OpenAI/Google/DeepSeek) +$26.78 / −$80.03; EO week +$3.74 / −$20.00;
+state gas +$1.41 / −$45.33; **Truth Social +$3.51 / −$0.04, Rotten Tomatoes +$3.88 / $0, rain (bot) +$2.34 / −$0.01**; Miami temp, Trump
+actions, soccer $0 / −$5.10. Series whose result is public before the close paid 77% of the rewards and lost $145; series settled by the
+event itself earned $9.73 for ~$0.05.
+**Filtered test (live from 2026-10-22 20:31Z, `kalshi-lip-short` with short.env):** `INCLUDE=KXTRUTHSOCIAL,KXRT,KXRAIN,MENTION` (new
+allow-list), `PULL_CENTS=97` (new: pull and skip a market when the opposite bid moves to ≥ 97¢ after entry), `MAX_FILL_COST=10`,
+`MAX_DAYS=31`, `MIN_LEFT_HOURS=12`, state/log `state_filtered.json` / `lip_log_filtered.jsonl`; code backup `lip_bot.py.bak-2026-10-22`.
+First loop: 6 thin sides, all KXTRUMPMENTIONB (Oct 27), est. $8/day (dry estimates have run high). Read after 3-5 days: rewards vs fill
+cost per series.
+
+## 878. A-LIP2 protocol — shadow competitive quoting on event-settled Kalshi rewards markets (no money) (S10)
+
+**No trial. Written BEFORE any shadow quote is simulated.** §877 showed event-settled series pay rewards without much adverse selection
+at the thin-side scale; the allowed series pay ≈ $33,500/day in rewards (2026-10-22), most of it to competitive quoters, not thin sides.
+Question: does joining the best bid on BOTH sides earn more in rewards than the quotes lose to the trades that fill them?
+- **Universe each cycle (60 s):** active liquidity programmes on `INCLUDE` series (KXTRUTHSOCIAL*, KXRT*, KXRAIN*, *MENTION*), the 40 with
+  the highest reward per day (re-ranked hourly). Public endpoints only.
+- **Shadow quote:** 100 contracts bid at the best bid on YES and on NO (never crossing). Reward per cycle = side_share (the bot's §694
+  formula) × side rate × 60 s for each side, counted only when both sides reach the target with our size included.
+- **Fills (conservative queue):** public trades since the last cycle; a YES bid at p fills on taker-NO trades at yes price ≤ p, beyond
+  the size resting ahead of us at p (we join last); likewise NO. Filled inventory is held to settlement; quoting continues (a YES fill
+  at p and a NO fill at q lock 1 − p − q).
+- **Read after ≥ 3 days, per series and in total:** rewards; fill P&L at settlement (unsettled marked at the last mid, reported apart);
+  net per day; capital (max simultaneous collateral + inventory). **A lead** if net > 0 in total and in at least two series, with net ≥
+  $2,000/month at a capital the user can scale to; then a small live test. Otherwise closed.
+
+## 879. LEAD — Polymarket US Standing Order Incentive Program: many rewarded markets have no real book (S10)
+
+**No trial.** Public gateway `gateway.polymarket.us/v1/incentives` (no key): liquidity programmes per market with `rewardPool`, `targetSize`,
+`discountFactor`, `period` (`daily_event`, `day_of`, `live`); first 20,000 markets listed (more pages remain); ≈ $345k of pools across 10,800
+active periods in the first 10,000 (college-football season futures/props ≈ $27 per market per day, target 7,500; LoL Worlds moneylines
+$97 live / $24 day-of). Sample of 150 programme markets (`/v1/markets/{slug}/book`): **52 one-sided or empty**, 12 thin on both sides,
+75 thin on the offer side (filling it ≈ $2.6k+ of collateral at 98-99¢), 11 full. Terms (CFTC filing 2025-11-26, effective 2025-12-12):
+eligible = "direct clearing API participants" in good standing, automatically enrolled; DMM/SLP/IB/FCM channels excluded; award amount per
+contract published; **formula (target, discount, any spread limit) is in a confidential appendix**. Retail access: identity-verified users
+create API keys at polymarket.us/developer (docs quickstart). Texas not on the reported restricted list (AZ IL MA MD MI MT NJ NV OH).
+**Why it may pay:** in an empty market, 7,500 @ 1¢ on both sides (≈ $150 collateral) may be the whole qualifying book. Unknown until a
+live test: the scoring formula (a spread-from-midpoint limit would kill 1¢ quotes), payout per market, fill risk on season-long props.
+Needs the user: Polymarket US account (KYC) + API key; a ~$150 live test on a few empty markets for 2-3 days.
+
+## 880. §879 corrected: the Polymarket US incentive list is 100 markets (pages repeat), ≈ $3.2k/day; 1¢ tick blocks a $20 test (S10)
+
+**No trial.** `/v1/incentives` returns the SAME 100 markets on every page (page 2 = page 1), so §879's "20,000 markets / ≈ $345k of pools"
+was the duplicate count; real: **100 markets, ≈ $3,233 of active pools** (mostly CFB season props, $27 each, target 7,500). Book states
+(100 markets): 64 two-sided, **35 with no bids** (offers 3.5-6.2k, below target), 1 timeout. Account (user's, key on the droplet
+/opt/pm-lip/.env, auth OK): $70 buying power ($20 deposit + $50 bonus). Order preview (`/v1/order/preview`): these markets trade in 1¢ —
+a 0.1¢ YES bid is rounded to $0 and a 99.9¢ offer to 99¢ — so filling an empty bid side costs 7,500 × 1¢ = $75 (> $70), and a 1¢ NO
+top-up sits ~97¢ from the best offer (≈ zero weight under a Kalshi-like formula). No order placed. Options for the user: ask Polymarket
+support for the scoring rules first; or a one-market test at ~$75; or stop.
+
+## 881. Polymarket US incentive test LIVE: one market, $79.28 (user: "run it with $75, or $80") (S10)
+
+**No trial.** 2026-10-22 21:53Z, market `aachc-cfb-2026-11-28-mostpassyds-niciam` (FBS passing-yards leader prop; pool $27/day, target 7,500):
+no bids before us; best offer 2¢ (offers 7,072). Orders (maker-only, GTC): YES bid 7,500 @ 1¢ (exchange shows 7,479) = $75.00; NO top-up
+428 @ YES 0.99 = $4.28. Account $80 ($30 deposits + $50 bonus). Within minutes the public bid side showed 19,479 @ 1¢ — another quoter
+joined (our share ≈ 38%). Monitor `pm-lip-monitor.service` (droplet, /opt/pm-lip, log pm_lip_log.jsonl): every 5 min balances, positions,
+activities, open orders; cancels all if fills cost > $15 or our orders vanish. Read rewards (activities / balance) after 1-3 days.
+Higher-collateral markets were skipped: books whose best offer is 1¢ cannot hold a 1¢ bid (it would cross) — why their bid sides are empty.
+
+## 882. A-LIP2 interim (72 min, not the verdict): same-day mention markets pick off quotes; slower series keep their rewards (S10)
+
+**No trial; interim.** Shadow (§878) 2026-10-22 ~20:55-22:07Z: rewards $62.37; fills marked −$46.36 → +$16.01. By series:
+KXWORLDNEWSMENTION (resolving today) rewards $41.10 / fills −$46.59 (89); KXTRUMPMENTION (multi-week) $16.63 / +$0.24 (33); KXRT $3.63 / 0;
+KXRAINONT $1.02 / 0. Without same-day mentions ≈ $21 in 72 min. Nothing settled yet; the 3-day readout (§878) decides.
+
+## 883. A-LIP3 protocol — shadow quoting on ALL Kalshi Rotten Tomatoes rewards markets (the largest event-settled pool) (S10)
+
+**No trial. Written before any A-LIP3 quote is simulated.** Kalshi rewards 2026-10-22: $389k/day across 7,222 programmes; KXRT $19.9k/day
+across 232 markets (19 films; e.g. "Hexed score above 70 on Nov 30", $100/day per market, target 1,000, discount 0.5). Scores are unknown
+until reviews appear, then fill in publicly (information arrives gradually). Same simulation as §878 (100 contracts at the best bid on both
+sides, conservative queue, fills held to settlement or marked), universe = every active KXRT programme, cycle 120 s; plus a **pull rule**
+variant reported apart: no quotes on a market for 6 h after its mid moved ≥ 5¢ within one cycle. Read after ≥ 3 days per film: rewards,
+fill P&L, net; a lead if net > 0 overall and in a majority of films, ≥ $2k/month at a capital the user can scale to.
+A98 paused (no qualifying Pinnacle moves since restart) to keep three runs.
+- **Amended after 2 cycles, before any readout:** universe extended to KXSTREAMERAWARDS (199 markets, $6k/day, target 1,000; winners revealed
+  only at the December 2026 ceremony — the cleanest no-early-information profile found); reported as its own series.
+
+## 884. Filtered LIP bot: a Truth Social bucket was dumped into our 1¢ bid (−$10); Truth Social counts are public in real time → excluded (S10)
+
+**No trial.** 2026-10-22 22:14Z: 1,000 YES @ 1¢ on KXTRUTHSOCIAL-26OCT24-B209 (200-219 posts) filled ($10.00) while the 240+ bucket traded
+97-98¢ — the running count had already passed the bucket; the §877 pull rule could not fire (the opposite side was already ≥ 97¢ at entry).
+Truth Social post counts are observable during the period, like the data-release series of §877; its earlier +$3.51 was luck. INCLUDE now
+KXRT, KXRAIN, MENTION, KXSTREAMERAWARDS (Streamer Awards added 22:24Z: winners revealed only at the December ceremony). fill_cost = $10.00
+= MAX_FILL_COST (the next fill stops the bot). Account effect: −$10 of the $29.15.
+
+## 885. Which series' 1¢ bid fills win? — historical win rate of contracts sold into 1¢ YES bids, by series (S10)
+
+**No trial.** K19's trades (§835; 6,000 settled non-sports markets 2026-08-14 → 10-20, rain excluded): every trade with a taker selling
+YES at 1¢ (what a resting 1¢ YES bid buys), weighted by contracts, against the market result. Break-even = 1%. **Overall 0.47%** (a blind
+1¢ bid loses ~half its fill cost). By series (≥ 1,000 contracts): **KXRT 1.78% (53 markets, 561k contracts)**, KXHIGHNY 4.92%, KXAAAGASDFL
+2.89%, KXEMMY 2.83%, KXHIGHMIA 2.00%, KXAAAGASD 1.35%, KXHIGHLAX 1.35%; toxic: KXTRUMPMENTION 0.21%, KXTRUMPMENTIONB 0.00%, KXTRUMPSAY 0.04%,
+KXTEMPMIAH 0.03%, KXTRUMPAPPROVE 0.49%, KXWORLDNEWSMENTION 0.90%, most state gas 0.00%, KXGOOGSHARE 0.00%. Clustered by market (few
+markets carry most contracts) — a guide, not a test. Live bot INCLUDE now KXRT, KXRAIN, KXSTREAMERAWARDS (mentions dropped).
+
+## 886. Screens: LEGO retirement resale (capital-bound, value data blocked) and open-source bug bounties (AI-report flood) — closed (S11)
+
+**No trial.** (1) LEGO: Brickset gives RRP and launch/exit dates; resale values need BrickLink (bot challenge) or eBay (403); the literature
+(Dobrynskaya & Kishilova 2022) reports ~11%/year for retired sets — capital-bound, slow, storage/selling effort; fails small-start/scale.
+(2) OSS bug bounties: huntr (Palo Alto Networks since 2025-07) moved away from open-source bounties to relieve maintainers of triaging
+report floods; AI-assisted reports are now discounted — crowded, uncertain. Closed.
+
+## 887. LEAD — Gemini Predictions liquidity rewards: $43k/day on NFL markets, most of it on thin quarter/half books (S10)
+
+**No trial.** Public API (no key): `api.gemini.com/v1/prediction-markets/liquidity-rewards/config` (max spread 10¢, min size 10 [docs say
+100 per side], spread exponent 2, floor 0.001) and `/liquidity-rewards/events` (738 events, $51,150/day; Pro Football 432 × $100/day =
+$43,200, avg 3.8 qualifying makers; Bitcoin/XRP/SOL/ETH short-dated contracts ~$5.5k/day). Scoring (docs): per-minute snapshots, order score
+= size / spread², two-sided within 10¢ required, no size cap, paid daily ~5:30 pm ET; makers under a Market Maker Agreement excluded.
+Books (`/v1/book/{symbol}`, 25 sampled NFL reward markets): quarter/half markets mostly one maker at 100/100 and 2-4¢, several EMPTY; full
+games deep (share ≈ 0-2%). Estimated share for our 100-contract two-sided quote at 4¢: median ≈ 50% (100% where empty). ≈ $100 collateral
+per market. Caveats: pool pro-rating per minute, game-start cut-off and fill risk unmeasured; qualifying_maker_count is from the last daily
+scoring (new short BTC contracts show 0 until scored). Texas availability not confirmed (sign-up decides). Pricing anchor: Pinnacle
+quarter/half lines. Needs the user: Gemini account + API key + ~$100-200 test on a few empty/thin quarter markets.
+
+## 888. G1 protocol — shadow quoting on Gemini Predictions NFL reward markets (no money; user: test without live funds) (S10)
+
+**No trial. Written before any G1 quote is simulated.** Universe: Pro Football events in `/liquidity-rewards/events` whose game starts
+within 5 days, all quarter/half/game markets, first contract of each; a fixed random sample of 60 (seed 888), re-drawn daily from the
+list. Every 120 s: book (`/v1/book/{symbol}`) and trades (`/v1/trades/{symbol}`). **Our quote:** 100 contracts bid at mid − 2¢ and ask at
+mid + 2¢ (mid = book mid; if a side is empty, the contract's displayed price; skipped if none), never crossing. **Reward per cycle:**
+pool/1440 × 2 min × our score / (our score + others'), with score = size / spread² per Gemini's published formula (others: each resting
+order within 5¢ of mid scored as size / (2·distance)², floor 1¢); counted only before the game's start time. **Fills:** public trades at or
+through our price (we are best when inside the book; otherwise we join last), held to the contract's result. **Read after the 10-25/26 slate
+settles:** rewards, fill P&L, net, per market type (quarter/half/full); capital = max simultaneous collateral. Flagged as untestable without
+money: actual payment rules (eligibility, per-minute pro-rating, two-sided checks).
+- **Started 2026-10-22 22:53Z** (`futres-g1`, until 2026-10-27 06:00Z). First cycle: 52 of 60 sampled markets quotable; simulated
+  rewards $3.04 per 2 min (≈ $2,200/day on ≈ $5,200 of quotes) — implausibly high, so fills and the unverifiable payment rules decide.
+  Gemini's realised-payout summary (`/liquidity-rewards/summary/daily`) needs an authenticated account (401).
+
+## 889. Screens: other venues' liquidity rewards — none open to us; CFTC advisory 26-23 (S10)
+
+**No trial.** DraftKings' Railbird: market-maker programme with confidential schedules, agreement required. Fanatics Markets: 10% FanCash
+back on trades (promo / store credit — excluded). Underdog Predict (on Crypto.com Derivatives): reportedly no resting orders. ForecastEx LIP
+(effective 2026-09-01) closed earlier (§725). Gemini also runs a trade-based "Titan" pro-football programme (volume rewards — excluded).
+CFTC staff letter 26-23 (2026-08-12) warns exchanges about incentive programmes that reward non-bona-fide activity → venues may tighten
+rules or claw back rewards earned by deep far-from-market quotes; quotes near fair value (G1's design) carry less of that risk.
+
+## 890. Gemini NFL 1st-half moneylines vs Pinnacle — the 4-5¢ gap is the tie rule; Gemini's quoters are sharp (no taking edge) (S10)
+
+**No trial.** 2026-10-22 ~23:20Z, 11 games: Gemini "X wins 1st Half" bid/ask sits 4-5¢ under Pinnacle's 1H no-vig for X in every game
+(e.g. CHI 0.53/0.54 vs 0.580; HOU 0.69/0.71 vs 0.747). Gemini resolves a tied half NO; Pinnacle's 2-way 1H line pushes ties. With
+P(1H tie) ≈ 8%, Pinnacle × 0.92 reproduces Gemini's mids (0.580 × 0.92 = 0.534). Not mispriced; Gemini's quarter/half quoters price the
+tie correctly → G1's mid-anchored quotes sit on a sharp price. Pinnacle prices NFL 1H/1Q (periods 1, 3) but not 2Q-4Q or 2H.
+
+## 891. User redirect (2026-10-22 18:20 CT): no new prediction-market / liquidity-reward leads. Screens: options prop firms (none), expired domains (data blocked) (S11)
+
+**No trial.** Running PM/reward tests (Polymarket §881, Kalshi bot §877, A-LIP2/3, G1) finish as registered; no new ones. (1) Options prop
+firms: none found for US equity/index options — the field is futures/forex/CFD (excluded or declined). (2) Expired-domain resale: NameBio
+and GoDaddy Auctions block automated reads (Cloudflare/403); typical portfolio sell-through ~1-2%/year vs ~$10/name/year renewals — a
+skill-and-capital business. Closed.
+
+## 892. Locked arbitrage 1: store-to-store Magic singles (Card Kingdom ↔ ABU Games) — 12 gaps in 69k cards; competed away (S11)
+
+**No trial.** User's bar (2026-10-22 night): automatable, ~90% likely — only locked arbitrage qualifies. Card Kingdom public pricelist
+(retail + cash buylist + quantities) joined to ABU Games' open Solr index (`data.abugames.com/solr/nodes/select`, NM English singles:
+retail price/qty, buy_price/buy_list_quantity; 132,388 rows) on name + collector number + foil + set: 69,261 matched. Gaps where one store's
+cash buy > the other's retail × 1.0825 (Texas sales tax) + $0.30: **12, ≈ $992 in total, the largest being version/listing mismatches
+($0 retail rows; Tempest Sapphire Medallion $27.99 → $154.44)**. Prices between stores are kept aligned; no stream. Closed.
+
+## 893. Locked arbitrage 2: gift-card exchanges, buyback vendors, bullion dealers — no crossing, data mostly blocked (S11)
+
+**No trial.** Gift-card exchanges (CardCash, Raise, GiftCardGranny) each run 10-15% buy/sell spreads and block or hide quote feeds; textbook
+and device buyback (SellBackYourBook, Decluttr, BookScouter) give quotes only per item behind redirects/blocks; bullion dealers (APMEX, SD
+Bullion, Money Metals, Bullion Exchanges) sit behind Cloudflare/captcha and their bid/ask spreads (3-8%) do not cross between dealers.
+Together with §841-859 (crypto), §715 (prediction markets) and §892 (cards): locked two-sided arbitrage on public, liquid markets is
+competed away; none found that is automatable and ~90% certain. Closed.
+
+## 894. B-family 1 protocol — Algora open-source code bounties: expected value per attempt from closed bounties (S11)
+
+**No trial (a measurement). Written before any closed bounty is read.** New bar (user, 2026-10-23): +EV verified on real data before money.
+Bounties are cash on GitHub issues (label "💎 Bounty"; paid label "💰 Rewarded"); workers comment `/attempt #N`, open a PR, and the
+maintainer awards one. Zero capital; I write the code — the user's time is the claim/payout account. **Sample:** GitHub search, issues
+labelled 💎 Bounty closed 2026-07-01 → 2026-10-20 (all pages ≤ 1,000), plus the 585 open ones. **Per closed bounty:** amount (from the
+"$N" label or the Algora bot comment), rewarded or not, distinct `/attempt` users, days open. **Read:** awarded share; median attempts;
+P(win | attempt) = rewarded / Σ attempts; EV per attempt = mean amount × P(win | attempt); total awarded $ per month across the platform;
+by amount bucket. **A lead** if EV per attempt ≥ $50 in some bucket with ≥ 10 awards a month there (enough flow for ≥ $2k/month at a
+plausible win rate). Otherwise closed.
+
+## 895. B-family 1: the Algora bounty market has dried up — 3 rewarded and 36 new bounties in Jul-Oct 2026; closed (S11)
+
+**No trial.** GitHub search (gh, authenticated): label "💰 Rewarded" — 2,908 issues all-time, **3 closed 2026-07-01 → 10-20**; label
+"💎 Bounty" — **36 created** in that window (4 closed); the 578 open are stale. Algora now markets hiring, not bounties. No flow to earn
+from. Fetch stopped. Closed.
+
+## 896. Paid-code/content boards: Topcoder shrank (~$2.9k/month platform-wide), Superteam Earn is 13 crypto-content listings — closed (S11)
+
+**No trial.** Topcoder public API (`api.topcoder.com/v6/challenges`, 34,012 completed all-time): **21 public challenges completed
+2026-04-01 → 10-22**, $19.5k of placement prizes (≈ $2.9k/month platform-wide) — Development 14 ($16,350, 425 submissions, ≈ $38 per
+submission), Design 2, QA 1, Marathon 4 ($0). Superteam Earn (`superteam.fun/api/listings`): 13 open bounties, mostly crypto promotion
+content (e.g. $500 thread, 268 submissions), a few technical pieces with little competition (a $2,500 Solana article, 1 submission) —
+occasional one-offs, not a stream. With Algora (§895), code-bounty boards hold no scalable +EV flow. Closed.
+
 
 ## 10. Still outstanding, and blocking
 
