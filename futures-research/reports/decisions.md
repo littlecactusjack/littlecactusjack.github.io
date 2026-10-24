@@ -16584,6 +16584,261 @@ submission), Design 2, QA 1, Marathon 4 ($0). Superteam Earn (`superteam.fun/api
 content (e.g. $500 thread, 268 submissions), a few technical pieces with little competition (a $2,500 Solana article, 1 submission) —
 occasional one-offs, not a stream. With Algora (§895), code-bounty boards hold no scalable +EV flow. Closed.
 
+## 897. Demo two-week check; FDXM shadow replay fixed (cash-index open faked takes) — deployed with the user's OK (S10)
+
+**No trial.** Two weeks (2026-10-12 → 10-23). User's EOD log (demo_log.csv): trading P&L −$9,779 across six products, 10 resets ($800 demo
+fees), **1 pass (MCL 10-22, now funded)**, no payouts. Bot's ticket replays (54 done): takes 22 vs 22.2 expected from `expected.json`;
+P&L −$6,084 vs −$1,231 expected (z −0.66) — FDXM +$5,851 (z +2.31), NKD −$3,140 (z −0.92). **The log and the replays disagree on FDXM
+(−$400 vs +$5,851): `shadow.py` replays FDXM on the DAX cash index (^GDAXI), which opens at 03:00 ET while the future traded all night;
+its first minutes catch up and fake brackets (10-22 short "take" at 03:06, the user saw no take).** The research is unaffected (FDXM paths
+from HistData's continuous DAX CFD quotes `grxeur`, a21). Fix (user: "go"): FDXM replays start 10 minutes after the entry and are tagged
+`approx: DAX index proxy`; the `!eod` cross-check no longer warns on FDXM. Tests 19 passed; deployed 2026-10-23 18:23Z, backup
+/opt/futures-bot/backup-2026-10-23. FDXM truth = the user's log.
+
+## 898. Demo two weeks, final (2026-10-12 → 10-23): first demo payout; hit rates as modelled; FDXM proxy unreliable even after the fix (S10)
+
+**No trial.** User's log: 61 trades, 26 wins (43%), trading P&L −$4,579, 10 resets ($800 demo fees); **MCL passed 10-22 and took the first
+payout 10-23 (balance 53,000 → 52,100)**. Live-plan products: NKD 4/12 −$3,779; FDXM 4/10 −$400. Accounts now: MCL funded 52,100; MGC 51,200,
+ZS 51,200, NKD 50,185, MNQ 50,000, FDXM 50,000 (eval). Bot replays (54): takes 21 vs 22.2 expected; P&L −$7,884 vs −$1,231 (z −0.91) —
+within noise. FDXM re-scored with §897's 10-minute skip: only 10-14 changes (TAKE → STOP); 10-22 is still a replay "take" the user did not
+see → the ^GDAXI cash index diverges from FDXM beyond the open; FDXM replays are indicative only, the log is the record.
+
+## 899. Review held early (2026-10-23): launch with one real NKD account; bot tickets for NKD and FDXM only (deployed) (S10)
+
+**No trial.** User: run the review now; "real traders have different brackets constantly" (§839 compliance concern closed); "the other
+instruments can still be tracked and reported weekly … but I don't want the tickets for them"; "any changes deploy now". Decisions in
+`reports/review_2026-10-23.md`: launch (one real NKD account to two payouts, then 3 NKD + 2 FDXM); keep the dollar rules; ≈ $4-5k fee
+budget; gold watchlist 11-20. **Bot change (`bot/schedule.py`, `bot/futures_bot.py`):** `TICKET_PRODUCTS` (default NKD, FDXM) — only these
+are posted (board, `!ticket`, daily results, missing-EOD reminders); all six are still issued and shadow-tracked; Friday's weekly check adds
+a per-product line (tracked-only products marked). Tests 17 passed (alert test now: 2 posted, 6 issued). Deployed 2026-10-23 19:39Z,
+backup /opt/futures-bot/backup-2026-10-23b.
+
+## 900. Bot tickets for NKD only (the one real account) — deployed (S10)
+
+**No trial.** User 2026-10-23: "I only want tickets for NKD actually since that's the only live market getting traded for now. I'm currently
+on a real NKD account and the bot is matched to the P&L already." `TICKET_PRODUCTS` default → NKD; the 02:45 FDXM side re-check posts only
+while FDXM is posted. FDXM, MNQ, MGC, MCL, ZS: issued and shadow-tracked silently, in Friday's weekly check. Tests 17 passed; deployed
+2026-10-23, backup /opt/futures-bot/backup-2026-10-23c. `!new NKD` not needed (the user's NKD book already matches the real account).
+
+## 901. Filtered Kalshi LIP bot stopped itself at the $10 fill limit; test over (S10)
+
+**No trial.** 2026-10-23 02:23Z: canary 94 YES @ 1¢ on KXRT-WILD-95 (a Rotten Tomatoes "above 95" long shot) filled ($0.94) → fill cost
+$10.94 > $10 → kill switch (exit 2). Account (read-only): cash $18.21, no resting orders; positions 1,000 KXTRUTHSOCIAL-26OCT24-B209 (dead,
+§884) and 94 KXRT-WILD-95 (likely dead). Rewards earned during the filtered test ≈ $0.68 estimated (to be confirmed in the user's Credits
+list). Outcome: the filtered thin-side bot did not cover its fills; even RT long shots get dumped into 1¢ bids. Not restarted (user's call).
+
+## 902. G1 interim (0.76 days): $364 simulated rewards, 116 unsettled fills (all on our offers) — verdict after Sunday's games (S10)
+
+**No trial; interim.** 157 cycles 2026-10-22 22:53Z → 10-23 ~17:00Z, 114 markets seen, 36-52 quoted per cycle: rewards $364.34 ($482/day)
+— game $93, 3Q $59, 2Q $58, 2H $55, 4Q $49, 1Q $44, 1H $7; fills 116, all taker buys lifting our offer (59 × 0.61 in one game market,
+24 × 0.47, 16 × 0.43 …), unsettled until the games. Caveat (conservative): cycles average ~7 min, not the 2 min credited per cycle, so
+rewards are understated up to ~3.5×; fills are counted from all trades between cycles. Settled fill P&L decides (§888).
+
+## 903. A91 refreshed to 2026-10-22: the NKD rule D227 has turned negative on unseen data (−6.84 bps, n 37, t −0.42) (S10)
+
+**No trial.** Forward from 2026-09-01 (Yahoo-patched targets): D171 +3.73 bps (37, t +0.37); D174 +20.53 (14, t +1.66); D175 +4.35 (10,
+t +0.26); **D227 NKD follows the euro week −6.84 (37, t −0.42; was +1.8 at n 35)**. Not significant; the plan pays at zero edge (§805-819),
+so the live NKD account does not depend on D227 being right — but D227 sets its side. A48's 40-session trigger (≈ 3 sessions away) is the
+pre-registered decision point; flagged for the user, nothing changed.
+A48 (the trigger's own tracker, demo tickets): 14 rule sessions, signed window **+96.8 bps**, bracket outcome rule − other side −$2,039,
+recorded −$3,229; trigger pending (needs 40 sessions, ~5 more weeks). No action.
+
+## 904. G1 corrected interim: three readout bugs fixed — ≈ $573/day simulated rewards, 11 fills (−$39 settled) (S10)
+
+**No trial.** Fixes (2026-10-23): (1) settlement read from Gemini's `resolutionSide` (was never matched → all "unsettled"); (2) fills
+capped at our 100 contracts per side per cycle (each trade had been counted up to 100); (3) the trade marker can no longer move back on a
+stale page (old trades re-counted every few cycles; recorder fixed and restarted, readout de-duplicates by trade id or identical fill);
+plus rewards credited for the real time between cycles (cap 15 min) instead of the nominal 2 min. Result over 0.89 days, 123 markets:
+**rewards $511 (≈ $573/day)**; fills 11 (game 6, 3Q 2, 1Q 3), settled P&L −$39 (the earlier −$1,268 was the double-count). The same
+monotonic-marker fix applied to A-LIP2/3 (restarted). Verdict after Sunday/Monday's games (§888).
+
+## 905. U-family 1 protocol — Upbit listing notices: is there still a move to catch a minute later on Coinbase? (S11)
+
+**No trial at registration; N 1,541. Written BEFORE any price around a notice is fetched.** Upbit (Korea's largest exchange) posts trade
+notices publicly (`api-manager.upbit.com/api/v1/announcements?category=trade`, second-precision KST times). New listings ("신규 거래지원",
+"KRW 마켓 디지털 자산 추가") are widely reported to lift the token on every venue within minutes. Public information, automatable, small
+start, legitimate US venue (Coinbase spot).
+- **Events:** listing notices 2025-01-01 → 2026-10-23 whose token has a Coinbase USD pair trading at the notice minute (first per token).
+- **Rule:** buy at the close of the Coinbase 1-minute candle starting 1 minute after the notice (entry lag variants 2 and 5 minutes
+  reported only); sell at the close 60 minutes after the notice (15 and 240 minutes reported only). Cost 1.2% round trip (Coinbase taker).
+- **Split:** notices before 2026-01-01 discovery, from 2026-01-01 sealed. Carry if discovery mean > 0 and t > 1.96 (one return per event);
+  sealed: strict §664.4 (t > 1.645, sign-flip placebo ≥ 95th, posterior > 0 with PRIOR_SD 0.02) → CONFIRM. One trial.
+- Delisting / warning notices (shorts) are out of scope (no spot shorting on Coinbase).
+
+## 906. U-family 1 discovery: Upbit listing moves are gone within ~1-2 minutes — not carried; closed (S11)
+
+**No trial.** 175 listing notices 2025-01 → 2026-10 (155 tokens, 109 with a Coinbase USD pair; 39 discovery events with candles, 37 priced):
+primary (enter +1 min, exit +60 min, 1.2% cost) **mean +1.52%, median −1.22%, t +0.98 → not carried**; +1 → +15 min +1.83% (t +1.38);
+**entering at +2 min ≈ 0 (−0.06% to +0.23%), at +5 min negative** — bots take the move within a minute or two. Sealed half unread. Closed.
+
+## 907. C-family 1 protocol — large hourly moves in liquid crypto (Coinbase USD): reversal or continuation? (S11)
+
+**No trial at registration; N 1,541. Written BEFORE any candle is fetched.** Universe: the 40 Coinbase USD pairs with the most 30-day USD
+volume on 2026-10-23 (stablecoins excluded). Data: Coinbase 1-hour candles 2024-01-01 → 2026-10-22. Event: an hour whose close-to-close
+return is beyond ±5% or ±8% (first event per coin per 24 h). **Rules (2 directions × 2 thresholds × 3 holds = 12):** reversal (buy after a
+drop / sell-side not traded — spot only, so drops only: buy) and continuation (buy after a rise), entry at the next hour's open, exit after
+4, 12 or 24 hours. Cost 0.8% round trip (Kraken taker 0.4% × 2). Split: discovery 2024-01 → 2025-06, sealed 2025-07 → 2026-10. Carry: mean
+> 0 and t (clustered by event day) > 1.96; sealed strict §664.4 → CONFIRM, one trial per carried rule.
+
+## 908. C-family 2 protocol — new Coinbase USD listings after the opening hour: buy and hold 1 or 3 days? (S11)
+
+**No trial at registration. Written BEFORE any post-open candle is read.** Events: the 109 Coinbase USD listings since 2025-03 of assets also
+on Kraken (§844 list, `data/xarb/x3/listings.json`). Rule: buy at the open of the second trading hour on Coinbase, sell at the close 24 h /
+72 h after the first trade; cost 1.2% (Coinbase taker both ways). Split by listing date: discovery before 2026-01-01, sealed after. Carry:
+mean > 0 and t > 1.96 (one return per listing); sealed strict §664.4. One trial per carried hold.
+
+## 909. C-family 2 discovery: new listings fade after the first hour (−4.7% / 1 day, −6.4% / 3 days) — long side loses; closed (S11)
+
+**No trial.** 67 discovery listings: buy 2nd-hour open → 24 h mean −4.67% (median −6.45%, t −1.69); → 72 h −6.43% (median −8.23%, t −1.71),
+after 1.2%. The fade is the tradeable side, but US spot venues give no short. Closed (sealed unread).
+
+## 910. U-family 2 protocol — Upbit delisting / warning notices: does the dump overshoot (buy 1 h later on Coinbase)? (S11)
+
+**No trial at registration. Written BEFORE any price around these notices is read.** Events: Upbit trade notices 2025-01 → 2026-10 titled
+"거래지원 종료 안내" (delisting) or "유의 종목 지정 안내" / "유의 촉구 안내" (warning; not "기간 연장" extensions), first per token, token with a
+Coinbase USD pair. Rule: buy at the Coinbase 1-hour candle close 1 hour after the notice; sell at the close 24 h / 72 h after the notice.
+Cost 1.2%. Split: discovery before 2026-01-01, sealed after. Carry mean > 0 and t > 1.96; sealed strict §664.4.
+
+## 911. U-family 2 discovery: only 6 Upbit delisting/warning events on Coinbase-listed tokens — not carried, too rare; closed (S11)
+
+**No trial.** n 6: 24 h +5.90% (t +1.20), 72 h +10.90% (median −1.23%, t +0.82). Too few events to matter or to test. Closed.
+
+## 912. E-family 2 protocol — post-earnings drift after large positive surprises (Nasdaq calendar, cached daily bars) (S11)
+
+**No trial at registration; N 1,541. Written BEFORE any calendar day or post-report price is read.** Events: Nasdaq earnings calendar
+(`api.nasdaq.com/api/calendar/earnings?date=D`) for report dates 2025-06-02 → 2026-09-30; keep rows with EPS forecast ≥ $0.05 in absolute
+value, ≥ 2 estimates, market cap ≥ $300M, and surprise ≥ +20% (primary; ≥ +50% reported only). Entry at the open of the first session
+after the report (pre-market reports: same day; after-hours or unstated: next day); exit at the close 5 trading days later (primary) or
+20 (reported). Return net of 0.2% (commission-free spread) and also minus SPY over the same window (market-adjusted). Prices: H2's cached
+Yahoo daily bars (`data/stocks/h2/daily.jsonl`) + SPY. Split: report dates before 2026-01-01 discovery, from 2026-01-01 sealed. Carry:
+market-adjusted mean > 0 with t (clustered by report date) > 1.96 AND raw mean > 0; sealed strict §664.4 on market-adjusted. One trial.
+
+## 913. I-family 1 protocol — open-market insider purchases (SEC Form 4 datasets) → drift over 5 / 20 days (S11)
+
+**No trial at registration; N 1,541. Written BEFORE any insider file is opened.** Data: SEC Insider Transactions Data Sets 2025Q2-2026Q3
+(SUBMISSION, NONDERIV_TRANS, REPORTINGOWNER). Event: per issuer and filing date, total open-market purchases (transaction code P, non-
+derivative) by officers or directors ≥ $100,000 (≥ $500,000 reported only); first event per issuer per 30 days. Liquidity filter from H2's
+cached daily bars: price ≥ $1, 20-day median dollar volume ≥ $500k. Entry at the open of the first session after the filing date; exit at
+the close 5 (primary) or 20 sessions later; cost 0.3%; market-adjusted by SPY over the same window. Split: filing dates before
+2026-01-01 discovery (from 2025-06-02), from 2026-01-01 sealed. Carry: adjusted mean > 0, t (clustered by filing date) > 1.96, raw mean > 0;
+sealed strict §664.4. One trial.
+
+## 914. E-family 2 and I-family 1 discovery; I-family 1b registered: insider purchases ≥ $500k, 20-session hold, on the sealed half (S11)
+
+**No trial yet.** E2 (PEAD, 348 calendar days): surprise ≥ 20%, 5 d: n 1,045, adjusted −0.12% (t −0.47) → **not carried**; reported:
+20 d +2.57% (t +0.70); ≥ 50%: 5 d −0.30%, 20 d +2.35% (t +1.02). Closed. I1 (insider purchases, 1,108 discovery events): primary ≥ $100k,
+5 d: n 820, adjusted +0.94% (median +0.32%, t +1.35) → **not carried**; reported: ≥ $100k 20 d +2.66% (t +1.89); ≥ $500k 5 d +1.35%
+(t +1.55); **≥ $500k 20 d: n 299, raw +5.26%, adjusted +3.49% (median +0.95%), t +2.58**.
+**I-family 1b (registered now, before the sealed half is read):** the ≥ $500k / 20-session rule exactly as reported (same filters, costs,
+market adjustment), tested once on 2026 filings; strict §664.4 (t > 1.645, sign-flip placebo ≥ 95th, posterior > 0) → CONFIRM, one trial.
+Caveat fixed now: 20-session windows overlap across nearby filing dates; t is clustered by filing date only.
+
+## 915. I-family 1b sealed: insider purchases ≥ $500k, 20 sessions — REJECT (t01542); N 1,541 → 1,542 (S11)
+
+2026 filings: n 474, raw −0.81%, **SPY-adjusted −1.12% (median −1.65%), t −1.38, placebo 3rd → REJECT**. The discovery's +3.49% did not
+survive. Insider-purchase drift is closed.
+
+## 916. H-family 7 protocol — S&P 400 / 600 additions: buy after the announcement, sell into the index funds' close (S11)
+
+**No trial at registration; N 1,542. Written BEFORE any price is joined.** Events: Wikipedia "Recent and announced changes" tables for the
+S&P MidCap 400 and SmallCap 600, additions with an S&P press-release citation date (the announcement date) and an effective date,
+2023-01-01 → 2026-10-20; additions arising from moves between S&P indices kept, spin-offs excluded. Rule: buy at the open of the first session
+after the announcement date; sell at the close of the last session before the effective date (when index funds buy). Cost 0.2%. Prices:
+Yahoo daily. Split: announcements before 2025-01-01 discovery, from 2025-01-01 sealed. Carry: mean > 0, t (clustered by announcement date)
+> 1.96; sealed strict §664.4. One trial.
+
+## 917. H-family 7 discovery: S&P 400 additions lose between announcement and effective date (−2.16%, t −1.55); closed (S11)
+
+**No trial.** 75 S&P 400 additions announced 2023-24 (67 priced, 37 announcement days): buy next open → sell before the effective date,
+mean −2.16% (median −0.95%, t −1.55) after 0.2%. The announcement jump is priced at the open; the run-up to the index funds' close is gone.
+Closed (sealed unread).
+
+## 918. Screen: closed-end fund discount reversion — NAV history not freely available (CEF Connect API serves HTML); closed (S11)
+
+**No trial.** Capital-bound in any case (discount narrowing ~ a few % a year). Closed on data access.
+
+## 919. R-family 1 protocol — weekly reversal in liquid US stocks (H2 cached bars) (S11)
+
+**No trial at registration; N 1,542. Written BEFORE the computation.** Universe each Friday: H2 stocks with price ≥ $5 and 20-day median
+dollar volume ≥ $5M. Signal: the 5-session return to Friday's close; portfolio: the 20 worst (primary) / 50 worst (reported), equal
+weight, bought at Monday's open, sold at Friday's close. Cost 0.2% round trip. Benchmark: SPY same week. Split: weeks before 2026-01-01
+discovery (from 2025-06), from 2026-01-01 sealed. Carry: mean weekly excess > 0 with t (over weeks) > 1.96 and raw > 0; sealed strict
+§664.4 (t over weeks). One trial.
+
+## 920. R-family 1 discovery: weekly losers keep losing (−3.30%/week vs SPY, t −2.92) → not carried. R-family 2 registered: weekly winners (S11)
+
+**No trial.** R1 discovery (28 weeks 2025-06 → 12): worst 20 raw −3.06%/wk, excess −3.30% (t −2.92); worst 50 excess −1.83% (t −2.46) —
+continuation, not reversal, despite survivorship bias in the losers' favour (current listings only). Closed.
+**R-family 2 protocol (written before the winners are computed):** identical to §919 but buying the 20 (primary) / 50 BEST 5-session
+performers. Same universe, filters, costs, benchmark, split and decision rule. Survivorship caveat: current listings only (biases up).
+
+## 921. R-family 2 discovery: weekly winners also lag (−1.40%/week vs SPY, t −1.36) — both extremes underperform (volatility effect); closed (S11)
+
+**No trial.** Best 20: raw −1.17%/wk, excess −1.40% (t −1.36); best 50 excess −0.80% (t −1.14). Extreme movers in either direction lag
+the market — the short-volatility side is not available to a long-only small account. R1/R2 closed (sealed unread).
+
+## 922. C-family 1: buying ≥8% hourly crypto drops carried in discovery and failed sealed — REJECT ×3 (t01543-t01545); N → 1,545 (S11)
+
+Discovery (2024-01 → 2025-06, 119 events / 33 days): hold 4 h +3.82% (t +3.52), 12 h +6.90% (t +2.36), 24 h +10.21% (t +2.05); all
+other rules not carried. **Sealed (2025-07 → 2026-10, 93 events / 44 days): 4 h −0.36% (t +0.18, placebo 32nd), 12 h −0.16% (43rd), 24 h
+−1.22% (19th) → REJECT.** The discovery edge was the 2024-early-2025 crash rebounds. Closed.
+
+## 923. C-family 3 protocol — weekly cross-sectional momentum among the 40 liquid Coinbase coins (C1's cached hourly bars) (S11)
+
+**No trial at registration; N 1,545. Written BEFORE the computation.** Every Monday 00:00 UTC: rank the 40 coins by their prior 7-day
+return; buy the top 5 (primary) or the bottom 5 (reported), equal weight, at that hour's open; sell 168 hours later. Cost 0.8% round trip.
+Benchmark: BTC over the same week. Split: weeks before 2025-07-01 discovery (from 2024-01-08), after sealed. Carry: mean weekly excess > 0,
+t over weeks > 1.96, raw > 0; sealed strict §664.4. One trial.
+
+## 924. C-family 3 discovery: weekly crypto momentum adds nothing over BTC (+0.15%/week, t +0.13); closed (S11)
+
+**No trial.** 78 weeks: top 5 raw +1.54%/wk, vs BTC +0.15% (t +0.13) → not carried; bottom 5 vs BTC −0.94% (t −0.93). Closed.
+
+## 925. O-family 1 protocol — follow-on offering pricings: does the stock recover after the pricing drop? (S11)
+
+**No trial at registration; N 1,545. Written BEFORE any event is priced.** Events: EDGAR full-text search, 8-K exhibits containing
+"announces pricing of" and "public offering", filed 2025-06-02 → 2026-09-30 (first per issuer per 30 days), symbol from the filer's
+display name, liquidity from H2 (price ≥ $1, 20-day median dollar volume ≥ $1M). Rule: buy at the close of the first session after the
+filing date (after the pricing drop has printed); sell at the close 5 sessions later (primary) or 20 (reported). Cost 0.3%; SPY-adjusted.
+Split: filings before 2026-01-01 discovery, after sealed. Carry: adjusted mean > 0, t (clustered by filing date) > 1.96, raw > 0; sealed
+strict §664.4. One trial.
+
+## 926. O-family 1 discovery: offering-pricing rebound not carried (+2.81% adjusted but median −0.37%, t +1.70); closed (S11)
+
+**No trial.** 567 pricing events (267 discovery, 117 liquid and priced): 5 d adjusted +2.81% (median −0.37%, t +1.70) — a skewed mean from
+a few squeezes; 20 d +3.08% (median +1.26%, t +1.53). Not carried. Closed (sealed unread).
+
+## 927. O-family 2 protocol — share repurchase authorizations: drift after the announcement (S11)
+
+**No trial at registration; N 1,545. Written BEFORE any event is priced.** Same machinery, filters, split and decision rule as §925, with
+events = 8-K exhibits containing "share repurchase program" and "authorized", and entry at the OPEN of the first session after the filing
+date (primary hold 20 sessions; 5 reported). Cost 0.3%; SPY-adjusted. One trial.
+
+## 928. O-family 2 discovery: buyback announcements give no drift (20 d adjusted +0.51%, median −0.05%, t −1.31); closed (S11)
+
+**No trial.** 2,217 events (900 discovery, 700 liquid and priced): 20 d raw +1.93%, adjusted +0.51% (t −1.31 by filing date) → not carried;
+5 d adjusted −0.10%. Closed (sealed unread).
+
+## 929. A94 closed: Riot's public livestats arrive ~28 s after the frame; Kalshi sweeps lead us by a median 18.8 s (S10)
+
+**No trial.** Worlds 2026-10-23 recording (fixed recorder §867): 28,007 Riot frames, 8,495 Kalshi trades; frame availability delay min
+20 s, median 27.6 s. Jumps 9; our receive time trails the Kalshi sweep by a median **18.8 s** (lead ≥ 1.5 s on 0%); value after receive +
+1 s median $102 a match → fails §776. The public feed is delayed by design. Closed; futres-a94 has no further recordings.
+
+## 930. R-family 3 and 4 protocols — SPY overnight drift; weekly low-volatility portfolio (cached daily bars) (S11)
+
+**No trial at registration; N 1,545. Written BEFORE either computation.** **R3:** every session, buy SPY at the close, sell at the next
+open; cost 0.02% round trip (ETF spread); compared with SPY's intraday (open → close) return; split as §919 (before 2026-01-01 discovery,
+from 2025-06). Carry: mean overnight net > 0 with t > 1.96. **R4:** every Friday, the 20 H2 stocks (price ≥ $5, 20-day median dollar
+volume ≥ $5M) with the lowest 20-day daily-return standard deviation, bought at Monday's open, sold at Friday's close, 0.2% cost, excess vs
+SPY; split and decision as §919. One trial each if carried.
+
+## 931. R3 sealed: SPY overnight +0.021%/night (t +0.54) → WATCHLIST (t01546); R4 low-volatility not carried; N → 1,546 (S11)
+
+Discovery R3 (2025-06 → 12): overnight +0.074%/night net (t +2.20; intraday +0.008%) → carried; **sealed 2026: +0.021% (t +0.54,
+placebo 71st) → WATCHLIST** (positive, not significant; capital-bound anyway). R4 discovery: lowest-volatility 20 −0.531%/week vs SPY
+(t −2.22) → not carried. Closed except the R3 watchlist entry.
+
 
 ## 10. Still outstanding, and blocking
 
