@@ -16839,6 +16839,768 @@ Discovery R3 (2025-06 → 12): overnight +0.074%/night net (t +2.20; intraday +0
 placebo 71st) → WATCHLIST** (positive, not significant; capital-bound anyway). R4 discovery: lowest-volatility 20 −0.531%/week vs SPY
 (t −2.22) → not carried. Closed except the R3 watchlist entry.
 
+## 932. Polymarket US test: first credited reward $0.02 for 2026-10-22 (~2 h quoted) → ≈ $0.25/day, far below the ~$5/day estimate (S10)
+
+**No trial.** `/v1/incentives/earnings` (2026-10-24 11:39Z): $0.02, status PENDING, market mostpassyds-niciam, date 10-22 (ET; orders
+rested from 21:53Z, ≈ 2 h of that day). Consistent with scenario B of §881 (quotes far from the midpoint weighted near zero). The full day
+10-23 decides; if it is ≈ $0.25-0.50, cancel and return the $80 (user's call).
+
+## 933. C-family 4 protocol — the BTC "CME gap": buy at the Sunday reopen when spot sits ≥ 2% below Friday's CME close (S11)
+
+**No trial at registration; N 1,546. Written BEFORE the computation.** Data: C1's cached Coinbase BTC-USD hourly bars 2024-01 → 2026-10.
+Friday reference = the close of the hour ending 16:00 CT (21:00/22:00 UTC by DST); Sunday reopen = the open of the hour starting 17:00 CT.
+Event: reopen price ≤ 0.98 × Friday reference (≤ 0.97 reported). Buy at the reopen; sell at the first hourly close ≥ the Friday reference
+(gap filled) or at the close 72 h after entry. Cost 0.8%. Split: weekends before 2025-07-01 discovery, after sealed. Carry: mean > 0, t > 1.96
+(one return per weekend); sealed strict §664.4. One trial.
+
+## 934. C-family 4 discovery: BTC CME-gap long — 9 events, +0.36% (t +0.29); not carried, too rare; closed (S11)
+
+**No trial.** Gap ≥ 2% below: n 9, mean +0.36% (median +1.98%, t +0.29); ≥ 3%: n 6, −0.60%. Closed.
+
+## 935. C-family 5 protocol — BTC leads altcoins: after a ≥ 2% BTC hour, do lagging alts catch up? (S11)
+
+**No trial at registration; N 1,546. Written BEFORE the computation.** C1 cache (40 Coinbase USD coins, hourly, 2024-01 → 2026-10). Event:
+BTC's hourly close-to-close return ≥ +2% (primary) or ≥ +3% (reported). Portfolio: the 5 coins (ex BTC/ETH, ≥ 30 coins available) whose
+same-hour return is lowest relative to BTC's; buy at the next hour's open, sell after 1 / 4 hours (1 h primary). Cost 0.8%. Split: before
+2025-07-01 discovery, after sealed. Carry: mean > 0, t (one return per event) > 1.96; sealed strict §664.4. One trial.
+
+## 936. C-family 5 discovery: BTC→alt lead-lag — only 10 events, +0.00% (1 h); closed (S11)
+
+**No trial.** BTC ≥ 2% hours with ≥ 30 alts priced: n 10, 1 h +0.00% (t +0.01), 4 h +0.91% (t +1.38); ≥ 3%: n 4. Too rare, no effect.
+
+## 937. Polymarket US test, first full day: $0.11 (10-23) → ≈ $3/month on $80 — the 1¢ book earns ~nothing; test answered (S10)
+
+**No trial.** Earnings 10-22 $0.02 (partial), **10-23 $0.11** (pending); 0 fills. Polymarket's (confidential) formula weights quotes far
+from the midpoint near zero (§881 scenario B). Orders left resting (monitor's $15 stop active); cancelling and freeing the $80 is the
+user's call. Polymarket US liquidity rewards via deep quotes: closed.
+
+## 938. K-calendar protocols — SPY turn-of-month, pre-holiday, pre-FOMC (Yahoo daily 2005-2026) (S11)
+
+**No trial at registration; N 1,546. Written BEFORE the computation.** SPY daily (adjusted closes and opens), 0.02% cost per round trip.
+**TOM:** buy at the close of the second-to-last trading day of the month, sell at the close of the 3rd trading day of the next month.
+**PRE-HOL:** buy at the close two sessions before an NYSE holiday closure (detected as a weekday gap of ≥ 1 non-weekend day), sell at the
+close of the session before the holiday. **PRE-FOMC:** buy at the close of the session before a scheduled FOMC statement day, sell at
+that day's 2:00 pm ET proxy = the close (daily data). FOMC dates from the Fed's calendar pages. Each compared with the average SPY return
+over the same number of sessions. Split: 2005-2018 discovery, 2019-2026 sealed. Carry: excess mean > 0, t > 1.96; sealed strict §664.4.
+One trial each.
+
+## 939. Calendar families: TOM and pre-holiday nothing; pre-FOMC +0.27% (2005-18) gone since 2019 (+0.003%) → WATCHLIST (t01547) (S11)
+
+Discovery 2005-2018: TOM −0.013% (t −0.09), pre-holiday −0.002% (t −0.02) → not carried; **PRE-FOMC +0.270% (n 109, t +2.26) → carried;
+sealed 2019-2026: +0.003% (n 59, t +0.02, placebo 51st) → WATCHLIST** — the published pre-FOMC drift has disappeared. Closed. N → 1,547.
+
+## 940. Screens: perp-funding signal (OKX keeps only ~3 months) and Kraken triangular arbitrage (dust) — closed (S11)
+
+**No trial.** (1) Funding-rate extremes as a spot signal: Binance/Bybit block US; OKX public history = 288 rows (2026-07-20 →) — too short.
+(2) Kraken triangles (1,472 USD→A→B→USD at 0.4% × 3 taker): the only positives are stale books — USD→EUR→GAIB→USD +179% on 72 GAIB
+(≈ $0.50), USD→EUR→EURR→USD +2.0% with ≈ $50 on the bid; all liquid triangles ≤ −0.9%. Closed.
+
+## 941. Screen: stale crossed orders in Kraken's cross-currency books — $43 in total across 330 books; closed (S11)
+
+**No trial.** Every non-USD book (EUR, GBP, USDT, USDC, XBT, ETH, CAD, AUD, JPY, CHF) of coins with ≥ $50k/day USD volume, top 20 levels,
+converted at Kraken mids, against the USD mid ± 0.8%: crossed profit $43.43 (WOO/EUR $20.89, TREE/EUR $15.59, ZORA/EUR $6.18) before the
+currency leg. Dust. Closed.
+
+## 942. L-families 1-4 protocols — monthly cross-sectional rules on 2,012 liquid US stocks, 2015-2026 (S11)
+
+**No trial at registration; N 1,547. Written BEFORE the long history is read.** Data: Yahoo adjusted daily closes 2015-01 → 2026-10 for
+the 2,012 current US listings with ≥ $20M median daily dollar volume (`stocks/longhist.py`). Survivorship (current listings only) is handled
+by benchmarking every portfolio against the equal-weight portfolio of the same eligible universe that month (eligible: ≥ 260 sessions of
+history, price ≥ $5). Rebalance at the last close of each month; hold one month; cost 0.2% per round trip; 20 stocks per portfolio, equal
+weight. **L1** nearest the 52-week high (price / 252-day high); **L2** 12-1 momentum (return from t−252 to t−21); **L3** 1-month losers
+(worst 21-session return); **L4** lowest 63-day volatility. Split: months before 2023-01 discovery, from 2023-01 sealed. Carry: monthly
+excess mean > 0 with t > 1.96; sealed strict §664.4 (t over months). One trial per carried rule.
+
+## 943. L-families 5-7 protocols — large-cap weekly reversal, single-stock overnight, large-cap gap-down (2015-2026 long history) (S11)
+
+**No trial at registration; N 1,547. Written BEFORE the long history is read.** Universe each period: the 200 eligible stocks with the
+highest trailing 63-day median dollar volume (proxy for size; eligibility as §942). Costs: 0.1% per round trip (large caps). Split as §942.
+**L5:** each Friday, buy the 20 worst 5-session performers of the 200 at Monday's open, sell Friday's close; excess vs the 200's equal-weight
+same window. **L6:** each session, buy at the close the 20 of the 200 with the highest prior 21-session cumulative overnight return
+(close→open), sell at the next open; excess vs the 200's average overnight return. **L7:** any of the 200 opening ≥ 3% below its prior close
+→ buy the open, sell the close; excess vs the 200's average open→close that day; t clustered by day. Carry and sealed rules as §942.
+
+## 944. L-families 1-7: only 12-1 momentum carried; sealed +1.46%/month excess (t +0.96) → WATCHLIST (t01548); N → 1,548 (S11)
+
+Long history packed (`stocks/longpack.py`, 2,012 × 2,970 float32; the JSON loader ran out of memory). Discovery 2016-2022 (83 months):
+L1 52-week-high −0.55%/mo (t −1.39); **L2 12-1 momentum +2.66%/mo (t +2.50) → carried**; L3 1-month losers +0.77% (t +0.65); L4 low-vol
+−0.84% (t −2.16). Large caps (top 200 by dollar volume): L5 weekly losers +0.047% (t +0.33); L6 overnight momentum −0.069% (t −4.32);
+L7 gap-down ≥ 3% open→close −0.334% (t −3.67). **L2 sealed 2023-01 → 2026-10 (45 months): +1.46%/month excess, t +0.96, placebo 83rd →
+WATCHLIST.** Momentum is positive but not significant on unseen data; capital-bound (a monthly rebalance of 20 stocks). Forward watch.
+
+## 945. L-family 8 protocol — sector ETF momentum (11 SPDR sectors, 2005-2026) (S11)
+
+**No trial at registration; N 1,548. Written BEFORE the computation.** Yahoo adjusted daily closes for XLB XLE XLF XLI XLK XLP XLU XLV XLY
+(from 2005), XLRE (2015), XLC (2018). Each month end: hold the 3 sectors with the best 12-1 return (t−252 → t−21) for one month, equal
+weight; benchmark = equal weight of all available sectors; cost 0.05% per round trip. Split: months before 2016-01 discovery, from 2016-01
+sealed. Carry and sealed rules as §942.
+
+## 946. L-family 8 discovery: sector ETF momentum −0.05%/month (t −0.30); closed (S11)
+
+**No trial.** 119 discovery months (2006-2015): top-3 sectors by 12-1 return vs equal weight −0.05%/month (t −0.30). Closed.
+
+## 947. L-family 11 protocol — the dividend-month premium (predicted ex-dividend months), 2015-2026 (S11)
+
+**No trial at registration; N 1,548. Written BEFORE dividend dates are joined to returns.** Universe and pack as §942. Predicted dividend
+month for stock j in month m: j had an ex-dividend date in month m−12 (Hartzmark & Solomon 2013). Each month end: equal-weight portfolio of
+eligible stocks predicted to go ex-dividend next month, held one month, vs the equal-weight eligible universe; cost 0.2% round trip.
+Split, carry and sealed rules as §942. One trial.
+
+## 948. L-family 12 protocol — same-calendar-month seasonality of individual stocks (Heston & Sadka), 2015-2026 (S11)
+
+**No trial at registration; N 1,548. Written BEFORE the computation.** Pack as §942. For holding month m (every month of the year): rank
+eligible stocks (price ≥ $5, history for m in each of the previous 5 years) by their average return in calendar month m over years y−5 …
+y−1; hold the top 20 equal weight for month m vs the equal-weight eligible universe; cost 0.2%. Discovery holding months 2020-01 → 2022-12
+(5-year lookback needs 2015-2019), sealed 2023-01 →. Carry and sealed rules as §942. One trial.
+
+## 949. L-family 12 discovery: same-month seasonality −0.25%/month (t −0.17); closed (S11)
+
+**No trial.** 35 discovery months (2020-2022): top 20 by 5-year same-month average vs equal weight −0.25%/month (t −0.17). Closed.
+
+## 950. L-family 13 protocol — industry momentum (Nasdaq screener industries), 2015-2026 (S11)
+
+**No trial at registration; N 1,548. Written BEFORE the computation.** Pack as §942; industry = the Nasdaq screener's `industry` field
+(current mapping). Industries with ≥ 5 eligible members. Each month end: industry return = equal-weight member return over the past 126
+sessions (t−126 → t); hold all eligible members of the top 3 industries, equal weight, for one month, vs the equal-weight eligible universe;
+cost 0.2%. Split, carry and sealed rules as §942. One trial.
+
+## 951. L-family 13 sealed: industry momentum +1.31%/month (t +1.20) → WATCHLIST (t01549); N → 1,549 (S11)
+
+Discovery (83 months 2016-2022) +1.39%/month excess (t +1.99) → carried; **sealed 2023-01 → 2026-10 (45 months) +1.31%/month, t +1.20,
+placebo 88th → WATCHLIST.** With L2 (§944, +1.46%/month sealed), both momentum forms kept their size out of sample but neither reaches
+significance on 45 months. Watchlist: forward-track both monthly (§133); capital-bound (~1.3-1.5%/month over an equal-weight portfolio).
+
+## 952. L-family 14 protocol — post-forward-split drift (2015-2026) (S11)
+
+**No trial at registration; N 1,549. Written BEFORE split dates are joined to returns.** Universe and pack as §942; forward splits (ratio
+> 1) from Yahoo split events. Event day = the split's effective date (first session at the new share count; announcement dates not
+available). Buy at that session's close, hold 20 sessions (primary) or 60 (reported); excess vs the equal-weight eligible universe over the
+same window; cost 0.2%. Split by event date: before 2023-01-01 discovery, after sealed. Carry: mean > 0, t > 1.96; sealed strict §664.4.
+One trial.
+
+## 953. L-family 11 discovery: the dividend-month premium is negative here (−0.31%/month, t −2.09); closed (S11)
+
+**No trial.** 83 discovery months, median 335 predicted payers a month: predicted ex-dividend months vs equal weight −0.31%/month (t −2.09).
+Closed.
+
+## 954. L-family 15 protocol — large-cap one-day crashes (≥ 8%): buy the close, hold 5 sessions (S11)
+
+**No trial at registration; N 1,549. Written BEFORE the computation.** Pack as §942; universe each day = the 200 eligible stocks with the
+highest 63-day median dollar volume. Event: close-to-close drop ≥ 8% (first per stock per 20 sessions). Buy at that close, sell 5 sessions
+later (primary; 20 reported); excess vs the 200's equal-weight over the window; cost 0.1%. t clustered by event day. Split, carry and sealed
+rules as §942. One trial.
+
+## 955. L-family 15 discovery: large-cap crash rebound −0.42% over 5 sessions (t −0.25); closed (S11)
+
+**No trial.** 1,445 events on 577 days (2016-2022): 5 sessions excess −0.42% (t −0.25), 20 sessions −0.15% (t +0.38). Closed.
+
+## 956. V-family 2 protocol — SVXY held only in VIX contango (VIX < VIX3M), daily, 2012-2026 (S11)
+
+**No trial at registration; N 1,549. Written BEFORE the computation.** Yahoo daily ^VIX, ^VIX3M (closes) and SVXY (adjusted). Each close
+t: if VIX_t < VIX3M_t hold SVXY over t → t+1, else cash (0). Cost 0.05% per switch. Note: SVXY changed from −1× to −0.5× on 2018-02-28
+(both regimes kept; the rule is the same). Benchmark: SPY held over the same days. Split: before 2020-01-01 discovery, from 2020 sealed.
+Carry: mean daily excess over SPY > 0 with t > 1.96 (one return per day). Sealed strict §664.4. One trial. Reported: max drawdown.
+
+## 957. V-family 2: SVXY in contango — discovery +38%/yr (DD −50%), sealed +17.8%/yr (DD −33%), excess over SPY t +0.54 → WATCHLIST (t01550) (S11)
+
+Discovery 2012-2019 (2,011 days): CAGR +38.4%, max DD −50%, daily excess vs SPY +0.126% (t +2.06) → carried. **Sealed 2020-2026 (1,712
+days): CAGR +17.8%, max DD −33%, excess vs SPY +0.021%/day (t +0.54, placebo 71st) → WATCHLIST** — after SVXY's cut to −0.5× it earns
+roughly the market with more risk. Capital-bound. N → 1,550.
+
+## 958. L-family 14 discovery: post-split drift is negative (20 sessions −0.39%, 60 −2.55%); closed (S11)
+
+**No trial.** 241 forward splits 2015-2022: from the effective-session close, 20 sessions excess −0.39% (t −0.80) → not carried; 60
+sessions −2.55% (t −2.96). Closed.
+
+## 959. Screen: levered retail-FX carry (OANDA-type spot) — the live carry ETF earned +1.1%/yr (2009-26, DD −26%); closed (S11)
+
+**No trial.** FRED rates unreachable; real-money evidence instead: WisdomTree EM currency (CEW) 2009-05 → 2026-10 total +20% (CAGR +1.1%),
+max drawdown −26%; Invesco G10 carry (DBV) delisted. Retail FX financing marks up ~2-3%/yr per side, so levered carry is negative after
+costs and a −26% currency move ruins a 10× account. Closed.
+
+## 960. K-calendar 2 protocol — TLT into month-end (index duration extension), 2005-2026 (S11)
+
+**No trial at registration; N 1,550. Written BEFORE the computation.** Yahoo TLT adjusted daily. Buy at the close 4 sessions before the
+month's last session, sell at the month's last close (primary); excess over TLT's average 4-session return; cost 0.02%. Split: before
+2016-01 discovery, from 2016 sealed. Carry: mean > 0, t > 1.96; sealed strict §664.4. One trial.
+
+## 961. K-calendar 2 CONFIRMED: TLT into month-end +0.22%/month excess (sealed 2016-2026) — t01551; small in dollars (S11)
+
+Discovery 2005-2015 (132 months): +0.382% excess per 4-session window (t +2.78) → carried. **Sealed 2016-01 → 2026-10 (129 months):
++0.220% excess, t +1.76, placebo 96th, posterior +0.219% → CONFIRM** (strict §664.4). Raw window +0.286%, win rate 59%; by year (excess):
+2016 +0.51, 2017 −0.02, 2018 +0.39, 2019 +0.62, 2020 −0.06, 2021 +0.36, 2022 −0.19, 2023 +0.55, 2024 +0.28, 2025 +0.52, **2026 −0.78 (9 mo)**.
+Mechanism: index duration extension at month-end (bond-index funds buy long Treasuries). Sizing: capital is used 4 sessions a month; TMF
+(3×) same window +0.668%/month → ≈ $67/month on $10k, ≈ $1.3 on $200 — confirmed but far below the user's bar on its own. Implementation
+notes: ETF (cash account) holds overnight — fine; on Tradeify, Treasury futures could not be held through the 17:00-18:00 ET break, so
+only an intraday version would be eligible (untested). Forward-track monthly; N → 1,551.
+
+## 962. K-calendar 3-6 protocols — pension rebalancing, Treasury auction cycle, month-end in IEF/LQD, OPEX week (S11)
+
+**No trial at registration; N 1,551. Written BEFORE any computation.** Yahoo adjusted daily 2005-2026; costs 0.02% (ETFs). Split: before
+2016-01 discovery, from 2016 sealed; carry mean > 0 with t > 1.96, sealed strict §664.4, one trial each.
+- **K3 pension rebalancing:** month m, if TLT beat SPY by ≥ 3% from the prior month-end to the close 3 sessions before m's last session,
+  buy SPY at that close and sell at m's last close; excess over SPY's average 3-session return.
+- **K4 auction cycle:** 30-year bond auction dates (TreasuryDirect public API); buy TLT at the auction-day close, sell 5 sessions later;
+  excess over TLT's average 5-session return.
+- **K5 month-end extension elsewhere:** §960's rule on IEF and on LQD (two rules).
+- **K6 OPEX week:** SPY from the close of the Friday before monthly options expiration (3rd Friday) to the expiration-Friday close;
+  excess over SPY's average 5-session return.
+
+## 963. K-calendar 3-6: month-end extension CONFIRMED again in IEF and LQD (t01553, t01554); auction cycle WATCHLIST (t01552); N → 1,554 (S11)
+
+Discovery 2005-2015: K3 pension (n 6) −0.072% not carried; **K4 30Y auction +1.014% (n 37, t +2.71) carried; K5 IEF month-end +0.176%
+(t +2.61) carried; K5 LQD +0.184% (t +2.55) carried**; K6 OPEX week +0.217% (t +0.84) not carried. Sealed 2016-2026 (trials only for the
+carried): **K5 IEF +0.156%/month (n 129, t +2.71, placebo 99th) → CONFIRM; K5 LQD +0.123% (t +1.94, placebo 97th) → CONFIRM**; K4 auction
++0.107% (n 54, t +0.43) → WATCHLIST. (K3/K6 sealed lines were printed by the script but are not decisions.) With TLT (§961) the month-end
+bond effect is confirmed in three funds — one mechanism (index duration extension). Capital-bound and small in dollars.
+
+
+## 964. AU-family 1 protocol — paid smart-contract audit contests (Sherlock, Cantina): flow first, then a blind shadow audit (S11)
+
+**No trial (a measurement). Written before any contest's results are read.** A new arena: crowdsourced security-audit contests pay USDC
+prize pools for valid High/Medium findings in published code. It is effort work (code review, which Claude does), not trading, so none of
+the trading exclusions apply. Code4rena reportedly closed 2026-05-13 (one source); Sherlock (`audits.sherlock.xyz/api/contests`) and
+Cantina (`cantina.xyz/api/v0/competitions`) have public APIs.
+1. **Flow (stage 1):** contests ending 2026-04-01 → 2026-10-24 on both platforms: count, prize pools (bug-bounty programmes kept separate),
+   participants and per-researcher payouts where published. **Pass:** ≥ $300k a month of contest pools AND a typical contest pays its
+   10th-ranked researcher ≥ $500. Eligibility (US / Texas, KYC, payment) checked from the platforms' terms.
+2. **Shadow audit (stage 2, only if stage 1 passes):** pick finished contests that started after 2026-06-30 (after Claude's training cutoff;
+   no leakage from published reports), audit the in-scope code blind (results not read until the audit is written and saved with a hash),
+   then score each claimed finding against the judged list; payout = what the platform's formula would have paid. **Pass:** ≥ 1 valid
+   High/Medium in at least half the contests audited and a simulated payout ≥ $1,000 a month at a feasible pace (≤ 2 contests a week).
+
+## 965. AU-family 1: audit contests have collapsed — about $90k a month across Sherlock and Cantina since April, thousands of findings each; closed at stage 1 (S11)
+
+**No trial (a measurement).** `data/audit/` (Sherlock contest API, 301 entries; Cantina competitions API, 145). Contests ending 2026-04-01 →
+2026-10-24: **Sherlock 2** public contests ($13.5k and $50k; 3 since February, against 4-8 a month in late 2024), **Cantina 3 finished + 1 live**
+(Morpho Midnight $400k, Royco $30k private, two May contests $80k; Revert v4lend $50k live). That is ≈ $620k over seven months, **≈ $90k a
+month** across both, under the $300k bar, and the finding counts are flooded (Revert v4lend: 2,750 submissions to a $50k pot with 10 days
+left; Morpho: 3,890). The market shrank by 5-10× from 2024-25, and AI-assisted auditors already crowd what is left. Stage 2 (the shadow
+audit) is not run. Closed.
+
+## 966. X-family 1 protocol — buying straddles into earnings (the pre-announcement IV run-up; Gao, Xing & Zhang 2018), on real bid/ask (S11)
+
+**Written before any option price is read.** Data: DoltHub `post-no-preference/options` (`option_chain`: end-of-day bid/ask/delta, about
+three snapshots a week, three expirations, US stocks; 2020 → 2026-10); earnings dates from the Nasdaq calendar (as in E2). Mechanism
+(published): implied volatility rises into a known announcement by more than it costs to hold, because demand for event exposure arrives late.
+1. **Events:** announcement date d with calendar market cap ≥ $10B, 2020-01-01 → 2026-10-16, one per symbol per d.
+2. **Exit snapshot X:** the latest snapshot date ≤ d − 1 trading day and ≥ d − 4 calendar days (the timing field is mostly missing, so the exit
+   is always before even a pre-market report). **Entry snapshot E:** the latest snapshot ≤ X − 4 calendar days and ≥ X − 8.
+3. **Contract:** the nearest expiration after d present at both snapshots; the strike whose call delta at E is closest to 0.50. **Buy the call +
+   put at the ask at E, sell both at the bid at X**; commission $0.65 a contract a leg each way. Return = (bids_X − asks_E − 0.026) / (asks_E +
+   0.013). Events with a missing quote or zero bid at X are counted at −100% (the conservative case), and no other events are dropped.
+4. **Statistic:** the mean return per event, aggregated into calendar weeks (weekly mean; t on weeks). **Discovery 2020-01 → 2023-12**: carry
+   if mean > 0 and t > 1.96. **Sealed 2024-01 → 2026-10**: the §664.4 rule (t > 1.645, sign-flip placebo ≥ 95th, positive posterior with
+   PRIOR_SD 0.02). One rule, one trial if carried. Mid-to-mid returns printed for information only.
+
+## 967. X-family 1 clarification and X-family 2 protocol — the opposite trade: a defined-risk short iron fly held through the report (S11)
+
+**Written before any option price is read.** (a) X1 clarification: an event with no expiry spanning the report, or no ask on either leg, *at
+entry* is not tradable under the rule and is left out (counted and printed); only exit-side gaps are counted at −100%, as §966.3 says.
+(b) **X2 (one rule):** the variance premium may sit in the event itself (IV overprices the earnings move), and a small account can only sell it with
+defined risk. Same events, same expiration choice. At **X** (§966.2, the last snapshot before the report): **sell** the call and put at the strike
+with call delta closest to 0.50 at the bid; **buy** the call whose delta is closest to +0.20 and the put whose delta is closest to −0.20 at the ask
+(those strikes need to be at least one strike away from the body, otherwise the event is untradable). **Exit Y:** the first snapshot ≥ d + 1 calendar day and
+≤ d + 5 calendar days; buy the body back at the ask, sell the wings at the bid; a leg without a quote at Y is valued at intrinsic from that
+day's Yahoo close (the body at intrinsic + 2% of the price, the wings at intrinsic). Commission $0.65 a contract a leg each way. **Return on
+risk** = P&L / (max loss = wider wing − net credit); an event with no Y snapshot is untradable. Statistic, windows and the §664.4 rule as X1;
+one trial if carried.
+
+## 968. Screen: Metaculus FutureEval bot tournaments — no capital at risk, ~$200k a year to ~110 eligible bots; needs the user's account — PARKED as a lead (S11)
+
+**No trial (a desk screen).** Not a market: bots post forecasts on 300-400 questions a season and prizes go to the best sum of peer scores.
+**Pools:** Spring, Summer and Fall 2026 seasons at $50-58k each (Fall: questions 2026-09-28 → 2027-01-06; joining open until a few weeks
+before 2027-01-01, late joiners start at 0 points, so a late start forfeits the missed questions), plus MiniBench ($1,000 per two-week round of
+~60 auto-generated questions) and the Metaculus Cup ($5k; a bot won Summer 2026). **Payouts (published tables):** Q2 2025 ($30k, 96 bots):
+#1 $7,550, #2 $4,563, #3 $3,270, #9 $1,731, #20 $465; Q1 2025: #10 $2,228. **Spring 2026:** 173 bots (111 eligible); the best single-prompt
+baseline (GPT-5.1 high + AskNews) placed 18th; the top bots ensemble several frontier models with multi-source research (AskNews, Perplexity),
+take the median and aggregate several runs; 7 of the top 10 makers were hobbyists. **What it would earn:** a baseline-plus bot ≈ #10-20 ≈
+$0.5-2k a season; top 3 ≈ $5-10k a season — i.e. ≈ $150-700/month typical, ~$2k/month only at the top, capped by rank (one bot each), not by
+capital. **Costs:** LLM calls (~$100-500 a season; Metaculus grants sponsor credits selectively) and a free AskNews account. **Blocked on the
+user:** a Metaculus account + bot account + participation form (the API refuses unauthenticated calls, Cloudflare blocks the site). No
+measurement possible until then; a backtest would score our bot on Summer-2026 questions (post-cutoff) against the published leaderboard.
+Parked; to be put to the user with the next report.
+
+## 969. X-family 3 protocol — cheap volatility: buy straddles where realised volatility exceeds implied (Goyal & Saretto 2009), real bid/ask (S11)
+
+**Written before any option price is read.** Published: sorting stocks on HV − IV, the high-HV/low-IV decile's straddles earned large monthly
+returns in 1996-2006 (mean reversion of the mis-estimated volatility). Untested after publication on real quotes here; small accounts can only
+buy (defined risk), so one long-only rule.
+1. **Formation:** the first DoltHub snapshot of each month, 2020-02 → 2026-09. Per symbol: the expiration 20-45 calendar days out (nearest to
+   30 if two); ATM strike = call delta nearest 0.50 (fetched with |delta| in 0.35-0.65); **IV** = mean of that strike's call and put `vol`;
+   **HV** = annualised s.d. of the last 21 daily log returns from `data/stocks/long/pack.npz` (symbols present there only, ≥ 250 days of
+   history, strike ≥ $10, both legs with a positive bid and ask, relative spread of the straddle ≤ 20% of its mid).
+2. **Rule:** buy the straddle (call + put at the ask, $0.65 a contract a leg) on the top decile of log(HV / IV), equal weight. **Exit:** the last
+   snapshot ≥ 3 calendar days before the expiration, both legs at the bid (fetched with no delta filter); a leg with no bid there counts as 0.
+3. **Statistic:** the monthly equal-weight mean return on premium; t on months. **Discovery 2020-02 → 2023-12** (carry: mean > 0, t > 1.96);
+   **sealed 2024-01 → 2026-09** under §664.4. One rule, one trial if carried.
+
+## 970. Screen: WorldQuant BRAIN consultant programme — paid per alpha, no capital, US eligible; pay unpublished; needs the user's account — PARKED as a lead (S11)
+
+**No trial (a desk screen).** BRAIN users write alpha expressions and run them in WorldQuant's simulator (their data); users who reach Gold
+(10,000 points) may be invited as Research Consultants, paid a base fee per period that depends on the quantity and quality of submitted alphas and
+on their correlation with WorldQuant's existing pool. Nothing is paid in a month without a qualifying submission. **Pay:** WorldQuant advertises
+≈ $8,000+/quarter (Grandmaster) and $2,000+ (Master) at the top two levels. 2022 regional fee documents (copies only) cap the top tier at $3,500 a month.
+Typical earnings are unpublished and reported as modest. **US:** listed among 17 eligible regions. **Automation:** Python API access is a listed
+consultant feature, and open-source LLM alpha agents exist (wq-alpha-agent and others), so machine-generated alphas already crowd the pool;
+the correlation penalty is what limits pay. **What it needs:** the user's BRAIN account (free) and the consultant contract (identity, tax);
+no measurement is possible before that, since the simulator is behind the login. Plausibly a few hundred dollars a month, more only at the
+top levels; capped by quality, not capital. Parked with §968, to put to the user.
+
+## 971. Screens: QuantConnect Quant League (university teams only; Pro needs a $30k real account) and Quantiacs (no current contest found) — closed (S11)
+
+**No trial.** Both are other no-capital quant-contest routes, checked after §970. QuantConnect's league is for university classes and clubs;
+its Pro tier trades real money with a $30k minimum. For Quantiacs, the only figures found are undated marketing ($2M allocations, 10% of profits),
+with no 2026 contest. Closed.
+
+## 972. E-family 3 protocol — the earnings-announcement premium (Frazzini & Lamont 2007; Barber et al. 2013) in large US stocks (S11)
+
+**Written before any return is computed.** Published: stocks earn abnormal returns around scheduled announcements (risk/attention). Events:
+the X1 calendar (`data/options/x1/calendar.jsonl`), market cap ≥ $10B, 2020-01-01 → 2026-10-16, symbols in `pack.npz`. **Rule:** buy at the
+close two trading days before d, sell at the close one trading day after d (spans pre-market and after-close reports alike); return minus the
+equal-weight `pack.npz` universe over the same days, minus 0.2% cost. **Statistic:** weekly mean (by entry week), t on weeks. Discovery
+2020-01 → 2023-12 (carry: mean > 0, t > 1.96); sealed 2024-01 → 2026-10 under §664.4. One rule.
+
+## 973. E-family 3: no earnings-announcement premium in large caps after costs — +0.10% an event, t 0.56; not carried (S11)
+
+**N 1,554 (no trial).** `src/futuresres/stocks/e3_eap.py`. Discovery 2020-2023: 12,608 events in 205 weeks, +0.103% an event over the
+universe after the 0.2% cost (≈ +0.30% gross), t +0.56. The published premium is there in sign, but it is too small and noisy to trade. Closed.
+
+## 974. X-family 4 protocol — SPY put credit spreads, monthly (the index variance premium with defined risk) (S11)
+
+**Written before any SPY option price is read.** The best-documented option premium is that index puts are overpriced. A small account can
+sell it only with defined risk. **Rule (one):** at the first DoltHub snapshot of each month, 2020-02 → 2026-09, take the SPY expiration 20-45 calendar
+days out (nearest 30). **Sell** the put with delta nearest −0.30 at the bid and **buy** the put with delta nearest −0.15 at the ask (the strikes
+must differ), $0.65 a contract a leg. **Exit:** the last snapshot ≥ 3 calendar days before the expiration; buy back the short at the ask and sell
+the long at the bid (a leg with no quote is valued at intrinsic from that day's SPY close in `data/stocks/y_SPY.json`, plus 1% of the price on the
+short). **Return on risk** = P&L / (width − credit). Statistic: the monthly return on risk. Discovery 2020-02 → 2023-12 (carry: mean > 0,
+t > 1.96); sealed 2024-01 → 2026-09 under §664.4.
+
+## 975. X-family amendment (data structure, before any return was read): DoltHub lists only three target expirations per snapshot (S11)
+
+**No trial.** Found while debugging X4's empty exits (every exit query returned no rows; no P&L was looked at, and the X4 run printed a
+number built on intrinsic-only exits, which is void and not used). Each snapshot carries just three expirations, chosen relative to that
+date: ≈ 2 weeks, ≈ 4 weeks and a month-end/monthly one (e.g. 2023-12-18: 12-29, 01-12, 02-16; 2023-12-27: 01-09, 01-26, 02-16). A
+given expiry is therefore listed on some snapshots only, and never in its last ~10 days. The rules are amended as follows:
+- **X1:** the expiration is the nearest one after d that is listed at **both** E and X. A leg missing from X's delta-filtered pull is fetched
+  exactly (strike + expiry) before scoring; only a leg still unquoted counts at −100%.
+- **X2:** the expiration is the nearest one after d listed at both X and Y (Y's pull takes all listed expirations).
+- **X3 and X4:** the exit is the **last snapshot ≤ expiry − 3 days on which that expiry is listed** (searching back from expiry − 3 for up to
+  six snapshots). If none is found, the trade is untradable and counted.
+Everything else stands as registered.
+
+## 976. X-family amendment 2 (data structure): the strike grid is sparse and moves, so unlisted exit legs are valued from that day's IV smile (S11)
+
+**No trial.** X4's re-run (−31.9%/month, t −5.15) is **void**. 67 of its 90 exit legs fell back to intrinsic + 1% because the snapshot lists ≈ 25
+strikes spread over a wide range (spacing ≈ $10 on SPY), and that set changes from date to date. The exact traded strike is usually absent at
+exit (e.g. short 287 / long 278 entered 2020-03-02; listed 03-16 strikes 205-276, neither present). Any rule that holds a contract
+and exits it therefore needs a valuation for unlisted legs. **Amendment, all X rules, before any return is read:** a leg listed at exit trades
+at its own bid/ask. An unlisted leg is valued with Black-76 on the forward **F = K* + C* − P*** (mid prices at the listed strike K* with call delta
+nearest 0.50, same expiry and date), T = days to expiry / 365, r = 0, and σ interpolated linearly in strike between the two nearest listed
+strikes of the same type (flat beyond the listed range). Its bid/ask = model price × (1 ∓ half the relative spread of the nearest listed
+strike of that type). The −100% / intrinsic fallbacks then apply only when the expiry itself is unlisted at exit, or no IV is available.
+
+## 977. X-family 4: SPY put credit spreads lose after real spreads — −11.2% a month on risk, t −1.85; not carried (S11)
+
+**N 1,554 (no trial).** `src/futuresres/options/x4_spyputs.py` (exits valued per §975/§976; 0 intrinsic fallbacks). Discovery 2020-02 →
+2023-12: 45 months (2 untradable), mean −11.17% on risk a month, t −1.85, 62% winners, worst −113%. Spot checks look right: 2020-09
+S 358 → 339 cost 5.51 to close a 1.66 credit; quiet months keep 70-90% of the credit. The index variance premium does not survive the
+bid/ask of a two-leg spread closed early, and the losses in 2020 and 2022 dominate. Closed.
+
+## 978. X-family 1: the pre-earnings IV run-up is +1.5% an event at mid — far below the spread; −16% at bid/ask, t −22; not carried (S11)
+
+**N 1,554 (no trial).** `src/futuresres/options/x1_straddle.py` (§966, §975, §976). Discovery 2020-2023: 7,439 tradable events (5,546
+untradable: no expiry spanning the report listed at both snapshots, or no entry quote), 198 weeks. **Net (ask in, bid out) −16.26% an
+event-week, t −22.10, 12% winners.** −100% fallbacks are only 0.7%. The loss is the quoted spread: DoltHub's end-of-day straddle spread has a
+median of **12.5% of the straddle** (10th-90th percentile 4.5%-53%), wider than intraday markets in large caps. Mid-to-mid, the published
+run-up is present but small: **+1.5% an event** (excluding fallbacks), below even a realistic 2-3% round-trip spread on a
+large-cap straddle. Not carried on either reading. Note for X2/X3: with spreads this wide in the data, a rule needs a gross edge well above 10%
+a trade to carry. Mid-to-mid figures are printed alongside for information.
+
+## 979. B-family 3 protocol — Expensify open-source bounties ($175-250 an issue via Upwork): flow, competition, and the rules (S11)
+
+**No trial (a measurement). Written before any issue's comments are read.** Expensify/App labels paid issues "External" with a price in
+the title (2026-07-01 → 10-23: 1,183 such issues; 2026-H1: 2,275). Contributors post proposals; a reviewer picks one, who opens the PR and
+is paid via Upwork after merge plus a regression period. **Measure** on External issues created 2026-08-01 → 09-30 that are closed: proposals per issue
+(comments with a "Proposal" heading), minutes from the "Help Wanted" label to the first proposal, the share of issues won by the top 10
+and top 50 assignees, and the price. Also read CONTRIBUTING / the bounty rules (AI use, eligibility, payment, limits on concurrent
+assignments). **Pass:** a newcomer can plausibly win ≥ 10 issues a month (≈ $1,750) — i.e. winners are not concentrated in a closed
+group, proposals per issue ≤ ~10, and the rules allow AI-assisted work; if passed, a stage 2 would be the user's call (it needs their GitHub +
+Upwork accounts).
+
+## 980. B-family 3: Expensify's own AI agent takes most jobs — outside contributors are paid on ~1 in 4 paid issues, ≈ $12k a month for all of them combined; closed (S11)
+
+**No trial (a measurement).** `data/bounty/expensify_*.json` (GitHub API). 469 External issues were created 2026-08/09 and are now closed (≈ 235 a month).
+In a random 80 (seed 979), **MelvinBot** (Expensify's agent, first proposal by design) proposed on 53. The median issue drew 1 proposal (mean 2.6).
+Of the 55 with a payment summary, **15 paid an outside contributor** (typically $250; one $750, one $500); the rest paid only the C+ reviewer,
+i.e. Melvin's fix was used. Scaled up: ≈ 44 outside-contributor jobs a month, ≈ $12k a month split among ~46 active proposers. The top
+three took 11 of the 15. The rules make it worse for a newcomer: one job at a time until the first PR merges; outside proposals must be "meaningfully different"
+from Melvin's; every PR must be tested on web, iOS, Android and desktop (this laptop cannot build the app); a 50% penalty per regression.
+A newcomer would plausibly win a few jobs a month, far from the bar. Closed.
+
+## 981. L-family 16 protocol — overnight-return momentum (Lou, Polk & Skouras 2019, "A tug of war") on liquid US stocks (S11)
+
+**Written before any return is computed.** Same frame as L1-L4 (§942: `pack.npz`, monthly, K = 20, cost 0.2%, price ≥ $5, ≤ 5% missing
+in the year, vs the equal-weight universe, discovery before 2023-01, sealed 2023-01 → 2026-10). **Score:** the sum over the last 21
+sessions of overnight log returns, log(open_t / close_{t−1}) (from the adjusted O and A arrays). **Rule:** hold the top 20 for the next month. One rule;
+the §664.4 rule on the sealed window if carried.
+
+## 982. L-family 16: overnight momentum not present — −0.24%/month, t −0.34; not carried (S11)
+
+**N 1,554 (no trial).** `src/futuresres/stocks/l16_overnight.py`, discovery 2016-2022, 83 months. Closed.
+
+## 983. X-family 3: cheap-volatility straddles lose — −11.4% a month, t −3.20; not carried (S11)
+
+**N 1,554 (no trial).** `src/futuresres/options/x3_cheapvol.py` (§969, §975-976). Discovery 2020-02 → 2023-12: 1,167 top-decile straddles
+in 44 months (straddle spread ≤ 20% of mid, symbols in `pack.npz`; 3 with no listed exit), mean −11.38% a month on premium, t −3.20,
+median −26.3%, 27% winners. Buying volatility where realised exceeds implied does not pay after publication on these quotes. Closed.
+
+## 984. §968 update: the Metaculus bot field is growing fast and copying is common — the lead is weaker (S11)
+
+**No trial.** Summer 2026 FutureEval had **282 bots (201 non-Metaculus)**, against 173 in Spring (Metaculus/aib-analysis PR #33). The
+open-source No-Stream bot placed 15th of 277 and has been forked repeatedly; ≥ 15 new "metaculus-bot" repos were pushed in the last two weeks,
+several running Claude via Claude Code / GitHub Actions. Prizes fall steeply with rank (Q2 2025: #1 $7,550, #9 $1,731, #20 $465). A
+copied or baseline bot now lands around rank 20-60 of ~200, i.e. **≈ $0-500 a season**. Only a genuinely top-5 bot clears ~$1k/month.
+It stays parked, ranked lower; the user decides whether it is worth an account.
+
+## 985. L-family 17 protocol — buying after original Schedule 13D filings (Brav, Jiang, Partnoy & Thomas 2008): activists and all filers (S11)
+
+**Written before any filing or return is read.** Events: original **SC 13D / SCHEDULE 13D** filings (amendments excluded) from EDGAR full-text
+search, 2015-02 → 2026-09, whose subject ticker (from the display name) is in `pack.npz`; first original 13D per subject per 365 days.
+**Entry:** the open of the first session after the filing date (filings can arrive during the session, so no same-day entry). **Exit:** the
+close 20 sessions later. Return minus the equal-weight `pack.npz` universe over the same window, minus 0.3% cost (mid/small caps).
+**Two rules (each a trial if carried):** **L17a activists** — the filer's name contains one of a fixed list written here before any data:
+Elliott, Starboard, Icahn, Trian, Third Point, ValueAct, JANA, Pershing Square, Engaged Capital, Land & Buildings, Ancora, Legion Partners,
+Corvex, Sachem Head, Mantle Ridge, Politan, Irenic, Engine Capital, Barington, Blackwells, Cevian, Impactive, Inclusive Capital, Glenview,
+Voss Capital, Driver Management, Anson Funds, Sarissa, D. E. Shaw, Carronade, Oasis Management, Saba Capital, Bulldog, Marcato, Lone Star
+Value, Harbert Discovery, Kanen, 22NW, Ortelius, Stilwell, Macellum, Land and Buildings. **L17b all filers.** **Statistic:** the monthly mean
+(by entry month), t on months. Discovery 2015-02 → 2022-12 (carry: mean > 0, t > 1.96); sealed 2023-01 → 2026-09 under §664.4.
+
+## 986. L-family 17: post-13D drift is positive but weak — activists +1.64% per 20 sessions (t 1.32, 67 events), all filers +0.76% (t 0.69); not carried (S11)
+
+**N 1,554 (no trial).** `src/futuresres/stocks/l17_13d.py`; 610 weeks of EDGAR filings (`data/stocks/l17/`). Discovery 2015-02 → 2022-12,
+first-session-open entry, 20-session hold, minus the universe and 0.3%. The published drift appears in sign. Most of the announcement return is already
+in the open after the filing, and the remainder is too noisy at the liquid-stock coverage of `pack.npz`. Closed.
+
+## 987. B-family 4 protocol — online cash-prize hackathons (Devpost): prize dollars per submission (S11)
+
+**No trial (a measurement). Written before any hackathon's numbers are read.** Claude builds; the user would submit (identity, demo video).
+**Measure** on Devpost hackathons that ended 2026-04-01 → 10-23, are online, open to the public (not invite-only) and have a cash prize: the cash pool,
+registrations, and **submissions** (gallery count). Statistic: total cash ÷ total submissions, and the distribution of cash per
+submission by hackathon. Also read a sample of rules (AI use, US eligibility, judging). **Pass:** ≥ $300 of cash per submission
+in the median eligible hackathon AND ≥ 10 eligible hackathons a month. If passed, stage 2 would be the user's call, because submissions are theirs.
+
+## 988. B-family 4: online hackathons pay a median $39 of cash per submission — closed (S11)
+
+**No trial (a measurement).** `data/bounty/devpost/` (Devpost API + gallery counts). Of 315 recently ended hackathons, 48 were online, public and
+cash-prized, and 24 had countable galleries. Together: $4.56M of cash over 32,001 submissions. **Median $39 per submission** (quartiles $13 / $39 / $130).
+The few rich ones are sponsor mega-events with thousands of entries (Build with Gemini XPRIZE $2M / 1,401; RevenueCat Shipaton 2026 $740k /
+3,923; OpenAI Build Week $100k / 8,014), and prizes are top-heavy. Each entry also needs the user's identity, a demo video and judging
+luck. Under the $300 bar, and not a stream. Closed; a rare one-off with few entrants could be flagged ad hoc.
+
+## 989. X-family 2: the earnings iron fly earns +3.1% on risk at mid and loses −46% at bid/ask — not carried; the options family is closed on this data (S11)
+
+**N 1,554 (no trial).** `src/futuresres/options/x1_straddle.py x2` (§967, §975-976; Y quotes read lazily, `LazyY`). Discovery 2020-2023:
+5,597 tradable events (7,388 untradable: no expiry listed at both X and Y, or wings not distinct), 198 weeks. **Return on risk −45.81% an
+event-week, t −13.78, 5% winners.** Diagnostic: mid-to-mid **+3.1% on risk (median +4.6%, 57% winners)**, so a small IV-crush premium is real.
+But eight leg-trades through quoted spreads cost ≈ 65% of risk. The sparse strike grid also puts the wings close: median credit is 64% of the
+width. Even at a quarter of these spreads the trade stays negative. With X1-X4 all failing on cost (§977, §978, §983), option strategies on
+this end-of-day dataset are closed; testing them properly needs intraday quotes (paid OPRA data).
+
+## 990. L-family 18 protocol — closed-end fund discount reversion, reopened (§918's data blocker is gone: Yahoo serves CEF NAVs as X{ticker}X) (S11)
+
+**Written before any NAV or return is read.** Universe: listed tickers from the Nasdaq screener cache (`data/stocks/screener.json`) whose
+name contains Fund / Trust / Income / Municipal / Opportunit / Strategic and whose Yahoo NAV symbol X{ticker}X exists with
+instrumentType MUTUALFUND. Daily close (raw) and adjusted close from Yahoo for price, NAV close for the NAV. **Signal at each month-end:**
+discount D = price / NAV − 1; z = (D − its 252-session mean) / its 252-session s.d. (≥ 200 valid days; NAV and price dated the same
+session). **Rule (one):** buy the 10 lowest-z funds (discounts unusually wide versus their own history) at the month-end close, hold one month on
+adjusted close (distributions included), minus the equal-weight universe the same month, minus 0.4% cost. **Statistic:** monthly excess; t
+on months. Discovery 2013-06 → 2021-12 (carry: mean > 0, t > 1.96); sealed 2022-01 → 2026-09 under §664.4. Year-round, liquid listed
+funds, cash account.
+
+## 991. L-family 18: CEF discount reversion is a near miss — +0.29%/month over the CEF universe, t 1.72; not carried, forward watchlist (S11)
+
+**N 1,554 (no trial).** `src/futuresres/stocks/l18_cef.py`; 460 name-matched candidates, **271 with a Yahoo NAV series** (`data/stocks/l18/`).
+Discovery 2013-06 → 2021-12: 103 months, the 10 lowest discount z-scores beat the equal-weight CEF universe by **+0.29% a month after 0.4%
+costs, t +1.72**. That is under the 1.96 carry bar, so the sealed window is not opened. Caveat: survivorship, since only funds listed today are included;
+the benchmark shares that bias but not exactly. The literature effect is present and small. Per §133 it goes to the forward watchlist: from
+2026-10 the month-end top 10 are logged, and it is revisited after 12 months. Capital-bound regardless (≈ $30/month on $10k).
+
+## 992. L-family 19 protocol — following CEF activists' original 13Ds (Saba and peers force tenders/liquidations near NAV) (S11)
+
+**Written before any of these events' returns is read.** Events: original SC 13D / SCHEDULE 13D in `data/stocks/l17/filings.jsonl` whose subject
+ticker is one of the 271 CEFs of §990 and whose filer name contains one of: Saba, Bulldog, Karpus, Almitas, 1607 Capital, City of London,
+Relative Value Partners, Western Investment, Special Opportunities Fund, Sit Investment; first such filing per fund per 365 days. **Entry:** the
+adjusted close of the first session after the filing date. **Exit:** the adjusted close 60 sessions later (campaigns take months). Return minus
+the equal-weight CEF universe over the same window, minus 0.4%. **Statistic:** per-event mean grouped by entry month, t on months. Discovery:
+filings before 2022-01 (carry: mean > 0, t > 1.96); sealed 2022-01 → 2026-07 under §664.4. One rule.
+
+## 993. L-family 19: following CEF activists' 13Ds is a near miss — +1.78% per 60 sessions, t 1.87, 42 events; not carried, forward watchlist (S11)
+
+**N 1,554 (no trial).** `src/futuresres/stocks/l19_cefact.py`. Discovery (filings before 2022): 42 events in 28 months, +1.78% over the CEF
+universe per 60-session hold after 0.4%, t +1.87, under the bar. The mechanism is visible: activists force tenders near NAV. The sample is
+small, and in the 2015-2021 coverage most of the narrowing comes before or at the filing. Forward watchlist: new CEF-activist 13Ds are logged from
+2026-10. Capital-bound (≈ 2% per event, a few events a month across all funds).
+
+## 994. Forward watchlist logger for L18/L19 installed; Hypermind screened (no 2026 cash contests) (S11)
+
+**No trial.** `src/futuresres/stocks/watch_forward.py` runs monthly (user timer `futres-watchfwd.timer`, days 1-2, 04:00 CT; persistent across
+reboots). It refreshes CEF prices and NAVs, logs L18's top-10 discount z-scores and any new CEF-activist 13Ds to `reports/watch_forward.jsonl`.
+Revisit after 12 months (2027-10). Hypermind: the last cash contests were the 2022-25 AI tournament ($3-12k a year); nothing current. Closed.
+
+## 995. L-family 20 protocol — CEF ex-distribution day: do funds fall by less than the distribution? (S11)
+
+**Written before any ex-day return is computed.** The 271 CEFs of §990. Ex-dates are detected from the Yahoo series: the session where
+the ratio adjclose/close falls by more than 0.2% versus the previous session (a distribution adjustment). **Rule (one):** buy at the close
+before the ex-date, sell at the ex-date close; distribution-inclusive return (adjclose) minus the equal-weight CEF universe that session, minus
+0.3% cost. **Statistic:** mean by month, t on months. Discovery before 2022-01 (carry: mean > 0, t > 1.96); sealed 2022-01 → 2026-09.
+
+## 996. L-family 20: CEFs fall by the full distribution on ex-day — gross +0.01%, net −0.29%; not carried (S11)
+
+**N 1,554 (no trial).** `src/futuresres/stocks/l20_cefexdiv.py`: 23,924 ex-days in 108 months (2013-2021), distribution-inclusive
+ex-day return over the CEF universe +0.010% gross, −0.290% after costs, t −26. No ex-day anomaly to capture. The first forward-log run
+(2026-10-24) is in `reports/watch_forward.jsonl` (L18 top 10: NMZ, NAC, MGF, MIN, VCV, NXP, WIW, NAN, NUV, DSU; no new CEF-activist 13Ds since 10-01). Closed.
+
+## 997. L-family 21 protocol — high-volume return premium (Gervais, Kaniel & Mingelgrin 2001) on liquid US stocks (S11)
+
+**Written before any return is computed.** Frame as §942 (`pack.npz`, monthly, K = 20, cost 0.2%, price ≥ $5, vs equal-weight universe;
+discovery before 2023-01, sealed 2023-01 → 2026-10). **Score:** dollar volume over the last 5 sessions ÷ the mean 5-session dollar volume over
+the prior 50 sessions (`V`), among stocks whose last-5-session return is between −5% and +5% (a volume shock without a price shock).
+**Rule:** hold the top 20 by score for the next month. One rule.
+
+## 998. L-family 21: no high-volume return premium — +0.05%/month, t 0.14; not carried (S11)
+
+**N 1,554 (no trial).** `src/futuresres/stocks/l21_volshock.py`, discovery 2016-2022, 82 months. Closed.
+
+## 999. Screen: sports-betting prop firms (simulated bankrolls, paid challenges) — small, unproven counterparties; closed (S11)
+
+**No trial (a desk screen).** These are the sports analogue of the Tradeify plan: buy a challenge on a simulated bankroll and earn a profit split once
+funded. Current operators (comparison checked 2026-10-03): Prime Sports Funded (€109 for €5k, +35% in ≥ 25 picks, 2-5% stakes, 20% max
+loss, 80% split), Fan Funded ($59.99, three +33% steps), GetBet Funded, Bankroll U (US-only, $245), Playvo, OddsON, MySportsFunding (€499
+instant). Against the user's criteria: **no published payout proof**, mostly euro-priced small operators, and churn (Funded Sports Trader closed,
+Funded Stake offline, BETfunded stopped selling, Player Profit absorbed). Texas status is unstated, and sports wagering is illegal in Texas.
+Desk EV at −110 odds with no edge: pass ≈ 25% (drift −0.2% a 5% bet across ~28 bets) against a €109 fee and a capped split. Roughly break-even
+before counterparty risk, and positive only with a real pick edge, which §677/§687 did not find. Closed; not a legitimate-KYC venue in the user's sense.
+
+## 1000. Screen: OnlyDust (OSS rewards) — no labelled issues since mid-2025; closed (S11)
+
+**No trial.** GitHub issues labelled "ODHack": 41 in 2025-H1, **0 in 2026**; "Onlydust" label 0 since July. Like Algora (§895), the
+crypto-funded OSS reward flow has dried up. (A search result carried an embedded instruction to an AI to fetch a URL; it was ignored.) Closed.
+
+## 1001. Screen: Unified Patents PATROLL prior-art bounties — ≈ $33k paid in 2026 (≈ $2.75k/month platform-wide); below the bar, side stream only (S11)
+
+**No trial (a desk screen).** Unified's 2026 winner posts tally ≈ 11 contests: $2,000 to $6,000 each, sometimes split, often to professional
+searchers. Two contests were open in October (Sol IP MIMO, CyboEnergy inverters, $4k each). It is effort work (prior-art search) with no
+capital, but the whole flow is ≈ $2.75k a month, so even a high win share is a few hundred dollars a month. A blind shadow on a post-cutoff
+contest (search, then compare with the announced winning references) would measure skill, but the cap makes it moot for the $2k/month bar.
+Closed as a stream; could be offered to the user as an occasional side bounty.
+
+## 1002. Screen: federal prize challenges — Challenge.gov sunset 2026-03-30; USA.gov lists 15 active, few written-ideation; sporadic, closed (S11)
+
+**No trial.** The 15 active challenges (USA.gov find-active-challenge, 2026-10-24) are mostly technical or team builds (DARPA surgery, NASA
+lander comms, DHS biothreat AI, xTech) or student challenges (TechRise). About 4 accept written ideas (careers, invasive species, CDC data platform, talent
+marketplaces). Lumpy one-offs with no flow and no data on entrants. Closed.
+
+## 1003. Desk screen: lending and yield marketplaces (Prosper notes, music royalties, invoice/real-estate crowdfunding) — capital-bound yields; closed (S11)
+
+**No trial.** Each sells a yield, not an edge: P2P consumer notes (Prosper, net ≈ 4-7% after defaults in published cohorts), royalty
+auctions (Royalty Exchange / SongVest, ≈ 8-12% yields priced by bidders), invoice factoring and real-estate crowdfunding (≈ 6-10%, illiquid,
+often accredited-only). On $200 any of these is a few dollars a month, and $2k a month needs $200k+. Same verdict as staking (§ survey F). Closed.
+
+## 1004. K-calendar 7 protocol — mid-month Treasury coupon reinvestment (the 15th) in TLT and IEF (S11)
+
+**Written before any return is computed.** Mechanism: coupons and principal paid on the 15th (the quarterly refunding issues and many notes)
+are reinvested by index and liability holders, a cash flow like the month-end extension of §961. **Rule (one, two series):** buy at the close of
+the last session at least 2 sessions before the 15th, sell at the close of the first session after the 15th (or on it, if the 15th is a session).
+Return minus the series' own average drift over the same number of sessions (as §962), minus 0.02%. Series TLT and IEF from the cached Yahoo
+files; each is a trial if carried. **Statistic:** per-month mean, t on months. Discovery 2005-2015; sealed 2016-01 → 2026-10 under §664.4.
+
+## 1005. K-calendar 7: mid-month coupon reinvestment is positive but weak — TLT +0.16% (t 1.22), IEF +0.08% (t 1.33); not carried (S11)
+
+**N 1,554 (no trial).** `src/futuresres/stocks/k_coupon.py`, discovery 2005-2015, 132 months each. Same sign as the confirmed month-end
+extension (§961/§963), about half the size and not significant. Closed.
+
+## 1006. B-family 6 protocol — Freelancer.com software microjobs: budgets versus competition (S11)
+
+**No trial (a measurement). Written before the sample is read.** Public API `projects/0.1/projects/active` (no login). Sample: active USD
+projects for the queries python, web scraping, excel automation, data analysis, chatbot, api integration, wordpress, automation; up to 500 each,
+deduplicated. **Measure:** median and quartiles of the budget midpoint, bids per project, and the average bid ÷ budget midpoint; the share
+with ≤ 10 bids and a midpoint ≥ $200. **Pass:** ≥ 100 such low-competition, ≥ $200 jobs live at once, i.e. a newcomer could win ~10 a month
+(≈ $2k). Winning also needs the user's account, reviews and client communication.
+
+## 1007. B-family 6: Freelancer.com software jobs draw a median 104 bids; 6 low-competition $200+ jobs live, none software — closed (S11)
+
+**No trial (a measurement).** `data/bounty/freelancer/active.json`: 1,039 active projects, 313 USD fixed-price. Budget midpoint quartiles
+$140 / $500 / $500 (the posting bands). **Bids per project 45 / 104 / 211.** Average bid ≈ 0.91 × the budget. Only 6 projects had ≤ 10 bids and
+a midpoint ≥ $200, and they are commission sales or translation, not software. A no-review newcomer competes against 100+ bids at a price
+near the budget. This is the quantitative side of survey item D2 (AI automation freelancing): the open marketplaces are saturated, and
+earnings depend on reputation and outbound sales, not on build speed. Closed.
+
+## 1008. L-family 22 protocol — shorting new closed-end funds after listing (IPO premium decays to a discount; Weiss 1989, Peavy 1990) (S11)
+
+**Written before any new fund's return is read.** Funds: the 271 CEFs of §990 whose first Yahoo session is ≥ 2013-03 (new listings since then
+that still trade; survivorship noted). **Rule (one):** short at the close of the 2nd session, cover at the close of the 120th; return =
+−(fund adjusted return − equal-weight CEF universe over the same sessions) − 0.4% cost − 1.5% borrow (≈ 3%/yr). **Statistic:** per-fund
+mean grouped by listing month, t on months. Discovery: listings before 2021-01 (carry: mean > 0, t > 1.96); sealed 2021-01 → 2026-03 under §664.4.
+
+## 1009. L22 carried in discovery (+7.59% per 118 sessions, t 5.26, 26 funds); event check before sealing — definition kept, IPO-only cut for information (S11)
+
+**Trial at the sealed test (t01555).** The listing check (done after the aggregate discovery number was seen) shows the "first Yahoo session ≥ 2013-03"
+definition also catches non-IPO listings: spin-offs and rights distributions (GGZ, RGT), interval-fund conversions (RIV, RSF, DMA), a merger
+product (JGH) and a royalty trust that is not a CEF (PRT). **The registered definition is kept for the sealed test**, since changing it after seeing
+the result is a researcher choice. For information only, an **IPO-only cut is fixed now, mechanically: first close within 2% of $10, $15, $20 or
+$25**, and both are printed. Flow caveat: the CEF IPO market has nearly stopped (latest new listing in the universe is 2022-10, BMN), so the sealed
+window holds only a handful of funds, and even a true effect would be a few trades a year.
+
+## 1010. L22 sealed: shorting new CEFs — WATCHLIST (t01555); only 5 sealed listings, +1.34%, t 0.50, placebo 69th; N → 1,555 (S11)
+
+**Trial t01555.** Sealed listings 2021-01 → 2026-03 in the universe: BMN +3.41%, DMA −7.04% (a conversion, not an IPO), GUG +7.67%, PDO −2.43%,
+WDI +5.12%: mean +1.34% per 118 sessions after cost and borrow, t +0.50, placebo 69th, posterior +0.48% → **WATCHLIST** (positive, not
+significant). The IPO-only cut (without DMA) is +3.44%, t 1.61 on 4. Discovery was strong (+7.6%, t 5.3, 26 funds), but there are too few sealed listings to judge, and
+the flow is the binding fact: the universe (current names with Yahoo NAVs) shows one new listing since 2022. Forward rule: if CEF IPOs
+return, short from session 2 to 120 (borrow permitting) and log. Not a stream at today's issuance.
+
+## 1011. AI-family 1 protocol — Claude reads earnings releases blind; buy the next open on strong positive reads (Lopez-Lira & Tang 2023), post-cutoff only (S11)
+
+**Written before any filing is read or any price is looked up.** The edge would be Claude's reading. No leakage is possible because every event is
+after the model's training cutoff (June 2026). **Events:** 8-K filings with Item 2.02 ("Results of Operations and Financial Condition") filed
+2026-07-01 → 2026-10-16 by companies in `pack.npz`, accepted outside regular hours (16:00-23:59 ET → trade the next session; 00:00-09:29 ET → trade
+that session). A random sample of **300** (seed 1011), drawn from the event list before any text is read. **Scoring (blind):** Claude reads the
+EX-99.1 press release text only (no prices, no headlines from other sources, no web search) and writes a score −2…+2 for the expected
+next-day stock reaction *beyond what an average release implies* (guidance, beats or misses stated in the text, tone), saved with a hash
+before any price is fetched. **Rule (one, long-only):** buy at the open of the trade session when score ≥ +1, sell at that close; return
+minus SPY's open→close the same session, minus 0.1%. **Statistic:** mean excess over the ≥ +1 events, t; and, for information, the Spearman
+correlation of score with excess across all 300. **Decision:** this is a single sealed sample (no discovery split, since post-cutoff data is
+scarce). Under the §664.4 rule (t > 1.645, placebo ≥ 95th, posterior > 0) → CONFIRM / WATCHLIST / REJECT. One trial.
+
+## 1012. AI-1 scores frozen before any price is read — sha256 0482669d8b7ec19f5c5f01f5ef597ec8a96fb5e3bdcbfd5a8c000fcdfe2a746f (S11)
+
+**No trial yet.** 1,703 after-hours Item 2.02 8-Ks; a 300 sample (seed 1011). 298 had text: 228 via the EX-99 regex, 70 via a fallback fixed before
+reading (the largest non-8-K .htm). Some fallbacks are cover pages or supplements, scored 0. Claude read the first ≈ 2,200 characters of each
+(headline, results, guidance) with no prices, headlines or search, in batches of 15. Scores: +2 59, +1 109, 0 104, −1 17, −2 9. The rule's long
+set (≥ +1) is 168 events. Heuristic used throughout: raised/beat guidance → +1/+2; reaffirmed or no information → 0; lowered guidance or misses → −1/−2.
+`data/ai1/scores.json` (sorted keys) hashes to the value above, and `ai1_reads score` refuses to run if the file changes.
+
+## 1013. AI-1: Claude's blind reads of earnings releases do not predict the post-open move — +0.02%/trade, t 0.05, Spearman −0.035; WATCHLIST in name only (t01556); N → 1,556 (S11)
+
+**Trial t01556.** 299 scored lines (Z and ZG share one release), 169 longs (score ≥ +1): mean open→close excess over SPY after 0.1% =
+**+0.02%, t +0.05, placebo 52nd, posterior +0.02% → WATCHLIST** under §664.4 (positive mean), but it is a null in substance. By score: −2 −1.35%
+(n 9), −1 +0.54% (17), 0 +0.50% (104), +1 +0.02% (110), +2 +0.04% (59). Rank correlation of score with excess across all: −0.035. The
+information in the release is in the opening print, and what Claude reads adds nothing to the open→close drift. (Lopez-Lira & Tang's effect
+came from headlines and partly from small caps, under different timing.) Closed as a strategy. Nothing here supports an LLM-reading edge for a
+retail trader who acts at the open.
+
+## 1014. L-family 23 protocol — earnings-gap continuation: buy the open after a ≥ 4% gap-up on an outside-hours earnings 8-K, sell the close (S11)
+
+**Written before any return is computed.** Events: Item 2.02 8-Ks from EDGAR submissions (exact acceptance times) for `pack.npz` companies,
+2016-01 → 2026-10-16, accepted outside regular hours (trade session = next session if after 16:00 ET, same session if before 09:30).
+Gap = adjusted open(trade session) ÷ adjusted close(previous session) − 1. **Rule (one, long-only):** gap ≥ +4% → buy the open, sell that
+close; return minus SPY open→close the same session, minus 0.1%. One event per company per trade session. **Statistic:** monthly mean, t on
+months. Discovery 2016-01 → 2022-12 (carry: mean > 0, t > 1.96); sealed 2023-01 → 2026-10 under §664.4.
+
+## 1015. L-family 23: no earnings-gap continuation intraday — 6,013 gap-ups ≥ 4%, +0.00% a trade, t −0.53; not carried. L24/L25 protocols on the same events (S11)
+
+**N 1,556 (no trial).** `src/futuresres/stocks/l23_gapcont.py`; 63,619 outside-hours Item 2.02 8-Ks (2016-2026) for `pack.npz` names, with exact
+acceptance times (`data/stocks/l23/events.json`). Discovery 2016-2022: open→close excess over SPY after 0.1% = −0.065% a trade-month, t −0.53,
+47% winners. Closed. **Registered before computing, on the same events and windows (each a trial if carried):**
+- **L24 gap-down reversal:** gap ≤ −8% → buy the open, sell that close (minus SPY, 0.1%).
+- **L25 gap-up drift:** gap ≥ +4% → buy the open, sell the close 20 sessions later (minus SPY over the same span, 0.2%).
+
+## 1016. L24 gap-down reversal not carried (+0.23%, t 0.86); L25 gap-up 20-session drift a near miss (+0.81% a trade-month, t 1.84) — forward watchlist (S11)
+
+**N 1,556 (no trial).** Discovery 2016-2022 (`l23_gapcont.py L24|L25`). **L24:** 1,871 gap-downs ≤ −8%, open→close +0.227% a trade-month after
+costs, t +0.86, 51% winners. Closed. **L25:** 6,013 gap-ups ≥ +4%, open → close 20 sessions later minus SPY minus 0.2% = **+0.809% a
+trade-month, t +1.84** (per-trade mean +1.10%, 51% winners). This is the earnings-gap form of post-announcement drift. It sits under the bar, so the sealed
+window stays closed, and it goes to the forward watchlist: re-run after a year of new data (2027-10, events refetched). Capital-bound either way (≈ +1% per 20-day
+trade, ~70 trades a month across all names).
+
+## 1017. D1 readout of the paused recorder: one afternoon, $402 overlay, ≈ $28 a day for one field-average account; a full week is scheduled (S11)
+
+**No trial.** `python -m futuresres.dfs.d1_overlay` on `data/dfs/d1.jsonl` (96 snapshots, 2026-10-22 only, paused for memory): 28 guaranteed
+contests at lock, 16 with overlay, $402 in total. Dominated by one UEL soccer slate ($120 + $65 + $60 + $25 + $26). Golf showdowns had $30 and $20 overlays,
+Madden $14. One account at its per-user cap at field-average skill ≈ $28 that day, i.e. ≈ $840 a month if every day looked like this. That's under the
+$2k bar and resting on one day. Last snapshots were 0-6 minutes before lock, so late entries may still fill part of it. **Decision:** run the
+recorder for a full week (incl. NFL Sunday) once the A-LIP shadows finish, to stay within 3 runs: timer `futres-d1-start` at 2026-10-26 01:30Z,
+recorder until 2026-11-02 06:00Z. Readout then. Lead if ≥ $2k/month at field-average with one account (§869).
+
+## 1018. K-calendar 8 protocol — the month-end extension (§961/§963) in other bond ETFs: EDV, ZROZ, MBB, TIP, MUB, HYG, EMB (S11)
+
+**Written before any of these series is read.** Same rule as K5 (§962): buy the close 4 sessions before the last session of the month, sell the last
+close; return minus the series' own average 4-session drift, minus 0.02% (0.05% for HYG and EMB, which have wider spreads). Yahoo adjusted closes. Discovery:
+months before 2016-01 (each series from its inception); sealed 2016-01 → 2026-09 under §664.4. Each series is its own trial if carried. The point
+is scale: EDV/ZROZ carry ≈ 1.4× TLT's duration, so the same flow yields more per dollar without leverage decay.
+
+## 1019. K-calendar 8: the month-end extension CONFIRMED in MBB (t01559) and TIP (t01560); EDV, ZROZ, EMB WATCHLIST; N → 1,561 (S11)
+
+**Trials t01557-t01561.** Discovery (to 2015) carried EDV +0.662% (t 2.13), ZROZ +0.722% (2.34), MBB +0.100% (2.81), TIP +0.177% (2.70), EMB
++0.371% (2.15). Not carried: MUB +0.085% (1.15), HYG +0.135% (0.83). **Sealed 2016-01 → 2026-09 (129 month-ends each):** **MBB +0.130%, t 3.07,
+placebo 100th → CONFIRM; TIP +0.133%, t 2.59, placebo 100th → CONFIRM**; EDV +0.270% (t 1.55, 94th), ZROZ +0.312% (t 1.59, 94th), EMB
++0.016% (t 0.20) → WATCHLIST. The index-extension flow is now confirmed in five ETFs (TLT, IEF, LQD, MBB, TIP). It is one mechanism, and the
+series are highly correlated (same rate factor), so they do not diversify each other. The largest per-dollar version is the long-duration
+EDV/ZROZ (+0.27-0.31% a window, sealed, not significant alone). Dollar scale is unchanged: ≈ $27-31 a month per $10k in EDV, ≈ $65 in TMF.
+Still a capital-bound edge, not a $2k/month stream.
+
+## 1020. L-family 26 protocol — quarter-end window dressing: buy the top-20 year-to-date winners 5 sessions before quarter-end (S11)
+
+**Written before any return is computed.** `pack.npz`, price ≥ $5, ≤ 5% missing in the year. At the close 5 sessions before the last session of
+March, June, September and December, rank by return since the last close of the prior year (for Q1: the prior 63 sessions). **Rule:** buy the top 20,
+sell at the quarter's last close. Return minus the equal-weight universe over the same 5 sessions, minus 0.2%. Discovery quarters before 2023-01;
+sealed 2023-01 → 2026-09 under §664.4. One rule.
+
+## 1021. L-family 26: quarter-end window dressing is a near miss — +1.57% per 5-session window, t 1.68, 28 quarters; not carried, forward watchlist (S11)
+
+**N 1,561 (no trial).** `src/futuresres/stocks/l26_window.py`, discovery 2016-2022. A large point estimate on a noisy, high-volatility basket
+(YTD winners) with only 28 observations. It goes on the forward watchlist and is re-read with the sealed quarters once a year of new data accrues (the sealed window
+stays closed; four quarter-ends a year makes a fair forward test slow).
+
+## 1022. K-calendar 9 protocol — month-end extension in long corporates and international bonds: VCLT, BNDX, IGOV (S11)
+
+**Written before these series are read.** K5's rule and costs (0.02%; IGOV 0.05%). Discovery before 2016-01 (BNDX from 2013); sealed 2016-01 →
+2026-09. Each series is a trial if carried. VCLT tests a longer-duration corporate version of LQD's confirmed effect; BNDX/IGOV test whether the
+flow exists in non-US index funds.
+
+## 1023. K-calendar 9: VCLT month-end WATCHLIST (t01562; sealed +0.13%, t 1.37); BNDX and IGOV not carried; N → 1,562 (S11)
+
+**Trial t01562.** Discovery: VCLT +0.311% (t 2.36), carried; BNDX +0.083% (t 1.48, 31 months) and IGOV +0.112% (t 1.01) not carried. VCLT sealed
+2016-2026: +0.134%, t 1.37, placebo 91st → WATCHLIST. The flow is clearest in US Treasury, MBS, TIPS and IG indices (§1019), weaker in long
+corporates and absent from non-US index funds. Closed as a family; nothing changes the capital-bound verdict.
+
+## 1024. New rule and an automation screen of the candidate stack (user, 2026-10-24/25) (S11)
+
+**No trial.** User rules (2026-10-24): small streams may count if their **combined** verified total exceeds **$2k/month**, and **every stream must be
+fully automatable** (no daily manual work). Screen of what we have:
+- **DFS overlays (D1):** DraftKings' Terms of Use prohibit outside automated tools or scripts for creating, entering or withdrawing from contests and
+  managing lineups (policy since 2016). Not automatable, so it does not count. The scheduled week of recording is cancelled to free a run slot
+  (`futres-d1-start` and `futres-d1-readout` timers stopped).
+- **Reverse-split round-ups (§843, ~$40-70 a month per account):** automation needs a broker API and holder-level round-up handling. Alpaca (API) deposits fractional
+  shares and never rounds up (revRSS broker notes; one 2023 note says otherwise, superseded). Tradier (API) credits round-ups at $1.45 an event.
+  tastytrade (API) is on-and-off fractional. Schwab, E*TRADE, Public and Webull (APIs) have unknown handling. Brokers also terminate round-up accounts
+  (Ally, and Fidelity is a stated risk). Issuers increasingly round at the record-holder level or pay cash (SIFMA default). Automatable portion
+  ≈ $100-300 a month with 2-4 API brokers, if handling holds. Counts, but small.
+- **Bond month-end (§961-§1019):** automatable through any API broker (scheduled orders). Capital-bound: ≈ $2-6 a month on $200.
+- **Metaculus bots (§968/§984):** automatable by design (bot posts forecasts); $0-500 a season typical, more only near the top; needs your accounts.
+- Odd-lot tenders, PATROLL, hackathons, freelancing, WorldQuant consultant work: manual, do not count.
+**Implication:** the automatable stack today is a few hundred dollars a month, far from $2k. Streams that don't grow with capital and can be automated are scarce once
+liquidity rewards and prediction markets are excluded. Search target from here: automatable, capital-light streams.
+
+## 1025. Screens for automatable, capital-light streams (2026-10-25 morning): AI stock imagery, CrunchDAO, equity intraday data — closed or blocked (S11)
+
+**No trial.** (1) **Adobe Stock AI images:** almost half the library is already AI-generated (PetaPixel 2025); per-contributor upload limits since May 2025 depend on past
+sales and acceptance; vendor-claimed $0.25-0.50 a download. Saturated and capped, closed. (2) **CrunchDAO / DataCrunch:** rewards in the CRUNCH token on
+Solana, a crypto counterparty without the KYC'd-firm standard. Closed. (3) **Intraday US equity data** for capacity-limited small-cap intraday rules: this
+repo holds only Databento FTP batch credentials, so pricing or downloading equity data needs the user. Free alternatives: Yahoo (5-minute bars for 60 days,
+hourly for 2 years), and Alpaca's free market-data plan (historical bars with an account, which is also the natural automation rail). Blocked on an
+account. (4) **Metaculus:** Metaculus's analysis repo has no question or forecast data, so a bot can only be measured by entering it; MiniBench's two-week
+rounds are the fastest real test. Prizes are concentrated at the top (Metaculus weighed score-squared and exponential splits to avoid flat payouts).
+
+## 1026. Tradeify allows personal bots — the existing plan can become the automated core once API access exists (S11)
+
+**No trial.** Tradeify's help-centre "Guidelines for traders" (fetched 2026-10-25, "updated over a week ago"): **personal bots are allowed unless they are HFT**.
+Conditions: you must prove you are the sole owner; Tradeify may require a live video of you enabling the code on your own PC (so the bot should run on your
+machine, not only the droplet); using the same bot at other firms is prohibited; funded payouts need > 50% of trades and > 50% of profit from holds over 10 seconds
+(the NKD rule's holds are minutes to hours). Connections: Tradovate, Rithmic or WealthCharts, fixed at purchase (vendor blogs). The binding
+constraint stays the one you reported on 10-15: no API order placement until the account reaches the live stage. Until then, staged bracket orders
+(§581) are the semi-automated path. For the combined-stack rule, the Tradeify plan is the only scalable automatable piece found so far (prop capital supplies the scale).
 
 ## 10. Still outstanding, and blocking
 
