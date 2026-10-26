@@ -17602,6 +17602,417 @@ machine, not only the droplet); using the same bot at other firms is prohibited;
 constraint stays the one you reported on 10-15: no API order placement until the account reaches the live stage. Until then, staged bracket orders
 (§581) are the semi-automated path. For the combined-stack rule, the Tradeify plan is the only scalable automatable piece found so far (prop capital supplies the scale).
 
+## 1027. Screen: free paper-trading competitions with cash prizes — a real lottery-ticket structure, but EV is a few dollars an entry; closed (S11)
+
+**No trial (desk).** Mechanism: free entry plus ranking by ROI means a maximum-variance strategy buys a free lottery ticket with EV = prize pool × P(top).
+Current: TradingView "The Leap" ($50k cash for 2026-07-20 → 08-14; paid or trial TradingView account; ≥ 5 trading days; typically
+tens of thousands of entrants, so ≈ a few dollars of EV each, and everyone else also plays high-variance); Trading.com monthly (US clients, forex demo, up to $6k;
+forex, close to the user's exclusions); GoChamp CME futures (prizes in commission credits, residence-restricted); Moomoo (weekly top-3, 2025 format). Contest rules
+on bots are unstated. EV per entry ≈ $1-20 a month and prizes are lumpy, so this is not a stream. Closed.
+
+## 1028. Round-up automation re-check: the stream is narrowing — issuers round at the record-holder level and automated RSA services crowd it (S11)
+
+**No trial (desk).** 2025-26 sources: issuers increasingly apply the round-up "at the record holder level with the transfer agent to prevent arbitrage" (MultiSensor AI,
+2026). Street-name brokers may keep the round-up rather than pass it to customers (Impact Biomedical, 2026-09: allocation to customers unexplained). SIFMA asks that
+round-ups be eliminated altogether. Commercial "automated RSA signal" services now sell the trade (TradeLabs, OneArbitrage, stocksplitarbitrage). Many RSA
+names are OTC or sub-$1, which some API brokers block. With Alpaca out (fractions, §1024), the automatable version is Tradier (fee) plus tastytrade (inconsistent):
+≈ $50-150 a month, shrinking. It stays in the stack as a minor piece and is not worth building ahead of anything larger.
+
+## 1029. An automation path for the Tradeify plan exists now: webhook bridges (TradersPost / PickMyTrade) on a Tradovate connection; direct API only later (S11)
+
+**No trial (desk; vendor sources marked).** Tradovate's own API needs a live funded account with ≥ $1,000 equity and a $25/month add-on, and **evaluation accounts are excluded**
+(vendor blog). Rithmic's API is approval-only. Tradeify's help centre says TradingView works only through Tradovate. TradersPost and PickMyTrade both advertise
+Tradeify automation over Tradovate through webhooks, and they accept a webhook from any source, so the droplet bot that already computes the NKD ticket
+could send the bracket order itself, replacing manual staging. Policy (§1026): personal, non-HFT bots allowed; prove sole ownership; possibly a live video of
+enabling it on your PC; no use at other firms. **Open points before any build (yours to check or decide):** which connection your account uses (Tradovate is
+needed for this path; the connection can't be switched without a new purchase); the bridge's cost (≈ $30-100/month); Tradeify support's written confirmation that a
+bridge counts as a personal bot; and any droplet change still needs your confirmation. This is the one path found that makes the scalable stream hands-free.
+
+## 1030. Metaculus bot lead, re-ranked under the automation rule: the strongest automatable stream that needs no capital; Market Pulse adds ≈ $7k a quarter (S11)
+
+**No trial (desk).** Bot-eligible prize pools: seasonal FutureEval ≈ $50-58k × 3 a year, MiniBench ≈ $1k every two weeks (≈ $26k a year), and Market Pulse
+≈ $7k a quarter (bots eligible since Q3 2025; bots must update continuously and handle numeric group questions). Total ≈ $200k a year. Prizes are top-weighted:
+Q2 2025 ($30k) paid #1 $7,550, #9 $1,731, #20 $465. Scaled to a $58k season, #9 ≈ $3.3k a season. The best single-prompt baseline placed 18th of 173 in Spring 2026,
+and top bots are research-plus-ensemble pipelines, so a well-engineered Claude ensemble with AskNews plausibly lands in the top 10-20: ≈ $300-1,000 a month
+across all series, and top 3 ≈ $1.6-3.5k. **Fully automatable** (a bot on the droplet), no capital, only API costs (Metaculus grants some credits). It needs your accounts
+(Metaculus account, bot account, participation form). Fastest real test: MiniBench's two-week rounds. Combined with the Tradeify plan automated through a bridge (§1029),
+it is the most credible automatable path to the user's $2k/month stack.
+
+## 1031. F-family 1 protocol — is a Claude forecaster competitive with top forecasting bots? A blind ForecastBench test on a post-cutoff question set (S11)
+
+**No trial (a skill measurement for the Metaculus lead, §1030). Written before any question is forecast or any resolution is read.** ForecastBench (FRI,
+`forecastingresearch/forecastbench-datasets`) question set **2026-07-05** (freeze 2026-06-25; after Claude's training cutoff, so outcomes are unknown).
+**Forecasts:** all resolved market questions (Manifold, Metaculus, Polymarket, INFER, as in the tournament fixed-effects file), plus a random 60 of the
+dataset questions (seed 1031) at their 7-, 30- and 90-day horizons. Claude forecasts from the question text, background and freeze value only (no web, no
+tools beyond reading the file), in batches. Probabilities are saved and hashed before `2026-07-05_resolution_set.json` is opened.
+**Scoring, ForecastBench's own method (`src/leaderboard/main.py`):** Brier per forecast minus the published tournament question fixed effect; mean per question type;
+shifted so that "Always 0.5" on the same questions scores 0.25; **Brier Index = (1 − √score) × 100** (higher is better). **Read:** compare with the tournament
+leaderboard (`leaderboard_tournament.csv`): top-10 Dataset ≈ 63-67, Market ≈ 72-76; superforecaster median 63.5 / 74.5. **Pass for the lead:** both
+indices within the top-20 band. Then a Metaculus bot built on Claude is plausibly a top-tier entrant, and the user's accounts are worth asking for. Caveat: one
+set (sampling noise), and real bots also use live news, which this test does not.
+
+## 1032. F1 forecasts frozen before resolutions are read — sha256 f7766cfa7d1dd2960db142f1f50ee81d760f726cadfb802f772a94f2a5256f90 (S11)
+
+**No trial.** 287 probabilities: 107 resolved market questions and 60 dataset questions × 3 horizons (`data/fbench/f1_forecasts.json`). Method used: anchor on the market
+price at freeze with small adjustments from prior knowledge, plus base rates for dataset questions (Poisson for ACLED counts, climatology for the Météo-France temperatures,
+slight upward drift for stocks, 0.5 for rates). **Leakage caveat, noted before scoring:** today's AI-1 reading included some July-October 2026 company releases
+(e.g. a bank's mention of 10-year yields above 5.2% in October, Rollins missing its Q2 expectations). To avoid using them, every rates/yields question was set to 0.5 and
+Rollins to a neutral drift. No World Cup or election outcomes were seen.
+
+## 1033. F1 result: a zero-shot Claude forecaster scores at the baseline-LLM tier, not the top — Brier Index 60.3 dataset / 67.5 market; fails the top-20 bar (S11)
+
+**No trial (a measurement).** ForecastBench's method on set 2026-07-05: **dataset 60.3** (180 forecasts; the leaderboard median of 463 entries is 59.8,
+Claude Opus 5 baselines 61.5, top-10 63-67, superforecaster median 63.5), **market 67.5** (107; on these same questions, copying the freeze price scores 66.6,
+so +0.9 for my adjustments, much like the baselines' +1 over Naive on the leaderboard. Top-10 market scores are 72-76 on other sets). Pooled 62.8. On a single set, the
+rescaling against Always 0.5 reduces to the raw Brier, so the numbers sit on the leaderboard scale directly. **Reading:** without a research pipeline,
+Claude is a mid-pack forecaster, about where single-model baselines rank. Biggest losses: SpaceX −50% (0.40 vs 0.49, resolved YES), ER seat gains, Mbappé top scorer. Biggest
+gains: shading OpenAI's S-1 timing, Hormuz-by-August and Haiti election down. **For the Metaculus lead (§1030):** the prize-relevant ranks need a research-plus-ensemble
+pipeline (AskNews, multiple models, aggregation), as the Spring 2026 top bots used. Zero-shot quality alone places it ~rank 50-150 of ~200 eligible bots, i.e.
+≈ $0-200 a season. The lead stays parked at its low estimate. Proving a top-tier pipeline needs live news, so the real test is a MiniBench round with your accounts.
+
+## 1034. Desk sweep for other automatable streams: merger cash-outs, SPAC trusts, data/bandwidth-sharing apps, per-record data programs — none qualifies (S11)
+
+**No trial.** (1) **Merger arbitrage** (buy targets after announcement; the cash at close is a mandatory, automatic event): automatable through any API broker, but it is a
+capital-bound spread of T-bills + ≈ 2-4% with deal-break tails. (2) **SPAC trust arbitrage:** redemption is a voluntary election (manual) and it is capital-bound (≈ T-bill
+yield). (3) **Data- and bandwidth-sharing apps** (Honeygain-type): ≈ $5-20 a month a device; affiliate-marketed, terms grey. (4) **Per-record data-contribution programs:**
+nothing verifiable surfaced; the category is scam-prone. With F1 (§1033) putting a zero-shot bot mid-pack, the automatable, capital-light stack stands at:
+Metaculus bot ≈ $0-200 a season unless a full research pipeline lifts it; round-ups ≈ $50-150 a month (narrowing); everything else capital-bound. The only
+automatable piece that scales without your own capital is still the prop account (§1026/§1029).
+
+## 1035. Round-ups, automated, priced on V1's real events: ≈ $35 a month per API-broker account after Tradier's fee, outliers aside — a negligible stack piece (S11)
+
+**No trial (a measurement).** `reports/v1_revsplit.json` (§843): 210 holder-level or round-lot events, 2025-10 → 2026-10, one share each, minus Tradier's $1.45
+per event: $2,731 over 12 months. Two outliers carry most of it: BRRN (1-for-100,000 cash-out shape) +$2,100 and AREB (round-lot) +$217. **Without events over
+$200: ≈ $35 a month, median $1.34 an event.** The trend runs against the stream (record-holder-level rounding, SIFMA cash-in-lieu default, §1028). Even across 3-4 API brokers it is ≈ $100-150 a month,
+mostly from rare outliers. It is logged in the stack at that value, and no build is warranted.
+
+## 1036. Capacity-and-rules sweep of automatable content/commerce arenas — all closed before any data (S11)
+
+**No trial (desk; the user's 10-19 rule: estimate the ceiling before downloading).** AI music on streaming (Spotify's 2025 AI-spam policy removes mass uploads;
+≈ $0.003 a stream); AI e-books on KDP (AI disclosure, a 3-titles-a-day cap, saturated); print-on-demand (saturated, Etsy AI rules); AI-content websites (search
+quality updates demote them; AI Overviews cut clicks, §survey E); faceless YouTube ("inauthentic content" policy); deal/affiliate bots on Telegram/Discord (need an
+audience; Amazon commission cuts); domain drop-catching (≈ 1-2% a year sell-through against renewals, §survey C); DePIN/bandwidth nodes (≈ $5-20 a month); airdrop
+farming (sybil filtering, no KYC'd counterparty). App/extension/API/data products are excluded until we profit from our own use (user, 10-19). None reaches the scale or
+rule bar, so all are closed.
+
+## 1037. §1029 follow-up: TradersPost says its Tradovate bridge supports Tradeify evaluation, funded-sim and Elite live accounts (S11)
+
+**No trial (vendor source, 2026-02-10).** Chain: alert → TradersPost webhook → Tradovate execution, set up by entering the Tradeify Tradovate credentials in
+TradersPost. Works for all three stages (Select/Growth evaluation, funded sim, Elite live). Bracket parameters can ride in the alert. A 7-day free trial and a paper
+account exist; pricing is not on the page. Tradeify rules it quotes: bots allowed with proof of sole ownership; commercial, shared and HFT bots banned; copy trading
+between traders banned; > 50% of trades held > 10 s; flat by 16:59 ET (12:59 on early-close days); Select evaluation consistency 40%; Elite traders may hold up to
+5 live funded accounts. Still open: whether a custom JSON webhook from the droplet (not TradingView) is accepted (TradersPost markets "any source", to verify in its docs);
+your account's connection type; and written confirmation from Tradeify. With this, the NKD plan is the stack's automatable, capital-independent core.
+
+## 1038. F2 protocol — a forward ForecastBench test of two automatable forecasters on today's set (2026-10-25): "latest market price" and Claude + research (S11)
+
+**No trial (a measurement for the Metaculus lead). Written before any forecast is made.** Set 2026-10-25 (freeze 2026-10-09, due today). Market questions only
+(Kalshi 104, Polymarket 104, Metaculus 42). **Bot A (mechanical):** for Kalshi and Polymarket, the live mid/last price fetched today from each venue's public API,
+clipped to [0.01, 0.99]. For Metaculus questions (no public price), the freeze value. **Bot B (Claude + research):** Bot A's number, adjusted by Claude after
+web searches on questions that close by 2027-01-31, recorded per question. Both are saved and hashed today. **Scoring** (ForecastBench method, §1031) when the resolution
+sets for 2026-10-25 are published (first ≈ 2026-11-08). Compare: freeze-value copy (Naive), Bot A, Bot B, and the tournament leaderboard's market indices
+(top-10 ≈ 72-76). **Read:** if Bot B beats Bot A by ≥ 1 index point and reaches top-20 levels, a research bot is plausibly prize-grade on Metaculus. Bot A
+measures how much fresh prices alone are worth.
+
+## 1039. F2 forecasts frozen — Bot A sha256 74e8bb60…69ff4, Bot B sha256 2c42a38b…fff87; scoring scheduled for 2026-11-09 (S11)
+
+**No trial.** Bot A: 248 market questions (206 live Kalshi/Polymarket prices, mean 8.2 points away from the freeze value; Metaculus at the freeze value; 2 missing).
+Bot B: Bot A plus research on all 42 Metaculus questions. Web checks covered CagriSema (FDA decision guided for Q4 2026, missed non-inferiority vs tirzepatide), Israel's 10-27 election
+(polls: opposition bloc ~62, no majority certain), Joby Dubai (commercial launch "toward end of 2026"), Waymo (500k weekly in Q1, 1M target), Ohio governor
+(markets 31% Ramaswamy), EUR/USD ≈ 1.12 (below the start of 2026) and Missouri Amendment 3 (43-44 tied in August). The other Metaculus questions got hazard time-decay (16 of the
+83 days remaining at freeze passed with no event seen). Full hashes are in `data/fbench/`. Scorer: `python -m futuresres.forecast.f2_score` (timer `futres-f2-score`).
+
+## 1040. L-family 27 protocol — premarket laggards: buy the open when a large cap's premarket move trails its beta × QQQ premarket move by > 2% (S11)
+
+**Written before any intraday data is read.** Free data: Yahoo 5-minute bars with pre/post (last ≈ 60 calendar days). Universe: the 100 largest `pack.npz` names by dollar
+volume. **Signal at 09:25 ET:** stock premarket return (09:25 last price ÷ prior 16:00 close − 1) minus β × QQQ premarket return (β = 60-session daily beta from
+`pack.npz`). **Rule:** residual < −2% and no earnings 8-K in the prior 24 h (from `data/stocks/l23/events.json`) → buy the 09:30 open, sell at the 16:00 close; return minus
+QQQ open→close, minus 0.1%. **Statistic:** per-day mean, t on days. This is a discovery read only (≈ 40 sessions); if it carries (mean > 0, t > 1.96), it gets a forward
+test, not a sealed window. Automatable through any API broker's open orders. Capital-bound.
+
+## 1041. L-family 27: premarket laggards don't catch up after the open — +0.002% a day, t 0.01; not carried (S11)
+
+**N 1,562 (no trial).** `src/futuresres/stocks/l27_premarket.py`, Yahoo 5-minute bars (2026-07-28 → 10-23, 59 sessions), the 100 most traded `pack.npz` names. With the registered
+60-session β vs QQQ: 351 signals on 58 days; open→close minus QQQ minus 0.1% = **+0.002% per day-mean, t +0.01**. Per-trade mean +0.57%, but it is concentrated on
+days with few signals; days with many signals (broad selloffs) lose. A first run used β = 1 by mistake (+0.045%, t 0.18), was corrected before reading the result as a
+verdict, and is noted here. Closed.
+
+## 1042. Screen: AI-agent prize competitions — no recurring stream; one large one-off noted (Dubai "Create AI Agents Championship") (S11)
+
+**No trial (desk).** Recurring agent contests with monthly pools open to API-based Claude/GPT agents: none found. ARC Prize 2026 (ARC-AGI-3, $850k) is annual and
+Kaggle-style. Berkeley AgentX-AgentBeats sprints pay ≈ $1-10k per track. Bybit's AI-vs-human contest is crypto trading in USDT. **One-off worth flagging:** Dubai Chamber's
+*Create AI Agents Championship* (registration 2026-10-07 → December 2026; global, individuals or teams, idea/prototype/MVP stage). Four categories (societal, personal,
+business, youth) at AED 550k (≈ $150k) each, plus AED 1M (≈ $272k) for "AI Agent of the Year". Judging criteria and AI-tool rules are unstated
+(`dubaichamberdigital.com/en/create-ai-agents`). It is a pitch-judged lottery ticket, not a stream, and does not count toward the automatable stack, but the cost is only build time. For the
+user's end-of-day list as optional.
+
+## 1043. §1037 open point closed: TradersPost accepts webhooks from custom code (Python requests POST of JSON), not only TradingView (S11)
+
+**No trial.** TradersPost's docs ("Signal sources → Custom code") show a Python `requests` POST of a JSON body (ticker, action, price) to the strategy's
+webhook URL, with a JSON success response and signal ID. The parser is JSON5 (since 2022-12). Stop/target fields for custom JSON are documented on its signal-format page
+(to read before any build). So the droplet bot could send the NKD bracket itself. Still open for the user: the account's connection (Tradovate), TradersPost's price, and
+Tradeify's written OK.
+
+## 1044. Metaculus bot design note: a market-implied module (options-implied distributions) for finance questions — the one structural edge over LLM bots (S11)
+
+**No trial (desk).** Market Pulse rounds (≈ $7.5k a quarter, bots eligible) ask rolling finance questions: NVIDIA guidance, S&P 500 additions, earnings, VIX maxima over a window.
+Seasonal tournaments also carry numeric market questions (e.g. the S&P 500 close on a date). For price and volatility thresholds, the risk-neutral distribution from live
+option chains (free, delayed, Yahoo `v7/finance/options`), with a small correction for the variance premium, is close to the best forecast. Most bots reason in text and are
+miscalibrated on numeric tails (F1's biggest miss was a −50% SpaceX threshold). This is the only identified structural edge for an automated forecaster, and F2's Bot A tests the
+same "use the market's own number" idea on ForecastBench. It would be built only with the user's accounts (§1030).
+
+## 1045. Desk screens: bond-fund stale NAVs, 24/5 overnight equity market-making, cross-broker borrow-fee arbitrage — blocked or capital-bound (S11)
+
+**No trial.** (1) **Stale NAVs in bond/muni mutual funds** (4 pm NAVs lag moves in futures-implied bond prices; Choi-Kronlund-style): round-trip limits and redemption fees cap
+frequency, broker APIs rarely route funds, and it is capital-bound. (2) **Market-making in the new 24/5 overnight equity sessions** (Blue Ocean ATS; retail flow, wide spreads vs
+ES/NQ-implied fair value): automatable only where an API broker routes overnight orders. Overnight trade data isn't free (§857 tabled it), and it is market-making, close to the
+user's "no liquidity rewards" line, though rebate-free. Blocked. (3) **Borrow-fee arbitrage** (be paid a hard-to-borrow fee through one broker's fully-paid lending while
+shorting the same stock at a broker whose borrow rate lags): needs two brokers' daily rates (IBKR's via iborrowdesk is public; payout rates aren't), a margin account, and
+capital. The user also rejects IBKR. Blocked. None changes the stack.
+
+## 1046. Screen: bot-eligible cash competitions (S11) — nothing new beyond Metaculus
+
+**No trial.** Web screen 2026-10-25 for recurring cash contests that allow bots. **Metaculus FutureEval Fall 2026** ($50k, bots welcome) and **Market Pulse** ($7.5k, bots eligible)
+are already parked (§968, §1030, §1044); they need the user's account. **CrunchDAO DataCrunch** pays in USDC, so the crypto exclusion applies (as before). Prop-firm "free
+trading competitions" (FundedNext, The5ers) are CFD/forex props, which are excluded. Bridgewater x Metaculus is a one-off (Jan–Mar). Ocean Predict-ETH is crypto. The stack is unchanged.
+
+## 1047. Desk screens: ERCOT/Texas power, demand response, gift-card and claim arbitrage, P2P/litigation lending — blocked, hardware- or capital-bound (S11)
+
+**No trial.** The user is in Texas, so ERCOT was checked first. (1) **ERCOT DAM/RT virtual trading and CRRs** require registration as a QSE/CRR account holder with
+collateral in the five-to-six figures. This is not a $100–200 start. (2) **Residential demand response and VPPs** (OhmConnect-style events, battery VPPs, wholesale
+pass-through plans) can be automated with a smart thermostat, but pay only about $5–20 a month without a home battery. With a battery (≈ $10k of hardware) they pay more, but that
+is capital. (3) **The 4CP transmission-charge avoidance** applies to commercial load only. (4) **Discounted gift-card resale and settlement claims** are promo-like or manual and
+eligibility-bound (filing a claim without eligibility is fraud), so they are excluded. (5) **P2P, Fundrise and litigation-finance lending** is capital-bound and returns about
+the market rate. None is automatable at scale from a small start. The stack is unchanged.
+
+## 1048. Screen: game/agent competitions and skill-game bots (S11) — excluded or sporadic
+
+**No trial.** (1) **Bots in real-money poker, chess, backgammon or sweepstakes poker** break every site's rules (cheating), so they are excluded outright. (2) **Season-long fantasy leagues (Sleeper,
+Underdog)** are pick'em/DFS-like, ban scripts, and fall under the PrizePicks/DK exclusions. (3) **Kaggle simulation and agent competitions** (Pokémon TCG AI Battle Challenge
+2026, > $300k, with the cash mostly in a written strategy track and an in-person final; Orbit Wars has no prize; ARC-AGI-3): bots are welcome, but the contests are one-off, top-8
+winner-take-most, and need months of skilled effort per contest. That is not recurring automated income and cannot be stacked toward $2k a month. The stack is unchanged.
+
+## 1049. Screen: autonomous AI web bug bounties (HackerOne/Bugcrowd hackbots) (S11) — fails automation and saturation
+
+**No trial.** Since XBOW (a funded company) topped HackerOne in 2025, hackbot volume has surged: Elastic alone got > 1,390 reports in the first half of 2026, more than 2024 and 2025 combined.
+Google paused part of its OSS VRP over AI reports (secondary coverage). HackerOne's 2026 conduct update makes the researcher validate AI-assisted findings, bars mass unverified submissions, and
+auto-closes out-of-scope or duplicate reports. Many programs ban automated scanning. Each finding therefore needs human validation (the user's hands, which fails the automation rule).
+Duplicate risk against funded hackbots is high, and a scope mistake is a legal exposure. Closed (cf. §886 for OSS bounties). The stack is unchanged.
+
+## 1050. Screen: other people's capital — copy-trading payouts, signal marketplaces, new funded programs (S11) — none open to us
+
+**No trial.** (1) **eToro's Popular Investor program** pays on assets under copy, but eToro's US CopyTrader page says it is "coming" and not yet available in the US.
+Third-party sources list $1–2k minimum equity and two months of history. Blocked. (2) **Collective2 signal subscriptions** take about a 50% platform cut (forum figures)
+and charge listing fees, and the leaderboard drives demand. That makes it a product sale, which the user excludes until we profit from our own use, and it needs a
+track record of an edge that we would simply trade ourselves. (3) **A 2026 web sweep of new funded programs** found only CFD/forex/futures props (Funded Academy UAE,
+FundedNext futures). Futures props other than Tradeify are deferred until payouts start (memory, §766), and the rest are excluded. Nothing funds forecasters or bettors beyond
+the parked Funding Predicts. With the excluded classes and §968/§970, this exhausts the firm-capital routes found so far. The stack is unchanged.
+
+## 1051. Screen: AI red-teaming prize arenas (Gray Swan, HackAPrompt) (S11) — automation banned; closed
+
+**No trial.** **Gray Swan Arena's rules prohibit "automated tools, scripts, or bots to generate or submit jailbreaks"**; submissions must be crafted by hand, and a breach
+disqualifies the entrant. Prizes are time-bound challenges paid as points converted to credits (an older championship paid $1–2k per model). **HackAPrompt 2.0** (2025, OpenAI-sponsored,
+> $100k) was a one-off with no 2026 edition found. Both fail the automation rule and are sporadic. Closed. The stack is unchanged.
+
+## 1052. Screen: tax-lien certificates and Texas tax-deed redemption premiums (S11) — capital-bound, yields bid away; closed
+
+**No trial.** **Lien states** (FL, AZ, AL, LA) run bid-down auctions, many online with uploaded bid lists, so they are partly automatable. Institutional buyers dominate the large auctions,
+with yields compressed to roughly 0.25–5% in metro auctions (unsourced industry claim). Arizona's Yavapai County sold 81% of its liens, and the remainder within a week. The national market is ≈ $5bn (NTLA 2024).
+Rural higher-yield liens need parcel due diligence (manual) and are capital at par. **Texas tax deeds** pay a 25% or 50% redemption premium on homestead and agricultural property, but
+the buyer pays the full bid (thousands per parcel) and bids in person or by county auction. Both are capital-bound. $200 at even 18% is ≈ $3 a month, and scale needs capital in
+proportion. This fails the small-start/scale rule. Closed. The stack is unchanged.
+
+## 1053. Synthesis of 2026-10-25's screens (§1045–1052): the binding constraint is "small start × automation", and only three routes survive it (S11)
+
+**No trial.** Every arena screened today failed on one of two walls. **Capital:** the edge is a percentage of one's own money (stale NAVs, borrow arbitrage, lending, tax liens, ERCOT, bond month-end),
+so $200 earns dollars a month. **Automation or rules:** the payer bans bots or wants human validation (Gray Swan, HackerOne, poker/chess, DFS), or the pay is one-off and top-heavy (Kaggle and agent
+contests). Clearing $2k a month from $100–200 therefore needs someone else's capital or prize money, plus a payer that permits code. Only three routes found so far meet all three conditions:
+(1) **Tradeify via the TradersPost webhook bridge** (§1029, §1037, §1043; backtested, not proven), (2) **a Metaculus bot** (FutureEval ≈ $50k a season plus Market Pulse ≈ $7.5k a quarter;
+zero-shot is at the baseline tier per F1, so a market-implied module (§1044) is the planned edge; F2 scores 11-09), and (3) **WorldQuant BRAIN** (API automation is common, pay is per-alpha and
+unpublished, about a few hundred a month typical). Routes (2) and (3) need the user's own accounts before anything can be measured. The search continues for a fourth route of this shape,
+meaning outside capital or prizes, with code allowed and a legitimate US payer.
+
+## 1054. Screen: Tradeify Grand Cup (free simulated futures tournament, $1M pool) and ChartChamps — annual, one entry per person, EV ≈ $50–150 a year; noted, not a route (S11)
+
+**No trial (desk; official T&C at tradeify.co/grandcup-tc and the help-centre guide).** Grand Cup 2 (May 17 – Jun 9, 2026) had a free entry. **Stage 1** was a 5-day qualifier on a $50k sim account with a
+$2.5k drawdown, max 1 mini or 10 micros, ranked by ending balance, top 1,000 advancing, with up to 3 resets at $29. **Stage 2** was a 1,024-trader single-elimination bracket of one-day head-to-heads,
+1 contract, no drawdown, at least 3 trades held > 10 s each. **All prizes are cash** ($80k per round split among those eliminated: $156 for a round-1 loss up to $200k for the champion, plus
+$5k bounties on 24 invited pros), paid by wire with a 1099-MISC. It is open in all 50 US states, and **one contest account per person** (a second means disqualification). The T&C are silent on bots.
+**Field:** Grand Cup 1 (2025) drew > 20,000 entrants, so qualifying is roughly the top 5%. The average bracket seat is worth ≈ $1M/1,024 ≈ $977. A free max-variance qualifier attempt,
+for example a stop at the $2.5k floor and a trend hold, qualifies perhaps 5–15% of the time, giving **≈ $50–150 EV per year** for one person; each $29 reset is +EV only if P(qualify) > 3%.
+It is annual, with no Grand Cup 3 announced. **ChartChamps** (acquired by Tradeify in June 2026) has Elo matches on historical data with no stated cash prizes. Conclusion: a free annual lottery ticket
+worth mentioning to the user when Grand Cup 3 opens, not a $2k-a-month route. The stack is unchanged.
+
+## 1055. Screen: free monthly prop-firm competitions as a source of free funded accounts (S11) — CFD-dominated, one entry each, top-N of thousands; closed
+
+**No trial.** Idea: a free funded or evaluation account has EV ≥ 0 even at firms whose fees made the plan negative (§766), so recurring free contests could be "free evals". Aggregators (fundedtrading,
+tradercomps, propfirmxl) list monthly free contests at FundedNext (≈ $8k cash over 600 places), Blue Guardian, Goat Funded and Alpha Capital. **All are CFD/forex props, which are excluded.** No free recurring contest
+was found at Apex, Bulenox, TakeProfitTrader or MyFundedFutures. The Topstep "Octagon" pool ($250k a month) is a bonus for Topstep's own paid funded traders (attribution unclear), so it is not free. Each allows one entry
+per person and ranks the top N of thousands, giving roughly $10–50 EV per month at best even if allowed. Futures firms other than Tradeify are deferred until payouts start. Closed. The stack is unchanged.
+
+## 1056. Sweeps for a fourth route (outside capital or prizes, code allowed, legitimate US payer) — paid-research and new-product scans find none (S11)
+
+**No trial.** (1) **Paid-research platforms:** Seeking Alpha contributor pay requires human-authored articles (manual). INFER and Good Judgment pay human pro forecasters (manual). Estimize, SumZero and
+VIC pay no cash. Replication Markets (DARPA SCORE) has ended. (2) **2026 new-product and market-structure scan:** retail AI-bot launches (AriseAlpha, AccuQuant) are vendor marketing; NYSE Arca's Retail Tier 6
+(May 2026) pays rebates to member firms, not retail; there is nothing early-adopter-mispriced that an API account can reach. Overnight 24/5 was already blocked (§1045). (3) **The generic "automated side income" scan**
+returns only vendor SEO pages. With §1046–1055, no fourth route of the §1053 shape was found today. The stack is unchanged.
+
+## 1057. Screen: the quantchallenges.com registry (first 40 of 245 listings) — four unseen recurring contests, all small or crypto (S11)
+
+**No trial (desk; registry last verified 2026-09-23, official pages where reachable).**
+- **AlphaNova Biweekly Season 1** (Singapore, crowdsourced fund; alphanova.tech): signals on factor-hedged residuals. Each cycle has a 2-week submission window, then one month of live evaluation, with 5 cycles a season.
+  The pot is "up to $2,500 + carry-over per cycle", grows with admitted *quality* signals, and saturates at 13 of them (the calculator shows $1,609 for 7). Admission needs a significant positive Sharpe plus a low
+  correlation to others. **Ceiling ≈ $200–400 per cycle for one consistently admitted contributor, about $12.5k for the whole season across everyone.** Payment currency, eligibility and API are unstated. Too
+  small for the stack. Revisit only if the pot grows.
+- **AI4Finance Open Trading Challenge** (FinRL strategy plus Alpaca paper trading, 30+ days, public repo): $3.5k / $1k / $500 for the top 3 in a "pilot quarter". Top-heavy and one-off so far.
+- **CrunchDAO × Synth** ("up to $50k a month"): a share of Bittensor subnet emissions converted TAO→USD, minus a $500 hosting fee and 20%, split among the top 8, paid on Solana. Crypto, excluded.
+- **ALGOGENE Global Quant Trading Challenge** (funded capital up to $100k, keep 85%): HK-based, and the asset class is unstated. Most likely CFD, crypto or stock-prop-like, so excluded unless shown otherwise.
+The others are student-only (Susquehanna Predictions Cup, Point72, Bloomberg, McGill), one-off, crypto (AGON, Virtuals, NetMind, Kuru, Prizefight), non-USD (MOEX analysts in RUB, Qminers in CZK), or no-cash.
+Metaculus FutureEval and Market Pulse remain the only sizeable recurring bot pools. The stack is unchanged. The remaining 205 listings are worth one more pass.
+
+## 1058. Registry pass complete (245 listings): free simulated-futures contests and quarterly benchmarks — real, US-open, but EV ≈ pool ÷ field; none is a route (S11)
+
+**No trial (desk; registry pages saved under the session scratchpad).** The rest of the 245 entries are student-only (Citadel, Jane Street, IMC, Rotman, university comps), one-off Kaggle comps, crypto arenas
+(Bitget, OKX, BNB, Gate, GRVT, Virtuals), or CFD (UEX, Monaxa, HF Markets). The recurring, US-open, USD ones are:
+- **TradingView "The Leap"** (monthly-ish, broker-sponsored, e.g. TradeStation July 2026): a $100k paper futures account with live CME data, ranked on realized P/L, one entry, ≥ 5 trading days, and it needs a TradingView
+  paid, trial or former-paid account. Cash: $10k, 7k, 6k, 3.5k, 2.5k, then $550 for ranks 6–25 and $400 for ranks 26–50, **≈ $50k an edition**. Paper orders go through TradingView's UI with no order API, so it is manual.
+- **NinjaTrader Arena Cup 2026**: free sim futures, three qualifier rounds plus an invite-only final, $250k pool, one qualifier per trader. Annual.
+- **Tradeify Grand Cup** (§1054): annual, $1M.
+- **ADIA Lab Structural Break benchmark** (CrunchDAO-hosted, USD): $3k / $2k / $1k a quarter for the top 3, with continuous submissions. A skill benchmark, $6k a quarter in total.
+- **Bridgewater "Forecasting the Future"**: annual, $25k per winner, with a written framework (manual). **ROLR**: an 8-week sweepstakes-style prediction promo (gambling operator), excluded as a promo.
+**Why none is a route:** in a free one-entry contest the average entrant's EV is pool ÷ field. For The Leap that is ≈ $50k ÷ (~10–30k entrants) ≈ $2–5 an edition. A max-variance strategy lifts the
+odds of a top-50 finish severalfold, but the field already gambles, so it is realistically ≈ $10–50 an edition, ≈ $10–50 a month, and manual. Summed across Leap, Arena Cup and Grand Cup, that is ≈ $20–60 a month for one
+person. These are noted as free lottery tickets for the user, not for the stack. Registry pass closed. The stack is unchanged.
+
+## 1059. Screen: renting out GPU compute (Vast.ai / Salad-style hosting) (S11) — hardware capital; closed
+
+**No trial (desk arithmetic).** One RTX 4090-class card (≈ $1.8k) rents at about $0.30–0.40 an hour at roughly 50% utilization, about $110–150 a month gross. Texas power for 0.35 kW × 360 h at about $0.14/kWh is ≈ $18,
+so it nets ≈ $90–130 a month and pays back in about 15 months. It is automatable, but it is hardware-capital-bound (each $2k a month needs ≈ 15–20 cards), so it fails the $100–200 start rule.
+A CPU-only or no-GPU PC earns about $0–10 a month (cf. the bandwidth/DePIN nodes in §1036). Code-bounty boards are already closed (§895–896). The stack is unchanged.
+
+## 1060. User broadens the search (2026-10-25): any automatable income, including services and data products. AP-1 protocol — Apify Store developer economics (S11)
+
+**Rule change (user, 2026-10-25):** the search is no longer only "money in → money out". Fully automatable freelance or custom work, services, data products and marketplaces are in scope,
+which relaxes the 10-19 "no products before we profit" rule for this search. The combined automatable stack must still exceed $2k a month, with a legitimate payer and a small start.
+**AP-1 (a market measurement, no trial).** Apify Store developers publish scrapers and automations ("Actors") that customers run pay-per-event. Apify bills and pays out 80% of revenue minus compute, and
+reported paying $563k a month to developers (Sep 2025), rising to ≈ $1–1.4M a month in 2026. **Data:** public store API (`/v2/store`, top ≈ 15k by popularity; 9,646 unique) plus `/v2/acts/{id}`
+`createdAt` for the top 3,000 community actors and a random 1,500 of the rest. **Revenue proxy:** a monthly payout ÷ Σ community paid-actor 30-day users = **$0.93–1.66 per actor-user-month**
+(the per-user spend is skewed, so this is a crude average). **Questions (Q1 was already glimpsed on a partial pull of 1,773 rows; Q2 and the bar are fixed before the newcomer analysis is run):** (1) how cohorts by creation half-year reach ≥ 100, 500 and 1,000 30-day users;
+(2) **newcomer developers** (earliest sampled actor ≥ 2025-11-01): the distribution of total 30-day users across their actors, and the share reaching ≥ 1,200 (≈ $2k a month at the upper rate);
+(3) which niches the newcomers won. **Lead bar:** at least about 10% of newcomer developers with ≥ 10 actors reach ≥ 1,200 users within about 12 months. Otherwise the route is too competitive.
+
+## 1061. AP-1 result: Apify Store newcomers can reach $2k a month in 6–12 months, about 1 in 8 of serious catalog builders. A LEAD (needs the user's free account) (S11)
+
+**No trial (a market measurement; data under the session scratchpad `apify/`, 4,483 actor details).** **Revenue proxy:** $0.93–2.3 per actor-user-month (Apify's payouts were $563k in Sep 2025, then ≈ $1M, with
+$1.4M quoted in 2026, divided by 602k community paid-actor 30-day users). **Developers today:** ≈ 75 earn ≥ $2k a month, ≈ 170 earn ≥ $500. **Newcomer developers (Q2)**, by first sampled actor:
+| first actor | devs | ≥ 10 actors | of those, ≥ 500 users (≈ $0.5–1.1k) | ≥ 1,200 users (≈ $1.1–2.8k) | ≥ 2,000 |
+|---|---|---|---|---|---|
+| 2025-05 → 11 (age 12–18 mo) | 107 | 36 | 19 (53%) | 10 (28%) | 8 |
+| 2025-11 → 2026-05 (age 6–12 mo) | 289 | 66 | 20 (30%) | **8 (12%)** | 5 |
+| 2026-05 → (age < 6 mo) | 370 | 33 | 2 (6%) | 0 | 0 |
+**Bias:** devs whose actors all sit outside the top ≈ 10k by popularity are missing (≈ 87k of 97k store actors are near-zero), so these shares overstate success. The bar (≈ 10% at 12 months) is met
+nominally and is perhaps 5–10% after correction. **Ramp:** nobody in the youngest cohort has passed 1,200 users. It takes 6–12 months, then compounds (the 12–18-month cohort: 28%).
+**Winners 2025-11 → 2026-05:** zen-studio (45 actors, 12.7k users ≈ $12–29k a month; Chinese platforms Douyin, Xiaohongshu, 1688, Taobao), automation-lab (71, 7.9k; Reddit, FB Ads Library, Trustpilot),
+data-slayer (22, 4.2k), blackfalcondata (148, 4.1k). **Where new actors take share** (u30 share new vs old): developer tools 11.8% vs 2.3%, e-commerce 6.1 vs 2.4, AI 5.0 vs 2.4, SEO 2.9 vs 1.3,
+MCP servers 1.6 vs 0.2. Old strongholds lose share to them: social 18 vs 27, travel 1 vs 6.
+**Effort:** a 98-actor developer reported 15–20 h a week (maintenance 5–7 h, support 3–4 h, about 4–8 h per new actor) for 855 MAU at 6 months. **Automation reading:** runs, billing and payouts are Apify's.
+Building, fixing broken scrapers and answering issues is code work that Claude can do on a schedule, and none of it falls to the user beyond the account, KYC and the payout method. **Risks:**
+target-site ToS and personal-data scraping, so prefer business, public and e-commerce data and avoid logged-in or personal scraping; it is a 6–12-month ramp; and revenue per user is a crude average.
+**Verdict:** the first broadened-search lead that can plausibly clear $2k a month alone, with $0 capital. It needs the user's (free) Apify account to publish, and nothing can be measured further before then.
+
+**Addendum (same day):** apify.com currently shows **"$1.7M paid out last month"**, which puts the proxy at $2.82 per actor-user-month. At that rate ≈ 119 developers earn ≥ $2k a month, and **$2k a month takes ≈ 710 users**,
+between the ≥ 500 (30%) and ≥ 1,200 (12%) marks of the 6–12-month newcomer cohort, so roughly 1 in 5 serious newcomers before the selection-bias haircut. The estimate is still crude, since spend per user is skewed.
+
+## 1062. Screens: other platforms that supply demand and billing — Poe bots, Telegram Stars, Discord apps, Shopify apps, Adobe Stock AI imagery (S11)
+
+**No trial.** (1) **Poe creator monetization** is live: per-message pricing set in code, with monthly Stripe payouts (US eligible). Quora claims creators earn "tens of millions" a year (unaudited), and most earn little.
+Bot-level usage data is not public, so it is unmeasured. Kept as a secondary candidate behind Apify. (2) **Telegram Stars** withdraw via Fragment in TON, which is crypto and excluded. (3) **Discord premium apps** need $100 to
+qualify for payouts, the developer share of Discord's revenue is small, and demand needs community growth, so it is too small. (4) **The Shopify App Store** keeps 0% fees on the first $1M, but 17.6k apps compete, ≈ 36% earn anything (RevenueHunt),
+and app review plus merchant support are heavy. It is a weaker version of Apify. (5) **Adobe Stock AI images** have dynamic caps (≈ 500 a week), multi-month review queues and a flooded collection, so they are closed.
+Apify (§1061) stays the lead in this class.
+
+## 1063. AP-1 niche scan: where the Apify incumbents are weak, preferring non-personal data (S11)
+
+**No trial (store data, §1061).** Paid actors are grouped by target site in the title. For each site: total 30-day users, number of actors, the top actor's share, its 30-day failure rate and its rating.
+**Personal-data social scraping** (Instagram, LinkedIn, TikTok, Facebook, which hold most users) is **avoided on ToS and privacy grounds** even where incumbents are weak (Instagram hashtag 18k users,
+rated 3.49; Facebook reels 2.81). **Non-personal candidates with weak incumbents:** YouTube transcripts (5.3k users, 34 actors, **17% run failures**, rated 3.72); Google Trends (4.0k, 23 actors,
+3.68); Indeed jobs (4.3k, 22 actors, top rated **3.01**); advanced job-board scrapers (2.0k, 2.92); Twitter/X public posts (rated 3.38–3.86). **Thinly served, with one or two actors:** Naver products (2.1k users),
+1688 wholesale (1.9k), Naukri jobs (1.7k), career-site job listings (1.6k), Zillow details (1.2k), Google Ads Transparency (1.4k), YouTube channel videos (1.5k). Newcomer winners took these regional and
+vertical e-commerce and job niches (§1061). **Build plan if the user opens an account:** 10–20 HTTP-only (cheap compute) PPE actors on public business data (jobs, e-commerce catalogs, trends, transcripts,
+ad-transparency, government datasets), each priced below the incumbent, with uptime monitoring and automatic repair by scheduled Claude runs.
+
+## 1064. AP-1 build 1: Google Trends Explorer, benchmarked against the incumbents on Apify; it beats them on success, speed and cost (S11)
+
+**No trial (a product benchmark; code in `~/apify-actors`, a separate local git repo).** The user opened Apify account DevColtrain (2026-10-25; token in `~/.apify_token`, never printed). Benchmark, identical input
+(bitcoin, ethereum, solana; US; 12 months):
+| Actor | 30-day users | Result | Time | Cost |
+|---|---|---|---|---|
+| apify/google-trends-scraper (official, headless browser, rated 3.7) | 2,731 | **0 of 3 succeeded** (timeouts) | 15.6 min | $0.37 |
+| agenscrape/google-trends-scraper | 328 | 3/3, related topics empty, no comparison mode | 35 s | $0.075 to the user ($0.025 start + $0.025/kw) |
+| data_xplorer "fast" | 779 | returns trending searches, not keyword data | 6 s | $0.05 |
+| **ours (HTTP-only, private build)** | — | **3/3; 20/20 in a batch; compare mode; DMA (210 metros); YouTube property** | 19 s (≈ 4.5 s/kw) | **$0.0004 compute** |
+Google tags non-browser Trends traffic `USER_TYPE_SCRAPER` and returns **empty related topics** even through residential proxies. Every HTTP competitor has the same gap, and it is documented in the README.
+**Next:** set PPE pricing (≈ $0.002 per keyword result, no start fee, failures free) once the user's payout setup exists, then publish with the user's go-ahead. Benchmarks used ≈ $0.9 of the $5 free credit.
+
+## 1065. AP-1 reality check and build 2: the Store is saturated; new users go to first movers. iStock & Getty scraper built for an empty niche (S11)
+
+**No trial.** (1) **Full Google Trends benchmark** (7 keyword actors, identical input): five small actors (sourabhbgp, cycha, leadsbrary, signalbench, unitbytes) already return what ours does, at similar speed and
+$0.0001–0.015 per 3 keywords, yet have 9–38 users each. The official actor (0 of 3 results, "SUCCEEDED" with an empty dataset, so its failure rate understates it) keeps 2.7k. **Users do not switch to
+better actors; store rank and trust decide.** Ours is a commodity there. (2) **Supply scan, ≈ 120 target sites:** nearly every valuable site has 5–47 actors (Seek has 5, not 3; Walmart 37, Zillow 43).
+**Catalog developers (≥ 30 actors) average a median 11 users per actor (p75 38); the median actor has 2.** At $2.82 per user, $2k a month needs ≈ 20 actors at p75 or ≈ 60 at the median. §1061's newcomer
+shares were survivors who were **first** on new demand (Chinese platforms, Naver, AI Mode). **This revises AP-1 down:** feasible only as a high-volume catalog aimed at unserved targets, with a 30-day
+traction test before scaling. (3) Rejected: AI utilities (no demand on Apify apart from one upscaler), AI-visibility trackers (≤ 65 users each; the official SERP actor already bundles AI engines), Adobe Stock
+(DataDome; the clean route is Adobe's keyed API, whose terms bar reselling). (4) **Build 2:** an iStock & Getty Images scraper with keyword-research summaries (total results, freshness of popular results,
+contributor concentration, related searches). There were zero actors for iStock, Getty, Dreamstime, 123RF, Depositphotos and Alamy, while Adobe Stock's ≈ 700 contributor-users show an audience. CloudFront's WAF rejected
+httpx from Apify IPs, including residential; **curl_cffi Chrome impersonation passes even on datacenter proxies.** Test: 6 query×site combinations, 1,080 assets plus summaries, about 90 s.
+
+## 1066. AP-1 build 3: Dreamstime scraper (download counts, level, keywords), the only stock agency publishing per-image sales (S11)
+
+**No trial.** StockX was checked and dropped: 8 actors, ≤ 22 users, so demand on Apify is thin. **Dreamstime** had zero actors, and its image pages show **downloads** and a 0–5 **level** (sales-based price tier). Structured data
+carries the full keyword list, creator and publish date. The actor collects search results (80 per page), opens each image page through a worker pool (one proxy session per worker, rotated only on block, paced),
+pushes rows incrementally, and writes a keyword summary: download median/P90, level mix, upload-year mix, top keywords weighted by downloads, top contributors and best sellers. **Blocking:** Cloudflare burned the free
+plan's 5 datacenter IPs at 6 parallel requests, so **residential is the default** at a measured **$0.0006 per result** in proxy traffic (5.8 MB per 81 pages, compressed). Under PPE the developer pays that, so it must sit inside the price.
+Test: 2 queries × 160, 320 rows, 0 errors, $0.19 total. About 20% of results are 2026 uploads whose stats Dreamstime hides (`statsShown: false`). Credit used so far $1.58 of $5.
+
+## 1067. AP-1 builds 4–6 (SEEK 8-market jobs, Envato Market, Nordic marketplaces); competitor benchmark; a substring error in one demand figure (S11)
+
+**No trial.** All are private and unpublished, with code in `~/apify-actors`. (1) **Seek/Jobstreet/JobsDB**: one JSON search API plus GraphQL `jobDetails` serves 8 markets (AU, NZ, MY, SG, PH, ID, HK, TH), with ≈ 950 users across
+the rival per-country actors. Head-to-head (AU "accountant", 50 jobs): ours 12 s and $0.0009; blackfalcondata 31 s, 78 fields, with applicant insights, alerts and incremental mode; websift 14 s, with applicant numbers and
+contacts; bovi 15 s, no descriptions. **Gap closed:** added GraphQL `insights` (applicant count/volume, resume and cover-letter %), screening questions, isLinkOut/apply URL, review count, contacts in the ad text, and
+an only-new-jobs mode (a named KV store; verified 0 overlap across two runs). Our remaining edges are the 8 markets in one run, salaries parsed into numbers, and price. (2) **Envato Market** (ThemeForest,
+CodeCanyon, AudioJungle, 3DOcean): sales, price, rating and reviews are on the search cards. Each site's firewall accepts different fingerprints (ThemeForest wants Safari plus residential; the others Chrome plus
+datacenter), so the actor rotates fingerprint × proxy type and remembers what worked: 480 items, 100 s, $0.013. GraphicRiver is blocked, and VideoHive/PhotoDune show no sales, so they are excluded. (3) **Nordic** (Tori, FINN, Blocket, DBA:
+one Vend "recommerce" platform; base64 react-query state embedded in the page; Product LD for details): 480 listings, 39 s, $0.002. **Correction:** "Tori 546 users" came from a substring match on
+"s-tori-es" (Instagram Stories actors). Real Tori demand is ≈ 4 users, and FINN/Blocket/DBA ≈ 125, so this is a low-demand bet. Rejected along the way: Depositphotos (obfuscated JS state), Alamy (client-side API),
+Vecteezy (no public stats), StockX/Steam (≤ 22 users per actor), Adobe Stock (DataDome), most EU classifieds (15–45 actors each). Credit used ≈ $1.7 of $5.
+
+## 1068. AP-1 batch 2 (IKEA, idealo, Coles/Woolworths, ATS career sites, Bayt) and the demand map (S11)
+
+**No trial.** **Demand map (whole-word store scans, about 200 sites):** Apify demand concentrates in social, Google Maps and **jobs** (LinkedIn Jobs ≈ 34k users, Indeed ≈ 13k, Naukri ≈ 5k, Glassdoor ≈ 4k).
+B2B public data (tenders, company registries, patents, SEC, FDA, grants) runs ≈ 1 user per actor. Real estate is saturated (13–86 actors per site, ≤ 12 users each, apart from Zillow), as are reviews (G2, Capterra, Trustpilot: 40–80 actors).
+**Scanner caveat:** regex and search misses produced false zeros (Daft.ie actually has ≈ 20 actors), so every pick was re-verified by direct search. **Built (private, tested):** (1) IKEA (zero actors): public search service,
+41 countries, `size=1000`, item numbers matched across countries with USD prices (open.er-api). Test: 1,440 products and 289 comparisons. BILLY white is $38 JP, $49 US, $80 MX. (2) idealo DE/AT (zero actors): 36 tiles per page,
+`I16-{offset}` paging, plus shop offers (shop, price, price incl. shipping, delivery time). Test: 144 products, 1,004 offers, 0 errors. UK/FR/IT/ES return 410. (3) Coles + Woolworths: works with fingerprint/proxy self-healing,
+428 products, 0 errors. **But it is a crowded clone:** ≈ 14 combined AU-grocery actors with ≈ 1 user each, and users sit with dromb's per-store actors at $0.0006 per item. (4) ATS career sites (Greenhouse, Lever, Ashby,
+Workday, SmartRecruiters via public APIs, auto-detected): 300 of 300 with descriptions and 52 with salaries. **Strong incumbent:** fantastic-jobs (275k career sites, 58 ATS, 1.6k users at $0.012 per job), so ours competes on price.
+(5) Bayt (2 rivals, 318 users): 10 MENA countries, JobPosting LD details. Cloudflare blocks datacenter IPs, so it falls back to residential (≈ $0.0003 per job). Test: 120 jobs, 114 with details, 44 with salaries.
+11 actors are now built. `publish.py` holds PPE prices for all of them. Credit used $2.12 of $5.
+
+## 1069. AP-1 marketing pass: quality-score prep, SEO, and a launch kit (IKEA Price Index data story) (S11)
+
+**No trial.** Apify ranks the Store by an Actor quality score: reliability (including a daily test of the default input that must succeed in under 5 minutes), popularity and repeat use, reviews, ease of use,
+pricing transparency, least-privilege permissions and consistency. Done for all 11 actors: dataset schemas with table views; READMEs rebuilt in Apify's structure (usage, cost example, real input/output samples,
+cross-link table, FAQ); a simulated daily test (all 11 SUCCEEDED; Dreamstime default cut to 40 because it took 213 s; ATS default cut to 100 jobs because a first run would have cost ≈ $1.50); SEO title and description per Store page
+in `publish.py`. **Launch kit** (`~/apify-actors/marketing/`): the **IKEA Price Index**, 35 items sold in ≥ 30 of 41 countries, matched by item number, USD, index = median(price/median) × 100. Germany 86 is cheapest;
+**US 128 is third most expensive**, after Saudi Arabia 159 and Mexico 172, and understated because US prices exclude sales tax. Also a chart, a blog article, a developer tutorial for the ATS actor, and a launch plan with community-rule-compliant drafts
+(r/dataisbeautiful [OC] with a sources comment; r/webscraping monthly thread only; Apify Discord; Apify ScrapeDiary pitch; niche forums). Posting is the user's job, from the user's accounts. Credit used $2.36 of $5.
+
+## 1070. AP-1 launch: 5 actors live on the Apify Store (2026-10-25, username ColtonT); 6 queued by Apify's 5-per-day publication limit (S11)
+
+**No trial.** The user completed billing, payout and KYC, made the profile public (username **ColtonT**) and accepted the Store terms. Live, with PPE pricing, SEO fields, output schemas and 10 public example tasks: Google Trends Explorer,
+iStock & Getty, Dreamstime, Seek/Jobstreet/JobsDB and Envato Market. Queued (systemd timers 10-27 and 10-28 00:30Z): IKEA, Bayt, ATS career sites, idealo, Nordic and Coles/Woolworths. A daily health check runs at 13:00Z.
+**The 30-day traction test starts now** (day 7–10 and day 30 reviews against §1065). Credit used ≈ $2.5 of $5.
+
 ## 10. Still outstanding, and blocking
 
 - ~~The Stage 1 bootstrap α calibration is still crypto's.~~ **RESOLVED 2026-08-29** —
