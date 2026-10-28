@@ -18128,3 +18128,71 @@ iStock & Getty, Dreamstime, Seek/Jobstreet/JobsDB and Envato Market. Queued (sys
   $2k/month needs ≈ $36k at the simulated reward share, and the reward formula / payment rules are unverified. A-LIP2 fails robustness, A-LIP3 plain
   is negative. **Closed**, consistent with the user's 2026-10-23 call (no new liquidity-reward work). Services futres-alip2/3 disabled (they had been
   restarting every minute after their end time; data complete to 2026-10-26 01:00Z). G1 still running to 2026-10-27 06:00Z (readout tomorrow).
+
+## §1078 — 2026-10-26 (night): Coles/Woolworths reliability fix + AU basket story; Envato/Bayt tutorials
+- Basket run on Apify (40 branded queries × 2 stores): first run 6/40 Coles searches failed after 7 attempts (Incapsula "page data missing", intermittent on all strategies). Fix: residential fallback pinned to AU, second pass after a 30 s cool-down, default retries 8. Rerun: 0 failures, 1,222 rows, $0.04.
+- Story: 34 matched identical products (Nescafé decaf/regular mismatch dropped by hand): 33/34 same regular price; today 20 same, Coles cheaper 8, Woolworths 6 (specials: Coles 18, Woolworths 9); basket $288.30 C / $300.50 W / $250.75 cheapest-of-each. Chart marketing/coles-woolworths-2026-10.png; posts scheduled Thu 29 Oct evening (r/AusFinance).
+- Tutorials written: themeforest-codecanyon-sales-data.md, bayt-jobs-api.md. Google Trends Actor: 1 external user generated ~$0.05 (12 runs from other accounts).
+
+## §1079 — 2026-10-27: G1 readout (Gemini NFL reward shadow, §888): PASSES on paper; payment rules unverifiable without an account (S10)
+
+**No trial.** 4.24 days, 305 markets (2026-10-22 22:53Z → 10-27 06:00Z). Simulated rewards **$2,223 ($524/day)**; fill P&L **−$408**
+(29 fills settled, 2 unsettled; game −$51 on 21, 3Q −$168 on 3, 1Q −$188 on 5); **net +$1,815 (≈ $428/day)**. Capital (max simultaneous
+collateral) **$4,984**, median $1,725. Concentration: rewards without the top 3 / 10 / 20 markets $1,940 / $1,509 / $1,102, so net stays
+positive with the top 20 removed. 29% of rewards came from cycles with no other order within 5¢ (we take the whole pool there). Caveats, all
+pointing down: (1) actual payment rules (snapshot timing, two-sided checks, eligibility) unverified, and the realised-payout endpoint needs an
+account (401); (2) fills only count prints at/through our price, so adverse selection is under-measured, with few fills and about −$14 per fill;
+(3) competitors would react if one quoter took whole pools; (4) CFTC letter 26-23 (§889). Texas: no source excludes TX (one excluded list:
+AZ IL MD MA MI MT NV OH), unconfirmed. Next step needs money and the user's decision: a small live test (≈ $1-2k, 1-2 weeks) to read
+real payouts. Job `futres-g1` disabled (it was restarting after its end time).
+
+## §1080 — 2026-10-27: G1 parked — Gemini's reward program ends 2026-11-06; no more reward-program searches (user) (S10)
+
+**No trial.** Gemini's published rules: program ends 2026-11-06; snapshots every minute; max 10¢ from mid; size 10-250; two-sided ×1.5;
+uptime ≥ 50% or $0 for the day; $1 minimum daily payout; pools $10-1,000/day. User decision: skip the live test; re-check around
+2026-11-10 whether the program was extended (then offer a $100 test). User: no further searches for liquidity/maker reward programs.
+
+## §1081 — 2026-10-27: Apify Store demand scan + job-board feasibility: LinkedIn Jobs feasible and biggest; Glassdoor feasible; Indeed, Naukri not (S11)
+
+**No trial.** Store scan (top 10k actors): every query with ≥300 users/30d has dozens of clones; the top ~4 search slots take the users
+(our Google Trends Explorer: #132 in search). Our 12 actors: 0 external users except 1. Newcomer evidence: valig's 8 job-board actors have
+15.9k users/30d (LinkedIn Jobs 7.1k, Indeed 4.9k, Naukri 2.5k after 5 months, Glassdoor 1.3k); blackfalcondata's 200 long-tail actors
+average ~30 users. Feasibility probe from Apify (public pages, no login, 5 tries each): LinkedIn guest search 5/5 on datacenter
+(10 jobs / 30 KB), details 5/5; Glassdoor search 4/5 residential (30 jobs / 920 KB ≈ $0.25 per 1k jobs in bandwidth), 1/5 datacenter;
+Indeed search 1/5 residential and job pages 401 (no); Naukri HTML is client-rendered and its JSON API requires a captcha token (no).
+Market: LinkedIn Jobs ≈ 35k users/30d, prices $0.40–2.00 per 1k (curious_coder 15.4k users at $2/1k); Glassdoor ≈ 2.5k, $0.40–4.75 per 1k.
+Probe cost $0.006.
+
+## §1082 — 2026-10-27: LinkedIn Jobs Actor benchmarked and approved; Glassdoor now behind a Cloudflare challenge: dropped (S11)
+
+**No trial.** LinkedIn Jobs (public logged-out pages). Same search as competitors (data analyst, US, 24h, 50 jobs): same 50 jobs as
+curious_coder and valig; salary on 37/50 vs 4/50 for each; details 100%, company fields ~90%, 0 errors. 1,000-job "sales" run: 0 errors,
+0 duplicates, 3.7 min, $0.019 compute (≈98% margin at $1/1k), salary 57%, no period mix-ups in spot check. User approved; publishes
+10-28 19:45 CT with Coles + idealo report (the 10-27 run hit Apify's limit of 5 publications per 24h). Glassdoor re-probe: 1/36 HTTP 200 across
+residential/datacenter × chrome/safari/firefox/cookie warm-up; the rest are 403 `cf-mitigated: challenge` (Cloudflare JS challenge).
+Would need a real browser to solve the challenge, and bypassing bot challenges is out of scope → dropped. Probe cost $0.001.
+
+## §1083 — 2026-10-27: second-tier job boards: demand and feasibility; shortlist StepStone, Wellfound, Dice (S11)
+
+**No trial.** LinkedIn Jobs: salary parser now also reads "Maximum … Minimum" order (0/1,050 regressions; smoke test 30 jobs, 0 errors).
+Store demand (users/30d, all matching actors): LinkedIn Jobs 36.5k, Indeed 13.4k, Naukri 5.6k, Glassdoor 4.0k, then Upwork 1.8k,
+Google Jobs ~1.2k (loose match), StepStone 1.0k, Wellfound 963, Xing 588, Welcome to the Jungle 525, Hiring Cafe 413, Dice 407;
+everything else < 350. Feasibility (Apify, 3 tries each, datacenter / residential, public pages): StepStone 1/3 / 3/3 (25 jobs
+per 1.2 MB page, salary present), Wellfound 3/3 / 3/3 (36 jobs in __NEXT_DATA__), Dice 3/3 / 3/3 (34 jobs), Xing 3/3 / 3/3 (16
+jobs, Apollo state), Hiring Cafe ok; Welcome to the Jungle and foundit render jobs client-side; Upwork, Indeed (residential
+1/3, rest 403 Cloudflare) out. Each second-tier market is ~1/35 of LinkedIn Jobs, so each Actor adds little on its own.
+Probe cost $0.004.
+
+## §1084 — 2026-10-28: NKD late-entry loss; entry-delay test; which instrument for the replacement account — keep NKD (S10)
+
+**No trial.** The user entered the 10-27 NKD ticket late; it stopped (eval failed) while the exact-entry replay took at 19:01 CT. Live
+NKD tickets settle fast (4 of 14 in the entry minute, 6 in two), because NKD is volatile now: live first-minute range median 0.23%,
+first 5 min 0.42% (19 sessions, Oct), matching the research paths for Jul–Sep 2026 (0.28% / 0.51%; 2021-26 average 0.16% / 0.29%), so
+no data problem. **Entry delay** (HistData paths 2021-26, rule side, ±0.31% / ±0.50% brackets, n 1,445): rule mean +0.057R / +0.061R at
+0 min, +0.03 to +0.06R at 1–10 min; the edge does not depend on the first minute. A91 refreshed: D227 (NKD) −5.21 bps at n 40 (t −0.34);
+DAX rules D171 +9.52, D174 +20.53, D175 +4.35. **Single 50K account per instrument** (A101 setup, V2, live rules; mean net per 84-session
+run, P>0): NKD 2025 +$3,877 (80%) / 2021-26 +$2,662 / 2010-20 +$99 / zero edge +$1,077; FDXM +$2,818 (91%, p10 +$875) / +$1,390 /
++$1,643 / +$984; MGC +$929 / +$1,253 / +$777 / +$428; MNQ +$406 / +$404 / +$187 / +$1,168; MCL +$1,155 / −$211 / −$337 / −$4 (ZS not in
+the simulator). The two-week shadow records (NKD 2/6, FDXM 5/7) are noise and FDXM's are on the DAX-index proxy. Decision: NKD stays for
+the replacement account; FDXM is the robust second (positive in every era) once the 02:00 CT entry can be placed as a scheduled bracket;
+D227's fate is A48's pre-registered 40-session trigger. Execution: enter at the open or skip; never chase.
