@@ -18196,3 +18196,362 @@ run, P>0): NKD 2025 +$3,877 (80%) / 2021-26 +$2,662 / 2010-20 +$99 / zero edge +
 the simulator). The two-week shadow records (NKD 2/6, FDXM 5/7) are noise and FDXM's are on the DAX-index proxy. Decision: NKD stays for
 the replacement account; FDXM is the robust second (positive in every era) once the 02:00 CT entry can be placed as a scheduled bracket;
 D227's fate is A48's pre-registered 40-session trigger. Execution: enter at the open or skip; never chase.
+
+## §1085 — F-family 3 protocol: are options-implied probabilities a better forecast of "close above K" questions than a realized-vol model? (S11)
+
+**No trial at registration; written BEFORE any outcome is joined.** Metaculus's API now requires an account even to read (403), so the
+§1044 module is tested on synthetic Market-Pulse-style questions. **Questions:** for 21 underlyings (SPY, NVDA, AAPL, MSFT, AMZN, GOOGL,
+META, TSLA, AVGO, AMD, NFLX, JPM, XOM, LLY, COST, WMT, ORCL, PLTR, MU, INTC, BA), every 5th DoltHub snapshot date (post-no-preference/options)
+from 2020-01, each listed expiration 5–60 calendar days out, each call strike with delta in [0.03, 0.97]: "will the close on the expiration
+date be above K?" Outcome: Yahoo daily close on the expiration date (previous close if closed). **Forecasts:** (M) module p = N(N⁻¹(Δ) − σ√T)
+with σ the strike's implied vol, T = days/365 (risk-neutral P(S_T > K)); (M_c) the same with σ × c, c fitted on 2020–2023 by Brier on a
+0.70–1.10 grid (variance-premium correction); (B) baseline lognormal, zero drift, σ = 20-session realized vol of daily log returns, S = the
+snapshot date's close. **Periods:** train 2020-01 → 2023-12 (fit c only); sealed = snapshot dates 2024-01 → expirations ≤ 2026-10-23.
+**Read (sealed):** Brier and log-score difference M − B (and M_c − B), paired, clustered by (underlying, date); calibration by forecast bin,
+with the tails (p < 0.15, p > 0.85) reported separately. **Pass:** M or M_c beats B on Brier with clustered t ≥ 2 AND the tail bins are
+calibrated within ±3 points or 2 SE. Pass → the module is worth wiring into a Metaculus bot once the user has an account; fail → §1044's
+edge is not demonstrated and the Metaculus route rests on F2 alone.
+
+## §1086 — F3 result: options-implied probabilities beat the realized-vol model (t −3.6) but fail the tail-calibration clause on the upper tail — FAIL by protocol (S11)
+
+**No trial.** 222,961 questions (train 73,828; sealed 149,133, 2,537 underlying × date clusters). `reports/f3_threshold.json`.
+**Accuracy (sealed):** module Brier 0.14464 vs baseline 0.14598, diff −0.00134 (clustered t −3.55); log score −0.0081 (t −3.99).
+c fitted on train = 1.025 (no variance-premium shrink); M_c t −2.83. **Calibration (sealed, module):** p < 0.05: 3.6% predicted vs 3.5%
+observed; 0.05–0.15: 9.4% vs 11.2%; 0.95+: 95.6% vs 98.3%; **0.85–0.95: 90.6% vs 96.3% — outside ±3 points and 2 SE → FAIL.** The
+baseline is far worse in the tails (p < 0.05: 1.6% predicted vs 6.0% observed). **Reading:** the miss is upward drift — risk-neutral
+odds carry no equity premium and 2024–26 was a strong rally (sealed: all questions 48.6% predicted vs 53.8% observed; even INTC +6.6
+points; train 2020–23 gap +3.0 points and its 0.85–0.95 bin calibrated, 90.7% vs 89.5%). Downside long shots — where LLM bots are worst
+— are calibrated. A drift correction is a new hypothesis: it can only be tested forward. Decision: no Metaculus account on F3's
+strength; the route rests on F2 (11-09). Module kept (`forecast/market_implied.py`).
+
+## §1087 — Screen: other channels for our data products — x402 agent payments, RapidAPI, AWS Data Exchange / Datarade (S11)
+
+**No trial (desk + x402scan's public explorer, 2026-10-28).** (1) **x402** (AI agents pay per call in USDC on Base/Solana): last 30 days
+$1.57M across 13,548 sellers and 33,080 buyers (x402scan); the top seller is a crypto gift-card shop ($229k), then an STT/TTS gateway
+($36k); data/search sellers earn little — StableEnrich $1.3k, Apify's own x402 gateway (agi.apify.com) $693, a SERP/scrape API $125.
+Supply is flooded (78k routes, median price $0.02, ~half of early volume was testing). Closed; our Actors are already reachable through
+Apify's gateway at no cost. (2) **RapidAPI** (Nokia API Hub since 11/2024): business declined before the sale, fee reportedly 25%, no
+public subscriber counts, so demand cannot be measured; a listing would need our own hosted endpoint proxying Apify. Parked as a
+zero-evidence add-on. (3) **AWS Data Exchange** needs a registered, qualified AWS Marketplace seller (reportedly a US/EU company);
+Datarade/Snowflake sell to enterprises. Closed for a small start.
+
+## §1088 — A120 protocol: a strategy fitted to each prop firm's own rules, at zero edge (user request 2026-10-28) (S10)
+
+**No trial; written before the grid is run.** User: the Tradeify plan is known to fail other firms (§766: consistency and qualifying-
+day gates destroy the one-big-bracket option); find a different, rule-fitted strategy per firm with positive EV. **Rules (2026, from
+third-party summaries, checked 2026-10-28; to verify at checkout):** Topstep 50K Combine $49/month + $149 activation, target $3,000,
+EOD MLL $2,000, best day ≤ 50% of target; XFA Standard: 5 winning days ≥ $150, payout ≤ 50% of balance up to $2,000, min $125, MLL
+fixed at the start after the first payout, 90%; XFA Consistency: 3 days, best day ≤ 40% of cycle profit, ≤ 50% up to $3,000. Apex 50K
+EOD: eval $349 list (often 80% off) + $119 activation, target $3,000, $2,000 EOD, $1,000 DLL; PA: safety net $52,100, 5 days ≥ $250,
+best day < 50% of profit since the last payout, caps $1.5k/1.5k/2k/2.5k/2.5k/3k, min $500, 100%, 6 payouts then closed. LucidFlex 50K:
+$138 one-time, target $3,000, $2,000 EOD, 40% eval consistency; funded: 5 days ≥ $150, ≤ 50% of profit up to $2,000, min $500, no
+consistency, no buffer, 90%, 5 payouts then treated as ended (live unmodelled). Tradeify Select Daily kept as a fixed-bracket reference.
+**Strategy family:** one MNQ bracket a day (take W, stop L in $, contracts = round(max(W,L)/$600)), separate (W, L) for evaluation and
+funded, sides randomised daily (4 seeds) on A23 MNQ RTH paths; W ∈ {150…1,500}, L ∈ {150…2,000}. **Selection:** chosen on one era
+(2010-20 or 2021-26) and scored on the other. **Read:** a firm is a candidate only if its policy chosen on EITHER era is positive on the
+OTHER era by ≥ $500 a run; dollars are approximate (rule fidelity is the main risk, as §766 showed), the sign is the finding.
+
+## §1089 — A120 result: Topstep passes — a rule-fitted strategy is positive at zero edge on both eras; Apex and LucidFlex do not (S10)
+
+**No trial.** `reports/a120_firm_strategies.json`. Mean net per 84-session run, one account slot, sides random (4 seeds), policy chosen on
+one era and scored on the other: **Topstep XFA Consistency** chosen on 2010-20 → 2021-26 **+$1,845** (chosen on 2021-26 → 2010-20 +$957);
+**Topstep XFA Standard** +$1,294 / +$743; LucidFlex +$616 / +$159 (only one direction ≥ $500 — marginal); Apex at list −$442 / −$447,
+at 80% off −$119 / +$16; Tradeify fixed-bracket reference +$884 (its solved policy is better, §806). **The Topstep strategy:** evaluation
+take $1,250 / stop up to the full $2,000 (best day stays under the 50% consistency mark, ~3 days to pass, a cheap monthly Combine to
+retry); funded take $650 / stop $2,000 (≈ 75% winning days), payout as soon as eligible (≤ 50% of balance), then the MLL sits at the
+start and the next loss usually ends the account — buy the next Combine. Value comes from cheap re-entry plus early payouts.
+**Robustness (Consistency path, chosen on 2010-20, read 2021-26, incl. the $29/month API):** EOD trailing +$1,373 / +$1,723 (P>0 63%);
+INTRADAY trailing (two sources say so) +$1,266 / +$1,737 (61%); plus a $1,000 Combine DLL +$629 / +$1,031 (48%); plus $85/month Combine
+pricing +$258 / +$564 (43%). Standard path: +$1,100 / +$1,172 → +$144 / +$39 in the worst variant. **Candidate (structural, zero edge):**
+≈ $330-430 a month per slot at the base terms, ≈ $65-140 in the worst; Topstep allows 5 XFAs (≈ $1.6-2.1k / $0.3-0.7k a month total).
+Open: Combine price ($49 vs $85/month) and DLL, the bot rules (API allowed via ProjectX, not on live accounts; third parties report
+"personal device only"), Live Funded Account terms (unmodelled), and accounts must trade the SAME side or different markets (opposite
+positions across accounts = prohibited hedging).
+
+## §1090 — A120 re-run at the user-verified Combine terms: $59/month, $1,000 DLL (S10)
+
+User checked Topstep checkout 2026-10-28: 50K Combine $59/month with a $1,000 daily loss limit. Re-fitted (Combine stop now ≤ $1,000), $29/month
+API fee included, chosen on one era and read on the other. Consistency path: EOD trailing +$659 / +$932 (pre→post), +$1,066 / +$440 (post→pre);
+intraday trailing +$526 / +$901 and +$939 / +$353; P>0 per run 43-46%. Chosen: Combine take $1,250 / stop $1,000, funded take $650-1,250 / stop
+$2,000. **If the funded XFA also has a $1,000 DLL** (funded stop ≤ $1,000): +$95 / +$247 and +$608 / -$41 — no longer reliably positive.
+Standard path: +$398-900 / +$142-520. **Status:** still positive at zero edge but halved: ≈ $90-230/month per slot, ≈ $0.4-1.2k/month over 5 XFAs
+— under the $2k bar alone. Decisive open item: whether the XFA (funded) has a DLL. Then bot rules (personal device) and LFA terms.
+**Addendum (user, same day):** the XFA DLL is optional (so the no-funded-DLL rows stand) and the per-account payout cap is now $6,000. Re-scored
+the chosen strategies (intraday trailing, $59 + $1k DLL Combine): cap $3k → $6k barely moves them (Consistency +$526/+$901 unchanged;
++$353/+$939 → +$379/+$992) because 50%-of-balance payouts on a $2k-drawdown account rarely reach $3k. Final: Consistency path, Combine take
+$1,250 / stop $1,000, funded take $650 / stop $2,000, no funded DLL: ≈ +$350-990 per 84-session run per slot, ≈ $0.4-1.2k/month over 5 XFAs.
+
+## §1091 — A121 protocol: the A120 rule-fitted zero-edge strategy on more bot-friendly firms (user 2026-10-28: "keep searching") (S10)
+
+**No trial.** Topstep is parked until the user runs 5 Tradeify accounts (user 2026-10-28). Screen: MyFundedFutures Rapid 50K (EOD
+evaluation $3k / $2k, 50% consistency, 2 days; funded $2k intraday trailing locking at +$100, $2,100 buffer, daily payouts, $500 min, no
+cap published, 90%; $157/month list, $79 with the usual 50% code; automation allowed if the trader's own legitimate strategy) and
+Bulenox Momentum ($78.65 / $143, $2,250 target, $3k drawdown, $1,200 DLL, Master 5 days ≥ $150, 35% consistency, $53k first
+withdrawal, reserve bracketed $3,000-3,100) and Fast Track (no evaluation, $268.40 / $488 one-time, $2,000-2,250 drawdown locking at
++$100, first payout after $3k profit then $2k, consistency 20/25/30% per payout cycle, $1k min / $2k cap, Option 1 intraday no DLL or
+Option 2 EOD + $1,200 DLL, 100% of the first $10k then 90%; reserve bracketed none / $2,350). Excluded: Take Profit Trader PRO and
+Alpha Futures (bots prohibited). Engine A120 (+ optional keys: e_skip, f_target ladder, f_cons ladder, funded-only intraday trailing,
+DLL bounding the stop), MNQ, chosen on one era and scored on the other; references Tradeify Select (MNQ) and Topstep at §1090 terms.
+Bar: beat the live plan's zero-edge NKD/Tradeify value (+$1,077 per 84-session run) on both eras, and allow a bot the droplet can run.
+
+## §1092 — A121 result: Bulenox Fast Track is the strongest zero-edge firm found — +$4.5k / +$6.4k per 84-session run per slot (S10)
+
+`reporting/a121_more_firms.py` (engine regression: Topstep §1090 policy reproduces +$526). Chosen on one era → read on the other (per
+slot, 84 sessions): **Bulenox Fast Track Option 1** (intraday, no DLL, help-center terms, $268.40, 100% split): funded take $650 / stop
+$2,000 chosen on both eras, +$4,516 / +$6,400; P>0 86% / 92%, p10 −$684 / +$779; 10.5-13.1 accounts bought per run, 2.7-2.9 per payout,
+avg payout $2,040. Stress (same policy): 90% split +$3,782 / +$5,408; list $488 + 90% +$1,476 / +$2,528; $488 + 90% + $3k goal every cycle
++$954 / +$1,727. Option 2 (EOD + $1,200 DLL) +$1,684..+$3,070. MFF Rapid $79/mo +$1,412..+$2,524 (P>0 53-69%, ~6 evals per payout);
+$157/mo +$53..+$795. Bulenox Momentum −$33..+$1,085. Refs: Tradeify Select (MNQ) −$136..+$1,405; Topstep §1090 +$191..+$1,197.
+**Why it works:** no evaluation — $268 buys a direct shot at a $2,000 payout after +$3,000 against a $2,000 trailing drawdown (≈ 35-40%
+of accounts), and the small-take / wide-stop bracket (≈ 75% winning days) satisfies the 20% per-cycle consistency. **Status: lead, rules
+unverified.** Open: current Fast Track price/discount, drawdown $2,000 vs $2,250, Option 1 availability, payout goal/cap/consistency ladder,
+whether Fast Track counts in the 5-Master cap and can be re-bought without limit, split (100% of first $10k?), and automation (FAQ:
+user-built bots for personal use allowed; Master Agreement: no VPS/VPN, third-party algos need approval) — Rithmic only, so a bot runs
+on the user's own computer (e.g. NinjaTrader over Rithmic). All accounts must take the same side (no cross-account hedging).
+**Addendum (user verified Bulenox terms, 2026-10-28):** $268.40 (45% off), $2,000 intraday trailing, no DLL, no minimum days, $3k profit
+for the 1st payout, $1k min, $2k max for payouts 1-3 then $2.5k, consistency 20/25/30% then 30%, **90/10 split (no 100%-of-first-$10k)**,
+re-buy after failure unlimited, counts toward the 5 Masters, user-built bot allowed for **+$100/month**. Re-fit (funded grid, era-swapped):
+take $650 / stop $2,000 chosen everywhere; later-payout goal none or $2k: +$3,698 / +$5,324 (bot fee per user) and +$3,362 / +$4,988 (per
+account); later goal $3k (unconfirmed, worst): +$3,076 / +$4,335 and +$2,740 / +$3,999. ≈ $3.4-6.7k/month over 5 slots. Next: the bot.
+
+## §1093 — Screen: Darwinex Zero / DarwinIA SILVER (performance fees on allocated capital, bots allowed, US not restricted) — closed: capped by subscription vs a 15% fee on risk-normalised returns (S11)
+
+**No trial (desk, 2026-10-29).** Shape fits §1053 (someone else's capital, code allowed): Darwinex Zero is a simulated account (€45/month+, EAs allowed, the
+US is not on the restricted list per third parties); DARWINs rated ≥ 75 each month (22% current-month return, 67% six-month return, 11% max drawdown) get
+a SILVER allocation of €30k (minimum) up to €375k (top rank), held 3 months, up to 3 overlapping; the trader earns 15% of the allocation's profit above a
+high-water mark, quarterly; one free €25k booster if nothing is allocated in the first 6 months; DARWINs from the same user must correlate < 0.5. **Ceiling
+at zero edge:** DARWIN returns are risk-normalised (leverage cannot buy variance), so a 3-month allocation's expected positive return ≈ 0.4 × σ(3 mo) ≈ 3%;
+fee ≈ 15% × 3% × €30-80k ≈ €130-360 per allocation. Even at an optimistic 30% monthly allocation rate that is ≈ €40-110/month per subscription against
+€45, and extra subscriptions need uncorrelated DARWINs. Below the bar before any data; a real edge would be traded directly instead. Closed.
+Sources: darwinexzero.document360.io (DarwinIA SILVER, performance fees), luxalgo.com (restricted countries), mql5.com blog 776722 (rating weights, €45).
+
+## §1094 — Screen: RL-environment bounties (Prime Intellect Environments Hub) and selling environments to AI labs — closed: semi-automated, below the $10k bar (S11)
+
+**No trial (desk, 2026-10-29).** Prime Intellect pays per accepted environment: open-access bounties $100-500, application-only tasks reportedly $1-5k
+(third-party), with 400+ contributors and 2,500+ environments already built. Most of the build could be done by code, but every bounty needs the user to apply,
+submit and go through human review, so the user's §feedback rule puts the bar at $10k/month; the pool (≈ hundreds of thousands of dollars across the
+whole ecosystem) and per-item pay make that unreachable. Direct sales to AI labs need a company and sales relationships. Closed.
+Sources: primeintellect.ai/blog/scaling-environments-program, zylos.ai research 2026-07-15.
+
+## §1095 — A122: Bulenox Fast Track replayed minute by minute (exact intraday trailing) on 2010-26, plus a daily forward test from 2026-09-30 (S10)
+
+**No trial (a fidelity check of §1092's lead, same trade and user-verified terms; no parameter chosen).** User question 2026-10-29: does the test account for the
+intraday trailing drawdown? §1092's engine raised the peak by each trade's best open profit but tested the floor only on the closing balance, so a trade that ran
+up, dipped through the raised floor and recovered counted as surviving. `reporting/a122_fast_track_minute.py` walks every 1-minute bar of the trade in the worst
+order (raise the peak by the bar's high, test the low against the floor, then the stop, then the take). One slot, continuous timeline, re-buy next session,
+$268.40, 90% split, no bot fee, 3 MNQ long at the 09:30 open, take 108.25 / stop 333.25 pts, A23 MNQ RTH minute paths (drift removed).
+
+| era, side | minute replay: per 84 sessions (accounts per payout) | §1092 shortcut, same timeline |
+|---|---|---|
+| 2010-20 long | **+$3,872** (3.38) | +$5,146 (2.33) |
+| 2010-20 short | +$2,748 (3.92) | +$4,548 (2.50) |
+| 2021-26 long | **+$3,876** (3.69) | +$5,749 (2.57) |
+| 2021-26 short | +$4,888 (3.19) | +$6,476 (2.14) |
+
+The shortcut overstated value by ≈ 25-40% (≈ 40% more accounts blown); the lead stays positive in every cell. A later-payout goal of $2,000 never binds (the 25-30%
+consistency already needs ≈ $2.6k a cycle). Most blow-ups follow a payout: the payout takes the balance down to the +$100 locked floor, leaving ≈ $1.4k of room against
+a $2k stop. **Forward test:** `reporting/a122_forward.py` pulls Yahoo NQ=F 1-minute bars (≈ 30 days kept; first available day 2026-09-30, after the A23 history's
+2026-08-27 end), stores them in data/forward/, and replays every complete session with the same engine in real dollars (no drift removed). Timer
+`futres-a122fwd.timer` (Mon-Fri 16:30 CT, persistent). First read (21 sessions, 09-30 → 10-28): 3 accounts, 1 payout ($2,000), net +$995 (+$3,979 per 84).
+**Pre-registered read** when the NKD payout arrives (or at 60 sessions): a red flag if net per 84 sessions < $0 or accounts per payout > 6; otherwise consistent with
+the history. Not a confirmation either way (one path, ~3 months).
+
+## §1096 — Overnight search 2026-10-29 (user: ≥ 90% autonomous / ≤ 10% human effort, ≥ $2k/month per stream). Screen: freelance scraping on Upwork — fails the effort bar (S11)
+
+**No trial (desk; Upwork's public category pages).** Open sample: 278 "Web Scraping" and 531 "Web Data Scraping" jobs; most are $25-150 contact-finding or
+list-building tasks, a few $1.5-5k builds (ad-spy platform, Accredia database, ticket bot). Reaching $2k/month needs ≈ 4-8 wins at $300-500; a new profile wins
+a few % of bids, so ≈ 150-250 proposals a month, each submitted by the user (Upwork bans automated bidding) plus client calls and revisions — well above 10% of the
+work. Kept only as the inbound Apify-Discord channel already running. Closed as a stream.
+
+## §1097 — A123: Fast Track account-management policies (payout reserve, room-capped stop, bracket) on the A122 minute engine — the A122 plan is already best (S10)
+
+**No trial.** `reporting/a123_fast_track_policy.py`: grid W ∈ {450, 650, 900} × L ∈ {1,500, 2,000} × payout reserve R ∈ {0, 500, 1,000, 1,500} × stop cut to the
+room minus M ∈ {none, $50, $250} (skip if room < $300); chosen on one era, scored on the other. **Both eras choose the A122 plan** (take $650 / stop $2,000, full
+payout, no stop cut): +$3,872 / +$3,876 per 84 sessions. Reserves ≤ $1,000 change nothing (the $2,000 cap binds first); R $1,500 and every room-capped stop are worse
+(stop cuts turn tolerable dips into realised losses and skipped days). The post-payout blow-ups are the price of the payout, not a fixable leak.
+
+## §1098 — A124: Bulenox Fast Track by account size — the 100K roughly doubles the 50K per slot and per dollar (S10)
+
+**No trial.** Fast Track list prices from bulenox.com's pricing bundle (2026-10-29): 25K $338 ($1,000 trailing, first goal $1,500), 50K $488 ($2,000 / $3,000), 100K $648
+($4,000 / $6,000), 150K $788 ($5,500 / $9,000), priced at the user's 45% discount ($186 / $268 / $356 / $433). Payout caps and later goals from third-party reviews
+(UNVERIFIED except 50K): 25K $1,000 → $1,250, later goal $1,000; 100K $2,500 → $3,000, later $3,000; 150K $3,000 → $3,500, later $4,500; $1,000 min, 20/25/30%,
+90%. `reporting/a124_fast_track_sizes.py`, A122 minute engine, bracket as fractions of the drawdown, chosen on one era and scored on the other (long, one slot):
+
+| size | chosen bracket | per 84 sessions (other era) | accounts per payout | fresh 84-session windows, long: mean / P>0 / p10 / worst |
+|---|---|---|---|---|
+| 25K | take 0.2-0.325 dd, stop 1.0 dd | +$847 / +$1,354 | 3.4-3.7 | — |
+| 50K | take 0.325, stop 1.0 (= A122) | +$3,876 / +$3,872 | 3.4-3.7 | +$3.3-3.6k / 80-86% / −$1.2..−2.0k / −$4.9k |
+| **100K** | **take 0.2 ($800), stop 1.0 ($4,000), 7 MNQ** | **+$7,809 / +$7,553** | **2.0-2.2** | **+$6.4k / 80-93% / −$2.6k..+$1.0k / −$8.6k** |
+| 150K | take 0.2, stop 1.0 | +$6,136 / +$7,338 | 1.9-2.4 | +$4.1-5.5k / 73-88% / −$4.0..−0.7k / −$10.0k |
+
+Short side is weaker at every size (100K +$2.2-3.5k, P>0 67-71%); keep long. The 100K wins because its first payout ($6,000) is reached against a $4,000 drawdown with a $2,500
+cap, so ≈ $3.4k of room stays after the payout (the 50K leaves ≈ $1.4k), and the price per $ of drawdown is lower ($0.089 vs $0.134). ≈ $1.6-1.9k a month per slot, 5 slots
+≈ $8-9.5k a month in backtests (same-side, perfectly correlated slots; the worst 84-session window buys ≈ 24 accounts). **Open:** the 100K payout caps, later goal and
+consistency must be verified in Bulenox's help center/checkout before buying. The forward test now also logs the 100K (first read 09-30 → 10-28: −$713, no payout yet).
+
+## §1099 — A125: the 100K Fast Track on other markets and sessions — positive everywhere, and gold vs MNQ slots are uncorrelated (S10)
+
+**No trial.** Same engine/terms as §1098 (100K, $356, take as a fraction of the $4,000 drawdown, stop $4,000), chosen on one era, scored on the other, A08 minute
+paths (drift removed): MGC London 03:00-11:30 long +$4,267 / +$5,115 per 84 sessions, short +$4,467 / +$3,924; MNQ evening 21:00-16:55 long +$6,719 / +$5,437,
+short +$8,065 / +$5,014; MNQ full session 18:00-16:55 long +$8,708 / +$8,074, short +$8,537 / +$8,006 (take 0.2 dd chosen in most cells). Fresh 84-session
+windows (take $800 / stop $4,000, long): MNQ RTH +$6.4k (P>0 80-93%, worst −$8.6k); MNQ full +$6.4-7.2k (81-87%, worst −$5.9k); MGC London +$3.5-6.1k (77-81%,
+worst −$5.2k). **Cross-slot:** correlation of window outcomes MNQ RTH vs MGC London −0.05 (2010-20) / −0.49 (2021-26), no matched window negative on both;
+MNQ RTH vs MNQ full −0.29 / +0.21. Five slots split across MNQ RTH, MNQ full session and MGC London (same side within a market, so no cross-account hedging)
+cut the joint bad-run risk that §1098's five identical slots carry: ≈ $6-7k a month in backtests. Execution: MNQ RTH 09:30 ET and MGC 03:00 ET / MNQ 18:00 ET
+entries are one bracket each; the 03:00 entry needs a scheduled order or the +$100/month bot. Caveats as §1098 (100K caps unverified); MGC/MNQ-full not yet in
+the forward test. Script: scripts/a125_fast_track_markets.py.
+**§1099 addendum (forward):** `a122_forward.py` now also replays the 100K on MNQ full session and MGC London from Yahoo NQ=F / GC=F (data/forward/gc_1m.parquet).
+First read (2026-10-01 → 10-28): MNQ full 16 sessions −$2,138 (6 accounts, no payout), MGC London 20 sessions −$2,138 (6 accounts) — session ranges match the history
+(median $1,034 vs $1,033 and $466 vs $489 per contract), so this is outcome, not data; too few sessions to read (the §1095 60-session rule applies to each).
+**§1098 addendum (sensitivity of the 100K to its unverified terms; MNQ RTH long, take $800 / stop = drawdown; per 84 sessions pre / post):** base +$7,553 / +$7,809;
+caps $2k/$2.5k +$5,739 / +$5,893; caps $3k/$3.5k +$9,134 / +$9,039; **later payout goal $6k (every cycle) +$3,179 / +$3,540**; consistency 30% flat unchanged;
+**list price $648 (no discount) +$4,733 / +$4,453**; **drawdown $3,000** +$3,578 / +$2,406; caps $2k + later goal $6k + list price +$811 / +$618. What decides the size choice,
+in order: the later payout goal, the discount, the drawdown, then the caps. Script: scripts/a124_sensitivity.py.
+**§1098 addendum 2 (terms VERIFIED from Bulenox's own help center, 2026-10-29: bulenox.com/cms help_items, "fast-track" category):** Option 1 (trailing, incl. open P&L)
+100K $648, $4,000, 12 minis; drawdown locks at start + $100; **first goal $6,000, later goal $3,000 new profit per cycle, caps $2,500 (payouts 1-3) / $3,000, min $1,000,
+consistency 20/25/30% of the cycle, 90/10, no minimum days**; payout may not bring the balance to/below the threshold. 25K/50K/150K rows match §1098 too; Option 1 has no daily
+loss limit (Option 2 does). Master-level session rules: session 5:00 PM-4:00 PM CT, flat by 3:59 PM CT, no overnight holds — the RTH, London and 18:00-16:55 ET windows all
+comply. The cash-on-hand scaling table (100K: 3 minis up to $2,000 profit) does not bind 7 MNQ (0.7 mini). Up to 5 Master-level accounts; ≥ 1 trade a week (inactivity rule).
+Only the discount is unverified (the user paid 45% off on the 50K; the site's always-on coupon "applies the best available discount"); at list price the 100K is
++$4.7k / +$4.5k per 84 sessions.
+
+## §1100 — A126: Fast Track Option 2 (EOD drawdown + daily loss limit) — worse than Option 1 at every size and market; keep Option 1 (S10)
+
+**No trial.** EOD floor (peak of closing balances − drawdown, lock at +$100), the stop bounded by the DLL (50K $1,200, 100K $2,500, 150K $3,300), Option 2 contract
+limits not binding at these sizes; grid take ∈ {0.1…0.45} × dd, stop ∈ {0.25…1.0} × dd within the DLL; chosen on one era, scored on the other. Per 84 sessions
+(other era): 100K MNQ RTH +$3,028 / +$2,445 (Option 1: +$7,809 / +$7,553); 100K MNQ full +$2,544 / +$3,105; 100K MGC London +$2,513 / +$1,536; 50K +$1.8-3.0k;
+150K +$2.0-3.8k. The DLL forces a stop of ≈ half the drawdown, which costs more than the EOD floor saves. Option 1 (intraday trailing, no DLL) stays.
+Script: scripts/a126_fast_track_option2.py.
+**§1099 addendum 2 (fills):** 100K, take $800 / stop $4,000, per 84 sessions with the entry 1/2/3 ticks worse and the take needing 1/1/2 ticks of trade-through:
+MNQ RTH 2010-20 +$7,553 → +$7,529 / +$7,152 / +$6,887, 2021-26 +$7,809 → +$7,219 / +$6,839 / +$6,725; MNQ full +$8.1-8.7k → +$7.1-8.3k; MGC London +$5.1-7.4k → +$4.2-6.2k.
+Worse fills cost ≈ 5-20%; none changes the sign. Script: scripts/a124_fill_ticks.py.
+
+## §1101 — A127: Bulenox Momentum (evaluation + free Master) on the minute engine — weak or negative at every size; and AI-agent task marketplaces — closed (S10/S11)
+
+**No trial.** `reporting/a127_momentum.py`, help-center terms (Option 1; Master: 5 qualifying days, 35% consistency, minimum payout balance, reserve = drawdown, caps by payout
+number, later goal $1k-5k), separate evaluation/Master brackets chosen on one era and scored on the other, MNQ RTH long, price at 45% off (and list): 25K +$162 / −$262
+(list −$468 / −$591); 50K −$36 / −$235 (list −$804 / −$922); 100K −$470 / −$340 (list −$2,626 / −$1,277); 150K +$662 / +$491 (list −$557 / −$461); 11-39 evaluations per
+payout. The Master's reserve plus five-day and 35% gates make most passed evaluations die before a payout. Fast Track 100K (§1098) stays the Bulenox product.
+**AI-agent task marketplaces (desk):** toku.agency (Stripe USD, 85/15), dealwork.ai, opentask.ai/BasedAgents/OKX AI (USDC/USDT) — promoter-written listings, crypto
+settlement on most, no measurable demand. Closed.
+
+## §1102 — A128: a third, untouched MNQ era (2010-06 → 2015-11) confirms the Fast Track plans; era-label correction for §1095-1100 (S10)
+
+**Correction:** the A08 MNQ minute caches labelled "pre" start 2015-11-20 (1,251 sessions; the loader keeps complete 18:00-16:55 sessions only), so every MNQ "2010-20"
+in §1095-§1100 reads **2015-20**; MGC London's "pre" does start 2011-02. **No trial.** `scripts/a128_mnq_2010_15.py` builds RTH 09:30-16:00 minute paths straight from
+NQ_MNQ_spliced for 2010-06-07 → 2015-11-19 (795 complete sessions, drift removed, scaled to today's notional like A08) and runs the plans unchanged (nothing chosen here):
+50K (take $650 / stop $2,000) long +$3,806 per 84 sessions (3.3 accounts per payout), fresh 84-session windows +$2,962, P>0 81%, worst −$4.1k; short +$1,998 / +$940, 57%.
+**100K (take $800 / stop $4,000) long +$6,948 (2.1 per payout), fresh windows +$5,710, P>0 88%, p10 −$846, worst −$3.3k**; short +$4,573 / +$3,363, 72%. Three eras now
+agree on the long 100K: +$6.9k / +$7.6k / +$7.8k per 84 sessions (2010-15 / 2015-20 / 2021-26).
+
+## §1103 — A129: the start-up risk — with a fixed budget, how often is it gone before the first Fast Track payout (S10)
+
+**No trial.** `scripts/a129_budget_ruin.py`: from every 3rd session (MNQ RTH long, 2015-20 and 2021-26) buy one account at a time until the first payout or the budget
+(k accounts) is spent; minute engine, verified terms, 45% off. **Only ≈ 17-19% of single accounts reach a first payout** (50K 83% / 100K 81% of 1-account budgets fail);
+the per-payout averages in §1095/§1098 are carried by survivors that then pay several times (later goals $2-3k with room left). Budget gone before the first payout:
+50K — 2 accts ($537) 65%, 3 ($805) 52%, 4 ($1,074) 41%, 5 ($1,342) 33%; **100K — 2 ($713) 62%, 3 ($1,069) 47%, 4 ($1,426) 36%, 5 ($1,782) 27%**. Median 8-15 sessions to the
+first payout (p90 13-29). The first payout ($2,250 net on the 100K, $1,800 on the 50K) funds the next several accounts, after which the long-run averages apply. Reading:
+positive long-run EV with a front-loaded ruin risk — a $1-1.5k start fails before any payout roughly a third to a half of the time. Funding the start from a payout
+(the user's plan) is the right sequencing.
+
+## §1104 — §970 follow-up: WorldQuant BRAIN pay against the overnight bar (≥ $2k/month per stream) — only the top tier clears it (S11)
+
+**No trial (desk).** WorldQuant's own consultant page: Master "upwards of $2,000 per quarterly payment" (≈ $670/month), Grandmaster "upwards of $8,000 per quarter" (≈ $2,700/month) —
+the top two of the levels; quantt.co.uk's 2026 review: typical reported earnings modest. Glassdoor's "$10-19k a month" rests on 3 self-reports (2024) that read like staff roles.
+With machine-generated alphas crowding the correlation check (§970), an automated miner plausibly reaches the lower paid levels, not Grandmaster. Stays a parked
+add-on (free, user's account), not a ≥ $2k stream.
+**§1103 addendum (can a bracket lift the first-payout odds?):** P(one account reaches its first payout), take ∈ {0.1…0.6} × dd, stop ∈ {0.6, 0.8, 1.0} × dd, 2015-20 / 2021-26:
+the best cells sit at 18-25% (50K take 0.15-0.2 dd: 19-25%; 100K take 0.15-0.2 dd: 18-25%), the chosen plans at 18-20%; large takes fall to 7-12%. At zero edge, reaching
++1.5 × the drawdown before −1 × with a ratcheting floor and a 20% consistency cap is ≈ 1-in-5 for any bracket — the start-up risk is structural, not a tuning gap.
+Script: scripts/a130_first_payout_grid.py.
+**§1098 addendum 3 (commissions):** Bulenox's rate sheet (bulenox.com/legal/Bulenox-Rates.pdf, 2026-10-29): MNQ $0.61 per side ($1.22 round trip), MGC $0.76 ($1.52), MES $0.61.
+§1095-§1103 charged $2.32 round trip per contract, so every Fast Track figure is slightly conservative (≈ $7-8 per 7-contract day on the 100K).
+
+## §1105 — Bulenox due diligence for the Fast Track plan: pays in most cases; denial risks are discretionary (flip days), and any bot needs written approval (S10)
+
+**Desk, 2026-10-29.** Reputation: Trustpilot 4.5-4.8 across mirrors, many reports of repeated payouts; PropFirmCircle lists it "Not Recommended" (34+ trader reports of
+vague, unevenly applied rules) but "not a scam". Recurring denial reason: the **flipping / flip-day rule** in the Master Agreement (not in the help center): third parties
+describe ≤ 2 "insignificant activity" days per rolling 10 trading days, no published thresholds; consequences warnings → payout review/denial → closure. The plan trades
+the same full size every day, so its days are not minimal-activity days, but its time-exit days (≈ 3-6% on MNQ, ≈ 20% on MGC London) can end near flat. **Terms of Use
+(bulenox.com/legal/Terms_of_Use.pdf), "Algorithms and Auto Trading":** no scalping algorithms or rapid-trade bots; "any third-party algorithm, automated trading software …
+must be reviewed and approved by the Bulenox management team before use"; the $100/month third-party API / trade-copier fee "does not constitute approval". Nothing
+published forbids a stop equal to the drawdown or one trade a day. **Implication:** run the plan with manual brackets (≤ 10% effort: one order per account per day; a
+copier costs $100/month and still needs approval), and before scaling past one account ask Bulenox support in writing whether (a) a daily bracket whose stop equals the
+drawdown and (b) identical brackets across up to five Fast Track accounts are acceptable, and how a flip day is defined. Payout-denial risk is not in any of the
+§1095-§1103 numbers.
+
+## §1106 — Overnight desk closes (≥ $2k/month, ≤ 10% effort, legit, small start) (S11)
+
+**No trial.** (1) **Texas property-tax protest service** (automated evidence packets for owners): agents need a TDLR property-tax-consultant registration, and protests
+run to a once-a-year deadline (≈ May 15) — seasonal, excluded (user, year-round only). (2) **GPU/compute rental** (Vast.ai-type): ≈ $100-200/month per $1.5k GPU — capital-bound.
+(3) **AI-training data work** (Mercor/Outlier/Alignerr-type expert tasks): human labour, AI use banned. (4) **Data-for-AI licensing** (Troveo/Wirestock-type): needs owned
+footage/photos. (5) **DePIN / data-sharing nodes** (Grass, Hivemapper …): crypto payouts — excluded. (6) **Alt-data sales of our job-posting scrapes to funds**: needs
+1-2 years of history and enterprise sales — not small-start. (7) **Apify $1M Challenge**: ended 2026-01-31, no 2026 edition. (8) **Apify Solution Provider programme**:
+free to apply; Apify shares inbound custom-project leads with its best certified partners (20% platform commission on deals) — logged as a user action, not a stream.
+**§1099 addendum 3 (size by market):** era-swapped, per 84 sessions (other era): MNQ full session 25K +$1.1-1.6k, 50K +$3.2-3.9k, **100K +$8.1-8.7k (23-24× its fee)**, 150K +$7.7-8.0k;
+MGC London 25K +$1.2-1.3k, 50K +$2.4-2.5k, **100K +$4.3-5.1k (12-14×)**, 150K +$4.2-4.3k. The 100K is the best size per slot and per dollar on every market tested.
+Script: scripts/a131_sizes_by_market.py.
+
+## §1107 — A132: gold on the full session (entry 18:00 ET / 5:00 PM CT) beats gold London and keeps every entry at a human hour (S10)
+
+**No trial.** 100K Fast Track, era-swapped, per 84 sessions (other era): **MGC full session 18:00-16:55 ET long +$8,037 / +$7,769 (1.8-2.0 accounts per payout), short
++$9,221 / +$9,163**; MGC evening 21:00-16:55 long +$7.3k / +$6.4k, short +$6.0k / +$5.7k (London 03:00-11:30 was +$4.3-5.1k, §1099). Fresh 84-session windows, MGC full long
+(take $800 / stop $4,000): mean +$6.1k (2011-20, P>0 91%) / +$10.2k (2021-26, P>0 86%). Window-outcome correlation: vs MNQ RTH −0.28 / −0.28 (no window negative on both),
+vs MNQ full +0.39 / −0.15 (both negative 1-4%). **A five-slot plan with every entry at a human hour:** MNQ day (8:30 AM CT) + MNQ full session (5:01 PM CT) + MGC full
+session (5:01 PM CT), one side per market (opposite sides across accounts would be hedging). The 2:00 AM CT London entry (needs a bot → Bulenox approval) is no longer needed.
+Script: scripts/a132_mgc_full_session.py.
+**§1107 addendum (forward calibration, honest read):** forward 2026-09-30 → 10-28, 100K: MNQ RTH −$713 (21 sessions), MNQ full −$2,138 (16), MGC London −$2,138 (20), MGC full
+−$1,782 (16); 50K MNQ RTH +$995. History, net over the same number of sessions from a fresh start: mean +$53 to +$459, **negative 45-61% of the time** (the start-up
+risk, §1103); the observed values sit at the 44th / 11th / 6th / 14th percentiles. Each alone is ordinary; three tail months at once (overlapping, partly correlated slots)
+is a mild warning, not a verdict. The pre-registered 60-session read (§1095) stands for each variant. Script: scripts/a133_forward_calibration.py.
+**§1098 addendum 4 (discount):** a 45%-off code for Fast Track and Momentum has been listed since the August 2026 launch (eltraderfinanciado.com, updated 2026-08-27; godfunded.com
+lists a 45% code with no end date); the user paid exactly 45% off on the 50K (§1092). Treat 45% as near-verified, product-wide; confirm on the 100K at checkout.
+
+## §1108 — A134: the three human-hour 100K plans by calendar year (S10)
+
+**No trial.** `scripts/a134_by_year.py`, one slot each, continuous timeline (re-buy next session), minute engine, drift removed, $356 per account, 90% split. Net per year
+(payouts / accounts bought): MNQ day 2016-26 every year positive, +$3.9k (2024: 9 payouts / 46 accounts) to +$46.1k (2023); MNQ full 2015-26 +$3.4k to +$46.2k; MGC full
+2011-26 positive except **2012 −$4,277 (0 payouts / 12 accounts)**, range +$0.2k (2013) to +$45.6k (2025). Three slots together: every full year 2013-2026 positive,
++$41k (2022) to +$108k (2023); median ≈ +$65k a year ≈ $5.4k a month for 3 slots in backtests. Churn is the price: 15-46 accounts bought per slot-year (≈ $5-16k of fees
+recycled from payouts), so cash flow must cover runs of 10+ blown accounts. Payout-denial risk (§1105) is outside these numbers.
+
+## §1109 — A135: Bulenox's transition rule (after 3 payouts → live Funded Account; pending Masters frozen while it is active) — the plans keep 45-80% of their value (S10)
+
+**Help center, 2026-10-29 ("funded" category):** after three payouts a Master-level account may be moved to a live Funded Account at Bulenox's discretion; refusing closes it;
+Master balances do not transfer (the Funded Account gets its own initial EOD drawdown: 100K $3,000); other active Masters with ≥ 1 payout may transition too; **a pending
+Master-level account cannot be activated while the trader holds an active Funded Account.** §1095-§1108 let accounts pay indefinitely. **No trial.**
+`scripts/a135_three_payout_cap.py` (100K, live account valued at $0): per 84 sessions, 2015-20 / 2021-26 (MGC 2011-20 / 2021-26) —
+MNQ day no cap +$7,553 / +$7,809 → ends at the 3rd payout and re-buys +$6,142 / +$6,275 → plus 20 idle sessions +$5,882 / +$5,137 → plus 60 idle +$4,619 / +$4,832;
+MNQ full +$8.1k / +$8.7k → +$6.6k / +$6.8k → +$5.8k / +$5.5k → +$5.0k / +$4.0k; MGC full +$7.8k / +$8.0k → +$6.5k / +$5.8k → +$6.0k / +$5.0k → +$4.5k / +$3.6k. 50K ending at the
+3rd payout: +$3.4-4.4k. Reading: the cap costs ≈ 20%; a long freeze of new activations after a transition costs up to ≈ 55%; all cases stay positive. The live Funded
+Account's own payouts (unknown terms) are left out. Open question for Bulenox support: how long a transition takes, and whether Fast Track accounts bought while a Funded
+Account is active stay frozen.
+
+## §1110 — A136: the 100K Fast Track on more Bulenox-listed CME markets (NKD, 6E, 6A, 6B, 6J) — positive except 6J, all weaker than MNQ/MGC full sessions (S10)
+
+**No trial.** A21 HistData minute windows (NKD Tokyo 09:00-15:00 JST = 7 PM-1 AM CT; FX London 08:00-16:00 = 2-10 AM CT), whole contracts, Bulenox rate sheet ($4.72 round
+trip per full FX contract — ten micros at $1.00 each cost more per notional; NKD assumed the same), take/stop as fractions of $4,000, era-swapped, per 84 sessions (other
+era): **NKD (2 contracts) long +$4,344 / +$4,513, short +$8,540 / +$4,514; 6E (4) long +$4,243 / +$5,490, short +$3.3-3.5k; 6A (7) long +$3,399 / +$5,036, short +$5,274 /
++$4,517; 6B (6) +$3.4-3.7k; 6J (2) ≈ 0** (+$5 / +$466). A first run with ten-to-one micros at $0.15 a round trip overstated FX; corrected here. Reading: NKD (7 PM CT
+entry) is a usable fourth market at a human hour; FX works but its windows open at 2 AM CT (needs a scheduled order or an approved bot). The five-slot core stays MNQ day,
+MNQ full, MGC full (+$7.8-8.7k each). Script: scripts/a136_more_markets.py.
+
+## §1111 — A137: a five-slot Fast Track 100K portfolio as monthly cash flows, with the 3-payout transition cap (S10)
+
+**No trial.** `scripts/a137_portfolio_months.py`: MNQ day ×2 (starts 40 sessions apart), MNQ full, MGC full, NKD Tokyo (2 contracts); take $800 / stop $4,000; each account
+ends at its 3rd payout (live account = $0) and is re-bought; Bulenox commissions; drift removed. Monthly net (payouts × 90% − purchases), all five slots live:
+**2015-12 → 2020-12 (61 months) mean +$7,320, median +$7,218, 15% of months negative, worst month −$5,947, worst 3 months +$1,361; 2021-01 → 2026-09 (69 months) mean
++$7,045, median +$5,904, 19% negative, worst month −$4,878, worst 3 months −$778**, best months +$20-26k. Not included: a freeze of new activations while a live Funded
+Account is active (§1109: up to ≈ −55%), payout denials (§1105), the start-up ruin before the first payout (§1103). A planning range of ≈ $3-7k a month for five slots
+in backtests, after the first payout has funded the churn.
+**§1105 addendum (flip-day exposure, if a flip day means a near-flat result):** share of days with |P&L| < $200 on the 100K plans (take $800 / stop $4,000), 2015-20 (MGC 2011-20)
+/ 2021-26: MNQ day 1.9% / 0.5%, MNQ full 1.6% / 0.2%, MGC full 1.2% / 0.4%, NKD 0.4% / 0.3%; rolling 10-day windows with ≥ 3 such days: 0.5% (MNQ day 2015-20), else 0.0%.
+Every day trades the full size, so a "minimal activity" reading is not met either. Flip-day exposure is negligible on the data; the discretionary risk remains.
+
+## §1112 — A138: Bulenox Qualification → Master (the cheap-evaluation route) — weak even at 89% off; Fast Track stays the product (S10)
+
+**No trial.** `reporting/a138_qualification.py`, help-center terms (Option 1 evaluation, 30-day access ≈ 21 sessions; Master: activation fee, ≥ 10 trading days per cycle,
+reserve, 40% consistency, caps $1,000-2,000, 90%; each Master ends at its 3rd payout), separate evaluation/Master brackets chosen on one era, scored on the other, MNQ RTH long.
+Per 84 sessions (other era): **50K at 89% off ($19 + $148 activation) +$765 / +$750**; 25K at 89% off +$362 / +$6; 100K at 89% off −$54 / +$81; 150K at 89% off −$680 / −$448;
+at 45% off or list every size is −$1.7k to +$0.1k. The Master's 10-day cycle, reserve and low caps leave little per pass, and the activation fee is paid on every pass.
+Fast Track 100K (§1098: +$7.6-7.8k; with the 3-payout cap +$5.8-6.8k) dominates.
