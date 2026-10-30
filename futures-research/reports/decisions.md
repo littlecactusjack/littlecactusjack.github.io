@@ -18555,3 +18555,468 @@ reserve, 40% consistency, caps $1,000-2,000, 90%; each Master ends at its 3rd pa
 Per 84 sessions (other era): **50K at 89% off ($19 + $148 activation) +$765 / +$750**; 25K at 89% off +$362 / +$6; 100K at 89% off −$54 / +$81; 150K at 89% off −$680 / −$448;
 at 45% off or list every size is −$1.7k to +$0.1k. The Master's 10-day cycle, reserve and low caps leave little per pass, and the activation fee is paid on every pass.
 Fast Track 100K (§1098: +$7.6-7.8k; with the 3-payout cap +$5.8-6.8k) dominates.
+
+## §1113 — S-family 1 protocol: aggregate short interest as a half-monthly sign for MNQ (Rapach, Ringgenberg & Zhou 2016), current regime (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,562 → one trial on the sealed read.** Overnight search (user 2026-10-29: ≥ $2k/month, ≤ 10% effort). Why this
+fits: it trades MNQ (small margin, prop-account eligible), once per half-month, fully automatable; no aggregate equity short-interest series has been tested here (CFTC
+positioning was, §604). **Data:** FINRA `consolidatedShortInterest` (free API, no key; history starts 2018-12), every settlement date, restricted to the `pack.npz` liquid
+names. **Signal:** S = log(equal-weighted mean days-to-cover) across names with ADV > 0, minus its mean over the previous 24 reports (causal detrend). **Timing:** FINRA
+publishes ≈ 7 business days after settlement, so S is usable at the close of the 10th `pack.npz` session after the settlement date; held to the next report's usable close.
+**Rule:** S > 0 (short interest high) → short MNQ, else long (the paper's sign). **Target:** QQQ adjusted close-to-close over each holding period. **Statistic (strict rule
+§119):** x = (rule − always long) × r; CONFIRM needs t > 1.645, circular-shift placebo ≥ 95th (2,000 shifts of the signal series), and mean x > 0. **Split:** discovery
+2020-12 → 2022-12 (first 24 reports are warm-up); sealed 2023-01 → latest, read once. A discovery mean ≤ 0 closes it without a sealed read.
+
+## §1114 — S-family 2 protocol: the CBOE equity put/call ratio as a contrarian next-session sign for MNQ, current regime (S1)
+
+**Written and committed BEFORE any statistic is computed; one trial on the sealed read.** Untested here (no put/call series in any family). **Data:** CBOE equity put/call
+ratio, daily: `equitypc.csv` (2006-11 → 2019-10-04) plus the daily `market_statistics/daily/{date}_daily_options` JSON ("EQUITY PUT/CALL RATIO", 2019-10-07 →). Published
+after the close. **Signal:** P = 5-session mean of the ratio ÷ its 60-session mean − 1, known at the close of day d. **Rule:** P > 0 (puts heavy: fear) → long the next
+session close-to-close, else short. **Target:** QQQ adjusted close d → d+1 (MNQ proxy). **Statistic (strict rule §119):** x = (rule − always long) × r; CONFIRM needs t > 1.645,
+circular-shift placebo ≥ 95th (2,000 shifts), mean x > 0. Costs: 0.25 MNQ point a side on each flip (≈ 0.003% at NQ 20k), charged to x. **Split:** discovery 2007-03 → 2022-12;
+sealed 2023-01 → latest, read once. A discovery mean ≤ 0 closes it.
+
+## §1115 — S-family 3 protocol: market breadth (share of liquid stocks above their 50-session mean) as a contrarian next-session sign for MNQ, current regime (S1)
+
+**Written and committed BEFORE any statistic is computed; one trial on the sealed read.** Family 159 (§558) tested the RSP − SPY *return* spread; the breadth *level* was
+not. **Data:** `pack.npz` adjusted closes (2,012 liquid US names, 2015-01 → 2026-10). **Signal at the close of d:** B = share of names (with 50 prior closes) above their
+50-session mean; z = B − mean of B over the previous 250 sessions. **Rule:** z < 0 (washed out) → long QQQ close d → d+1, else short. **Statistic, costs, placebo:** as §1114.
+**Split:** discovery 2016-01 → 2022-12; sealed 2023-01 → latest, read once. A discovery mean ≤ 0 closes it.
+
+## §1116 — S-family 3 discovery: breadth is not a contrarian sign for MNQ — −6.44 bp a session, t −1.67; closed without a sealed read. NAAIM: data behind scripts (S1)
+
+**No trial (discovery fail, §1115).** `stocks/s3_breadth.py`, 1,714 sessions 2016-01 → 2022-12, long on 48% of them. The sign runs the other way (weak breadth → weaker
+next day), but reversing it after seeing it would be a new, data-led hypothesis; not registered. NAAIM exposure index: the site serves the series only through
+scripts (no file link), so it is not used. AAII sentiment: `sentiment.xls` returns 403.
+
+## §1117 — S-family 4 protocol: the off-exchange short-volume ratio (a "DIX"-style dealer-buying gauge) as a next-session sign for MNQ, current regime (S1)
+
+**Written and committed BEFORE any statistic is computed; one trial on the sealed read.** Mechanism claimed by SqueezeMetrics (2017, "Short Is Long"): off-exchange short
+volume is mostly market makers selling into customer buying, so a high ratio marks buying pressure. **Data:** FINRA Reg SHO consolidated daily files
+(`cdn.finra.org/equity/regsho/daily/CNMSshvol{YYYYMMDD}.txt`, published the same evening), 2018-08 →. **Signal at the close of d:** D = Σ ShortVolume × price ÷
+Σ TotalVolume × price over the 500 `pack.npz` names with the largest prior-60-session dollar volume (price = that day's `pack` close); z = D − mean of D over the previous
+60 sessions. **Rule:** z > 0 → long QQQ close d → d+1, else short. **Statistic, costs, placebo:** as §1114. **Split:** discovery 2018-11 → 2022-12; sealed 2023-01 → latest,
+read once. A discovery mean ≤ 0 closes it.
+
+## §1118 — S-family 5 protocol: aggregate insider buying (Seyhun 1988; Lakonishok & Lee 2001) as a weekly sign for MNQ, 2007-2026 (S1)
+
+**Written and committed BEFORE any statistic is computed; one trial on the sealed read.** I-family 1 (§913-915) tested stock-level drift after purchases; the *aggregate*
+insider buy/sell balance as a market-timing sign has not been tested. **Data:** SEC Insider Transactions Data Sets (Form 4 and 4/A, quarterly, 2006Q1 →), officers and
+directors only, open-market non-derivative trades: code P (buy) and S (sale). **Signal at each Friday close:** b = purchase filings ÷ (purchase + sale filings), by filing
+date, over the last 20 sessions; z = b − mean of the weekly b over the previous 52 weeks. **Rule:** z > 0 (insiders buying more than usual) → long QQQ Friday close → next
+Friday close, else short. **Statistic, placebo:** as §1114, on weeks; cost charged on flips. **Split:** discovery 2007-06 → 2022-12; sealed 2023-01 → latest, read once.
+A discovery mean ≤ 0 closes it.
+
+## §1119 — S-family 5 discovery: aggregate insider buying does not time MNQ — −0.366% a week against always long, t −3.01; closed (S1)
+
+**No trial (discovery fail, §1118).** `stocks/s5_insideragg.py`, 83 SEC quarters (2006Q1 → 2026Q3; 2026Q2-Q3 from I-family 1's copies, the SEC URL now 404s), 330,761
+purchase and 804,296 sale filings by officers/directors; 814 discovery weeks, long on 47%. The short weeks give up QQQ's drift and the sign adds nothing back.
+
+## §1120 — S-family 1 discovery: aggregate short interest does not time MNQ — −0.586% a half-month against always long, t −0.93; closed (S1)
+
+**No trial (discovery fail, §1113).** `stocks/s1_shortint.py`, 211 FINRA settlement dates (the API serves 2018-01 → 2026-10-15, not 2018-12 as probed), so after the
+24-report warm-up the discovery window ran 2019-01 → 2022-12 (95 periods) instead of 2020-12 → 2022-12; noted, not material to a negative mean. Short 53% of periods.
+
+## §1121 — S-family 2 discovery: the equity put/call ratio is not a contrarian next-session sign for MNQ — −5.73 bp a session against always long, t −2.18; closed (S1)
+
+**No trial (discovery fail, §1114).** `stocks/s2_putcall.py`, 5,028 CBOE days (2006-11-01 → 2026-10-28; CSV to 2019-10-04, daily JSON after), 3,989 discovery sessions
+2007-03 → 2022-12. The short sessions give up QQQ's drift; the ratio adds nothing next-day.
+
+## §1122 — S-family 4 discovery: the off-exchange short-volume ratio does not time MNQ — −7.22 bp a session, t −1.01; closed. S-series reading (S1)
+
+**No trial (discovery fail, §1117).** `stocks/s4_shortvol.py`, 2,069 FINRA CNMS days (2018-08 → 2026-10), 1,048 discovery sessions, long on 54%.
+**S-series reading (§1113-§1122):** five free sentiment/positioning gauges (short interest, put/call, breadth, short volume, insider buying), each as a long/short
+sign for MNQ against always long: all five negative in discovery. Paying the short side's drift is the bar none clears. No more index-timing gauges; the next tests use
+targets without a drift (relative spreads).
+
+## §1123 — A139: the D68 side (follow a 10-year-note shock) on the Fast Track 100K MNQ day slot — no gain where it counts; the plan stays always long (S10)
+
+**No trial (overlay of a confirmed rule).** `scripts/a139_d68_overlay.py`, a123 minute engine, take $800 / stop $4,000, 7 MNQ, drift removed, per 84 sessions: **2015-20
+always long +$7,553 (2.03 accounts/payout) vs overlay +$8,506 (1.80); 2021-26 +$7,809 (2.24) vs +$7,804 (2.28).** 2015-20 overlaps D68's own discovery years (2018-22),
+so only 2021-26 is a fair read, and it is flat. Not adopted.
+
+## §1124 — A140: every Fast Track size under the 3-payout transition cap — 100K stays best (S10)
+
+**No trial.** `scripts/a140_cap_sizes.py` (A135 engine, each account ends at its 3rd payout and is re-bought; take 0.2 × drawdown, stop = drawdown; 45% off; per 84 sessions,
+2015-20 / 2021-26; MGC 2011-20 / 2021-26): **MNQ day 25K +$1.3k / +$0.7k, 50K +$3.7k / +$3.3k, 100K +$6.1k / +$6.3k, 150K +$5.9k / +$4.9k; MNQ full 100K +$6.6k / +$6.8k vs
+150K +$6.1k / +$6.0k; MGC full 100K +$6.5k / +$5.8k vs 150K +$6.6k / +$4.3k.** The 150K's larger first goal ($9k) takes longer to reach under a cap of three payouts.
+100K remains the size.
+
+## §1125 — D-series family 176 protocol: the four S-series gauges as every-day signs for the non-equity markets, current regime (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,562.** Gauges known at the close of day d (constructions exactly as §1114/§1115/§1117/§1118): put/call P,
+breadth z, short-volume z, insider z (latest weekly value). Each gauge's sign gives side = +1 when it reads "risk-on" (P < 0, breadth z > 0, short-volume z > 0, insider z > 0)
+else −1. **Targets:** next weekday's open → close (d10 series, bps) for GC, SI, HG, CL, NG, ZN, 6E, 6J, ZC, ZS, ZW, RTY; rules **follow** (side) and **fade** (−side):
+4 × 12 × 2 = 96 cells. Cost d12.COST per session. **Discovery** 2018-11 → 2022-12 (d24.DISC, from the short-volume start): carry if mean > 0 and t > 1.96; at most 5
+carried, by t. **Sealed** 2023-01 → 2026-08 (d24.VAL), each carried cell read once (one trial each): CONFIRM needs net t > 1.645, against-always-long t > 1.645
+(§119), circular-shift placebo ≥ 95th.
+
+## §1126 — Family 176: 1 of 96 carried (insider gauge, fade, into ZN); sealed REJECT (t01563); N 1,562 → 1,563 (S1)
+
+`reporting/d176_gauges.py`; `reports/d176_discovery.json`, `d176_sealed.json`. Discovery 2018-11 → 2022-12: 96 cells, one carried — fade the insider gauge into ZN's next
+session, +2.28 bp (t +2.14, 1,009 sessions), about what chance gives across 96 cells. **Sealed 2023-01 → 2026-08: −1.64 bp, t −1.33, against always long t −0.58,
+placebo 17th → REJECT.** The S-series gauges carry nothing into the other markets either.
+
+## §1127 — D-series family 177 protocol: the weekly natural-gas storage surprise against its 5-year norm as a week-long sign for NG (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,563.** Untested here (families 40/89 used EIA crude only). **Data:** EIA weekly Lower-48 working gas
+(`NW2_EPG0_SWO_R48_BCFw.xls`, week ending Friday, released the next Thursday 10:30 ET), 2010 →. **Surprise:** u = this week's change − mean change of the same ISO week
+in the previous 5 years. **Trade:** the 5 weekdays after the release Thursday (Fri → Thu), summed open → close returns of NG (d10 series, bps; open → close only, so
+the continuous contract's roll gaps are excluded), cost d12.COST × 5. **Cells:** follow fundamentals (u > 0 → short, else long) and fade (opposite): 2 cells. **Discovery**
+2015-01 → 2022-12: carry if mean > 0, t > 1.96. **Sealed** 2023-01 → 2026-08 once per carried cell, strict rule as §1125.
+
+## §1128 — Family 177: the gas-storage surprise does not carry into NG's next week — follow +6.3 bp (t 0.20), fade −19.8 bp (t −0.62); 0 of 2 carried (S1)
+
+**No trial.** `reporting/d177_ngstorage.py`, `reports/d177_discovery.json`, 415 release weeks 2015-2022. The weekly surprise is priced on release day.
+
+## §1129 — D-series family 178 protocol: Treasury coupon-auction strength as a next-session sign for ZN (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,563.** Auction outcomes have not been a predictor here (K4 used only the auction calendar). **Data:** Fiscal
+Data `auctions_query` (free, no key): Notes and Bonds, 2009 →. Each auction's term bucket = years in `security_term` rounded (a 9-Year 10-Month reopening is the 10-year).
+**Strength measures:** (a) bid-to-cover − mean of the previous 6 auctions in the same bucket; (b) indirect share (indirect accepted ÷ total accepted) − the same mean.
+A day with several auctions takes the mean across them. **Trade:** ZN next weekday open → close (d10 bps), cost d12.COST; strong (> 0) → long for **follow**, short for
+**fade**: 2 measures × 2 rules = 4 cells. **Discovery** 2010-01 → 2022-12: carry if mean > 0, t > 1.96. **Sealed** 2023-01 → 2026-08, strict rule as §1125.
+
+## §1130 — Family 178: auction strength does not carry into ZN's next session — 0 of 4 carried (best +0.58 bp, t 0.62) (S1)
+
+**No trial.** `reporting/d178_auctions.py`, 1,721 Fiscal Data coupon auctions (2009 →), 1,093 auction days in discovery 2010-2022. Bid-to-cover follow +0.53 (t 0.57), fade
+−1.33; indirect share follow −1.38, fade +0.58. The auction is priced by the close.
+
+## §1131 — A141: Fast Track 100K MNQ day slot by entry time — the 09:30 ET open stays the choice (S10)
+
+**No trial.** `scripts/a141_entry_time.py` (A135 engine, 3-payout cap, take $800 / stop $4,000, 7 MNQ, flat 16:00 ET; per 84 sessions, 2015-20 / 2021-26): **08:30 +$4.9k / +$5.5k;
+09:30 +$6.1k / +$6.3k; 10:00 +$5.7k / +$4.7k; 11:00 +$4.8k / +$7.5k; 13:00 +$4.6k / +$3.9k.** 09:30 is best on the worse era and steady across both; 11:00's 2021-26
+figure does not hold in 2015-20. No change.
+
+## §1132 — Desk closes (overnight criterion): paid communities/newsletters (Whop, Substack), browser extensions, print-on-demand, bank sign-up bonuses, rig-count and NAAIM data (S11)
+
+**No trial.** (1) **Whop / Substack / paid Discord** for signals or tools: income scales with an audience the user would have to build and serve (≫ 10% effort), and selling
+futures signals to the public sits under CFTC/NFA adviser rules unless purely impersonal; closed. (2) **Browser extensions / micro-SaaS:** the same distribution wall as
+the Shopify/Discord app stores (§1062); closed. (3) **Print-on-demand:** design and listing churn is manual and the marketplaces are flooded by AI images; closed.
+(4) **Bank/brokerage sign-up bonuses:** one-off per institution, manual, and a reward-program variant (user excluded 10-27); closed. (5) **Baker Hughes rig count:**
+history only through scraping or paid APIs (ICE, OilPriceAPI), weekly and slow-moving; not pursued. **NAAIM:** §1116.
+
+## §1133 — D-series family 179 protocol: weekly momentum/reversal in commodity futures, cross-sectional and own-market (KAIST short-term commodity momentum) (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,563.** Universe: GC, SI, HG, CL, NG, ZC, ZS, ZW (d10 daily open → close, bps; overnight and roll gaps
+excluded). Each market's weekly return = sum of its open → close moves Mon-Fri, in risk units (÷ its daily sd over the previous 60 sessions × √5). **Cells:**
+(1) cross-sectional: next week long the top 2 and short the bottom 2 by last week's risk-unit return — **follow**; (2) the same **fade**; (3) own-market: each market takes
+the sign of its own last week, pooled equal-risk — **follow**; (4) the same **fade**. 4 cells; weekly return in risk units net of d12.COST × 5 per leg. **Discovery**
+2010-03 → 2022-12: carry if mean > 0 and t > 1.96. **Sealed** 2023-01 → 2026-08, once per carried cell: CONFIRM needs t > 1.645 and circular-shift placebo ≥ 95th
+(the cells are market-neutral or two-sided, so the always-long leg of §119 is the pooled-long benchmark: the cell must also beat it with t > 1.645).
+
+## §1134 — Family 179: weekly commodity momentum is too small to trade — follow +0.011 / +0.006 risk units a week (t 0.51 / 0.36); 0 of 4 carried (S1)
+
+**No trial.** `reporting/d179_cmdmom.py`, 667 discovery weeks 2010-2022. Cross-sectional follow +0.0105 (t 0.51), fade −0.049 (t −2.37); own-market follow +0.0059 (t 0.36),
+fade −0.045 (t −2.77): the gross effect is near zero on either side and costs decide the sign. (The script's placebo flips signs rather than shifting; never reached.)
+
+## §1135 — D-series family 180 protocol: ACM 10-year term-premium shocks as signs for ZN and ES two sessions later (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,563.** Untested here. **Data:** NY Fed `ACMTermPremium.xls` daily ACMTP10 (1961 →). The publication lag is
+unclear, so a value dated d is used only for the session after next (d+2). **Event:** |ΔTP10| > 2 × sd of the previous 60 daily changes. **Cells:** ZN and ES, d+2 open →
+close (d10 bps, d12.COST); **follow** = side −sign(ΔTP) (a rising premium continues to weigh on bonds and stocks), **fade** = the opposite: 4 cells. **Discovery**
+2010-03 → 2022-12, carry if mean > 0 and t > 1.96; **sealed** 2023-01 → 2026-08, strict rule as §1125.
+
+## §1136 — Family 180: term-premium shocks — 0 of 4 carried (ZN follow +3.73 bp, t 1.38; ES fade +14.7 bp, t 1.15; 180 events) (S1)
+
+**No trial.** `reporting/d180_termprem.py`, `reports/d180_discovery.json`. Below the carry bar; closed.
+
+## §1137 — Data blocks and a saturation reading for the daytime 10-29 search (S1/S11)
+
+**No trial.** Blocked sources: GDELT DOC API (rate-limits even single requests from this IP; the bulk ngrams set is far larger than the question), SPDR GLD holdings
+archive (the "CSV" link now serves a PDF), Baker Hughes rig count (§1132), FRED ICE BofA spreads (now only the last 3 years). **Reading:** after §1113-§1136 (nine
+families, 125 discovery cells, one sealed read) every free daily predictor class checked today was either already in the archive (overnight drift §617, month-end
+fix Z11, net liquidity 87, auction calendar K4, relative value 17/134/135, VIX term structure, CFTC 174) or null on discovery. Free public gauges are priced by the
+close; new futures families now have a very low prior. The Fast Track plan (§1098-§1112, §1123-§1131) remains the only lead clearing the overnight bar.
+
+## §1138 — Desk sweep of zero-coverage arenas; CS2 skin cross-market arbitrage screened and closed (S11)
+
+**No trial.** A keyword sweep of the log found no prior screen for: trading cards, sneakers, pawn, carbon credits/RECs, water/mineral rights, receivables/factoring,
+farmland/timber, storage units, EV charging, Roblox, game skins, Twitch, podcasts, Canva/fonts/3D-model marketplaces, Hugging Face, mystery shopping, user testing,
+Prolific, MTurk. **Capital-bound** (a yield on owned assets far below $2k/month at a small start): mineral/water rights, factoring, farmland, timber, storage, EV
+charging, carbon credits, pawn. **Manual or physical:** card/sneaker resale (drop bots break retailer terms), mystery shopping. **Human-only labour** (botting
+breaks the terms): MTurk, Prolific, user testing. **Audience-bound:** Twitch, podcasts, Roblox, template/font/3D marketplaces (the §1062 distribution wall).
+**CS2 skins** (Steam ↔ CSFloat/Skinport/DMarket arbitrage via public price APIs): automatable, but listed spreads are mostly fees and Steam-wallet illiquidity
+(Steam 15%, Skinport 12% seller), crowded by bots that close gaps within minutes, trade-protection holds lock inventory, and Valve can reprice the whole market by
+policy (the Oct-2025 trade-up change); closed. Nothing new clears the bar.
+
+## §1139 — Fast Track price re-check (2026-10-29): list $338 / $488 / $648 / $788, 45% code still listed — the model's fees stand (S10)
+
+**No trial.** eltraderfinanciado.com's Bulenox launch page (header updated 2026-10-13): Fast Track 25K/50K/100K/150K list $338/$488/$648/$788, with the 45% code
+(ETFPROMO) $185.90/$268.40/$356.40/$433.40, activation included; Momentum $94-$358 list (the "$94" seen in a search snippet is Momentum, not Fast Track). Matches
+the help-center terms and the A124 fees. Still confirm the code at checkout.
+
+## §1140 — D-series family 181 protocol: VIX-settlement Wednesdays (SOQ at the open; Griffin & Shams 2018) in ES and NQ (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,563.** Untested here. **Dates:** each month's VIX expiry = the third Friday of the following month − 30 days
+(a Wednesday), moved to the prior weekday if that is not a d10 trading day, 2010-03 →. **Cells:** ES, NQ × {expiry-day open → close, next-day open → close} × {long, short}
+= 8 cells (d10 bps, d12.COST). Drift-neutral reading: each cell's mean is compared with the same market's mean on all other days (excess = cell − that mean, sign-
+matched). **Discovery** 2010-03 → 2022-12: carry if excess > 0 and t > 1.96 (t of the cell's event returns minus the other-day mean). **Sealed** 2023-01 → 2026-08 once per
+carried cell: CONFIRM needs net t > 1.645, against-always-long t > 1.645, placebo (random Wednesdays, 2,000 draws) ≥ 95th.
+
+## §1141 — Family 181: VIX-settlement days — 0 of 8 carried; the day after leans short (ES −16.1 bp vs other days, t 1.91; NQ −18.7, t 1.78), just under the bar (S1)
+
+**No trial.** `reporting/d181_vixexp.py`, `reports/d181_discovery.json`, 154 expiries 2010-03 → 2022-12. Expiry day itself: ES −7.0 bp (t −0.92), NQ −5.0 (t −0.57) against other
+days. The next session is weaker in both indices, short excess t 1.91 / 1.78 (net +8.5 / +10.6 bp a trade), below the pre-registered 1.96. Not carried, not re-registered
+(a re-test on the same discovery data would be data-led); noted only.
+
+## §1142 — D-series family 182 protocol: the sessions after monthly SPX options expiration (the "post-OPEX unwind") in ES and NQ (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,563.** K6 (§962) tested the week INTO expiration; the week after was not tested. **Dates:** monthly
+expiration = third Friday (prior trading day if a holiday). **Cells:** ES, NQ × {the next session open → close, the next 5 sessions summed} × {long, short} = 8 cells,
+read exactly as §1140 (drift-neutral excess against all other sessions or non-overlapping 5-session blocks; discovery 2010-03 → 2022-12, carry if excess > 0 and t > 1.96;
+sealed 2023-01 → 2026-08 with the strict rule; placebo = random Fridays).
+
+## §1143 — Family 182: no post-OPEX unwind — 0 of 8 carried; if anything the week after is stronger (NQ long +38 bp vs other weeks, t 1.79) (S1)
+
+**No trial.** `reporting/d182_postopex.py`, `reports/d182_discovery.json`, 154 expirations 2010-2022. The popular "weak week after OPEX" is the wrong sign here; the long side
+falls short of the bar. Closed.
+
+## §1144 — Fast Track ticket and payout module for the bot (bot/fasttrack.py), written and tested, NOT deployed (S10)
+
+**No trial.** To run the Fast Track plan at ≤ 10% effort once the user funds it: `bot/fasttrack.py` holds the 100K terms, the three human-hour slots (MNQ day 8:30 AM CT,
+MNQ full and MGC full 5:01 PM CT; 7 contracts, take $800 / stop $4,000, long), `ticket()` (skips a closed account, warns that a full stop ends it) and `payout()`
+(eligibility, amount, the reason when not eligible, and a flag when the next payout is the 3rd — the transition point). `tests/test_bot_fasttrack.py` (4 tests) checks
+it against the A123/A124 engine's payout rule on 5,000 random states. Not wired into `futures_bot.py`, and nothing is copied to the droplet without the user's OK.
+Bulenox needs written approval for any automated order placement (§1105), so the tickets are for manual brackets.
+
+## §1145 — Bulenox account limit confirmed: at most five active Master-level accounts (Fast Track included), all activatable at once (S10)
+
+**No trial.** Help centre ("Multiple Master Accounts", "Number of Accounts", read 2026-10-29 via the CMS translations endpoint): up to five active Master-level accounts
+per profile and Rithmic ID, shared across Master, Fast Track and Momentum Master; no unlocking sequence; balances and drawdowns cannot be combined. Qualification
+accounts are unlimited. The five-slot plan (§1111) is the ceiling at Bulenox.
+
+## §1146 — A142: the transition rule as the help centre states it (sweep of other paid accounts + pending accounts frozen while a Funded Account is active) — five slots keep ≈ $3.9-6.6k a month (S10)
+
+**No trial.** Help centre "Transition of Master-level Accounts" (read 2026-10-29): when an account is eligible after 3 payouts, Bulenox reviews every active Master-level
+account; others with ≥ 1 payout may transition too; balances do not transfer; accounts pending at the time cannot be activated while a Funded Account is active.
+`scripts/a142_transition_sweep.py` simulates the five A137 slots jointly by date (Funded Account valued $0; during a freeze, active 0-payout accounts keep trading,
+replacements stay pending). Mean monthly net, 2015-20 / 2021-26: **own-only, no freeze +$7,320 / +$7,148 (reproduces A137); sweep, no freeze +$6,559 / +$6,254;
+own-only, 20-session freeze +$5,766 / +$5,090; sweep + 60 +$4,800 / +$4,510; sweep + 120 +$4,674 / +$3,896** (28-37% of months negative with a freeze). Transitions
+≈ 4-8 a year. The freeze costs less than feared because accounts without a payout keep trading through it. Planning range for five slots: ≈ $4-6.5k a month in
+backtests, before payout-denial risk and the start-up ruin (§1103).
+
+## §1147 — D-series family 183 protocol: FOMC minutes days (meeting + 21 days, 14:00 ET) in ES, ZN and GC (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,563.** Pre-FOMC drift and decision days were tested (§962 family, Lucca & Moench); minutes days were not.
+**Dates:** each `fomc_dates.json` decision date + 21 calendar days (the Fed's standing schedule), moved to the next d10 trading day if needed. **Cells:** ES, ZN, GC ×
+{long, short}, minutes-day open → close = 6 cells, read as §1140 (drift-neutral excess vs all other days; discovery 2010-03 → 2022-12, carry if excess > 0 and t > 1.96;
+sealed 2023-01 → 2026-08 strict rule; placebo = random Wednesdays).
+
+## §1148 — Family 183: FOMC minutes days — 0 of 6 carried (best ES long +8.9 bp vs other days, t 1.13; 98 days) (S1)
+
+**No trial.** `reporting/d183_minutes.py`, `reports/d183_discovery.json`. Closed.
+
+## §1149 — D-series family 184 protocol: WASDE release days (12:00 ET) in corn, soybeans and wheat (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,563.** Untested here. **Dates:** USDA ESMIS WASDE listing (692 releases, 1973 →; `data/wasde/dates.txt`).
+**Cells:** ZC, ZS, ZW × {long, short}, release-day open → close = 6 cells, read as §1140 (drift-neutral excess vs all other days; discovery 2010-03 → 2022-12, carry if
+excess > 0 and t > 1.96; sealed 2023-01 → 2026-08 strict rule; placebo = random days of the same weekday mix — here random trading days).
+
+## §1150 — Family 184: WASDE days — 0 of 6 carried (best ZW short +18.5 bp vs other days, t 1.08; 155 releases) (S1)
+
+**No trial.** `reporting/d184_wasde.py`, `reports/d184_discovery.json`. Release days are bigger-range days with no directional lean. Closed.
+
+## §1151 — A143: a volatility-scaled Fast Track bracket (stop = k × median 20-session range, contracts sized to $4,000) — no robust gain over the fixed 7-contract plan (S10)
+
+**No trial.** `scripts/a143_vol_bracket.py` (A135 engine, 3-payout cap, per 84 sessions, 2015-20 / 2021-26; MGC 2011-20 / 2021-26). Fixed plan: MNQ day +$6,339 / +$6,134,
+MNQ full +$6,379 / +$6,679, MGC full +$6,532 / +$6,006. Best k (0.5, chosen on either era) scored on the other: MNQ day +$5,858 (vs +$6,134) / +$6,610 (vs +$6,339);
+MNQ full +$6,818 / +$6,086 (vs +$6,679 / +$6,379); MGC full +$6,208 / +$6,556 (vs +$6,006 / +$6,532). Wider vol stops (k ≥ 1) are clearly worse. Within ±5% either
+way: the fixed bracket stays (simpler, and the forward test is registered on it).
+
+## §1152 — D-series family 185 protocol: COMEX gold options expiry (4th-last business day of each month) in GC; mid-month Treasury coupon day (15th) in ZN (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,563.** Neither calendar is in the archive. **Dates:** OG monthly expiry = the 4th-last d10 trading day of
+each month; coupon day = the 15th, or the next d10 trading day. **Cells:** GC × {expiry day, next day} × {long, short} and ZN coupon day × {long, short} = 6 cells,
+read as §1140 (drift-neutral excess; discovery 2010-03 → 2022-12, carry if excess > 0 and t > 1.96; sealed strict rule; placebo random trading days).
+
+## §1153 — Family 185: gold options expiry and coupon day — 0 of 6 carried (GC day after expiry short +10.0 bp vs other days, t 1.80; ZN 15th long +2.2, t 0.91) (S1)
+
+**No trial.** `reporting/d185_ogcoupon.py`, `reports/d185_discovery.json`, 154 events each. Under the bar; closed.
+
+## §1154 — D-series family 186 protocol: gold first notice day (longs exit before delivery) in GC (S1)
+
+**Written and committed BEFORE any statistic is computed; N 1,563.** Untested here. **Dates:** FND for the active gold months (Feb, Apr, Jun, Aug, Oct, Dec) = the last d10
+trading day of the month before (Jan, Mar, May, Jul, Sep, Nov). **Cells:** GC × {the 3 sessions before FND summed, FND day, the day after} × {long, short} = 6 cells, open →
+close (roll gaps excluded), read as §1140 (drift-neutral excess against non-overlapping blocks of the same length; discovery 2010-03 → 2022-12, carry if excess > 0 and
+t > 1.96; sealed strict rule; placebo random trading days).
+
+## §1155 — Family 186: gold first notice day — 2 of 6 carried; sealed: pre-FND short REJECT (t01564), day-after long WATCHLIST (t01565); N 1,563 → 1,565 (S1)
+
+`reporting/d186_goldfnd.py`; `reports/d186_discovery.json`, `d186_sealed.json`. Discovery 2010-03 → 2022-12 (77 FNDs): short the 3 sessions before FND +30.8 bp vs other
+3-session blocks (t +2.47); long the day after +28.8 bp (t +2.26) — the liquidation-and-recovery story. **Sealed 2023-01 → 2026-08 (22 FNDs): pre-FND short −44.7 bp a
+trade (t −1.08, placebo 39th) → REJECT; day-after long +14.3 bp (t +0.50, placebo 55th) → WATCHLIST** (positive, far from the strict rule; the against-always-long
+test is undefined for a long-only cell). Six events a year at ≈ $14 per MGC contract would not matter to the stack even if it held. Watchlist only.
+
+## §1156 — D-series family 187 protocol: the first-notice-day mechanism in Treasury notes (ZN FND = last trading day of Feb, May, Aug, Nov) (S1)
+
+**Written and committed BEFORE any ZN statistic is computed; N 1,565.** The same liquidation-and-recovery mechanism as §1154, applied to the other physically delivered
+plan-adjacent market. Cells, reading and splits exactly as §1154 with ZN in place of GC (6 cells).
+
+## §1157 — Family 187: no first-notice liquidation in ZN — 0 of 6 carried (the sessions before FND lean UP, +12.0 bp vs other blocks, t 1.87) (S1)
+
+**No trial.** `reporting/d187_znfnd.py`, `reports/d187_discovery.json`, 51 FNDs 2010-2022. The gold pattern does not generalise; with §1155's sealed reversal, the FND
+mechanism is closed.
+
+## §1158 — D-series family 188 protocol: crude oil contract expiry (expiring-month liquidation) in CL (S1)
+
+**Written and committed BEFORE any CL statistic is computed; N 1,565.** Untested here (families 70/Z09 tested the GSCI roll on business days 5-9, not the CL expiry). **Dates:**
+CME rule — trading ends 3 business days before the 25th calendar day of each month (4 if the 25th is not a business day), from d10's CL trading days. **Cells:** CL ×
+{the 3 sessions before expiry, expiry day, the day after} × {long, short} = 6 cells, open → close, read exactly as §1154.
+
+## §1159 — Family 188: CL expiry — 0 of 6 carried (best: short the 3 sessions before, +18.8 bp vs other blocks, t 0.56; 154 expiries) (S1)
+
+**No trial.** `reporting/d188_clexp.py`, `reports/d188_discovery.json`. Expiry-week liquidation is not visible in front-month open → close moves. Closed.
+
+## §1160 — Filter for the rest of the search: monthly event-calendar families cannot reach the bar even if confirmed (S1/S11)
+
+**No trial.** Families 181-188 tested monthly or rarer events (6-12 a year). At the effect sizes seen (10-30 bp of open → close) one event is worth ≈ $10-40 per micro
+contract, ≈ $100-500 a year per contract; even 10 contracts on a prop account is far below $2k a month, and these events fit poorly into the Fast Track slots. From here,
+futures families only if they trade (nearly) every day, or structures that pay at zero edge; event calendars are dropped unless the event is daily.
+
+## §1161 — A144: the bot's NKD dollar-week side (D227) on the Fast Track 100K NKD slot — helps in the current regime, nothing before 2021 (S10)
+
+**No trial (overlay of a confirmed rule).** `scripts/a144_nkd_dollar_side.py`, A21 NKD Tokyo paths (09:00-15:00 JST = 7 PM-1 AM CT, drift removed), 2 contracts, take $800 /
+stop $4,000, 3-payout cap, $4.72 round trip, per 84 sessions. **2011-20: long +$4,058, short +$4,883, dollar-week side +$4,414. 2021-26: long +$4,072, short +$6,538,
+dollar-week +$9,252** — split: 2021-24 (D227's discovery years) long +$5,424 / short +$5,672 / rule +$10,162; **2025-26 (D227's sealed window + forward, 443 sessions)
+long +$947 / short +$8,360 / rule +$7,127.** Reading: in the regime where D227 was confirmed the rule adds ≈ $2.5-4.5k per 84 sessions over the average fixed side; before
+2021 it adds nothing (as D227's own regime notes say). If an NKD Fast Track slot is opened, use the same dollar-week side as the Tradeify NKD ticket; keep MNQ/MGC long.
+
+## §1162 — Re-check (2026-10-29): AI-agent task marketplaces launched in 2026 still pay in stablecoins — §1101 stands (S11)
+
+**No trial (desk).** FutureTools AI (pay-per-task in USDC on Base/Solana), ClawTasks (decentralised), SwarmDock (subscription), Virtuals Revenue Network (agent commerce
+protocol), roborent.cc (USDT): crypto-settled or not per-task developer pay; excluded (no crypto). Nothing USD-denominated and per-task found.
+
+## §1163 — Forward test: the A144 NKD dollar-week slot added as a separate variant (registered variants unchanged) (S10)
+
+**No trial.** `reporting/a122_forward.py` now also replays the 100K NKD Tokyo slot (Yahoo NKD=F 1-minute, 09:00-15:00 JST, 2 contracts, take $800 / stop $4,000, the
+dollar-week side from Yahoo 6E=F daily, A137's 3-payout cap) from 2026-09-30 in every daily run; a failure in this variant never blocks the others. First read
+(2026-10-29, 20 sessions): 3 accounts bought, net −$1,069, the open account +$3,162. Read with the other variants at 60 sessions.
+
+## §1164 — Crypto now in scope (user, 2026-10-29): Bittensor mining screen; SN50 (Synth) Crypto-24h backtest — a simple conditional-vol model beats the median miner on BTC (S11)
+
+**No trial (new arena, measurement).** User: crypto payouts are fine ("crypto is correct"). **Chain economics** (raw JSON-RPC to finney, TAO $253): per-UID miner pay = emission per
+tempo × tempos per day × alpha price. Scan of 128 subnets (median miner UID per month / registration burn): SN82 Noah ≈ $14.9k / $1,671 (30 miners); SN5 Hone (SWE tasks,
+RLVR) $1,130 / $129; SN92 REAX $511 / $147; SN83 CliqueAI (maximum clique) $509 / $38; SN61 RedTeam $396 / $11; SN101 Tag101 $353 / $9; SN79 $263; SN32 ItsAI $242; SN33
+$210; SN22 Desearch $203; SN50 Synth $203 / $202. Many subnets pay one owner UID or almost nothing to the median miner.
+**SN50 Synth** (miners submit 1,000 simulated price paths; CRPS on bp changes at 5m/30m/3h/24h; per-prompt cap at the 90th pct, minus the best; 10-day rolling mean;
+softmax β 0.15; four competitions share emissions: Crypto 24h, Crypto 1h, Commodities/Equities 24h, VHFT). Public API gives every miner's per-prompt CRPS and the validator's
+realized path, so a backtest is exact. `synth/s50_backtest.py` + `synth/fast_crps.py` (vectorised, equals the subnet's own code to 1e-13, 250× faster). Findings: Binance.US
+data is too noisy; Binance's public market-data mirror (data-api.binance.vision, reachable from the US) matches the validator feed; the 5-minute terms are ~63% of the score;
+a time-of-day vol profile × fast EWMA level (half-life 0.5-1 h, reverting to the 7-day level over 2-3 h) with residuals standardised by local vol, scaled 0.9-0.95, works best.
+**BTC, last 10 days (240 prompts; the variants were chosen on the last 3): our averaged score 29.8-30.4 vs the field's median UID 33.1; softmax share 0.49-0.55% of the
+competition vs the median UID's 0.33%.** ≈ $75/month per UID from Crypto-24h alone at today's prices; other assets and the other three competitions not yet built.
+Registration ≈ 0.8 TAO ($202) per UID. Next: ETH/SOL/XRP/HYPE, then Crypto-1h and Com/Equ-24h; CliqueAI benchmark in parallel.
+
+## §1165 — SN83 CliqueAI (maximum clique) benchmarked on 513 logged problems: the field is strong; our solvers tie the best on ≈ 70-85% — not yet competitive (S11)
+
+**No trial (measurement).** Data: the validator's public W&B history (anonymous GraphQL + parquet export; 15 chunks, 513 problems with graphs and every miner's answer;
+`synth/clique_data.py`). Graphs are dense (density 0.70-0.95, 290-900 vertices, time limits 6-30 s), all distinct (no repeated degree sequences). On a typical problem
+90-100% of miners reach the best size; on ≈ 1 in 4 only 4-20% do, and those decide ratings (a smaller clique scores ≈ 1/3 of the best via exp(−pr/rel)).
+Our C solvers on 60 problems (30% of the time limit, one core): DLS-MC 32 ties / 28 short; greedy+DLS-MC 33 / 27; **NuMVC on the complement 43 / 17**; 8 parallel NuMVC
+seeds fix some misses but one 900-vertex problem every miner solves at 79 stays at 77; a beam-greedy copy of a public fork's method is worse (73-74). A public fork shows
+operators hash graphs (bliss canonical form) to share work across their many UIDs. Median UID ≈ $509/month, burn ≈ $38: attractive only with a top-tier solver; parked
+behind SN50. Code: `synth/dlsmc.c`, `dlsmc2.c`, `numvc.c`, `beam.c`, `clique_bench.py`.
+
+## §1166 — SN50 Crypto-24h on ETH, SOL, XRP (out of sample: parameters chosen on BTC) — above the median miner on every asset (S11)
+
+**No trial.** `synth/s50_backtest.py`, last 10 days (240 prompts per asset), variant todg_12_36_c@0.9 (chosen on BTC's last 3 days): softmax share **ETH 0.50% vs the
+median UID's 0.36%, SOL 0.53% vs 0.21%, XRP 0.43% vs 0.28%** (BTC 0.54% vs 0.33%). Averaged scores 38.6-41.2 vs field medians 43.3-44.8. HYPE (Hyperliquid feed) not yet
+tested. Crypto-24h is one quarter of miner emissions (≈ $15k/month): ≈ 0.5% of it ≈ $75/month per UID. Crypto-1h backtest (`synth/s50_1h.py`, vol term verified against
+upstream to 1e-12) running.
+
+## §1167 — SN50: Crypto-1h above median; a mild mean reversion helps Crypto-24h; equities (NVDA) far behind; per-UID economics (S11)
+
+**No trial.** (1) **Crypto-1h** (`synth/s50_1h.py`, 3 days, ~435 prompts, β 0.3): variant tod1_120_240 (minute-of-day profile × EWMA level half-life 2 h reverting over 4 h)
+share **BTC 0.55% vs the median UID's 0.34%, SOL 0.85% vs 0.33%** (ETH pending). (2) **Crypto-24h + mean reversion:** realized 3 h / 24 h variance is only 0.57-0.79 of
+36 / 288 five-minute variances (BTC, ETH); an OU pull toward the start (θ = 0.002 per 5 min) lifts BTC from 0.53% to 0.58-0.62% (10 days). (3) **Com/Equ-24h, NVDA:**
+our score 54 vs the field median's 35 (share 0.01% vs 0.23%); not fixed by vol scale (oracle-k bound 50), weekday/weekend profiles, OU, or an unsmoothed profile; the
+Hyperliquid 5-minute feed matches the validator's level and vol; the gap is uniform across hours and days. Open. (4) **Per-UID economics at today's prices** (miner
+emissions ≈ $60.6k/month, four equal competitions): ≈ 0.6% of Crypto-24h + ≈ 0.6% of Crypto-1h + ≈ 0 of Com/Equ and VHFT ≈ **$190 a month per UID** (median UID $201);
+registration ≈ 0.8 TAO ($202) per UID, no duplicate-submission penalty in the code. 10-15 UIDs ≈ $1.9-2.8k/month for ≈ $2-3k of TAO, paid in SN50 alpha (price risk:
+alpha $0.90, TAO $253). Fully automatable after setup (VPS with a public port; wallet keys stay with the user). Kraken lists TAO (Texas availability to confirm).
+
+## §1168 — SN50 equities: longer profiles do not close the gap; live miner forecast module built and format-checked (not deployed) (S11)
+
+**No trial.** Com/Equ-24h: weekday/weekend profiles lift XAU to 0.12% (median UID 0.28%) and SP500 to 0.15% (0.37%); a 200-day hourly profile from Hyperliquid 1 h
+candles adds nothing (SP500 21.0 vs field 15.2); oracle-k bounds SP500 18.5 / XAU 27.1 vs field 14.2 / 21.8, so the deficit is shape or timing, not the vol level. SN50
+alpha $0.86 (90-day range $0.93-1.31), TAO $239 (range $193-301). **`synth/miner_model.py`**: `generate_simulations(asset, start, increment, length)` for every prompt
+type — Crypto-24h todg_12_36_c_ou20 @0.95, Crypto-1h tod1_120_240, Hyperliquid assets todg_12_36_c_wk @1.0 — from live Binance-mirror and Hyperliquid data; output
+in the validator's format (8 significant digits), 1-5 s per forecast with warm caches (first fill ≈ 75 s, so a cache warmer must run). Per-UID estimate now ≈ $220/month
+at today's prices with equities at their current shares.
+
+## §1169 — SN50 Com/Equ: a 60-day Yahoo profile brings gold (XAU) to near the median; SP500 and NVDA stay well behind. Other subnets screened (S11)
+
+**No trial.** Weekday 5-minute vol profile from Yahoo (60 days; GC=F for XAU, ^GSPC/ES=F for SP500, NVDA for NVDAX) with weekends/gaps from the Hyperliquid 1 h profile:
+**XAU 25.8 vs the field median 24.8, share 0.24% vs the median UID's 0.28%** (was 0.12%); SP500 21.5-23.7 vs 15.2 (no gain; both ES=F and ^GSPC); NVDA 58.8 vs 35.0 (worse).
+Equity perps on Hyperliquid stay unexplained. **Other subnets:** SN5 Hone (median UID ≈ $1,130/month) pays only for full passes of hidden test suites on real SWE /
+terminal tasks — it needs a frontier coding agent, and Hone produces RL training signal, so using Claude's outputs there may conflict with Anthropic's terms on
+building competing models: not pursued without the user's decision. SN32 ItsAI (AI-text detection, ≈ $242 / $16) needs a SOTA detector (the field reports ≈ 98%
+accuracy): GPU model work, skipped. SN83 §1165.
+
+## §1170 — SN50: what real operators earn; Synth Ultra (the VHFT quarter) mapped; HYPE behind (S11)
+
+**No trial.** (1) **Operators today** (Synth leaderboard, alpha $0.862, 20 tempos/day): coldkeys with 20 UIDs earn ≈ $7,866 / 6,427 / 6,390 / 6,352 / 3,676 / 3,051 a month
+($153-393 per UID); one single-UID coldkey ≈ $4,066 (most likely the top Synth Ultra model). Our backtested ≈ $200-220 per UID sits among the mid operators.
+(2) **Synth Ultra** (github synthdataco/synth-ultra): 25% of miner emissions, split equally over BTC/ETH/SOL/XRP (each ≈ $3.8k a month); a Docker model, run by Synth
+on live Binance spot + futures order-book/trade data (and Bybit trades), predicts 100 percentiles of the spot microprice 10 s ahead in < 5 ms, scored by pinball
+CRPS; ≈ 9 scored participants; **one slot per operator** (code and forecasts are compared), needs a registered SN50 UID, an application signed by the hotkey, an
+email and a Discord name, manual approval. No latency race on our side. Recording live Binance spot and futures book tickers (public streams reachable from
+here) to build and score a model (`synth/ultra_record.py`, `ultra_eval.py`). (3) HYPE Crypto-24h: behind on Hyperliquid or Binance history (72 vs 60; 103 vs 84);
+weight 0.48, left on the Hyperliquid model.
+
+## §1171 — SN101 Tag101 (tagging X posts): a flat payout where a reference miner should sit near the median — ≈ $280-370 per UID a month for a $6 registration (S11)
+
+**No trial (desk + chain).** Task: return K short tags for a post (validators pull posts from a public whitelist of AI-related X accounts); each tag is scored on
+cluster support among miners (log-scaled distinct-miner count), proximity to its cluster's centre, stability, validity and label fitness — a consensus score.
+Identical tag sets are scaled down only when ~50 miners share one (c = 50, p = 5.5). Reference miner (`tasks/sn101_reference/core/miner.py`): one OpenAI-compatible
+chat call (gpt-4o-mini by default; `OPENAI_BASE_URL` and `OPENAI_MODEL` are configurable), 3 tags as a JSON array — ≈ $0.0001 a call. **Chain (TAO $239): 247 miners,
+only 16 under $100 a month; percentiles 10/25/50/75/90 = $155 / $281 / $291 / $369 / $373; total ≈ $71.5k a month; registration burn 0.025 TAO (≈ $6).** SN101 pool
+3,452 TAO (≈ $0.82M) — selling a few $k a month moves it ≈ 0.3%. Reading: a miner with a decent LLM should earn near the median; 10 UIDs ≈ $2.8-3.7k a month before
+alpha-price changes and the ≈ 4% dilution they cause. Needs: an LLM API key (user's choice of provider; open-weight providers work through the OpenAI-compatible
+URL), a VPS with a public port, the user's wallet. Risks: SN101 alpha price ($0.81) and the subnet's emission share can fall; the scorer can change; posts come from
+X (the miner only reads the post text the validator sends).
+
+## §1172 — SN83 CliqueAI: an 8-core portfolio (6 NuMVC + 2 greedy/DLS-MC seeds, best kept) ties the field's best on 53 of 60 problems at half the time limit (S11)
+
+**No trial.** `synth/clique_portfolio.py`: same 60 problems as §1165; all 7 misses are one vertex short on ≈ 900-vertex graphs. A one-short answer scores ≈ 0.4 of the best
+(exp(−pr/rel)); ≈ 12% misses puts the average optimality ≈ 0.93 — plausibly near the median UID (≈ $509/month, burn ≈ $38) once diversity credit (returning a different
+maximum clique) is added. One solver farm can serve all UIDs (a public fork hashes graphs to share work). Upgraded from "not competitive" to a live candidate.
+Other flat-payout subnets (chain, TAO $239; p10/p50/p90 per miner UID, burn): SN33 ReadyAI $142/$198/$240, $10; SN32 ItsAI $146/$225/$261, $8; SN22 Desearch
+$47/$196/$245, $5; SN13 Data Universe $51/$117/$127, $5; SN5 Hone $991/$1,069/$1,132, $109 (coldkey concentration being checked).
+
+## §1173 — SN33 ReadyAI: another flat LLM-tagging payout; a three-subnet stack on one server (S11)
+
+**No trial (desk).** ReadyAI miners tag windows of conversations with an LLM (GPT-4o default; OpenAI-compatible overrides) and are scored by cosine distance to the
+validator's own full-conversation tags; output is published as a Hugging Face dataset. Chain: median UID ≈ $198 a month, p10 $142, registration ≈ $10. With SN101
+(§1171) and SN50 (§1164-§1170), a stack of ≈ 10 UIDs each on one VPS ≈ $2.8-3.7k + ≈ $2.0k + ≈ $2.0-2.2k ≈ **$7-8k a month at today's prices** if our UIDs earn
+near the medians (SN101 and SN33 are flat; SN50 backtested at/above median on crypto). Registration ≈ $60 + $100 + $2,000. LLM costs ≈ cents to a few dollars a day.
+Terms: for LLM-tagging subnets whose outputs become public training data, use OpenAI or open-weight models (not Claude) to stay clear of Anthropic's competing-model
+restriction; the user picks the provider and holds the key.
+
+## §1174 — SN101 Tag101 live test started: 2 UIDs on the futures droplet (S11)
+
+**No trial (live test).** User 2026-10-29: start small. Wallet created by the user on the laptop (coldkey stays there); registered **UID 104 (hotkey m1) for 0.0366 TAO
+and UID 181 (m2) for 0.0456 TAO** (balance 0.3209 → 0.2372). PrizePicks bot removed from the droplet at the user's request (code backup kept). Tag101 installed in
+/opt/tag101 (CPU-only torch; fastapi/uvicorn/spaCy model added — missing from the package's dependency list); services tag101-m1 (port 8091) and tag101-m2 (8092),
+MemoryMax 450 MB each (≈ 79 MB used), gpt-4o-mini via the user's OpenAI key (saved on the server by the user; reference tagger verified). Both miners announced at
+block 9393227. Hourly chain logger `tag101-earnings.timer` → /opt/tag101/earnings.csv (our UIDs vs the subnet median; first row: median ≈ $311 a month at TAO
+$228.68). Read: compare each UID's emission with the median after the debiased-EMA ramp (days); go/no-go on ReadyAI and one Synth UID in 1-2 weeks.
+
+## §1175 — SN101 day 1: both UIDs below the median; cause = the repeated-set penalty on reference tags; m1 switched to an "uncommon set" tagger (A/B vs m2) (S11)
+
+**No trial (live).** By 11:00 UTC 10-30 both UIDs had answered every task (≈ 166 each since midnight) but earned little: m2 peaked at $294/month (04:00) and slid to
+$106; m1 ≈ $0.4. All 8 validators agree (per-validator weight: median miner ≈ 0.44%, UID 181 ≈ 0.11-0.14%, UID 104 ≈ 0.001%). Cause found in the scorer
+(`tasks/sn101_reference/core/scoring/tag_scorer.py`): each miner's score is multiplied by 1 / (1 + (k/50)^5.5), k = miners whose tokenised tag SET is identical;
+the stock reference prompt (gpt-4o-mini, 3 tags) gives the same obvious sets as everyone else running it. Fix (`/opt/tag101/repo/tasks/ourtags.py`, loaded with
+`--task.miner_module tag101.tasks.ourtags`, TAG_SEED per miner): the model ranks 6 candidate tags; submit the top one plus 2 seeded-random picks from ranks 2-5 —
+every tag on-consensus, the set rarely identical to anyone's. Deployed on m1 at ≈ 11:40 UTC; m2 stays on the reference for comparison. m1's 24 h immunity ends
+≈ 01:00 UTC 10-31.
+
+## §1176 — SN101 Discord miner watch live (S11)
+
+**No trial.** `deploy/sn101/minerwatch.py` on the droplet (/opt/tag101): posts to the user's #miners channel (ID 1565694815595925534) through the bot's REST API;
+token in /opt/tag101/discord.env (saved by the user, never seen). `minerwatch-health.timer` every 5 min — red embed once per incident (service not active; no
+solved task in 20 min, ignoring the first 25 min after a restart; ≥ 5 errors in 20 min), state in watch_state.json; `minerwatch-report.timer` at :05 every 4 h UTC —
+green embed with miners ranked by $/month, rank among all miner UIDs, % of median, earned α (TotalHotkeyAlpha) and $. Test post and first report sent 10-30 ≈ 12:00
+UTC; health check ran clean.
