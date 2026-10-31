@@ -19020,3 +19020,222 @@ token in /opt/tag101/discord.env (saved by the user, never seen). `minerwatch-he
 solved task in 20 min, ignoring the first 25 min after a restart; ≥ 5 errors in 20 min), state in watch_state.json; `minerwatch-report.timer` at :05 every 4 h UTC —
 green embed with miners ranked by $/month, rank among all miner UIDs, % of median, earned α (TotalHotkeyAlpha) and $. Test post and first report sent 10-30 ≈ 12:00
 UTC; health check ran clean.
+
+## §1177 — SN101 scoring lab started (post logging on m1); SN50 forecasts pass Synth's own response validator on all 18 prompt types (S11)
+
+**No trial.** (1) m1's tagger now appends {post, ranked candidates, submitted tags} per task to /opt/tag101/posts.jsonl (TAG_POST_LOG) for an offline study with
+the validator's TagScorer against a synthetic crowd (reference prompt sampled repeatedly + other prompt styles/models). (2) `synth/miner_check.py`: our
+`miner_model.generate_simulations` output for every LF asset (13, 5-min/24 h) and HF asset (5, 1-min/1 h) passes `synth/validator/response_validation_v2.validate_responses`
+— **18/18 CORRECT, 0.6-4.7 s each with warm caches**; cold caches take ≈ 75 s (SOL/XRP 24 h, HYPE 1 h), so a cache warmer is required before deployment. The
+miner integration is one line: neurons/miner.py imports `generate_simulations` from synth.miner.simulations; ours has the same signature.
+
+## §1178 — Full subnet screen (128 subnets; median miner UID ≥ $80/month) and the first lab read (S11)
+
+**No trial.** `synth/subnet_screen.py` → `reports/subnet_screen.json` (TAO $233; p10 / median / p90 per miner UID, burn, pool, operators, top-5 share): Hone SN5
+$944 / $1,053 / $1,098, burn $105, 42 operators; CliqueAI SN83 $142 / $519 / $1,187, $23, top-5 84%; REAX SN92 $37 / $497 / $2,596, $116; Tag101 SN101 $196 / $315 / $331,
+$7; RedTeam SN61 $0 / $293 / $535, $4, 248 operators; MVTRX SN79 $53 / $253 / $444, $22 (simulated dTAO exchange); Synth SN50 $60 / $203 / $367, $186; ReadyAI SN33
+$134 / $194 / $235, $10; Desearch SN22 $69 / $185 / $220, $2; SayGM SN28 $0 / $179 / $8,970 (resells Claude/GPT/Gemini access — provider terms, skip); Data Universe
+SN13 $46 / $121 / $124 (scrapes X — skip); AlphaRidge SN45 $55 / $94 / $129. Next to study: Hone (open-weight coding model only, for terms reasons), then MVTRX.
+**Lab** (`deploy/sn101/lab_score.py`, validator's TagScorer, half-size crowd of 109 with the repeated-set threshold scaled to match; runs on the droplet at Nice 15,
+600 MB, 10 s/post — the ARM laptop is too slow): first post — entities-first prompt 256% of the crowd median, m1's uncommon-set tagger 189%, gpt-4.1-mini 170%,
+stock reference 5%. One post only; full run at ≈ 40 posts.
+
+## §1179 — SN101 lab on 27 real posts: the entities-first prompt scores best; m2 switched to it (S11)
+
+**No trial.** `deploy/sn101/lab_score.py` (validator's TagScorer; half-size crowd 109, repeated-set threshold scaled; crowd per post = stock-prompt answers ×75,
+entities-first ×12, normal-spacing ×12, gpt-4.1-mini ×10). Mean score per strategy over 27 posts: **entity3 0.734**, uncommon_ent6 0.668, uncommon_space6 0.639,
+uncommon_ref6 0.638 (m1 since §1175), space3 0.613, ref_41mini 0.569, **reference 0.479 (m2 until now)**. (The "vs crowd median" ratio is unstable because the
+duplicate-heavy crowd's median is often ≈ 0.) The prompt matters more than the model. m2 switched at ≈ 15:20 UTC to TAG_MODE=entity3 (posts logged to
+posts_m2.jsonl); live A/B now m1 uncommon-set vs m2 entities-first. Caveat: the crowd is a stand-in; live emission decides.
+
+## §1180 — SN5 Hone deep look: flat ≈ $1,050 per UID because pay ∝ pass rate and farms submit one answer from many UIDs; the cost of solving every task decides it (S11)
+
+**No trial (desk).** Repo hone-subnet-org/hone-subnet (53454a9). Tasks: real repositories with planted defects or terminal incident tasks, graded in a pinned Docker
+sandbox by hidden checks; the answer is a unified diff or a Bash script plus a trajectory; the demo miner is an agent with read-only workspace tools (≤ 48 calls)
+on an OpenAI-compatible endpoint — default **Kimi K3 (open-weight) on Amazon Bedrock**, so an open model fits the terms constraint. **Pay:** a full pass earns
+1 (≥ 0.95 with a light speed tiebreak), a fail 0; each UID's weight = mean payment over its last ≤ 100 tasks, L1-normalised — linear in pass rate. **Volume:**
+one task per validator every 38 blocks (≈ 7.6 min) to 128 of 256 miners; 11 validators → up to ≈ 2,000 tasks a day; byte-identical submissions are graded once,
+so an operator solves each task once and submits it from all its UIDs — hence the flat p10 $944 / median $1,053 / p90 $1,098. **Economics:** income ≈ $1,050 ×
+UIDs at the field's pass rate; cost ≈ tasks/day × agent cost per task (unknown: plausibly $0.05-0.30 with an open model) — ≈ $3-18k a month for an operator that
+answers everything, nearly independent of how many UIDs it runs. Viable only with several UIDs and a cheap model at the field's pass rate. Burn 0.432 TAO (≈ $100).
+Unknowns to measure before any spend: our agent's pass rate on the two retired fixtures (Docker, pinned image) and its tokens per task.
+
+## §1181 — SN101: m1 (UID 104) scores ≈ 0 regardless of its answers; moved to port 8093 to isolate the cause (S11)
+
+**No trial (live diagnosis).** At 15:00 UTC m1 still earned ≈ $0.7/month (validator weight ≈ 0.002% vs the median 0.38-0.41%) ≈ 4 h after its tagger change,
+while m2 (UID 181) sat at ≈ 0.08-0.10%. Both receive the same tasks (31 of 31-32 task IDs in common over 2 h) and answer them; on-chain axons are correct
+(157.230.91.2:8091 / :8092); the validator code has no per-IP rule; Tag101's scoreboard endpoint refuses miners (403). Decisive clue: at the first hourly read
+both ran identical stock code on identical tasks, yet m2 earned 0.61 α/tempo and m1 0.0002 — slot/hotkey/port-specific, not answer-specific. The only
+differences: hotkey, UID, port (8091 is Bittensor's default). Test: m1 moved to port 8093 at block 9397584 (≈ 15:40 UTC), nothing else changed. If m1 recovers
+→ port; if not → UID/hotkey (next: re-register a fresh hotkey, ≈ 0.04 TAO, or ask Tag101's Discord).
+
+## §1182 — SN79 MVTRX (simulated-exchange trading) screened: a real strategy competition, fourth in line (S11)
+
+**No trial (desk).** Repo taos-im/sn-79 (0.6.6). Miners run trading agents over 128 simulated limit-order books (C++ MAXE engine) against background agents;
+≈ 95% of rewards from trading, split equally into **making** (spread captured on maker fills on both sides of a book, judged by the price shortly afterwards;
+smoothed over ≈ 3 simulated hours) and **skill** (mark-to-market P&L minus average inventory × the book's move — de-beta'd alpha — on a minimum number of books);
+≈ 5% for optional GenTRX gradient training (GPU helps). Latency is penalised; a capital-turnover cap limits volume; new simulation configs ≈ weekly; public
+dashboards (taos.simulate.trading) show per-miner activity. Miners need ≈ 1 GB RAM each; strategy work needs the simulator (validators run 32 GB / 16 cores).
+Chain: median miner UID ≈ $253/month, p10 $53, burn ≈ $22, 45 operators (top-5 46%). Fit: our market-making / short-term research; cost: a bigger server and
+real strategy development. Order of additions: Tag101 (fixing) → ReadyAI → Synth → MVTRX → Hone.
+
+## §1183 — SN101 lab round 2 (38 posts): no variant beats the plain entities-first prompt; it stays the recipe (S11)
+
+**No trial.** `deploy/sn101/crowd2.py` + `lab_score.py`, same stand-in crowds as round 1. Mean score: **entity3 0.709**, entity3 at temperature 0 0.705, one entity +
+two topics 0.685, one-or-two-word tags 0.681, ask-6-keep-top-3 0.679, entity3 on gpt-4.1-mini 0.666, strict entity/entity/topic 0.662, ask-6-uncommon-pick 0.645.
+Spread ≤ 8%, about the noise. m2 already runs entity3; m1 moves to it after its port test (§1181) reads out; new UIDs get it (our own few copies stay far below
+the ≈ 50-identical-set penalty range).
+
+## §1184 — SN33 ReadyAI scoring study: cosine to the validator's own full-conversation tags, cubed weights, a 25% owner burn since 10-27 (S11)
+
+**No trial (desk).** Repo afterpartyai/bittensor-conversation-genome-project (37b4474). The validator tags the FULL conversation itself (GPT-4o default) and
+averages those tags' embeddings (OpenAI text-embedding-3-large) into one "neighbourhood" vector; a miner sees only a window. Each miner tag scores its cosine to
+that vector (≤ 20 tags scored, ≥ 3 required); score = 0.55 × mean of the top 3 UNIQUE tags (not exactly in the validator's set) + 0.25 × mean + 0.10 × median +
+0.10 × max; penalties: no exact matches × 0.9, < 1-3 unique tags × 0.85-0.95, max < 0.2 × 0.5, < 2 tags × 0.2. Validator EMA (half alpha on zero rewards) →
+normalised → **cubed** (nonlinear_power 3): a 10% better score earns ≈ 33% more weight, so the flat payout reflects a field of near-identical default miners.
+**Owner burn: 25% of emissions since 2026-10-27** (today's chain medians already reflect it, ≈ $194). Other task types exist (webpage metadata, skill coverage).
+Plan for a ReadyAI slot: (1) a few tags the validator would also produce (avoid the no-match penalty) plus several distinct tags close to the conversation's
+centre (the top-3 unique term is 55%); (2) pick tags by our own text-embedding-3-large cosine to the centroid of a broad candidate set; (3) an offline lab on
+ReadyAI's public Hugging Face conversations with GPT-4o full-conversation tags as the stand-in ground truth. Needs the bigger server for live slots (8 GB).
+
+## §1185 — SN33 ReadyAI lab (19 conversations, 38 windows): 25 candidates → keep the 15 nearest their centroid beats the stock GPT-4o miner by 17% (t 4.8) ≈ +60% weight after cubing (S11)
+
+**No trial.** `deploy/sn33/readyai_lab.py` on the droplet (user's OpenAI key; ReadyAI's own podcast transcripts from Hugging Face, small_dataset; first 150 lines
+as the conversation; stand-in ground truth = GPT-4o with the subnet's tagging prompt on the full conversation; text-embedding-3-large; the evaluator's formula
+and penalties copied; 10-line windows with 2-line overlap). Mean score / paired difference vs the stock GPT-4o miner on the same windows: **central15 0.530
+(+0.077, t 4.80, 31/38 wins)**, central10 0.523 (+0.069, t 4.14), broad_mini 0.523 (+0.069, t 4.52), cands_all20 0.519 (+0.065, t 4.28), central5 0.504 (+0.050,
+t 2.98), default_mini 0.488 (+0.035, t 2.30), default_4o 0.453. Cubed weights → ≈ +60% for central15 vs a stock miner, ≈ $280-310/month at today's median if the
+field is mostly stock. Runs on gpt-4o-mini (cheaper than the stock GPT-4o). Caveats: the real validator adds an enrichment step; live pay decides. Launch recipe for
+ReadyAI UIDs: central15.
+
+## §1186 — SN33 ReadyAI pre-installed on the droplet (not registered, not started) with the central15 patch (S11)
+
+**No trial.** /opt/readyai: repo 37b4474, Python 3.12 venv (CPU torch 2.15 instead of the pinned 2.1.1, which has no 3.12 wheel; typing-extensions/setuptools
+upgraded for torch), W&B key saved by the user (/opt/readyai/wandb.env), OpenAI key shared from /opt/tag101/openai.env. `deploy/sn33/central15.py` replaces only
+LlmLib.conversation_to_metadata in the miner process: 25 candidates from gpt-4o-mini → the backend's own batch embeddings (text-embedding-3-large, 1,536 dims
+as the validator uses) → 15 nearest the centroid; coding conversations and any error fall back to stock. Offline check on a sample window: 15 theme-level tags
+vs the stock prompt's 10 single nouns; ≈ 295 MB RSS per process → 2 miners fit next to Tag101 and the futures bot (2 GB swap). Services readyai-r1/r2 (ports
+8095/8096, hotkeys r1/r2, MemoryMax 550 MB, disabled; start only when the hotkey file exists). Launch steps: user creates hotkeys r1/r2, registers on netuid 33
+(≈ 0.04-0.05 TAO each), copies them; then enable the services and add SN33 to the Discord watch.
+
+## §1187 — SN33 ReadyAI live: 2 UIDs (r1 = UID 168, r2 = UID 132) on central15; Discord watch covers both subnets (S11)
+
+**No trial (live).** User registered r1 (0.0401 TAO) and r2 (≈ 0.06 TAO) from the laptop after closing VS Code (btcli was OOM-killed twice: 2.7 GB laptop, no
+swap; the coldkey decryption needs a burst of RAM); free balance 0.1268 TAO. ReadyAI's venv needed bittensor-wallet 4.1.0 (4.0.1 cannot parse keyfiles written
+by the laptop's btcli 9.23.2 / wallet 4.1.0). Services readyai-r1/r2 running (≈ 276 MB each; droplet ≈ 0.9 GB free). `deploy/sn101/minerwatch.py` now covers
+SN101 (m* hotkeys) and SN33 (r* hotkeys): one embed with a section per subnet + combined totals; health uses a per-subnet quiet window (Tag101 20 min, ReadyAI
+90 min until its task rate is known).
+**§1187 addendum (16:54 UTC):** ReadyAI miners publish a dummy axon (192.0.2.1:1234) to the metagraph by design and put the real endpoint, encrypted for
+validators, in an on-chain commitment built from `--axon.ip/--axon.port`. Without `--axon.ip` the commitment carried the bind address (`[::]`), unreachable;
+services now pass `--axon.ip 157.230.91.2`, and the logs confirm "Real endpoint: 157.230.91.2:8095/8096 … commitment published successfully" at block 9397972.
+
+## §1189 Synth (SN50) launch kit — built, not deployed (2026-10-30)
+
+`deploy/sn50/`: `run_miner.py` swaps `synth.miner.simulations.generate_simulations` for `futuresres.synth.miner_model.generate_simulations`
+(same signature) before running the stock `neurons/miner.py`, which imports the name at run time, so the swap takes. `cache_warmer.py` refreshes the
+Binance-minute, Hyperliquid and Yahoo caches every 4 min. `install.sh <ip>` installs into /opt/synth (synth-subnet clone + venv, our five modules under
+/opt/synth/ours/src, where `s50_backtest.CACHE` resolves to /opt/synth/ours/data/synth with no override) and writes `synth-cache` + `synth-s1..s5`
+units (ports 8101-8105, each conditional on its hotkey file). Smoke test of the packaged layout: BTC 24 h, 1,000 paths, 72 s cold / 1.0 s warm;
+XAU 6 s cold / 4.1 s warm. Cold start exceeds a validator's wait, hence the warmer. Launch needs ≈ 0.8 TAO per slot (register + immunity); not started.
+
+## §1190 — SN101: why both UIDs earn little — softmax pay, inherited UID history, and our answers ≈ 0.28 below the field (S11)
+
+**No trial (live diagnosis).** From Tag101 1.1.1 source: validators score with `rolling_ma_softmax` (not the EMA assumed in §1175/§1177): per-UID mean raw
+reward over the last 24 h (missing rounds count as 0), then softmax with β = 10; weights = stake-weighted mean of the validators' softmaxed scoreboards
+(owner validator UID 0 holds ≈ 84% of validator alpha stake). Rounds every 15 min. So ln(w_i / w_j) / 10 = mean-raw-score gap. On-chain incentive inverted
+(18:10 UTC): 75% of the 248 miners sit within 0.04 of the best (the 117-UID operator −0.021..−0.036; ≈ 40 small operators similar); UID 181 (m2) −0.23,
+UID 104 (m1) −0.57. The scoreboard's raw history is keyed by UID and never reset when the hotkey changes, so each new registrant inherits the pruned
+occupant's last-24 h rewards: this, not the port, explains §1181 (m1's UID inherited ≈ 0, m2's ≈ median; port test moot). m2's slide fits
+avg(t) = prior·(1 − t/24) + ours·t/24 with ours ≈ prior − 0.28 (predicted −0.12 / −0.198 vs the median at 11:00 / 18:03 UTC; observed −0.10 / −0.197),
+the same line through the stock (to 15:20) and entity3 periods — entity3 changed nothing visible. The lab crowd (§1177-§1179) is therefore not the live
+crowd. Validator reach confirmed (25-min SYN capture): owner 54.177.95.135, 34.70.162.213 (UID 61) and two more IPs (≈ UIDs 56/60) hit both miners every
+≈ 15 min; the 4 near-zero-stake validators send nothing (irrelevant to weights). Inherited history rolls off ≈ 01:00 UTC 10-31 (registration block
+9393200/9393207); afterwards the hourly weight change measures our current answers directly (Δgap/h ≈ 4·(new − dropped)/96 for the owner validator).
+Projection with today's answers: m2 ≈ $15-20/month. Next: a live arm with a different answer style on m1 (pending the user's approval), read by slope.
+
+## §1191 — SN101 live arm: m1 → "extract" (literal spans, no LLM) (S11)
+
+**No trial (live arm, user-approved).** Hypothesis from §1190: ≈ 40 independent operators land within 0.04 of the best, so the field's answer is probably
+the post's own words, which every extractor converges on; our LLM tags drift into paraphrase. `TAG_MODE=extract` (`deploy/sn101/ourtags.py`): spaCy
+en_core_web_sm on the post (RT prefix, URLs, @/# stripped): named entities in order of appearance, then noun chunks (proper-noun chunks first, longest
+first), determiners/stopwords trimmed, generic words dropped, lower case, no overlapping tags; fewer than 3 → entity3 fallback. No OpenAI cost. On 14
+logged posts it gave 3 tags every time. Deployed on m1 (UID 104) at 20:34 UTC 10-30 via drop-in `tag101-m1.service.d/mode.conf`; m2 stays entity3.
+Backup: /root/backups/ourtags-2026-10-30-pre-extract.py. Read: after ≈ 01:00 UTC 10-31 (inherited history gone) compare hourly gap
+ln(usd_month / median) / 10 slopes: m2 (entity3 replacing stock, ≈ equal per §1190) should be flat; if extract sits in the band, m1's gap rises
+≈ 0.012/h (its pay ≈ +12%/h, ≈ 2× in 6 h). Flat m1 → extract no better; Tag101 work stops pending the Discord question.
+
+## §1192 — ReadyAI scaling prep: the stock miner busy-loops (≈ 40% CPU each); fix + usage logging built; field ceiling ≈ $280/slot (S11)
+
+**No trial (desk + live read, 21:30 UTC 10-30).** (1) CPU: each ReadyAI miner holds ≈ 35-50% of the droplet's single core while idle (top, 3 × 5 s).
+Cause: `BaseMinerNeuron.run` waits for `block - metagraph.last_update[uid] >= epoch_length`, always true for a miner (miners never set weights), so it
+calls `sync()` (registration check + full metagraph resync + save_state) back to back. Fix in `deploy/sn33/run_miner.py`: `sync()` throttled to once per
+SYNC_SECONDS (300); only the run-loop thread calls it (validators reach the axon independently). (2) Cost: ReadyAI sends five task types, not only
+tagging — since 17:00 UTC r1/r2 received conversation_tagging 14/9, skill_generation 7/9, skill_coverage_evaluation 10/3, named_entities 1/0,
+webpage_metadata 0/1; skill generation chains several long-output calls. No upstream token logging, so the launcher now wraps the OpenAI client's
+chat/embedding `create` and appends the reported tokens per call to USAGE_LOG (dry-run on the droplet: patched, one embed row logged). (3) Memory:
+r1/r2 ≈ 280-370 MB RSS each, m1 ≈ 390 MB (spaCy), m2 ≈ 100 MB; ≈ 660 MB available of 1.97 GB. (4) Chain (TAO $234.5): wallet free 0.1268 TAO;
+ReadyAI burn 0.0413 TAO ($10); ReadyAI pay is flat — top $283/month, 10th-best percentile $234, median $194, 75th-from-top $181; ours $110/$109
+(rank 236/248, still filling its EMA: α 0.1 per observation, reset on new hotkey, cubed after normalisation). Ceiling for a stock-quality slot ≈ the
+median; the top of the field is only ≈ 1.45× it. Deployment of (1)+(2) awaits the user's OK (restarts r1/r2).
+
+## §1193 — ReadyAI: validators grade with gpt-5.2; our miners moved from gpt-4o-mini to gpt-5.2 (central15 kept) (S11)
+
+**No trial (lab + live change, user-approved).** Live read 00:00 UTC 10-31: r1/r2 ≈ $117/month at 7.6 h, near the bottom of their age cohort
+(immune miners: median $129 at 6-9 h, $191 at 21-24 h); the lowest non-immune miner earns $172, so on that path immunity ends (≈ 16:40 UTC) near
+the pruning line. Cause found in the code: on mainnet every validator is locked to the in-code default LLM (`llm_factory.configure_llm_override_lockdown`
+→ `LlmOpenAI(ignore_model_override=True)`, DEFAULT_MODEL "gpt-5.2"), so the ground truth for every tag-similarity task (conversation tagging,
+skill_generation, webpage metadata) is gpt-5.2's tags; our services set OPENAI_MODEL=gpt-4o-mini. skill_generation gives the miner the same
+1,000-character skill text the validator tagged (`SkillGenerationTaskBundle._generate_metadata`), so a default miner nearly reproduces the answer key.
+Lab round 2 (`deploy/sn33/lab52.py`, 20 conversations × 2 windows, ground truth = gpt-5.2 on the full conversation, the evaluator's formula):
+central15 on gpt-5.2 **+9.3% vs live** (cubed +30%, paired t 4.1); stock prompt on gpt-5.2 +1.5% (t 0.6); live central15 on mini = baseline; stock
+on mini −8.2% (t −5.4). Our live setup ≈ a default miner on conversations; central15 was compensating for the weaker model. Deployed 00:45 UTC:
+drop-in `readyai-rN.service.d/model.conf` OPENAI_MODEL=gpt-5.2, central15 unchanged (skill and combine paths stay stock = the validator's own
+pipeline). Wallet/W&B: validator per-UID scores go to W&B afterparty/conversationgenome, which is private (403). Cost of gpt-5.2 to be read from
+the usage log. Earlier the same evening: stock miners busy-loop on sync() (§1192 fix live).
+
+## §1194 — SN79 MVTRX lab: simulator built; passive making is adversely selected; a 60 s book predictor holds out of sample (S11)
+
+**No trial (lab).** DO droplet mvtrx-lab (4 vCPU / 8 GB, user-created) runs the 0.6.6 simulator (16 books, blockCount 1, checkpoints off) with our
+QuoteAgent and an offline scorer replaying the tape through the validator's de-beta code (`deploy/sn79/score_tape.py`). Live economics (chain):
+median $235/month, top $550-880, burn ≈ $22; pay = proportional making (Σ_books 2·min(buy, sell) capture) + proportional positive de-beta alpha
+on ≥ 20 books; the public Grafana (taos.simulate.trading) shows positive-skill miners (126 of 248) take 71% of pay and the median miner has
+negative alpha. Runs 2-3 (1 h, 4 variants): every passive maker loses ≈ 0.03 per fill to adverse selection whatever its inventory limit,
+join rule or flow lean; tightening inventory only cuts fills and kills making credit (A 78.8 → 0). Signal scan on 55 min of 5-level depth
+(run 4, `signal_scan.py`): taker flow 5 s IC +0.275 at 5 s; 120 s return IC −0.126 at 60 s (reversal, −10.9 ticks top vs bottom decile at 30 s);
+5-level imbalance +0.107 at 60 s. Combined linear predictor (`signal_fit.py`), fitted on the first half, tested on the second: 60 s IC +0.159,
+top-vs-bottom decile +20.6 ticks (median spread 2 ticks). Wired into QuoteAgent (model=, alpha_k=); run 5 tests it in a fresh market.
+
+## §1195 — SN83 CliqueAI refresh: our solver now ties the best size on 93/98 live problems, but the field wins on answer diversity — parked (S11)
+
+**No trial (measurement).** Chain: burn $24, median UID $521/month, top-10% ≥ $1,263, 25 operators (top 5 hold 84% of UIDs). Scoring
+(CliqueAI v0.0.17 `scoring/clique_scoring.py`): reward = optimality·(1 + difficulty) + diversity, optimality = exp(−pr/rel) (pr = share of
+responders strictly larger), diversity = 1 / (responders returning the identical clique); EMA α 0.01; weights min-max → sigmoid at the median.
+98 newest logged problems (10-27, W&B toptensor-ai/CliqueAI, which also logs every responder's hotkey, coldkey and reward); our answer
+inserted into the real responder set (`synth/clique_rank.py`). Single portfolio answer: 87/98 best size, diversity 0.61 vs field 0.85 → mean
+reward 2.35, beats 2% of hotkeys (field median 2.64). A 200-step plateau walk moves cliques by ≈ 1 node and barely helps (2.353). 8 restarts,
+least-frequently-found maximum clique (`deploy/sn83/multi_bench.py`, `portfolio.py`): 93/98 best size, optimality 0.974 (field 0.981), diversity
+0.566 → 2.385, still 2nd percentile; 65% of our answers coincide with ≥ 1 logged answer. The maximum cliques share a large core, the field
+already covers most of them, and big operators spread their many UIDs across distinct cliques; a newcomer's answer usually duplicates one.
+Closing the gap needs full enumeration of each problem's maximum cliques to find unclaimed ones — parked. Live miner wrapper ready
+(`deploy/sn83/our_miner.py`: one solve per graph per box, a different clique per UID).
+
+## §1196 — SN101 Tag101: both UIDs pruned when immunity ended; services stopped; the watch now alerts on deregistration (S11)
+
+**No trial (live).** UIDs 104 (m1) and 181 (m2) left the metagraph soon after ≈ 01:00 UTC 10-31, when their 24 h immunity (registered blocks
+9393200/9393207) ended: at $6.8 and $24 per month they were the lowest non-immune miners and were pruned by the next registrations. The extract
+arm (§1191) never got its clean read. Cost ≈ 0.046 TAO. Not re-entering: a new UID inherits the pruned occupant's last 24 h (§1190) and must
+clear the pruning line within a day against a field ≈ 0.28 raw score above our answers. The minerwatch health check only inspected miners the
+chain still listed, so a pruned miner vanished silently; it now remembers each "netuid:name" → UID and posts a red alert when one is no longer
+registered (state key "registered"). tag101-m1/m2 disabled (code and units kept); droplet memory available ≈ 980 MB.
+
+## §1197 — SN79 MVTRX live: x1 = UID 93 (QuoteAgent, 60 s predictor ×2) on mvtrx-lab, 2026-10-31 11:50 UTC (S11)
+
+**Live (user-registered, ≈ 0.08 TAO).** Lab evidence (§1194 + overnight runs 7-8): predictor ×2 earns making credit 75-115 in all 6 simulated
+markets (no-predictor baseline 25) and alpha positive in 3 of 6 (+186, +181, +83/+26; −174, −787, −153/−185); two copies in one market earn
+about as much each as one alone (making 104/105), so a second UID should roughly double the take; the trend guard (quote only the unwinding
+side when the 120 s move exceeds 0.5-1 sd against inventory) is worse in both run-7 markets and is dropped. Service mvtrx-x1 (axon 8101,
+external 157.245.86.147, Restart=always); first minute: validator state every ≈ 3-5 s, 127 simulation fills in 3 min, 9% CPU, 290 MB.
+Startup banner "SETTLEMENT NOT READY … grant a Staking proxy from your coldkey to the exchange's delegate" concerns the MVTRX exchange
+mechanism (real alpha settlement), not yet a scored mainnet mechanism per the 0.6.6 README; NOT granted (it would give a third party
+authority over the coldkey's stake). minerwatch tracks SN79 via the chain only (remote box): report + push-out alert; earnings logged
+hourly. Immunity 24 h. Plan: ≥ median (≈ $235/month) over about a week → second UID on the same box.
