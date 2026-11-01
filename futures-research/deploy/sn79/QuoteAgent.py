@@ -14,10 +14,58 @@ validator's own capture code.
 """
 
 import json
+from collections import defaultdict
 
 from taos.common.agents import launch
 from taos.im.agents import FinanceAgent
 from taos.im.protocol.models import OrderDirection, STP, TimeInForce
+from taos.im.agents import ExchangeStateUpdate, UnifiedAccount
+from taos.im.utils import duration_from_timestamp
+import bittensor as bt
+
+
+class _Ev:
+    """An event / order from the raw wire dict (raw=1, §1207) under QuoteAgent's field names, built once with plain attributes: the
+    pydantic build of the whole state (~9k resting orders + ~8k events) is most of our answer time, and the validator delays us by it."""
+    __slots__ = ("y", "timestamp", "id", "price", "quantity", "side", "Ma", "Ta", "Mf", "Tf", "Mi")
+
+    def __init__(self, d):
+        g = d.get
+        self.y, self.timestamp, self.id, self.price, self.quantity, self.side = g("y"), g("t"), g("i"), g("p"), g("q"), g("s")
+        self.Ma, self.Ta, self.Mf, self.Tf, self.Mi = g("Ma"), g("Ta"), g("Mf"), g("Tf"), g("Mi")
+
+
+class _Lv:
+    __slots__ = ("price", "quantity")
+
+    def __init__(self, d):
+        self.price, self.quantity = d["p"], d["q"]
+
+
+class _Bal:
+    __slots__ = ("total", "free", "reserved", "initial")
+
+    def __init__(self, d):
+        self.total, self.free, self.reserved, self.initial = d.get("t"), d.get("f"), d.get("r"), d.get("i")
+
+
+class _RawBook:
+    __slots__ = ("bids", "asks", "events", "fundamental", "raw_b", "raw_a")
+
+    def __init__(self, d):
+        self.raw_b, self.raw_a = d.get("b") or [], d.get("a") or []    # levels with their resting orders in queue order (qlog)
+        self.bids = [_Lv(x) for x in d.get("b") or []]
+        self.asks = [_Lv(x) for x in d.get("a") or []]
+        self.events = [_Ev(x) for x in d.get("e") or []]
+        self.fundamental = d.get("f")
+
+
+class _RawAccount:
+    __slots__ = ("base_balance", "quote_balance", "orders")
+
+    def __init__(self, d):
+        self.base_balance, self.quote_balance = _Bal(d.get("bb") or {}), _Bal(d.get("qb") or {})
+        self.orders = [_Ev(x) for x in d.get("o") or []]
 
 
 class QuoteAgent(FinanceAgent):
@@ -37,17 +85,64 @@ class QuoteAgent(FinanceAgent):
         self._flow, self._absflow = {}, {}
         self.alpha_k = float(getattr(c, "alpha_k", 0.0))   # fair += ALPHA_K × the model's predicted 60 s mid change (signal_fit.py export)
         self.model = json.load(open(str(c.model))) if getattr(c, "model", "") else None
+        self._oflow = {}                                    # per book: {sec: order-flow sums} (last 6 s), §1206
         self._mids, self._sflow = {}, {}                   # per book: {sec: mid} (last 125 s), {sec: signed taker qty} (last 6 s)
         self.trend_z = float(getattr(c, "trend_z", 0.0))   # >0: when the 120 s move exceeds TREND_Z standard deviations and inventory
                                                            # fights it, quote only the side that unwinds (§1194: losses sit on trending books)
+        self.max_units = float(getattr(c, "max_units", 0.0))   # >0: hard position cap per book in base units (max_inv is a share of wealth and
+                                                               # barely binds live: positions reached 285 units, §1199)
+        self.back = int(getattr(c, "back", 0))             # >0: rest BACK ticks behind the best price on both sides: snipers take the
+                                                           # touch; fills that reach deeper come from large sweeps that tend to revert (§1199)
+        self.pull = float(getattr(c, "pull", 0.0))         # >0: drop the quote on the side the model says the price will cross (|pred| > PULL ticks):
+                                                           # live, other miners snipe stale quotes at −8 ticks each (§1199)
+        self.toxic = float(getattr(c, "toxic", 0.0))       # >0: pause a book while our fills' 30 s markout EMA is below −TOXIC ticks
+        self.toxic_pause = int(getattr(c, "toxic_pause", 180))   # sim seconds the book stays paused
+        self._pending, self._mo, self._paused = {}, {}, {}  # per book: [(due sec, side, price)], markout EMA (ticks), paused until sec
         self.tape = open(str(c.tape), "a") if getattr(c, "tape", "") else None
+        self.lean = int(getattr(c, "lean", 0))             # 1: skip the base agent's state history, CSV event log and debug text (§1207, speed)
+        self.cancel_first = int(getattr(c, "cancel_first", 0))   # 1: cancel the side the prediction says is exposed first (§1207)
+        self.flow_pull = float(getattr(c, "flow_pull", 0.0))   # >0: drop our offer while near-touch new-order imbalance (5 s) > FLOW_PULL, our
+        self._near = {}                                    # bid while < -FLOW_PULL; fills there average −2 ticks from anyone (pull_scan.py, §1207)
+        self.flow_win = int(getattr(c, "flow_win", 5))     # seconds of near-touch order flow behind flow_pull
+        self.flow_cool = int(getattr(c, "flow_cool", 0))   # seconds a side stays pulled after flow_pull last fired (backoff_scan.py: 10 s window +
+        self._pull_until = {}                              # 3 s cooldown ≈ break-even out of sample vs −0.16 for 5 s / none)
+        self.sticky = int(getattr(c, "sticky", 0))         # >0: keep a resting order when the target moves up to STICKY ticks more aggressive than
+                                                           # it — a re-placed order joins the back of the queue and fills only when the level is
+                                                           # being swept: 62% of our fills vs 41% of the field's, at −3 ticks (§1207)
+        self.snap = int(getattr(c, "snap", 0))             # 1: move each quote to the nearest price another maker already holds (never alone)
+        self.qlog = int(getattr(c, "qlog", 0))             # 1 (raw mode, tape on): log each of our orders' size ahead in its queue per update
+        self.raw = int(getattr(c, "raw", 0))               # 1 (with lean=1 lazy_load=1): read books / our accounts from the raw wire dicts, §1207
+        self._books = None
+
+    def update(self, state):
+        """lean=1: only what QuoteAgent reads (config, our accounts, our notices). The base update copies every state into a
+        history, writes every order / cancel / trade to CSV (reloaded on restart, §1207) and formats a debug dump of every book;
+        QuoteAgent uses none of it and the validator delays our orders by how long we take."""
+        if not self.lean or isinstance(state, ExchangeStateUpdate):
+            return super().update(state)
+        self.simulation_config = state.config
+        raw_books = getattr(state.books, "_raw_books", None)
+        if self.raw and raw_books is not None:            # lazy_load=1 left the wire dicts in place
+            self._books = {bid: _RawBook(d) for bid, d in raw_books.items()}
+            self.accounts = {int(bid): _RawAccount(d) for bid, d in state.accounts._raw_accounts[self.uid].items()}
+        else:
+            self._books = None
+            self.accounts = {bid: UnifiedAccount(a) for bid, a in state.accounts[self.uid].items()}
+        self.events = list(state.notices[self.uid])
+        self._exchange_mode = False
+        for e in self.events:
+            if e.type in ("EVENT_SIMULATION_START", "ESS"):
+                self.onStart(e)
+            elif e.type in ("EVENT_SIMULATION_END", "ESE"):
+                self.onEnd(e)
+        bt.logging.info(f"VALIDATOR : {state.dendrite.hotkey} | SIMULATION TIME : {duration_from_timestamp(state.timestamp)} (T={state.timestamp})")
 
     def respond_simulation(self, state):
         response = self.make_response()
         self._sec = state.timestamp // 1_000_000_000
         if self.tape is not None:
             self._record(state)
-        for book_id, book in (state.books or {}).items():
+        for book_id, book in (self._books if self._books is not None else state.books or {}).items():
             acct = self.accounts.get(book_id)
             if acct is None or not book.bids or not book.asks:
                 continue
@@ -60,14 +155,28 @@ class QuoteAgent(FinanceAgent):
     def _predict(self, book_id, book, sec, mid):
         """The signal_fit features, live: taker flow 5 s, returns 5/30/120 s, depth imbalance L1/L5, microprice − mid (§1194)."""
         mids = self._mids.setdefault(book_id, {}); fl = self._sflow.setdefault(book_id, {})
+        ofl = self._oflow.setdefault(book_id, {})       # {sec: [new bid, new ask, near-touch new bid, near-touch new ask, cancelled bid, cancelled ask]}
         mids[sec] = mid
+        tick = 10.0 ** -self.price_decimals(book_id)
+        b0, a0 = book.bids[0].price, book.asks[0].price
+        row = ofl.setdefault(sec, [0.0] * 6)
         for e in book.events or []:
-            if getattr(e, "y", "") == "t":
+            kind = getattr(e, "y", "")
+            if kind == "t":
                 s = e.timestamp // 1_000_000_000
                 fl[s] = fl.get(s, 0.0) + e.quantity * (1 if e.side == 0 else -1)
-        for d, keep in ((mids, 125), (fl, 6)):
+            elif kind == "o" and e.price is not None:
+                bid_side = e.side == 0
+                row[0 if bid_side else 1] += e.quantity
+                if (bid_side and e.price >= b0 - 2 * tick) or (not bid_side and e.price <= a0 + 2 * tick):
+                    row[2 if bid_side else 3] += e.quantity
+            elif kind == "c" and e.side is not None:
+                row[4 if e.side == 0 else 5] += e.quantity or 0.0
+        for d, keep in ((mids, 125), (fl, 6), (ofl, max(6, self.flow_win + 1))):
             for s in [s for s in d if s < sec - keep]:
                 del d[s]
+        nb2, na2 = (sum(ofl.get(sec - j, [0.0] * 6)[i] for j in range(self.flow_win)) for i in (2, 3))
+        self._near[book_id] = (nb2 - na2) / (nb2 + na2) if nb2 + na2 > 0 else 0.0   # near-touch new-order imbalance, 5 s (flow_pull)
         if sec - 120 not in mids:
             return 0.0
         b, a = book.bids, book.asks
@@ -75,10 +184,33 @@ class QuoteAgent(FinanceAgent):
             bq, aq = sum(l.quantity for l in b[:k]), sum(l.quantity for l in a[:k])
             return (bq - aq) / (bq + aq) if bq + aq else 0.0
         micro = (b[0].price * a[0].quantity + a[0].price * b[0].quantity) / (b[0].quantity + a[0].quantity) - mid
-        x = [sum(fl.get(sec - j, 0.0) for j in range(5)), mid - mids.get(sec - 5, mid), mid - mids.get(sec - 30, mid), mid - mids[sec - 120],
-             imb(1), imb(5), micro]
+        o5 = [sum(ofl.get(sec - j, [0.0] * 6)[i] for j in range(5)) for i in range(6)]
+        ratio = lambda x, y: (x - y) / (x + y) if x + y > 0 else 0.0
+        feats = {"flow5": sum(fl.get(sec - j, 0.0) for j in range(5)), "ret5": mid - mids.get(sec - 5, mid), "ret30": mid - mids.get(sec - 30, mid),
+                 "ret120": mid - mids[sec - 120], "imb1": imb(1), "imb5": imb(5), "micro": micro,
+                 "of_new": ratio(o5[0], o5[1]), "of_near": ratio(o5[2], o5[3]), "of_cancel": ratio(o5[5], o5[4])}   # §1206 order flow
         m = self.model
+        x = [feats[n] for n in m["names"]]
         return sum(w * (v - mu) / sd for w, v, mu, sd in zip(m["w"], x, m["mu"], m["sd"]) if sd > 0)
+
+    def _toxic_update(self, book_id, book, sec, mid, tick):
+        """Track our own maker fills on this book; 30 s later mark them against the mid and keep an EMA; pause the book when it is bad."""
+        pend = self._pending.setdefault(book_id, [])
+        for e in book.events or []:
+            if getattr(e, "y", "") == "t" and e.Ma == self.uid:
+                pend.append((e.timestamp // 1_000_000_000 + 30, 1 if e.side == 1 else -1, e.price))
+        keep = []
+        for due, side, price in pend:
+            if due <= sec:
+                mo = side * (mid - price) / tick
+                self._mo[book_id] = 0.8 * self._mo.get(book_id, 0.0) + 0.2 * mo
+            else:
+                keep.append((due, side, price))
+        self._pending[book_id] = keep
+        if self._mo.get(book_id, 0.0) < -self.toxic:
+            self._paused[book_id] = sec + self.toxic_pause
+            self._mo[book_id] = 0.0                        # fresh start after the pause
+        return self._paused.get(book_id, 0) > sec
 
     def _flow_signal(self, book_id, book):
         """Signed taker volume this update (side 0 = taker bought), smoothed; +1 = persistent buying pressure."""
@@ -110,6 +242,7 @@ class QuoteAgent(FinanceAgent):
         if self.flow:
             fair += self.flow * spread * self._flow_signal(book_id, book)
         trend = 0.0
+        pred = 0.0
         if self.model is not None:
             pred = self._predict(book_id, book, self._sec, mid)
             fair += self.alpha_k * pred
@@ -120,19 +253,54 @@ class QuoteAgent(FinanceAgent):
         inside = spread > 2.5 * tick and not self.join
         bid_px = min(bid + tick if inside else bid, fair - self.edge * tick, ask - tick)
         ask_px = max(ask - tick if inside else ask, fair + self.edge * tick, bid + tick)
+        if self.back:
+            bid_px = min(bid_px, bid - self.back * tick)
+            ask_px = max(ask_px, ask + self.back * tick)
         bid_px = round(round(bid_px / tick) * tick, pd)
         ask_px = round(round(ask_px / tick) * tick, pd)
+        if self.snap:                                      # quote only at prices other makers already hold (§1207): 54% of our fills came alone at a
+            ours = defaultdict(float)                      # price nobody else quoted, at −3.87 ticks; sharing a level ≈ break-even
+            for o in acct.orders:
+                ours[(int(o.side), o.price)] += o.quantity or 0.0
+            held = lambda side, lv: lv.quantity - ours.get((side, lv.price), 0.0) > 1e-9
+            bid_px = max((l.price for l in book.bids if l.price <= bid_px + tick / 2 and held(0, l)), default=None)
+            ask_px = min((l.price for l in book.asks if l.price >= ask_px - tick / 2 and held(1, l)), default=None)
         qty = round(max(self.size * wealth0 / mid, self.min_order_size(book_id)), vd)
         want = {}
-        if inv < self.max_inv and acct.quote_balance.free + self._reserved(acct, OrderDirection.BUY) >= qty * bid_px:
+        if self.toxic and self._toxic_update(book_id, book, self._sec, mid, tick):
+            for o in acct.orders:                          # book paused: pull our quotes and stay out
+                response.cancel_order(book_id, o.id)
+            return
+        units = acct.base_balance.total - base0
+        if self.max_units and units >= self.max_units:
+            inv = max(inv, self.max_inv)                   # at the long cap: no more bids
+        if self.max_units and units <= -self.max_units:
+            inv = min(inv, -self.max_inv)                  # at the short cap: no more offers
+        if bid_px is not None and inv < self.max_inv and acct.quote_balance.free + self._reserved(acct, OrderDirection.BUY) >= qty * bid_px:
             want[OrderDirection.BUY] = bid_px
-        if inv > -self.max_inv and acct.base_balance.free + self._reserved(acct, OrderDirection.SELL) >= qty:
+        if ask_px is not None and inv > -self.max_inv and acct.base_balance.free + self._reserved(acct, OrderDirection.SELL) >= qty:
             want[OrderDirection.SELL] = ask_px
+        if self.pull and pred > self.pull * tick:
+            want.pop(OrderDirection.SELL, None)            # price about to rise: do not leave an offer for a sniper to lift
+        elif self.pull and pred < -self.pull * tick:
+            want.pop(OrderDirection.BUY, None)             # price about to fall: do not leave a bid to be hit
+        near = self._near.get(book_id, 0.0); until = self._pull_until.setdefault(book_id, {})
+        if self.flow_pull and near > self.flow_pull:
+            until[OrderDirection.SELL] = self._sec + self.flow_cool   # new orders crowding the bid near the touch: our offer gets lifted
+        elif self.flow_pull and near < -self.flow_pull:
+            until[OrderDirection.BUY] = self._sec + self.flow_cool
+        for side, t in until.items():
+            if self._sec <= t:
+                want.pop(side, None)
         if self.trend_z and abs(trend) > self.trend_z and trend * inv < 0:
             want.pop(OrderDirection.BUY if inv > 0 else OrderDirection.SELL, None)   # long into a fall / short into a rise: unwind only
-        for o in acct.orders:
-            if want.get(o.side) == o.price:
-                want.pop(o.side)                      # already resting at the target price: keep its queue place
+        # the validator adds 5-25 ms to every instruction after a book's first: cancel the side the prediction says is exposed first
+        orders = sorted(acct.orders, key=lambda o: (o.side == OrderDirection.SELL) != (pred > 0)) if self.cancel_first else acct.orders
+        for o in orders:
+            px = want.get(o.side)
+            behind = None if px is None else round(((px - o.price) if o.side == OrderDirection.BUY else (o.price - px)) / tick, 6)
+            if px == o.price or (self.sticky and behind is not None and 0 <= behind <= self.sticky):
+                want.pop(o.side)                      # at the target, or up to STICKY ticks less aggressive: keep its queue place (§1207)
             else:
                 response.cancel_order(book_id, o.id)
         for side, px in want.items():
@@ -141,15 +309,43 @@ class QuoteAgent(FinanceAgent):
 
     def _record(self, state):
         ts = state.timestamp
-        for book_id, book in (state.books or {}).items():
+        for book_id, book in (self._books if self._books is not None else state.books or {}).items():
             for e in book.events or []:
                 if getattr(e, "y", "") == "t":
                     self.tape.write(json.dumps({"ts": e.timestamp, "book": book_id, "id": e.id, "p": e.price, "q": e.quantity, "s": e.side,
-                                                "Ma": e.Ma, "Ta": e.Ta, "Mf": e.Mf, "Tf": e.Tf}) + "\n")
+                                                "Ma": e.Ma, "Ta": e.Ta, "Mf": e.Mf, "Tf": e.Tf, "Mi": getattr(e, "Mi", None)}) + "\n")
             if book.bids and book.asks:
+                b0, a0 = book.bids[0].price, book.asks[0].price
+                tick = 10.0 ** -self.price_decimals(book_id)
+                of = {"nb": 0.0, "na": 0.0, "nb2": 0.0, "na2": 0.0, "cb": 0.0, "ca": 0.0}   # new / near-touch (<= 2 ticks) / cancelled size
+                for e in book.events or []:
+                    kind = getattr(e, "y", "")
+                    if kind == "o" and e.price is not None:
+                        side = "b" if e.side == 0 else "a"
+                        of["n" + side] += e.quantity
+                        if (side == "b" and e.price >= b0 - 2 * tick) or (side == "a" and e.price <= a0 + 2 * tick):
+                            of["n" + side + "2"] += e.quantity
+                    elif kind == "c" and e.side is not None:
+                        of["c" + ("b" if e.side == 0 else "a")] += e.quantity or 0.0
+                self.tape.write(json.dumps({"ts": ts, "book": book_id, "of": {k: round(v, 4) for k, v in of.items()}}) + "\n")
                 self.tape.write(json.dumps({"ts": ts, "book": book_id, "bid": book.bids[0].price, "ask": book.asks[0].price,
                                             "bids": [[l.price, l.quantity] for l in book.bids[:5]], "asks": [[l.price, l.quantity] for l in book.asks[:5]],
                                             "fund": getattr(book, "fundamental", None) or getattr(book, "f", None)}) + "\n")
+            acct = self.accounts.get(book_id) if self.qlog else None
+            if acct is not None and getattr(book, "raw_b", None) is not None:   # qlog=1 (raw mode): where each of our orders sits in its queue
+                q = []
+                for o in acct.orders:
+                    for lv in (book.raw_b if o.side == OrderDirection.BUY else book.raw_a):
+                        if lv["p"] == o.price:
+                            ahead = 0.0
+                            for x in lv.get("o") or []:
+                                if x.get("i") == o.id:
+                                    break
+                                ahead += x.get("q") or 0.0
+                            q.append([int(o.side), o.price, round(ahead, 4), round(lv["q"], 4), o.id])
+                            break
+                if q:
+                    self.tape.write(json.dumps({"ts": ts, "book": book_id, "queue": q}) + "\n")
         self.tape.flush()
 
     @staticmethod

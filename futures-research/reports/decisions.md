@@ -19239,3 +19239,244 @@ Startup banner "SETTLEMENT NOT READY … grant a Staking proxy from your coldkey
 mechanism (real alpha settlement), not yet a scored mainnet mechanism per the 0.6.6 README; NOT granted (it would give a third party
 authority over the coldkey's stake). minerwatch tracks SN79 via the chain only (remote box): report + push-out alert; earnings logged
 hourly. Immunity 24 h. Plan: ≥ median (≈ $235/month) over about a week → second UID on the same box.
+
+## §1198 — SN5 Hone cost / pass trial: 0 passes in 9 attempts over OpenRouter; parked. SN32 ItsAI pays miners nothing (S11)
+
+**No trial (measurement).** SN32 ItsAI: all 252 miners at zero emission (only 3 validators paid) — closed. Hone (chain: median $1,076/UID flat,
+burn 0.45 TAO): the reference demo miner's own agent loop (`DemoMiner._generate`, read-only workspace tools, 48-call budget, ≈ 260 s of model
+time inside the live 280 s window) driven offline on the retired yaml-cpp fixture through OpenRouter (`deploy/sn5/hone_trial.py`), graded in the
+pinned sandbox (`scripts/try_task.py grade`, unprivileged user; reference.diff passes 6/6). High reasoning effort (reference default): GLM 5.3
+Flash, DeepSeek V4.1 Flash ×3, Kimi K3 — all time out with no answer (13-44 model calls, 0.25-1.5 M input tokens, $0.02-0.35). Medium: Kimi
+answers in 115 s ($0.21) and fails all 6 checks; DeepSeek times out. Low: both time out (Kimi $0.52). Total ≈ $1.25. Validators do not yet
+require token logprobs (`TRACE_EVIDENCE_REQUIRED = False`). Economics even at a pass: ≈ 1,000 tasks/UID/day × $0.2-0.5 (Kimi) ≈ $6-15k/month
+to answer everything, viable only spread over many $108 UIDs — not a small start. Parked; revisit only with a Bedrock-speed endpoint and a
+cheaper passing model.
+
+## §1199 — SN79 live: our lab-fitted predictor is BACKWARDS in the live market (momentum, not reversal); live A/B under way (S11)
+
+**Live diagnosis.** Dashboard after ≈ 75 min: UID 93 fills the most of any miner (912 in the window, all 128 books) but making captured 0 and
+de-beta alpha −1,565 (rank 240/256). Live tape (QuoteAgent tape=, 17 sim min, 20.5k of our fills, `markouts.py`): our maker fills mark
+−0.4 / −2.0 / −3.2 ticks at 5 / 30 / 60 s; other miners' +0.7 / +1.1 / +1.2 — we are picked off, they are not. Cause (live features vs the
+forward mid): the live market TRENDS (ret120 IC +0.33, ret30 +0.30, imbalance L1 +0.23 vs the 60 s move) where the lab mean-reverts; our live
+model60 (fit on lab run 4) has live IC −0.22 at 60 s (top-bottom decile −3.1 ticks), so it leaned our quotes against the trend. The lab
+also cannot show it: run 10 (2 markets) — join-only and a toxic-book filter (pause a book while our 30 s markout EMA < −3 ticks) cut making
+55-90% without improving alpha; the live settings stay best in the lab. A predictor fitted on the first half of the live tape holds on the
+second half: IC +0.23 / +0.21 / +0.17 at 5 / 30 / 60 s (top-bottom decile +2.6 / +6.0 / +4.9 ticks). Live sequence (user pre-approved
+low-risk MVTRX tests): 14:01 UTC join=1 (model60 ×2), 14:06 UTC alpha_k=0 + join (baseline), 15:05 UTC model30_live ×1 + join (scheduled),
+16:05 UTC markout comparison of the three tapes (scheduled, /opt/mvtrx/live_compare.txt). ReadyAI skill-coverage lab (`deploy/sn33/skill_lab.py`,
+validator path: gpt-5.2 judge + SkillCoverageScoringMechanism, all sections): on 3 logged tasks the live stock answer (luna, 2 tests/section)
+scores 0.585, best of four; 4 tests/section −20%, gpt-5.2 −6%, both −23% — no fixable gap found there.
+
+## §1200 — SN33 ReadyAI closed: slots settle ≈ $135 vs a ≈ $170 pruning line, and gpt-5.2 costs ≈ $28/slot/month (S11)
+
+**Closed.** r1/r2 at 23.5 h: $134 / $139 per month (climbing ≈ 3-5 $/h as the gpt-4o-mini-era scores wash out of each validator's EMA),
+against a lowest non-immune of ≈ $167-172 and a typical new miner at ≈ $187-194 by 21-24 h; immunity ends ≈ 16:40 UTC. OpenAI spend on
+gpt-5.2 for the two slots ≈ $1.85 on 10-31 (≈ $28 per slot per month) against ≈ $135 earned. The skill-coverage lab (§1199) found no fixable
+gap; a fresh slot is estimated at ≈ $150-175 at 24 h, a coin flip at best with a thin margin after model cost. The wallet (0.047 TAO) is
+kept for MVTRX. `/opt/readyai/stop_when_pruned.sh` disables each readyai-rN service within 5 min of deregistration (log
+/opt/readyai/closed.log); code, task logs and lab kept.
+
+## §1201 — SN33 ReadyAI: the missing ≈ 12% was timeouts — 28% of our conversation answers exceeded the validator's 12 s; fixed (not deployed)
+
+**Lab.** Validators dispatch each task with `timeout=task.timeout` (12 s default; 24 s for skill coverage). Since the gpt-5.2 switch our
+conversation_tagging answers took median 10.1 s, p90 12.9 s, and 21 of 74 (28%) exceeded 12 s — scored zero; other task types were well
+inside their limits. Conversation tagging is ≈ 40% of tasks, so ≈ 11-12% of all tasks scored zero, matching the ≈ 12% shortfall (§1193,
+§1200). Cause: central15's two sequential calls plus the stock code's sequential per-enrichment-line calls and combine (up to 6 calls).
+`deploy/sn33/speed_lab.py` (12 logged live tasks, 2-6 enrichment lines): stock 9.2 s median / 11.1 s max; central15 as live 9.9 / 12.3;
+low effort + priority tier 8.4 / 10.8; + enrichment calls in parallel 5.4 / 6.6 (0 of 12 over 10 s). Quality (`lab_low.py`, 20 fresh
+conversations × 2 windows, gpt-5.2 ground truth): central15 low+priority 0.544 vs central15 default 0.536 (+1.5%, t 1.2) vs stock gpt-5.2
+0.526 (−1.9%). The fix is in `deploy/sn33/central15.py` (low effort + priority for the tagging calls; ConversationTaggingTask.mine runs the
+enrichment calls concurrently); tested on logged tasks: 4.4-5.5 s. ReadyAI stays closed (§1200) unless the user re-enters a slot with this fix.
+**§1201 addendum (16:36 UTC):** user re-entered ReadyAI with the speed fix: hotkey r3 = UID 107 (port 8097, gpt-5.2, central15 low+priority,
+parallel enrichment; unit `deploy/sn33/readyai-r3.service`). r1/r2 left to prune and auto-stop (§1200). Wallet topped up ≈ $50 (≈ 0.21 TAO).
+
+## §1202 — Subnet screen refresh: REAX CPU pool crowded (no), RedTeam the next desk study, Desearch/AlphaRidge low (S11)
+
+**No trial (desk).** Chain 10-31 (TAO $236): SN92 REAX — burn 0.5 TAO ($118), median $362, top-10% $2,279, 135 operators (top 5 21%),
+total miner pay ≈ $436k/month; miners serve pinned models verified in logit space; pools gpu 80% (s1-fast/s1-pro, NVIDIA ≥ 24 GB) /
+lite 15% / cpu 5% (Gutsy 0.8B Q8 GGUF, 812 MB, ≥ 4 cores, 4 GB, llama.cpp). Commitments: s1-cpu served by 175 hotkeys (172 hotkeys are
+multi-model), and REAX's DESIGN-POOLS says the cpu tier actually receives ≈ 1.2% → ≈ $5k/month over 175 slots ≈ $30 per slot — no; the GPU
+pools need ≈ $250-350/month of rented GPU against a $362 median — no. SN61 RedTeam — burn ≈ $1, immunity 48 h, 253 operators (top 5 3%),
+105 of 242 miners at zero, median of the paid ≈ $262: active challenges are defensive (bex_tracer 60%: JavaScript identifying which of 89
+browser extensions are active, MCC over 6 rounds, ≥ 0.8; ada_detection 40%: detecting commercial anti-detect browsers, ≥ 0.9), with
+originality comparison between submissions — next desk study. SN22 Desearch — median $196 flat, 28 operators (top 5 62%) — low. SN45
+AlphaRidge — median $94 — no.
+
+## §1203 — SN61 RedTeam: BEX Tracer's 0.8 bar is unreachable by honest detection; pay comes from ADA-3 (crowded, needs 5 commercial products) — parked (S11)
+
+**No trial (desk).** Chain: 137 paid miners — one outlier UID ≈ $33k/month (≈ 40% of miner pay), the other 136 $260-515 (median ≈ $372);
+105 at zero. Rules (RedTeam core + bex-tracer-challenge): one paid UID per entity (shared IP, coldkey or Docker username → best only);
+accepted if raw score ≥ challenge_min_acceptable_score (bex 0.8, ada 0.9) and similarity to every accepted submission ≤ 0.6; softmax T 0.2
+among accepted; score stable 10 days, zero by day 15; one commit per challenge per 24 h, revealed ≈ 24 h later; submissions are Docker
+images. BEX Tracer: 12 of 89 extensions enabled per round, MCC over all 89; with no false positives MCC = √(TP·77 / (12·(89 − TP))),
+so 0.8 needs ≈ 8 of 12 detected each round (≈ two-thirds of the pool page-visible). Manifests of all 89 (downloaded with the challenge's
+own fetch script, `deploy/sn61/bex_manifests.py`): page-world script on all sites 2, content script on all sites 24, network rules only 9
+(several off by default), site-specific only 11, no page access 43 → perfect detection of everything visible gives MCC ≈ 0.55-0.60, so
+nobody can pass and its 60% weight redistributes to ADA-3. ADA-3: detect AdsPower, Dolphin Anty, GoLogin, Multilogin, Octo (plus
+headless) from page JS at ≥ 0.9 without flagging humans, original vs ≈ 137 accepted solutions — needs the five paid desktop products to
+study and is capped at one slot (≈ $370/month). Parked.
+
+## §1204 — SN101 Tag101 revisit: three-strategy live experiment prepared (modal, stock on gpt-5-mini, extract) (S11)
+
+**Prepared, not launched.** Our earlier answers scored ≈ 0.28 below a tight field (§1190) and the lab cannot model the crowd, so the field is
+measured live: three fresh UIDs (registration 0.027 TAO ≈ $6 each), each a different hypothesis about what the consensus rewards, read
+against each other on chain at ≈ 20-24 h when each UID's 24 h window holds only its own answers (inherited history gone), just before the
+immunity deadline. m3 = modal (stock prompt sampled 8× on gpt-4o-mini, the 3 most frequent tags), m4 = stock reference unchanged on
+gpt-5-mini, m5 = extract (spaCy literal spans, §1191). Units tag101-m3/m4/m5 (ports 8098-8100) on the futures droplet; `ourtags.py`
+gains `modal` and a pass-through `reference` mode. Smoke test on one post: 1.8 / 2.7 / 6.2 s (limit 120 s). Silent-loss check: Tag101's
+time limit is 120 s and our answers took 1-7 s, so the ReadyAI timeout failure (§1201) does not apply here.
+**§1199 addendum (20:30 UTC):** live comparisons, markouts at 30 / 60 s (ours vs other miners): pull rule −2.0 / −2.6 (vs +0.5 / +0.3);
+pull + inventory cap 5% (skew 6) −1.0 / −1.5 (vs +1.3 / +1.5), background-taker fills turn positive (+0.25), bots still take 20% at −6.0;
+quoting 2 ticks behind the best −4.8 / −6.7 (vs +0.9 / +0.9), bots take 35% at −10.6 — resting deeper only gets filled by flow already
+moving through levels: reverted. Positions still reach ≈ 285 units under the 5%-of-wealth cap, so a hard cap of 20 units per book
+(`max_units`) is live from 20:30 UTC (pull + join + cap), comparison at 22:00 UTC (/opt/mvtrx/live_compare5.txt).
+
+## §1205 — SN50 Synth refresh: the model wins in calm markets and loses in volatile ones — no slot for now (S11)
+
+**No trial (backtest).** Exact backtest (Synth API per-prompt CRPS of every miner + realized paths, our forecasts scored with the subnet's
+code). Replaying the cached 10-day window (to ≈ 10-29) with today's code reproduces the earlier result: todg_12_36_c_ou20@0.95 share 0.64%
+vs median UID 0.33% — pipeline sound. The last 5 days were ≈ 2× as volatile (CRPS scale 53-76 vs 29-33) and the same model falls BELOW
+the median everywhere: Crypto-24h BTC 0.022% vs 0.177%, ETH 0.054% vs 0.072%, SOL 0.059% vs 0.061%, XRP 0.015% vs 0.051%; Crypto-1h BTC
+0.155% vs 0.467%. Variant grid on BTC (decay of the EWMA level toward the 7-day level 3 h → 12 h / 24 h, scale 0.95 → 1.0, OU on/off):
+best volatile-window share 0.074% (todg_12_144_c_ou20@1.0) — still far below the median — and every slower variant gives up most of the
+calm-window edge (0.68% → 0.23-0.39%). The gap is structural (regime adaptation), not a parameter; a GARCH-style / regime-aware volatility
+model validated on both windows is the next step if Synth is revisited. No registration (0.8 TAO).
+**§1205 addendum (21:00 UTC):** GARCH-style per-path variance (`todv_<hl>_<L lookback>_<α>_<β>`, `s50_backtest.ensemble`: each path's variance
+h' = (1−α−β)L² + α·e² + β·h in time-of-day-profile units, h₀ = the EWMA level², L = recent level) on BTC: volatile 5 days best 0.035%
+(todv_12_288_0.05_0.94_c, CRPS 64.1 vs median 53.4) vs current 0.017%; calm 10 days 0.25-0.48% vs current 0.62% (median 0.33%). Volatility
+dynamics are not the gap; next: per-prompt diagnosis (drift / a few big days / start-price timing).
+**§1205 addendum 2 (21:25 UTC), per-prompt diagnosis (BTC, last 5 days, `rows_BTC_5.json`):** the price cache has no gaps; our start price
+matches the validator's (mean |diff| 2-7 bp, max 37 bp); Synth's scoring code is unchanged since our copy. In RAW CRPS we are at the field
+median every day (ratio 1.00-1.01 on 10-25…10-29, 1.03 on 10-30). The field sits within ≈ 1-3% raw CRPS; the per-prompt transform (cap at the
+90th percentile, minus the best) and softmax β 0.15 turn that into a steep payout: ≈ 1-3% worse than the median → ≈ 0.1× median pay (this
+window), a few % better → ≈ 2× (the calm window). Our model is a median-level forecaster with regime-dependent pay; no structural fault.
+Expected value of a 0.8 TAO slot ≈ break-even at current accuracy — hold; revisit only with a consistent few-% CRPS improvement (e.g. order
+book / funding inputs).
+
+## §1206 — SN79 live: the bots that pick us off trade on visible order flow; an order-flow predictor beats ours out of sample (S11)
+
+**Live analysis.** Books are independent (median cross-book correlation of 10 s returns +0.002; other books' last 5 s move → this book's next
+30 s: IC +0.01), and the 5 s before a bot fill on our quote show no larger visible move than before a background fill (+0.45 vs +0.55 ticks),
+so the bots neither use other books nor merely react faster. QuoteAgent now records per book per update the new bid / ask size, the size
+placed within 2 ticks of the touch, and cancelled size (tape "of" lines, `orderflow.py`): near-touch new-order imbalance (5 s) has rank IC
++0.23 / +0.27 with the next 5 / 30 s move, above the taker flow we use (+0.25 / +0.18); before bot fills the 5 s taker flow in the bot's
+direction is ≈ 3.7× that before background fills (+288 vs +78) and net order-flow imbalance is −0.39 vs +0.13. `fit_orderflow.py` (the live
+features of QuoteAgent._predict + of_new / of_near / of_cancel), 18 sim min, fit on the first 75% by time, held-out 30 s IC +0.353 vs
+the deployed model's +0.252 (top-bottom decile +12.1 ticks) → model30_of.json, live from 22:01 UTC (pull + join + cap + 20 units
+unchanged), comparison at 23:35 UTC (/opt/mvtrx/live_compare6.txt).
+**§1206 addendum (23:15 UTC):** live order-flow model (22:00-23:10 UTC, 17 sim min): our markouts −0.35 / −0.17 ticks at 30 / 60 s
+(20-unit-cap tape −1.29 / −1.25; other miners +1.30 / +1.76); background-taker fills +1.01 (≈ the field); bot takers still 19% at −6.25;
+max position 69 units. Pull threshold 2 → 1 tick live from 23:10 UTC (comparison 00:45 UTC). Each of our three live restarts today
+(20:26, 21:55, 23:10 UTC) was followed by the validator's simulation clock stalling ≥ 10 min (axon re-published → our agent re-initialised
+with a large catch-up state); live restarts are now kept to a minimum — variants go to the lab sim, one winner per (re)registration.
+
+## §1207 — SN79 live: the post-restart "validator stalls" were our miner; fixed. Our answers are ~4× slower than the field's (S11)
+
+**The stall was ours (corrects the §1206 addendum).** py-spy on the live miner 13 min after the 23:08 UTC restart: 99% CPU inside
+`AgentEventHistory.append` (taos/im/protocol/events.py), not waiting on the validator. On restart the base agent reloads every order /
+cancel / trade it ever logged to CSV (`load_event_history`: 1.49 M rows, 77 MB since 10-31 11:50 UTC), then the first state trims to the
+60-min lookback by popping the dict's oldest key one at a time; CPython re-scans the deleted slots on every `next(iter(d))`, so the trim is
+quadratic and grew with each restart. While it ran we answered nothing. Fix (`deploy/sn79/fix_trim.sh`, applied 23:22 UTC): the trim is one
+linear dict rebuild, and the CSV directory was moved to /opt/mvtrx/csv_archive/. The miner answered its first state 20 s after restart.
+Live restarts are cheap again; the "keep restarts minimal" rule from §1206 no longer applies.
+**Speed.** Validators delay each miner's instructions by an exponential curve over the 3 s timeout (10 ms floor, 1 s cap; taos/im/validator/
+delays.py): field median ≈ 0.06 s → 10.7 ms; ours ≈ 0.24 s logged decompress (p50 0.237, p90 0.364 s) and ≈ 0.9 s per state in total by
+py-spy → ≈ 13-40 ms. Every miner that answers faster acts on the same state before us — a bot that sees our stale quote lifts it before our
+cancel lands, consistent with the bots' 19% of fills at −6.25 ticks. Profile of a state: decompress 65% (mostly pydantic building every
+book level's order list and the accounts), base-agent update + CSV logging 15%, QuoteAgent 19%. `--agent.params lazy_load=1` skips the
+eager build (QuoteAgent reads only fields the Lazy* objects expose). Also: every instruction after a book's first gets +5-25 ms, so
+QuoteAgent now cancels the side its prediction says is exposed first. Both go live after the pull=1.0 comparison at 00:45 UTC.
+**§1207 addendum (23:50 UTC), speed measured on live states.** Three live requests captured passively (tcpdump on the axon port,
+`pcap_req.py`) and replayed through QuoteAgent (`replay.py`, median of 15 runs): 128 books × 21 levels a side with ≈ 70 resting orders
+inside the levels and ≈ 64 events per book → ≈ 9k orders + 8k events built as pydantic objects per state. Network is not the gap: 570 kB
+requests arrive in 3-14 ms over a kept-alive connection from the validator (Chicago, 18.5 ms RTT); replies are ≈ 5 kB; our server time
+is 290-390 ms per request. Dashboard (record:miner_call_time_avg_5m): ours 0.53 s, rank 249 / 256; field median 0.12 s, p10 0.06 s.
+Replay per state: current 0.237 s (decompress 0.147 + agent 0.087); lean=1 0.183 s; lazy_load=1 alone BREAKS QuoteAgent (lazy cancel
+events have no `side`; the per-book try/except swallowed it → 4 orders instead of 1038) — never deploy lazy_load without raw;
+**raw=1 lean=1 lazy_load=1 0.080 s** (decompress 0.027 + agent 0.050), orders and tape byte-identical to the current setup. The 00:45 UTC
+live test is therefore the full speed package (`switch_fast.sh`) — one variable (speed), behaviour verified identical; cancel_first
+(param, default off) is a later test of its own.
+**§1207 addendum 2 (00:50 UTC 11-01).** Comparison 7 (/opt/mvtrx/live_compare7.txt): pull 1.0 tick (23:22-00:45 UTC, 23 sim min) vs pull 2:
+30 / 60 s markouts −0.42 / −0.73 vs −0.36 / −0.18 ticks (others +1.16 / +1.44); miner takers 20% of our fills at −5.68 vs 19% at −6.24 —
+no gain: pulling earlier does not keep the bots off us, consistent with our cancels arriving after their orders. pull 1.0 kept so the next
+test changes speed only. `switch_fast.sh` live at 00:46 UTC (raw=1 lean=1 lazy_load=1, tape live_tape_x1_fast.jsonl): decompress 0.03-0.04 s
+(was 0.20-0.45), server time per request 115-120 ms by packet capture (was 290-390), quoting and fills normal. Read: dashboard call time
+and the bot share / bot markout of our fills after ≈ 80 min (~02:10 UTC).
+**§1207 addendum 3 (02:15 UTC 11-01), comparison 8: speed alone does not stop the bots.** Dashboard call time 0.44 → 0.16-0.18 s (rank 196
+/ 256, median 0.122; sim delay ≈ 12.4 ms vs the median's 11.6, was ≈ 19.6). Fast path vs pull 1.0 baseline (20 vs 23 sim min): 30 / 60 s
+markouts −0.26 / −0.50 vs −0.43 / −0.77 ticks (others +1.23 / +1.04); miner takers 22% of our fills (was 20%) at −4.74 (was −5.67);
+total miner-taker loss ≈ −16%; background fills +1.00 (+0.89). The bots hit us as often as before — they win on information (one-sided
+near-touch order flow before their fills, §1206), not on reaching the book first; faster cancels only trim the loss per hit. Fast path
+stays on. Next: pull / back off the exposed side on strongly one-sided near-touch order flow (threshold from the pre-bot-fill flow).
+**§1207 addendum 4 (02:20 UTC 11-01), flow pull.** `pull_scan.py` over our 19,038 maker fills on 3 live tapes: rule = drop our offer while
+near-touch new-order imbalance (5 s before, bid − ask) > THR, our bid while < −THR. At THR 0.3 it blocks ≈ 29% of fills — bot and
+background alike (it is not a bot detector: one-sided near-touch flow predicts a bad fill from anyone) — whose 30 s markout is −1.84 /
+−2.65 / −2.10 ticks per tape; the kept fills are +0.24 / +0.48 / +0.25 (all three tapes turn positive). Upper bound: blocked fills assumed
+gone with no replacement. Other features weaker (taker flow, new-order imbalance) or harmful (cancel imbalance). QuoteAgent `flow_pull`
+(replay: off = byte-identical to the live agent; 0.3 drops ≈ 17% of instructions) live 02:20 UTC on the fast path (tape
+live_tape_x1_flowpull.jsonl); comparison 9 at 03:40 UTC (/opt/mvtrx/live_compare9.txt).
+**§1207 addendum 5 (02:35 UTC), flow pull out of sample (`pull_oos.py`):** threshold picked on the first half of each tape's fills (0.3 /
+0.2 / 0.4 — near the deployed 0.3), scored on the second half: blocked fills −1.11 / −2.49…−2.73 / −2.29…−2.33 ticks (the signal holds),
+kept fills +0.02 / −0.13 / −0.34 vs all −0.28 / −0.73 / −0.80. Realistic gain ≈ +0.4-0.6 ticks per fill — about a third of the gap to
+the field (+1.2), probably not break-even on its own. Expect comparison 9 to beat the fast path but stay slightly negative.
+**§1207 addendum 6 (02:55 UTC), stronger back-off (`backoff_scan.py`, second half of each tape, pooled; no rule −0.62 ticks per fill):**
+deployed (5 s window, no cooldown, 0.3) kept −0.16 (76% kept); 10 s window + 3 s cooldown + 0.3 kept +0.05 (67%); 5 s + 10 s cooldown
++ 0.4 +0.08 (38%); the variant best on the first halves (10 s / 10 s / 0.3) −0.01 (49%). Flow pulling can remove most of the adverse
+fills but reaches ≈ break-even, not the field's +1.2, and costs maker volume (which is part of the pay). QuoteAgent `flow_win` /
+`flow_cool` (defaults = the live behaviour, byte-identical on replay); `switch_backoff.sh` (10 s / 3 s) and `switch_cancelfirst.sh` staged
+for after comparison 9 — one change per run.
+**§1207 addendum 7 (03:15 UTC), where the field's edge comes from (`field_split.py`, fast tape).** Other miners are bot-taken exactly as
+often as we are (22% vs 22%); bot fills cost them −2.92 vs our −5.35, background fills earn +2.30 vs our +0.97; median fill size 9-12 vs
+our 1.6. By distance from the pre-fill mid, at the SAME distance their fills are far better (< 1 tick: +2.53 / +2.20 vs our −0.29 / −0.80;
+1-2 ticks: +1.98 / +2.09 vs +0.31 / −0.03) — not a wider-quote effect: they are filled on the side the price then moves toward (better
+fair value / lean). The books' published fundamental has 30 s rank IC +0.23 alone but adds nothing to the order-flow model out of sample
+(`fit_fund.py`, cap 0.2 / 0.5 / 2.0: +0.356 / +0.352 / +0.334 vs deployed +0.359): collinear with ret120 / imbalance. Next candidate: lean
+harder on the prediction (alpha_k > 1, quote one-sided on stronger predictions), after the flow back-off and cancel_first runs.
+**§1207 addendum 8 (03:05 UTC): the loss is queue position.** `lean_scan.py` (model30_of recomputed per book-second from the tapes): 75%
+of our fills are on the side the model favours (field 57%) — we already lean more; one-sided quoting at lower thresholds only moves the
+second-half markout −0.83 → −0.67. At the same signed prediction the field's fills earn 2-4 ticks more (> +2: +4.91 vs our +0.87).
+Sweep test (best price on the filled side worse than our fill price 1 s later): 61-62% of our fills vs 41% of the field's; markout of
+swept fills −2.9 / −3.0 (field −1.8 / −2.0), of the rest **+3.5 / +3.8 (field +3.2 / +3.4)**. Our unswept fills are as good as the
+field's; we are filled at the back of the queue, i.e. when the level is being consumed. QuoteAgent re-placed any order whose target moved
+by a tick. `sticky=N`: keep a resting order up to N ticks less aggressive than the target (cancel at once if the target moves away);
+replay: sticky=0 byte-identical, sticky=1 cuts instructions 433 → 289 on 3 states. `switch_sticky.sh` staged — first in the queue after
+comparison 9 (ahead of the flow back-off and cancel_first).
+**§1207 addendum 9 (03:42 UTC), comparison 9: flow pull dropped.** Fast vs fast + flow_pull 0.3 (22 vs 18 sim min): our 30 s markout −0.46
+vs −0.65, but the field fell in the second window (+1.11 → +0.38), so the gap to the field narrowed −1.57 → −1.03; our fills per sim
+minute fell ≈ 37% (311 → 197; maker volume is part of the pay); miner takers 24% at −6.81, background +1.31. Not a clear win → removed.
+`sticky=1` live 03:41 UTC on the fast path (no flow_pull; tape live_tape_x1_sticky.jsonl); comparison 10 at 05:01 UTC. Judge sequential
+runs against the field in the same window, not in absolute terms — the market regime moves between windows.
+**§1207 addendum 10 (03:55 UTC), queue position measured directly.** QuoteAgent `qlog=1` (raw mode): per update, for each of our resting
+orders, the size queued ahead of it at its price (levels carry their orders in queue order) → tape "queue" lines; trade lines now carry
+the maker order id `Mi`. Replay of the 3 captured live states (23:34 UTC, the pull-1.0 agent): instructions byte-identical; **median 81%
+of a level's size sat ahead of our orders** (mean 58%) — e.g. 815 of 837 units ahead. Back of the queue confirmed directly. `swept.py`
+added to comparison 10 (fast baseline: 62.4% of our fills swept vs 41.2% for the field). `switch_qlog.sh` staged for after comparison 10.
+**§1207 addendum 11 (04:30 UTC), queue study → we quote at prices nobody else holds.** `queue_study.py` on a 15-min passive capture
+(211 states, 03:46-04:01 UTC, sticky live): for every maker fill, the filled order looked up in the previous state. Ours: 902 fills,
+markout −2.01, median share ahead 0.00, age 5 s. Top makers: age 6-14 s, share ahead 0.02-0.24 (order age / queue depth are not the
+difference — the earlier 36-state hint of 30 s ages was noise). Front-half fills: ours −2.43 vs field +1.19 — queue position alone does
+not explain it. **54% of our fills came when ours was the only order at its price, at −3.87 ticks; sharing a level −0.01.** The field
+is alone on 8% of fills (+0.59), top makers 1-15%. Our price is fair ± edge rounded to the tick, which lands in gaps between the field's
+levels; only sweeps reach it. Replay: 23% of the live agent's new orders go to prices with no existing level. QuoteAgent `snap=1`: quote
+only at the nearest price another maker holds (bid down / ask up; our own size excluded) — replay: snap=0 byte-identical, snap=1 100% at
+existing levels. `switch_params.sh` staged; next live test = snap=1 (+ qlog=1) on whichever setup wins comparison 10.
+**§1207 addendum 12 (04:35 UTC), snap stacking estimate + overnight chain.** `snap_stack.py` (shared / alone from the tape's top-5 depth
+before each fill): shared-price fills +0.40 / +0.85 / +0.75 on the order-flow / pull-1.0 / fast tapes, alone −2.45 / −3.91 / −3.89
+(≈ 26% of fills); the sticky tape is worse — alone 34% at −4.98, all −1.74 (sticky keeps orders at prices the field left). On shared fills
+only, second half pooled: no flow rule +0.51; + flow pull 5 s / 0.3 +1.14 (76% kept); 10 s / 3 s cooldown / 0.3 +1.32 (67% kept) — at
+the field's level. Upper bounds. Chain scheduled on mvtrx-lab (runs with the laptop closed): 05:03 UTC fast + snap=1 + qlog=1 (sticky
+removed; tape live_tape_x1_snap), comparison 11 at 06:23 (fast vs snap), 06:25 + flow_pull 0.3 / flow_win 10 / flow_cool 3 (tape
+live_tape_x1_snapflow), comparison 12 at 07:45 (snap vs snapflow); stays on snapflow afterwards. Configs dry-run verified.
+**§1207 addendum 13 (08:40 UTC 11-01), overnight chain: every change since the fast path did worse live.** Gap of our 30 s markout to
+the field in the same window: fast −0.46 vs +1.11 (−1.57; 62% of our fills swept, 22% bot-taken, 6,852 fills / 22 sim min); sticky −1.81
+vs +1.08 (−2.89; 64%, 32%, 4,493); snap −2.75 vs +0.68 (−3.43; 72%, 37%, 3,520); snap + flow pull 10 s / 3 s / 0.3 −1.42 vs +0.92
+(−2.34; 67%, 38%, 1,702). qlog: snapped quotes sat at the touch 74% of the time (as fast) with a median 76% of the level ahead — snap
+put us at the back of crowded levels; the background fills we used to get at lone prices vanished and bots took a larger share. The
+offline estimates (snap_stack / backoff_scan / pull_scan) scored "remove these fills" on the existing fills and could not see that a change
+alters which fills we get — tape analysis locates losses but does not predict live effects; only live A/B does. Reverted to fast (+ qlog)
+at 08:34 UTC. UID 93 immunity ends ≈ 11:50 UTC; no profitable setup → recommend no re-registration for now.
+**§1207 addendum 14 (08:45 UTC), last tests on UID 93 (user: keep testing while the slot lasts).** Picked from live evidence only: fresh fast
+baseline (live_tape_x1_fast2, 08:34-09:15 UTC); 09:15 edge=2 (the field captures +3.05 ticks from the mid on fills vs our +2.24, and
+earns +2.30 on background fills vs our +0.95 — quote no closer than 2 ticks to fair), comparison 13 at 10:35; 10:37 fast + cancel_first=1
+(changes cancel timing only, not which fills we get), comparison 14 at 11:57 if the slot survives immunity end (≈ 11:50 UTC). Judged by
+the gap to the field in the same window. Scheduled on mvtrx-lab (`step_edge2.sh`, `step_cancelfirst.sh`, `compare_pair.sh`).

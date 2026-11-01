@@ -187,6 +187,8 @@ def ensemble(closes: np.ndarray, s0: float, model: str, rng, n=1000, steps=288, 
         dec = 288.0
         if model.startswith("todg"):                         # todg_<half-life steps>_<decay steps>
             hl, dec = (float(x) for x in model.split("_")[1:3])
+        if model.startswith("todv"):                         # todv_<half-life>_<long lookback steps>_<alpha>_<beta> (§1207)
+            hl, lb, ga, gb = (float(x) for x in model.split("_")[1:5])
         w = 0.5 ** (np.arange(m)[::-1] / hl); level = np.sqrt((w * z_hist ** 2).sum() / w.sum())
         long = np.sqrt(np.mean(z_hist[-2016:] ** 2)); decay = np.exp(-np.arange(steps) / dec)         # level reverts to the 7-day mean over ~a day
         lev = long + (level - long) * decay
@@ -198,6 +200,13 @@ def ensemble(closes: np.ndarray, s0: float, model: str, rng, n=1000, steps=288, 
                 v[t] = acc; acc = (1 - a) * acc + a * z_hist[t] ** 2
             zc = z_hist / np.sqrt(v); pool = zc[-8640:] / np.sqrt(np.mean(zc[-8640:] ** 2))
         z = rng.choice(pool, (n, steps)) * fut[None, :]
+        if model.startswith("todv"):                         # GARCH-style per-path variance in profile units: h' = (1-a-b)L^2 + a e^2 + b h,
+            L2 = np.mean(z_hist[-int(lb):] ** 2)             # L = recent (lb steps) level, h0 = current EWMA level^2; e = the path's own shock
+            h = np.full(n, level ** 2); eps = rng.choice(pool, (n, steps)); z = np.empty((n, steps))
+            for t in range(steps):
+                e = eps[:, t] * np.sqrt(h)
+                z[:, t] = e * fut_prof[t] * k
+                h = (1 - ga - gb) * L2 + ga * e ** 2 + gb * h
         if "_ou" in model:                                  # mean reversion of log price toward the start: x_{t+1} = (1 - theta) x_t + z_t
             th = float(model.split("_ou")[1].split("_")[0]) / 1e4; x = np.zeros((n, steps + 1))
             for t in range(steps):
@@ -252,9 +261,12 @@ def main(asset: str, days: int, models=("boot_7d", "tod_1d", "tod_6h", "tod_6h@0
             hp = (hp[0], hp[1], yahoo_profile(Y, t0))
         ours = {m: crps_sum(ensemble(hist, s0, m.split("@")[0], rng, slot0=slot0, k=float(m.split("@")[1]) if "@" in m else 1.0, stride=stride, day0=day0, hprof=hp),
                             np.array(real, float), 300, INTERVALS) for m in models}
-        rows.append({"start": st, "field": P[st], **ours})
+        rl = np.log(np.array(real, float)); rows.append({"start": st, "field": P[st], **ours, "_move24": float(rl[-1] - rl[0]),
+                                                          "_rv": float(np.sqrt(np.sum(np.diff(rl) ** 2)))})
     out = summarise(rows, models)
     (CACHE / f"bt_{asset}_{days}.json").write_text(json.dumps({"summary": out, "n_prompts": len(rows)}, indent=1))
+    (CACHE / f"rows_{asset}_{days}.json").write_text(json.dumps([{k: v for k, v in r.items() if k != "field"} | {"_field_median": float(np.median(
+        [v for v in r["field"].values() if v > 0]))} for r in rows]))      # per-prompt diagnosis (§1205)
     return out
 
 
