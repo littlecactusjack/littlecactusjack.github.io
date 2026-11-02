@@ -19480,3 +19480,128 @@ baseline (live_tape_x1_fast2, 08:34-09:15 UTC); 09:15 edge=2 (the field captures
 earns +2.30 on background fills vs our +0.95 — quote no closer than 2 ticks to fair), comparison 13 at 10:35; 10:37 fast + cancel_first=1
 (changes cancel timing only, not which fills we get), comparison 14 at 11:57 if the slot survives immunity end (≈ 11:50 UTC). Judged by
 the gap to the field in the same window. Scheduled on mvtrx-lab (`step_edge2.sh`, `step_cancelfirst.sh`, `compare_pair.sh`).
+**§1207 addendum 15 (19:20 UTC 11-01), last MVTRX tests; slot gone.** Gap to the field in the same window: fresh fast baseline −1.99 vs +1.47
+(−3.46; short window), edge=2 −1.07 vs +1.02 (−2.09), cancel_first −1.73 vs −0.11 (−1.62). Neither beats the earlier fast result (−1.57); all
+lose money. UID 93 pruned after immunity (no states since). MVTRX closed without a profitable setup: best = fast path, ≈ 1.6 ticks per
+fill behind the field.
+
+## §1208 — SN101 Tag101 audit: our tags pass every crowd-independent check; the loss is consensus with an unseen crowd (S11)
+
+**No trial (desk + live read).** Scorer (tag101 c3d788b): TagScore = mean(signal, validity, utility); miner score = best TagScore per
+qualifying cluster (≥ 3 distinct miners) over the top-3 clusters / 3 × max; all tags of all miners on a post are clustered into 3-8 clusters
+(agglomerative, cosine, average linkage, 0.30 threshold then clamped); repeated-set penalty only bites near 50 identical sets. The crowd's
+answers are not observable (task server exposes no public endpoints; /tasks/report needs a validator signature; scoreboards are aggregate).
+`tag_audit.py` (validator code, run on mvtrx-lab) on 200 posts all three live strategies answered: validity m3 0.87 / m4 0.87 / m5 0.99,
+label fitness 0.83 / 0.89 / 0.85, format pass 100%, answers with an own-tag pair ≥ 0.70 cosine 6 / 4 / 2%, glued hashtag-style tags
+17 / 2 / 1% (gpt-4o-mini's stock-prompt style, inherited by modal). Live at 19:00 UTC: m5 $21, m4 $12, m3 $10 /month vs median $290.
+Our answers are grounded, well-formed and non-redundant; the deficit is signal / coverage against the consensus of a crowd dominated by
+one ≈ 117-UID operator, which cannot be seen — strategies can only be tested blind at ≈ $5 + 24 h per registration. Recommendation: stop.
+ReadyAI r3 pruned 11-01 (≈ $120 vs bar ≈ $161). Tag101 m3-m5 lose immunity ≈ 20:02 UTC.
+**§1207 addendum 16 (20:55 UTC 11-01), re-registered; ReadyAI / Tag101 services off.** User: stop Tag101 and ReadyAI (readyai-r3, tag101-m3/m4/m5
+disabled on the futures droplet), keep testing MVTRX and re-register. x1 re-registered by the user (burn ≈ 0.095 TAO) → UID 41, live
+20:51 UTC on fast + cancel_first + qlog (tape live_tape_x1_base3). `compare_pair.sh` now takes the UID from UID_X (default 41; it had 93
+hard-coded). Next: edge=2 at 21:35 UTC (tape live_tape_x1_edge2b), comparison 15 at 22:55 UTC. Immunity ≈ 24 h → ≈ 15 more single-change
+live tests; offline estimates no longer pick tests (§1207 addendum 13).
+**§1207 addendum 17 (21:00 UTC 11-01), per-book A/B replaces sequential runs.** Noise (fast tape, 6,602 fills / 21 sim min): per-fill sd of
+the 30 s markout 19.4 ticks, book-clustered SE of a run's mean 0.47 → SE of a difference between two sequential 80-min runs ≈ 0.66 ticks
+(40 min ≈ 0.93, 20 min ≈ 1.32), before any regime shift between windows (the same fast setup read −1.57 and −3.46 vs the field in two
+windows). Several earlier 0.5-1.5-tick "wins" were inside the noise; sticky / snap were not. Shorter runs rejected. QuoteAgent `arms`
+(e.g. `edge:2/edge:3/flow_pull:0.3+flow_win:10+flow_cool:3`; no "=" since the miner's param parser splits on it): book n runs arm
+n mod (K + 1), arm 0 = configured params; replay: no arms and identity arms byte-identical to the live agent, real arms change only
+books outside arm 0. `compare_arms.py`: per-arm markout, difference vs arm 0 with a book-clustered SE, swept / bot-taken share, field
+markout on the same books. Run 1 live 20:57 UTC on UID 41 (tape live_tape_x1_arms1): base (fast + cancel_first) / edge 2 / edge 3 /
+flow pull 10 s 3 s 0.3; readouts at 22:20, 23:40, 01:00 UTC → /opt/mvtrx/arms1_readouts.txt. The scheduled sequential edge=2 run cancelled.
+
+## §1209 — SN79: we were optimizing the wrong number — the making pool pays on capped realized spread, where we sit near zero (S11)
+
+**No trial (desk + public gauges).** The validator publishes ≈ 90 per-miner gauges (miner_gauges{miner_gauge_name=…} on the public Grafana).
+UID 93 at 11:30 UTC 11-01 vs the field median: two-sided maker notional 13.4M (p90 11.0M), time at best 534k s (p90 200k), daily maker
+volume 0.36M (0.19M) — top-decile making — but debeta_making_realized 0 / captured 0 / making_share 0 (median 42 / 140 / 0.0038), skill
+−0.65 (+0.25), trading_score 0, incentive 0. Mechanism (taos/im/validator/debeta.py): making credit = Σ_book 2·min(buy, sell) captured
+spread × markout_quality, quality = clamp(R / C, 0, 1); per maker fill c = (mid − p)·q at the fill, r = (mark 20 s of sim time later − p)·q
+**capped to ±|c|**, R and C summed over all fills (making_basis = realized, making_horizon_s = 20). Pool = debeta_weight 1 × w_make 0.5 =
+half of trading emission (SN79 miners ≈ $65k/month in total → ≈ $32k/month pool), split ∝ credit; the other half pays on directional
+skill (ours negative). The cap removes the tail losses that dominated our markout means. `rc_quality.py` (mid-based approximation of the
+print mark): our R/C fast −0.002, pull 1.0 +0.071, edge 2 +0.043, cancel_first +0.048, sticky −0.081, snap −0.137, snap+flow −0.046;
+field median +0.15…+0.26. Our two-sided capture ≈ 280 (field median ≈ 85, p90 ≈ 250-320), so credit = capture × R/C: pull 1.0 → rank 87
+/ 162, ≈ 0.4% of the pool ≈ $125/month; R/C 0.25 at our volume ≈ 1.3% ≈ $400-450/month. Objective changes from the unweighted 30 s
+markout to R/C at 20 s (capped, capture-weighted — far less noisy). Arms readouts now include R/C per arm.
+**§1209 addendum (21:35 UTC), CORRECTION — exact replica.** `making_exact.py` runs the validator's own accumulate_book_capture over each book's
+full trade stream with the live dials (centred window 15 prints, realized horizon 20 s, min order size 0.25, fee weight 0.005, votes off,
+taker legs removed), then markout_quality and the two-sided credit exactly as reward.making_basis_sums. The mid-based R/C above was wrong:
+captured and realized are measured against a print-centred mid (W prints either side), not the quote mid. Exact: our quality is 0 on every
+tape — fast C 9.0 / R −27.1, pull 1.0 19.8 / −18.8, edge 2 1.4 / −12.6, cancel_first 10.8 / −3.8, sticky and snap negative C, arms1 (all
+four arms, first 30 min) C −0.3…3.5 / R −1.3…−4.1 → credit 0, matching the dashboard's 0; the field's quality median 0.38-0.50, captured
+C median ≈ 20-28 (ours ≈ field median on pull 1.0). By class (pull 1.0 tape; other fills' maker id masked so they still print into the
+mid): background-taken C 37.9 / R +4.5 → quality +0.12; bot-taken C −18.1 / R −23.0; fills ≤ 1.6 units C 13.1 / R +0.4 (+0.03), full-size
+fills C 6.7 / R −19.1. Our background fills alone would be paid; bot fills (negative even at the fill) erase them. Arms readouts now use
+making_exact per arm. Lever: cut bot / full-size fills, not average quality.
+**§1209 addendum 2 (21:45 UTC), book selection is a dead end.** Exact per-book realized R (making_exact.py --books): dropping the 30-40
+worst books would turn quality positive in hindsight (pull 1.0: 0.160 / 0.270; fast: 0 / 0.162), but the worst books differ completely
+between tapes, and per-book R does not persist (`book_persistence.py`, rank correlation between consecutive tapes +0.12 / +0.04 / +0.07).
+Bots hit whichever books are moving, not particular books. No book filter.
+**§1209 addendum 3 (21:45 UTC), run 2 staged.** Candidate arms aimed at bot / full-size fills: size 0.005 (half), flow_pull 0.2 (10 s, 3 s),
+prediction pull 0.5 tick; replay: parse cleanly, only their own books change. Generic `switch_arms.sh <tape> "<arms>" ["<base params>"]` and
+`read_arms.sh <tape> <n> "<labels>" <out>` (per-arm markouts + exact making credit) staged on mvtrx-lab; final choice after run 1's readouts.
+**§1209 addendum 4 (22:35 UTC), first arms readout + two-sided diagnosis.** Run 1 at 18 sim min (22:20 UTC): markout vs base edge 2
++0.73 ± 0.58, edge 3 +1.02 ± 0.65, flow pull +1.33 ± 0.67; EXACT quality base 0 (R/C −2.49), edge 2 0 (−0.47), edge 3 0 (−0.26), flow
+pull **+0.27** (first positive exact quality), credit 0.2 (field median 1.9). On the exact basis the field's quality median is ≈ 0.47, so the
+earlier +0.25 target (mid-based) is below the median, and credit is capped by two-sided capture. making_exact.py now prints per-arm
+two-sided diagnostics: sides are never missing; on 21 of 32 books (base, edge 2) / 20 (edge 3) / 15 (flow pull) one side's captured spread
+nets ≤ 0 (bot / sweep fills on that side), so Σ 2·min is negative (−13.4 / −9.0 / −6.6) except flow pull (+0.9; 17 books both positive).
+Two-sided capture and quality share one cause — bot fills — so run 2 targets bot fills only, judged on quality and two-sided together.
+**§1209 addendum 5 (23:51 UTC), run 1 ended early, run 2 live.** Run 1 at 36 sim min (23:40 UTC): markout vs base edge 2 +0.49 ± 0.50,
+edge 3 +0.43 ± 0.56, flow pull +1.00 ± 0.53 (≈ 1.9 SE, best in both readouts); EXACT quality 0 / 0.013 / 0 / **0.133** (field median 0.46);
+credit 0 / 0 / 0 / 0.3 on a quarter of the books (×4 ≈ 1.2 vs field median 7.2); books with both sides positive 12 / 11 / 11 / 16 of 32. Flow
+pull's captured spread ×4 ≈ 61 ≈ the field median (54), so the gap is quality alone. User call: no point waiting for the 01:00 readout — the
+slot is losing ground either way. Edge arms dropped (gains halved into noise, R/C ≈ 0). Run 2 started 23:51 UTC: base = run 1 + flow pull
+0.3 / 10 s / 3 s; arms size 0.005 / flow_pull 0.2 / pull 0.5; verified live: the size arm's orders average 250 notional vs 491-498 on the
+others. Readouts (read_arms.sh → /opt/mvtrx/arms2_readouts.txt) 01:15 / 02:35 / 03:55 UTC.
+**§1209 addendum 6 (01:17 UTC 11-02), survival bar measured; arms dropped.** Live gauges + validator code: combined = w_make·rank(making
+among positives) + (1−w_make)·rank(skill among positives); non-positive skill ranks 0 and does NOT subtract; making_floor_scale defaults to
+0 (off), so making as small as 1.6 ranks > 0. 253 of 257 uids score > 0; UID 41 is one of 4 at exactly 0, so ANY sustained positive making
+clears the bottom. Run 2 at 18 sim min: EXACT quality base 0.425 / size 0.005 0.428 / flow_pull 0.2 0.314 / pull 0.5 0.396 (field median
+0.487 — near the field for the first time); two-sided Σ2·min +1.2 / −3.1 / −4.9 / −5.1 (both sides positive on 16 / 13 / 15 / 10 of 32).
+balanced_reward_per_book clamps the TOTAL over books, so the three arms' negatives summed our live making to −11.9 → 0. Arms stopped:
+flow pull 0.3 / 10 s / 3 s on all books (tape live_tape_x1_base3, readouts 02:40 / 04:00 UTC → base3_readouts.txt). Arms resume only once
+the live making gauge is positive, and then on fewer books.
+**§1209 addendum 7 (01:23 UTC), the validator's window still holds our losses.** kappa.lookback = 3 h SIM time (≈ 13 wall hours at the
+live pace, 18 sim min per ~80 wall min), so every fill since UID 41 registered (20:51 UTC) is still scored, and the per-book sides are
+summed over the whole window before the min. `window_est.sh` (hourly at :20 → /opt/mvtrx/window_readouts.txt) runs making_exact over
+all tapes since registration plus the live gauges. 01:23 UTC: R −11.4 (R/C −0.15, quality 0), Σ2·min −23.1 over 128 books (51 both
+sides positive), live making 0. At run 2 base's rate on all books (R ≈ +15.6, Σ2·min ≈ +4.8 per 18 sim min) R turns positive in ≈ 1-2
+wall hours and Σ2·min in ≈ 6 (sooner as run 1's fills age out from ≈ 10:30 UTC) — before immunity ends ≈ 20:50 UTC, if the rate holds.
+**§1209 addendum 8 (02:50 UTC), tapes overlap; validator window improving.** Each tape opens with the validator's backlog of recent trades,
+so a new tape repeats the previous run's last ~40 sim min (base3 starts at sim min 1222.5, run 2 ran 1262-1280.5): the 02:40 base3 readout
+(Σ2·min −128.7) mixed run-2 fills in and is void. making_exact.py now de-duplicates by (book, id, ts) and takes `--since <sim min>` (our
+fills before it lose their maker id). Validator-window estimate (all tapes, deduped): 01:23 → 02:50 UTC R −11.4 → −7.3, Σ2·min −23.1 →
+−7.9, books both-sides-positive 51 → 57 of 128. Base period alone (since 1280.6, ≈ 19 sim min): R/C +0.209, Σ2·min −15.3 (sides short and
+noisy per book). window_est.sh prints both; the 04:00 base3 readout timer stopped.
+
+## §1210 — SN33 ReadyAI re-entry: the validator's scoring code read line by line; skill coverage +37-46%, tagging +4% (S11)
+
+**Trial (lab, then live re-entry, user-approved 11-02 04:50 UTC).** r3 settled ≈ $120 vs a ≈ $161 pruning line after the gpt-5.2 and speed
+fixes (§1200-§1201). Pay = EMA of absolute per-task scores, normalized and cubed, so +10% raw ≈ +33% pay. Read against the validator code:
+(1) conversation_tagging scores each tag by cosine to the MEAN embedding of the ground-truth tags (gpt-5.2 on the FULL conversation +
+gpt-5.2 tags of each enrichment snippet, combined); 0.55·top-3 unique + 0.25 mean + 0.10 median + 0.10 max; validate_tag_set keeps a
+tag only if its cleaned form (Utils.get_safe_tag) equals a tag we sent, so punctuated tags ("end-to-end testing") were silently dropped
+(10% of ours; 8% on skill_generation), and ≥ 20 tags are randomly sampled to 20. `lab_final.py` (20 conversations × 2 windows,
+synthesized enrichment, the repo's own LlmLib on gpt-5.2, scored after validate_tag_set): live 0.522; pre-cleaned +2.2% (t 0.8);
+pre-cleaned + 12 nearest own centroid **+3.9%** (t 1.8); 6-8 tags −2%, 4 tags −24% (unique top-3 starves). (2) skill_coverage
+(36% of tasks): section score = mean of the top-2 judged-correct tests' cosine to the embedding of "{title}: {description}" — text the
+miner receives — with 3 random sections scored, too_few_tests (< 5 over those 3) ×0.5, near-duplicate (any pair ≥ 0.95) ×0.5, and an
+LLM judge on assertions only. `sc_headroom.py`: live section coverage 0.554 vs 0.890 with the section text as description.
+`sc_lab2.py` (all 47 logged r3 tasks through format_results + the scoring mechanism, real gpt-5.2 judge, paired sections): live 0.395
+(19% zeros: judge failed every assertion), anchored **0.542 (+37%, t 4.4)**, anchored + self-judge **0.575 (+46%, t 4.9)**.
+Task-mix weighted ≈ +13-15% raw → ≈ +44-53% pay → r3 ≈ $175-185 vs the $161 line. Patch `deploy/sn33/scoring_fixes.py`
+(imported by run_miner.py after central15): tagging pre-clean + trim to 12; skill_generation pre-clean; skill coverage anchor (test 2
+nearest the section with cosine to test 1 < 0.94) + our own judge pass at low effort / priority (≈ 5 s; abandoned at 21 s of the 24 s
+limit). Timing: generation ≈ 8 s + anchor ≈ 2 s + judge ≈ 5 s. run_miner.py logs time-to-answer (dt). Re-entry: hotkey r3 (SN33 burn
+0.045 TAO), unit readyai-r3 enabled, logs tasks_r3b / usage_r3b.
+**§1210 addendum (12:59 UTC 11-02), first night + deadline cut.** UID 39 (registered 04:53 UTC) earned ≈ $7/month until 09:00 UTC (validators
+catching up), then $92-98 by 12:00 — 0.53× the field median, vs old r3's 0.55× at the same effective age: no visible gain yet (5 of 29 tasks
+were skill coverage). Fixes verified in tasks_r3b: every coverage answer anchored (7/7 sections, 2 tests each), tags 8-12 cleaned, 0 timeouts.
+But skill coverage time-to-answer was median 16.9 s, max 20.9 s (the judge pass is slower live than in the test) against a 24 s timeout that
+includes network, so COVERAGE_DEADLINE_S 21 → 15 (unit env; the judge pass is skipped when late, anchoring always runs). MVTRX UID 41 overnight
+(window_est): live making 3.3 → 26.0 (08:20 → 12:20 UTC), making rank 0.013 → 0.051, window R/C 0.12 → 0.22; on-chain incentive 0.00005 vs the
+lowest non-immune 0.0024 (one validator still scores 0); immunity ends ≈ 20:40 UTC.
