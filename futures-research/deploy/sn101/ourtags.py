@@ -16,12 +16,61 @@ from .framework import TaskHandler
 N_CANDIDATES = int(os.getenv("TAG_CANDIDATES", "6"))
 SEED = os.getenv("TAG_SEED", "0")
 POST_LOG = os.getenv("TAG_POST_LOG", "")          # scoring lab: append {post, candidates, submitted} per task (decisions.md 1177)
-MODE = os.getenv("TAG_MODE", "uncommon")          # "uncommon" (§1175), "entity3" (§1179), "extract" (§1191), "modal" (§1204)
+MODE = os.getenv("TAG_MODE", "uncommon")          # "uncommon" (§1175), "entity3" (§1179), "extract" (§1191), "modal" (§1204), "verbatim" (§1211)
 MODAL_SAMPLES = int(os.getenv("TAG_MODAL_SAMPLES", "8"))
 
 ENTITY_SYSTEM = ("Generate topic tags for a social post. Prefer the specific named entities (people, companies, models, products), then the main topic. "
                  "Use short noun phrases with normal spacing, lower case. Return only a JSON array of lower-case strings. Output exactly {n} tags.\n")
 ENTITY_USER = "Create tags for the post. Return a JSON array only, with no duplicates or extra text.\nPost:\n{post}\n"
+
+
+VERBATIM_SYSTEM = ("Generate topic tags for a social post: the {n} most important key phrases, copied word for word from the post. Return only a JSON "
+                   "array of lower-case strings.\nOutput exactly {n} tags.\n")     # crowd_fit_gen.py VERBATIM: the best-fitting live crowd (§1211)
+
+
+def _verbatim_tags(post: str, n: int) -> list[str]:
+    m = base.ReferenceMiner(n_tags=n, timeout_sec=int(base.SN101_TIME_LIMIT))
+    payload = {"model": m.model, "messages": [{"role": "system", "content": VERBATIM_SYSTEM.format(n=n)},
+                                              {"role": "user", "content": ENTITY_USER.format(post=post.strip())}]}
+    return [str(t) for t in m._parse_tags(m._call_chat_completions(payload)) if str(t).strip()][:n]
+
+
+# Bench families (§1211 add. 13): six LLM post-specific styles all landed ≈ 0.3 below the median live, so test families outside that style.
+PROMPT_MODES = {
+    "generic": ("Classify a social post from an AI-focused account into {n} broad topic categories, 1-3 words each, the kind of general "
+                "category names many posts share (for example: artificial intelligence, ai agents, large language models, startups, "
+                "open source, robotics). Prefer widely used category names over details specific to this post. Return only a JSON array of "
+                "lower-case strings.\nOutput exactly {n} tags.\n"),
+    "genre": ("Label a social post from an AI-focused account with {n} short tags for what KIND of post it is (for example: product launch, "
+              "research paper, benchmark result, opinion, tutorial, event announcement, hiring, funding news, open source release). Return only "
+              "a JSON array of lower-case strings.\nOutput exactly {n} tags.\n"),
+    "summary": ("Describe what a social post is about with {n} descriptive phrases of 3-6 words each. Return only a JSON array of lower-case "
+                "strings.\nOutput exactly {n} tags.\n"),
+    "keywords": ("Give the {n} most important single-word keywords of a social post (one word each, no phrases). Return only a JSON array of "
+                 "lower-case strings.\nOutput exactly {n} tags.\n"),
+}
+
+
+def _prompt_tags(post: str, n: int, system: str) -> list[str]:
+    m = base.ReferenceMiner(n_tags=n, timeout_sec=int(base.SN101_TIME_LIMIT))
+    payload = {"model": m.model, "messages": [{"role": "system", "content": system.format(n=n)},
+                                              {"role": "user", "content": ENTITY_USER.format(post=post.strip())}]}
+    return list(dict.fromkeys(str(t).strip().lower() for t in m._parse_tags(m._call_chat_completions(payload)) if str(t).strip()))[:n]
+
+
+def _hashtag_tags(post: str, n: int) -> list[str]:
+    """Literal hashtags, @handles and $tickers from the post (in order), topped up with the entity prompt's named entities."""
+    text = re.sub(r"^RT @\w+:\s*", "", post)
+    found = [x.lower() for x in re.findall(r"[#@$]([A-Za-z][\w.]{1,30})", text)]
+    out = list(dict.fromkeys(found))[:n]
+    if len(out) < n:
+        for t in _entity_tags(post, n):
+            t = str(t).strip().lower()
+            if t and t not in out:
+                out.append(t)
+            if len(out) >= n:
+                break
+    return out[:n]
 
 
 def _entity_tags(post: str, n: int) -> list[str]:
@@ -110,6 +159,28 @@ def solve_problem(envelope, chain_runtime) -> dict[str, Any]:
             tags = []
         if tags:
             _log(post, ["modal"], tags)
+            return {"tags": tags}
+        return base.solve_problem(envelope, chain_runtime)
+    if MODE == "fixed":                                # the same broad set for every post: tests whether the consensus is post-independent
+        tags = ["artificial intelligence", "machine learning", "large language models"][:k]
+        _log(post, ["fixed"], tags)
+        return {"tags": tags}
+    if MODE in PROMPT_MODES or MODE == "hashtag":
+        try:
+            tags = _hashtag_tags(post, k) if MODE == "hashtag" else _prompt_tags(post, k, PROMPT_MODES[MODE])
+        except Exception:
+            tags = []
+        if len(tags) >= k:
+            _log(post, [MODE], tags)
+            return {"tags": tags}
+        return base.solve_problem(envelope, chain_runtime)
+    if MODE == "verbatim":
+        try:
+            tags = list(dict.fromkeys(_verbatim_tags(post, k)))
+        except Exception:
+            tags = []
+        if len(tags) >= k:
+            _log(post, ["verbatim"], tags)
             return {"tags": tags}
         return base.solve_problem(envelope, chain_runtime)
     if MODE == "extract":

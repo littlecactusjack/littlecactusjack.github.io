@@ -95,9 +95,23 @@ class QuoteAgent(FinanceAgent):
                                                            # touch; fills that reach deeper come from large sweeps that tend to revert (§1199)
         self.pull = float(getattr(c, "pull", 0.0))         # >0: drop the quote on the side the model says the price will cross (|pred| > PULL ticks):
                                                            # live, other miners snipe stale quotes at −8 ticks each (§1199)
+        self.take = float(getattr(c, "take", 0.0))         # >0: also TAKE when |pred| > TAKE ticks: IOC at the opposite best price (§1211 add. 5:
+                                                           # out of sample the 30 s gross edge is +2.4..+5.6 ticks per trade at 4 ticks; de-beta
+                                                           # skill counts gross alpha, fees excluded; taker legs do not enter the making credit)
+        self.take_size = float(getattr(c, "take_size", 10.0))   # units per take, capped by the top level's size and the position cap
+        self.take_cool = int(getattr(c, "take_cool", 30))       # sim seconds between takes on one book
+        self._last_take = {}
+        self.own_ex = int(getattr(c, "own_ex", 0))         # 1: the order-flow features skip OUR orders / cancels (by order id) and our takes:
+                                                           # at size 0.06 our own flow drove |pred| (§1211 add. 5: 30× the replay's takes)
+        self._own_hist, self._own = [], set()
+        self.own_stats = [0, 0, 0.0, 0.0]                  # [our o/c events skipped, all o/c events, our size, all size] (diagnostic)
         self.toxic = float(getattr(c, "toxic", 0.0))       # >0: pause a book while our fills' 30 s markout EMA is below −TOXIC ticks
         self.toxic_pause = int(getattr(c, "toxic_pause", 180))   # sim seconds the book stays paused
         self._pending, self._mo, self._paused = {}, {}, {}  # per book: [(due sec, side, price)], markout EMA (ticks), paused until sec
+        sf = str(getattr(c, "skip_file", "") or "")         # file of book ids we never quote on: books whose fills stay picked off (§1211 add. 7:
+        self.skip = {int(x) for x in open(sf).read().split()} if sf else set()
+        self.skip_flat = int(getattr(c, "skip_flat", 0))   # 1: on skipped books, unwind the position with IOC takes (taker fills never enter the
+                                                           # making pool, takers get a fee rebate) — one take per take_cool, ≤ take_size, ≤ top level   # books ranked on one half lift the other half 0.03 → 0.22)
         self.tape = open(str(c.tape), "a") if getattr(c, "tape", "") else None
         self.lean = int(getattr(c, "lean", 0))             # 1: skip the base agent's state history, CSV event log and debug text (§1207, speed)
         self.cancel_first = int(getattr(c, "cancel_first", 0))   # 1: cancel the side the prediction says is exposed first (§1207)
@@ -153,6 +167,12 @@ class QuoteAgent(FinanceAgent):
     def respond_simulation(self, state):
         response = self.make_response()
         self._sec = state.timestamp // 1_000_000_000
+        if self.own_ex:                                    # ids of our resting orders in this and the last 2 states: an order we placed rests
+            self._own_hist.append({o.id for a in self.accounts.values() for o in (a.orders or [])})   # at least one state before its cancel
+            self._own_hist = self._own_hist[-3:]; self._own = set().union(*self._own_hist)
+            if self._sec % 60 == 0 and self.own_stats[1]:
+                n, t, q, qt = self.own_stats
+                bt.logging.info(f"OWN FLOW: our share of order/cancel events {n / t:.1%} by count, {q / max(qt, 1e-9):.1%} by size")
         if self.tape is not None:
             self._record(state)
         for book_id, book in (self._books if self._books is not None else state.books or {}).items():
@@ -175,6 +195,13 @@ class QuoteAgent(FinanceAgent):
         row = ofl.setdefault(sec, [0.0] * 6)
         for e in book.events or []:
             kind = getattr(e, "y", "")
+            if self.own_ex and kind in ("o", "c"):
+                self.own_stats[1] += 1; self.own_stats[3] += e.quantity or 0.0
+                if e.id in self._own:
+                    self.own_stats[0] += 1; self.own_stats[2] += e.quantity or 0.0
+                    continue
+            if kind == "t" and self.own_ex and e.Ta == self.uid:
+                continue
             if kind == "t":
                 s = e.timestamp // 1_000_000_000
                 fl[s] = fl.get(s, 0.0) + e.quantity * (1 if e.side == 0 else -1)
@@ -294,6 +321,20 @@ class QuoteAgent(FinanceAgent):
             ask_px = min((l.price for l in book.asks if l.price >= ask_px - tick / 2 and held(1, l)), default=None)
         qty = round(max(self.size * wealth0 / mid, self.min_order_size(book_id)), vd)
         want = {}
+        if int(book_id) in self.skip:
+            for o in acct.orders:                          # skipped book: pull our quotes and stay out
+                response.cancel_order(book_id, o.id)
+            units = acct.base_balance.total - base0
+            if self.skip_flat and abs(units) >= self.min_order_size(book_id) and self._sec - self._last_take.get(book_id, -10 ** 9) >= self.take_cool:
+                side = OrderDirection.SELL if units > 0 else OrderDirection.BUY
+                q = round(min(abs(units), self.take_size, qb if side == OrderDirection.SELL else qa), vd)
+                px = bid if side == OrderDirection.SELL else ask
+                funded = (acct.base_balance.free >= q) if side == OrderDirection.SELL else (acct.quote_balance.free >= q * px)
+                if q >= self.min_order_size(book_id) and funded:
+                    response.limit_order(book_id=book_id, direction=side, quantity=q, price=px, stp=STP.CANCEL_OLDEST, postOnly=False,
+                                         timeInForce=TimeInForce.IOC)
+                    self._last_take[book_id] = self._sec
+            return
         if self.toxic and self._toxic_update(book_id, book, self._sec, mid, tick):
             for o in acct.orders:                          # book paused: pull our quotes and stay out
                 response.cancel_order(book_id, o.id)
@@ -307,6 +348,17 @@ class QuoteAgent(FinanceAgent):
             want[OrderDirection.BUY] = bid_px
         if ask_px is not None and inv > -self.max_inv and acct.base_balance.free + self._reserved(acct, OrderDirection.SELL) >= qty:
             want[OrderDirection.SELL] = ask_px
+        if self.take and abs(pred) > self.take * tick and self._sec - self._last_take.get(book_id, -10 ** 9) >= self.take_cool:
+            side = OrderDirection.BUY if pred > 0 else OrderDirection.SELL
+            room = (self.max_units - units if side == OrderDirection.BUY else self.max_units + units) if self.max_units else self.take_size
+            q = round(min(self.take_size, qa if side == OrderDirection.BUY else qb, max(room, 0.0)), vd)
+            px = ask if side == OrderDirection.BUY else bid
+            funded = (acct.quote_balance.free >= q * px) if side == OrderDirection.BUY else (acct.base_balance.free >= q)
+            if q >= self.min_order_size(book_id) and funded:
+                response.limit_order(book_id=book_id, direction=side, quantity=q, price=px, stp=STP.CANCEL_OLDEST, postOnly=False,
+                                     timeInForce=TimeInForce.IOC)
+                self._last_take[book_id] = self._sec
+                want.pop(OrderDirection.SELL if side == OrderDirection.BUY else OrderDirection.BUY, None)   # never rest on the side we take
         if self.pull and pred > self.pull * tick:
             want.pop(OrderDirection.SELL, None)            # price about to rise: do not leave an offer for a sniper to lift
         elif self.pull and pred < -self.pull * tick:

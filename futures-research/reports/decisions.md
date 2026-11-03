@@ -19605,3 +19605,188 @@ But skill coverage time-to-answer was median 16.9 s, max 20.9 s (the judge pass 
 includes network, so COVERAGE_DEADLINE_S 21 → 15 (unit env; the judge pass is skipped when late, anchoring always runs). MVTRX UID 41 overnight
 (window_est): live making 3.3 → 26.0 (08:20 → 12:20 UTC), making rank 0.013 → 0.051, window R/C 0.12 → 0.22; on-chain incentive 0.00005 vs the
 lowest non-immune 0.0024 (one validator still scores 0); immunity ends ≈ 20:40 UTC.
+
+## §1211 — SN33 ReadyAI: two lab-verified fixes live (skill generation pooled, tagging steered to the enrichment); SN101 Tag101's crowd fits a "verbatim key phrases" field (S11)
+
+**No trial (live diagnosis + labs; user-approved deploys).** Context 16:00 UTC 11-02: MVTRX UID 41 $7/mo vs lowest PRUNABLE $140 (the §1209
+"any positive making survives" bar was wrong: every $0 uid was a still-immune newcomer), pruned after 20:40 UTC; ReadyAI UID 39 at 11 h =
+0.61× median, the same as the unfixed UID 107 at that age (lowest prunable $153). On-chain weights: all 7 active SN33 validators rate
+UID 39 at 0.62-0.70× the median — reach is fine, quality is the gap (pay ∝ raw³: 0.61 ≈ −15% raw). Task mix since 04:53 UTC: tagging 63% /
+skill generation 20% / skill coverage 17%. OpenAI credits ran out 17:11 UTC (my crowd-fit generation, ≈ 8k calls); the user added $10.
+(1) **skill_generation** — the ground truth is skill_to_metadata (gpt-5.2) on skill_markdown[:1000] with the task's input_categories,
+then combine_metadata_tags; the miner's window is rewritten to that same text, so the lab rebuilds the ground truth exactly.
+`deploy/sn33/lab_skillgen.py` (36 logged tasks, one fresh ground truth each, validate_tag_set + the scoring formula): live 0.450
+(17% zeros: 3 credit-outage empties, 3 short answers of 2-6 narrow tool names cut below 3 tags), fresh stock 0.568, **3 stock samples
+pooled, 15 nearest the pool's centroid 0.613 (+36% vs live, t 4.2; +8% vs stock, never empty)**. Deployed 17:56 UTC (scoring_fixes,
+3 parallel samples, 9 s cutoff; 3.1-4.5 s per answer on logged tasks vs the 12 s timeout).
+(2) **conversation_tagging** — the validator's search queries are written from the FULL conversation, so the enrichment lines the miner
+receives are its only view of the hidden part of the ground truth. `lab_enr.py` (lab_final setup): the 12 tags nearest the centroid of
+the enrichment tags, chosen from the combined answer + the raw window and enrichment tags (which combine drops): **+23.6% (t 3.1, n 23)**,
+fresh seed **+21.8% (t 3.3, n 33)**; K 15 +22.5%, enrichment tags only +20.8%, re-ranking the combined answer alone ±5%. Deployed 18:00
+UTC (central15 keeps the raw parts in PARTS[id(task)], scoring_fixes.near_enrichment; 5.3-7.5 s on 6 logged live tasks; falls back
+to trim_central). Caveat: lab enrichment is synthesized from the full conversation; live snippets are real search results.
+Backups /root/backups/{scoring_fixes,central15}-2026-11-02-pre-*.py. Lab-predicted combined ≈ +0.2 raw ≈ +70-90% pay — the first lab
+gain large enough to clear the median; read on chain before trusting it (every earlier lab gain failed to show live).
+(3) **Tag101 crowd fit** (`deploy/sn101/crowd_fit_{gen,score,add}.py`): 10 generators (model × prompt) × 8 samples on 120 posts m3/m4/m5
+all answered; each hypothesis = a 240-miner crowd + our live answers through the validator's TagScorer. With the clone penalty on, every
+crowd was an artefact (3-6 distinct sets per 8 draws → 40-80 copies each); penalty off (a real field varies its sets): single crowds
+miss the live gaps (m3 −0.34, m4 −0.32, m5 −0.27, stock/entity ≈ −0.28) by rmse 0.10-0.17 except **"key phrases copied word for word"
+on gpt-4o-mini, rmse 0.043** (0.031 with the held-out run); every mixture fits worse (0.12-0.20). Held-out candidates in that crowd:
+verbatim gpt-4o-mini −0.034 / −0.050, gpt-4o −0.057, gpt-4.1-mini −0.122 (old strategies −0.27..−0.36). Lowest prunable SN101 slot
+$240 ≈ −0.02 → predicted ≈ $175-205: much closer, still under the line. `ourtags.py` TAG_MODE=verbatim; tag101-m3 drop-in set to
+verbatim (log posts_m3v.jsonl), DISABLED until the user re-registers m3 (burn 0.033 TAO; SN33 0.045).
+**§1211 addendum 1 (20:30 UTC 11-02), Tag101 m3 live + skill coverage contract.** User re-registered m3 → SN101 **UID 210** (verbatim, live
+19:09 UTC; the crawler's axon announcement 403 is harmless, validator tasks arrive). Selection rules on top of verbatim (`crowd_fit_add2.py`,
+`crowd_fit_select.py`: 5 draws / one 6-phrase answer, MiniLM): first draw −0.012, central-3-of-5 −0.012, modal −0.019, 3 of a 6-phrase
+answer −0.274; the plain recipe's three independent draws read −0.048 / −0.037 / −0.012 (SE ≈ 0.01 each) → recipe ≈ −0.03 ± 0.015 ≈ $200-230
+vs the $240 line; selection adds nothing beyond draw noise, m3 unchanged. ReadyAI skill coverage decomposed (`sc_decomp.py`, deployed
+anchor + own-judge logic, validator pipeline): when a section's tests pass the judge it scores ≈ 0.9, but the gpt-5.2 judge accepts only
+≈ 50-60% of our assertions, ≈ 1 of the 3 scored sections has none (scores 0), and accuracy < 0.5 costs ×0.7. Fix: append the kept tests'
+claims to the skill document as a "Behavior contract" section (no model call; ≤ 6000 chars, the validator's truncation): **+25% (t 1.8,
+n 16) and +44% (t 3.9, n 22 fresh)**; judged accuracy 0.49-0.59 → 0.79-0.82, zero sections 0.94-1.05 → 0.27-0.50, skill-coverage term
+0.55 → 0.77. Deployed 20:28 UTC (scoring_fixes.with_contract; backup /root/backups/scoring_fixes-2026-11-02-pre-contract.py). UID 39 at
+19:00 UTC: $124 = 0.69× median (0.61× at 16:00), one hour after the 18:00 deploy.
+**§1211 addendum 2 (21:10 UTC 11-02), MVTRX stopped; size is the untested lever.** User: stop MVTRX (mvtrx-x1 + mvtrx-window-est.timer
+disabled on mvtrx-lab; UID 41 past immunity at $8 vs $140 lowest prunable; tape kept). `deploy/sn79/maker_profile.py` on the previous sim
+day (making_exact, our base period from sim min 1280.6: our C 216 / R/C 0.365 / credit 25 rank 145 of 256; field quality median 0.518,
+credit median 54): across 178 makers, total maker volume vs quality Spearman −0.01, median fill size vs quality +0.29 — **size does not
+cost quality**; volume vs credit +0.88. Top credit makers: ≈ 9,500 fills, 210-320k volume, fill size 3 or 12, quality 0.49-0.59. We had
+the MOST fills (31,934) at 1.61 units → 91k volume. At our quality, credit ×k: ×3 → 76 (24% of positive makers below), ×6 → 151 (49%;
+positive-maker median 157). Re-registration plan: size 0.01 → 0.06 (≈ 10 units, the field's range) with max_units 20 → 120, everything
+else as the last live config; judge by window making_exact the first hours. Risks: quality was 0 on the new sim day (R/C −0.28); the skill
+pool (≤ 0 ranks 0) and the rank → incentive map are unmeasured.
+**§1211 addendum 3 (20:55 UTC 11-02), MVTRX size test live; ReadyAI cost cut.** MVTRX UID 41 (still registered after immunity) restarted
+20:22 UTC with size 0.01 → 0.06, max_inv 0.05 → 0.3 (the wealth cap would have blocked after one 10-unit fill), max_units 20 → 60; tape
+live_tape_x1_size6.jsonl; window_est.sh rewritten for that tape with --since 96.6 (the last sim minute of the old tape), transient timer
+mvtrx-window-est (*:20) recreated; backup /opt/mvtrx/tape.conf.base3.bak. First 15 min: 2,117 fills on 127 books, median 4.0 units,
+volume 21k (≈ ¼ of the previous whole sim day), other-miner takers 24%; 24 books moved > 50 units since the restart (the cap counts from
+the sim-day start, so this may be legitimate — check). ReadyAI cost per slot (usage log, list prices, since 18:00 UTC): tagging $0.0115 /
+task (6 calls, priority tier), skill generation $0.0086, skill coverage $0.0251 → ≈ $1.6-1.9/day list, ≈ $2 with priority. central15
+gains TAG_NO_COMBINE (skip combine_metadata_tags; scoring_fixes picks from window + enrichment tags) and TAG_NO_PRIORITY. Timing on 6 logged
+tasks: live 5.3-7.5 s; no combine + priority 3.7-5.5 s (×2 runs); no combine, standard tier 4.8-10.1 s → priority stays (late = 0).
+Quality (`lab_enr.py`, seed 3033, n 22): no combine 0.6414 vs wider pool 0.6416 (both +11% vs the old trim, t 2.4 — smaller than the
+first two runs' +22-24%; pooled ≈ +18%). Deployed 20:52 UTC: TAG_NO_COMBINE=1 on readyai-r3 and the standby readyai-r1 (r1 rebuilt as a
+copy of r3: port 8095, logs tasks_r1b, disabled until registered; old unit in /root/backups/readyai-r1-old). Tag101 m4 drop-in = verbatim
+(gpt-4o-mini, posts_m4v.jsonl), disabled. Saving ≈ 10-15% of the slot's OpenAI cost, answers ≈ 2 s faster.
+**§1211 addendum 4 (21:50 UTC 11-02), MVTRX re-registered on the size config.** UID 41 was pruned ≈ 21:20 UTC, one hour into the size test
+(that hour, exact making code: quality 0.351, two-sided 99, credit 34.8 → rank 2 of 251 in-window; short windows flatter us — the field's
+in-window credit median is 0 because the per-book min clamps one-sided books; 3 sim h at that pace ≈ 450 vs yesterday's field p90 442).
+User re-registered x1 (burn 0.111 TAO) → **UID 213**, started ≈ 21:45 UTC on size 0.06 / max_inv 0.3 / max_units 60 (same tape file);
+window_est.sh now scores uid 213 and reads its gauges.
+**§1211 addendum 5 (23:40 UTC 11-02), MVTRX fees, the pay split, and a taking test that failed live.** Fees (validator debeta.py: "a rebate
+is a negative fee and adds"; 300k trades of the previous sim day): makers PAY a median +22 bp (p95 +67), takers RECEIVE a median −20 bp
+rebate (89% of taker fees negative) — the dynamic fee policy is inverted; but "de-beta does not" count fees, so fees do not enter the
+skill pool. Public gauges (all 257 miners): debeta_w_make 0.5 for everyone → combined = ½ making rank + ½ skill rank; skill 141 positive /
+19 zero / 96 negative; UID 213 skill −0.24 (rank 0), making 32.9 after 50 min (positive-maker p10 / median 43 / 195). Miners as takers
+(`taker_profile.py`): previous full sim day +4.98 ticks per trade at 30 s (109 of 150 takers positive), a 20-min window −1.56.
+`taker_bt.py` (live model30_of recomputed per book-second, IOC at the NEXT second's opposite best, 10 units, 30 s cooldown, gross = what
+de-beta sees): previous day (32 books) |pred| > 3 +1.14 (halves +1.27 / +1.08, t 6.4), ≤ 2 ≈ 0; out of sample on three 11-01 tapes,
+> 4: +2.38 / +3.53 / +5.56 (t 7.5 / 9.1 / 3.9), > 5: +3.52 / +5.27 / +7.65. QuoteAgent gains `take` / `take_size` / `take_cool` (IOC at the
+opposite best, capped by the top level and max_units, STP cancel-oldest; replay_take.py: take=0 byte-identical to the live agent over
+491 instructions; forced ±5-tick predictions → one IOC per book, ≤ 10 units). Live on UID 213 at take=4: 744 takes in 9.9 sim min on 99
+books (≈ 30× the replay's rate) at **−0.56 ticks gross (t −2.0, 959 fills)** → switched off (~23:35 UTC; agent keeps the code, take=0).
+Hypothesis: at size 0.06 our own 10-unit quotes and takes are a visible part of the order flow the predictor reads (of_new / of_near /
+flow5), inflating |pred| — which would also contaminate fair value (alpha_k 1) and the pull rule, a candidate for the size test's quality
+drop (0.35 → 0.15). Next: exclude our own events from the order-flow features, then re-test.
+**§1211 addendum 6 (00:30 UTC 11-03), own-flow filter; taking closed.** QuoteAgent `own_ex=1`: the order-flow features skip order / cancel
+events whose id is one of our resting orders in the last 3 states, and trades where we are the taker (replay_own.py: own_ex=0 byte-
+identical over 988 instructions). Live at size 0.06 our own orders are only **0.5% of order / cancel size** (0.8-0.9% by count) — the
+"our quotes contaminate the predictor" hypothesis (addendum 5) is wrong for making; the quality drop has another cause. Take retest with
+own_ex=1 (from sim min 143.4): rate unchanged (≈ 75 takes per sim minute — the live model simply exceeds 4 ticks far more often than in
+the tape replays), 207 fills at **+0.11 gross (size-weighted +0.31), t 0.2** → zero edge live vs +2.4..+5.6 replayed; take OFF for good
+(own_ex stays). The replay-to-live gap is unexplained (candidates: the live state's event set differs from the tape's per-second "of"
+aggregation; regime). MVTRX 23:20 UTC readout: quality 0.203, credit 61.4 (rank 13/254 in-window), live making rank 0.024 → 0.188, skill
+−0.24 → 0.0, combined 0.094. ReadyAI 00:00 UTC: $137 = 0.75× median, validators 0.69-0.75 (line ≈ 0.84). Tag101 m3 00:00 UTC: $221 vs
+lowest prunable $229 (incentive 0.00334 vs median 0.00371; mostly inherited history at 5 h).
+
+**§1211 addendum 7 (03:30 UTC 11-03), why all three slots fail — dug one at a time at the user's request.** (1) SN33 ReadyAI: weights are
+RANK-based (ValidatorLib.get_raw_weights: transposed cubic over rank, 0.001-0.003 — the EMA's "cubed" only orders); `deploy/sn33/sn_ranks.py`:
+UID 39 ranks 221/242 at the four largest validators (identical rankings, ≈ 75% of stake), prune line (UID 149) 13 places up; all 25 below us
+are < 24 h newcomers and 12 of the 13 between us and the line are 9-18 h newcomers → last among established miners. The fixes moved the
+plateau from ≈ 11 to ≈ 22 places from the bottom (UID 107 → 39) but only past newcomers. Field: operators with 19-23 UIDs per coldkey,
+a registration every ≈ 24 min. W&B project 403; conversations come from a validator-only API — no legitimate view of the field's answers.
+Recommendation: do not re-register. (2) SN101 Tag101 m3 UID 210: 236/241, 3 places below the line (UID 226, $233); TagScorer is consensus
+clustering over all miners' tags, coldkey 5GRj7u8J holds 115 of 185 established UIDs; verbatim m3 fell $220 → $184 as inherited history
+rolled off → our own answers score below the pruned previous occupant; the crowd fit was wrong. (Startup axon announcement 403 is harmless:
+task rate unchanged, ≈ 16/h.) (3) SN79 MVTRX UID 213 (`deploy/sn79/mvtrx_trend.py`, making_exact on 10-sim-min slices): quality +0.29 at
+sim 120-130, negative 130-170 (the taking test ran sim 131.2-147.5), +0.30 at 170-180; field steady 0.40-0.47 per slice, our flow balanced,
+no drift — so it is us. Losses concentrate in books: dropping the 40 worst-R books lifts quality 0.066 → 0.350 keeping 89% of C; the worst
+books carry 2-3× the median book's fills and often negative captured (stale quotes picked off). Out of sample (books ranked on sim < 150,
+scored on ≥ 150; `making_exact_dump.py` BOOKS_OUT): drop 20 / 30 / 40 → 0.128 / 0.183 / 0.222 vs 0.033 kept-all; random 30-book drops
+median 0.034, p95 0.117 → per-book toxicity persists. Next lever: skip the persistently toxic books (static list or online per-book R).
+**§1211 addendum 8 (02:55 UTC 11-03), skip list live (user: go).** QuoteAgent `skip_file` (book ids never quoted: pull our orders and stay
+out); list = the 40 worst-R books over the whole size6 tape (`deploy/sn79/skip_books_213.txt`; in-sample quality 0.343 without them).
+The list sits entirely in books 0-62 and 102-118 — none in 63-101: unexplained, check. UID 213 restarted 02:55:31 UTC (sim ≈ 183 min,
+backups /opt/mvtrx/QuoteAgent.pre-skip.py, tape.conf.size6own.bak); first minute: 45 fills, 0 on skipped books. Judge on the hourly
+readouts (the bad sim 130-170 stretch leaves the 3-sim-h window ≈ sim 310-350).
+**§1211 addendum 9 (03:05 UTC 11-03), skipped books unwound by IOC (user: go ahead).** QuoteAgent `skip_flat=1`: on a skipped book, after
+pulling our quotes, one IOC at the opposite best per take_cool (30 sim s) for min(|position|, take_size 10, top level) on the reducing side —
+taker fills never enter the making pool (maker-only pair) and takers get a fee rebate, so the unwind cannot dilute R/C; it removes the
+skipped books' inventory swings from the de-beta skill P&L. `replay_flat.py`: without the new params the agent equals the pre-skip agent
+(987 instructions); with them, the only non-cancel instructions on skipped books are 37 IOCs (one per book, ≤ 10 units). Live 03:05:07 UTC:
+first 90 sim s — 252 maker fills, none on skipped books; 46 taker fills (199 units), all on skipped books. Backups QuoteAgent.pre-flat.py,
+tape.conf.skip.bak. Next: measure skill in the clean post-skip window; re-tune `toxic` on the live tape (split-half) for an adaptive list;
+explain the 0-62 / 102-118 concentration.
+**§1211 addendum 10 (03:15 UTC 11-03), the bad books are a market regime; quote only the 40 calmest.** Book-id groups on the size6 tape:
+ids 0-62 spread 6 c, 10-s mid vol 3.4, our fills median 347, R −4.0 / book; ids 63-101 spread 2 c, vol 0.5, fills 71, R +10.8; ids
+102-127 4-decimal prices, vol 4.4, R −3.6 with NEGATIVE captured. Held-out half (books chosen on sim < 150, scored with making_exact on
+≥ 150, our fills on dropped books de-attributed): keep all 0.033 / credit 7.1 (rank 89); drop 40 worst-R 0.222 / 54.7 (rank 7); the 40
+calmest by first-half 10-s |Δmid| 0.527 / 142.5 (rank 1 of 254, two-sided 270 vs 218). Ids 63-101 alone 0.562 keeping 83% of C. Live
+03:13:40 UTC: skip_books.txt = all books but the 40 calmest by full-tape volatility (36 of 40 shared with the first-half list), skip_flat
+unwinds the other 88; after the restart 26 maker fills in 25 sim s, none on skipped books. Previous list: /opt/mvtrx/skip_books_worst40.txt.
+The sim may redraw book regimes at the sim-day reset (sim min 1440) — then recompute the list (or move to an online volatility rule).
+**§1211 addendum 11 (03:45 UTC 11-03), the "calm" books are the ≈ $30 books; online selection built (not deployed).** Prices: ids 0-62
+≈ $297-302, ids 63-101 ≈ $29.3-29.9 (one at $308), ids 102-127 ≈ $304-311 (4-decimal). Per bp the groups are equally volatile; per
+cent (= per tick on 2-decimal books) the $30 books move 0.24 vs 2.1-2.7 — a large-tick market (1 c = 3.4 bp, spread 1-2 ticks) where
+queue position protects a maker, vs small-tick $300 books where we are picked off. Book volatility ranks persist (10-sim-min slices: rank
+corr 0.68-0.73, 32-35 of the next slice's calm 40). `calm_k` / `calm_hl` (QuoteAgent.calm.py, patch add_calm.py): EMA of |Δmid| over
+10 s in CENTS (the bp version failed: 9-23/40 overlap), half-life 300 sim s, quote only the calm_k lowest, re-chosen every 60 sim s after
+warm-up; `calm_sim.py` replays the tape's books through it: 32-36 / 40 overlap with the validated static list from 5 sim min on. Off:
+identical to the live agent (926 instructions). For the sim-day reset or if prices are redrawn; live agent unchanged.
+**§1211 addendum 12 (04:00 UTC 11-03), deeper dig on ReadyAI and Tag101 (user asked) — three leads tested, all closed.** (1) ReadyAI
+newcomer curve (sn_ranks.py CURVE=1, val 209): competitors' new UIDs (one every ≈ 24 min, rotating coldkeys) sit at ranks 26-160 by 13-23 h;
+ours at 22.5 h = 22 — bottom of its age cohort. Sampling is uniform (get_random_uids over serving uids) and response time is not scored, so
+the gap is per-task score. Windows of one conversation share the enrichment set and reach several miners (our single UID saw a second window
+of 11 of 125 conversations) — but `lab_pool.py` (10 conversations, answers from 1 / 2 / 5 windows): +0.7% (t 0.6) / +0.2% (t 0.2): pooling is
+not the field's edge. (2) Tag101: m3 answers every round it is sent (4 posts per 15 min since 19:28 UTC, no gaps) and m2/m4/m5 got the same
+rate. Each validator queries ALL miners every 15 min and scores only its own rounds; weights = stake-weighted average of validators' boards
+(aggregate_validator_scores), so a validator that never reaches us would zero our share of its stake. Archive weights (`sn101_hist.py`,
+`sn101_perval.py`): UID 210's 24 h mean gap −0.007 → −0.067 over 4 h, identical at all 8 validators (aggregate); implied own-round level
+≈ −0.3 vs median (crowd sim: per-round crowd mean 0.82). SYN capture on port 8098 for one 15-min cycle: 4 validators connect —
+54.177.95.135 (val 0, 62.5% of stake), 34.70.162.213 (val 61, 11.3%) and two without published axons (192.150.253.122, 54.228.70.29);
+missing validators hold ≤ ≈ 25% → at most ≈ −0.03 of the gap. Closed: the deficit is answer quality vs the consensus. The 403 on m3's
+startup axon announcement is harmless (public axon used).
+**§1211 addendum 13 (04:10 UTC 11-03), Tag101 overnight bench on m3 (user: yes).** Six LLM post-specific styles (uncommon, entity3, extract,
+modal, verbatim, reference) all landed ≈ 0.3 below the median live, so the field is likely outside that family. New ourtags modes:
+`generic` (broad shared category names), `keywords` (single words), `hashtag` (literal #tags / @handles / $tickers, topped up with entities).
+Schedule (transient timers, bench_switch.sh writes mode.conf + restarts in the gap after a burst; switches logged to bench_log.txt):
+04:22 generic, 07:22 keywords, 10:22 hashtag, 13:22 UTC verbatim (control) until m3's immunity ends ≈ 19:09 UTC. Read: aggregate 24 h mean
+gap of UID 210 hourly at :05 (bench_reads.txt; baseline 04:07 −0.06688) plus the archive afterwards at any resolution; a mode's own-round
+level ≈ 24·ΔG/h + the rolled-off occupant level, compared across modes (the occupant term cancels). Backup
+/root/backups/ourtags-2026-11-03-pre-bench.py, tag101-m3-mode.conf.pre-bench.
+**§1211 addendum 14 (04:30 UTC 11-03), bench widened to 7 families in 2-h slots (user away until ≈ noon CT, asked for more families).** New
+modes `genre` (kind of post: product launch, research paper, …), `summary` (3-6-word descriptive phrases), `fixed` (the same 3 broad AI
+tags for every post — tests a post-independent consensus). Schedule (UTC): 04:22 generic (live, switch logged 04:22:09 block 9423005),
+06:22 keywords, 08:22 hashtag, 10:22 fixed, 12:22 genre, 14:22 summary, 16:22 verbatim control → immunity end ≈ 19:09. 2 h = 32 rounds,
+enough for the ≈ 0.2-0.3 per-round effect that would close the gap.
+**§1211 addendum 15 (05:00 UTC 11-03), MVTRX skill on the calm-books setup.** Skill = kappa_of_alpha over per-book alpha (MTM P&L − mean
+inventory × drift; MAD-normalised mean with a cubed downside penalty), ranked among POSITIVE skills only (lowest positive ranks 0). Live
+gauges: skill_coverage_factor 1.0 for every miner (field p10 coverage 32 books) → quoting 40 books costs nothing; ours skill 0 with
+net alpha −2,158 (field median +230), weakest-3 −0.70, notional 42M (field median 4.5M) — the toxic stretch, 10× our size, still in the
+3-sim-h window. `skill_est.py` (alpha is invariant to the starting inventory, so a period can be scored from the tape alone): last 10 sim
+min, 32 of 33 quoted books positive, kappa +5.66; last 20 sim min, 35 of 38 positive, kappa +3.17 (field skill median 0.06, p90 2.12). If
+it holds once the window is clean, skill ranks near the top of the positives as well as making → combined toward the top-10% band
+(top-10% miners: combined 0.46, making rank 0.48, skill rank 0.43; pay ≥ $401/mo, mean $470).
+**§1211 addendum 16 (05:20 UTC 11-03), second MVTRX UID planned (not registered; user chose to prepare).** Additive, not a split: on the 40
+calm books UID 213 is 3.7% of miner-maker volume (median 4.0% per book, ≈ 113 other maker uids per book) over the last 20 sim min, so a
+second UID mostly takes flow from other makers; skill (kappa, MAD-normalised) is scale-invariant, so it does not halve; pay is per-uid rank.
+No multi-UID / clone / same-IP rule in the validator (coldkeys only reported). Box: load 0.09, 0.9 of 7.9 GB used, the agent ≈ 7% CPU /
+165 MB. Registration burn 0.0874 TAO vs free coldkey balance 0.0891 TAO — exactly one registration. Prepared: /etc/systemd/system/
+mvtrx-x2.service (DISABLED, ConditionPathExists hotkey x2; port 8102; tape live_tape_x2.jsonl; same params and skip list as x1) and
+window_est_x2.sh (UID2 env). Gate: register only if the noon readouts confirm the calm-books making + skill on UID 213.
+**§1211 addendum 17 (05:45 UTC 11-03), MVTRX steady-state estimate; Tag101 bench analysis ready.** Last 30 sim min (185.5-215.5, all
+post-switch), making_exact: quality 0.536 (field median 0.479), credit 143.1 (field p90 45.8) → rank 4 of 254. Over a clean 3-sim-h window
+≈ 6× → credit ≈ 800-900 vs field p90 ≈ 275 → making rank ≈ 0.95-1; with the kappa estimate, combined ≈ 0.9 (field p90 0.57). Window clean
+≈ sim 363 ≈ noon CT at ≈ 12 sim min per wall hour; pay lags. Sim-day reset at sim 1440 is ≈ 4 days out. `bench_analyze.py`: per weight
+update, UID 210's gap change minus the field's median change, summed per mode slot → per-round level vs the rolled-off rounds. Dry run
+05:45 UTC: verbatim (4 h before) −0.261, generic (1.1 h, 4 updates) −0.652 — early and noisy.
