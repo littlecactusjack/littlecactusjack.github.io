@@ -19790,3 +19790,257 @@ post-switch), making_exact: quality 0.536 (field median 0.479), credit 143.1 (fi
 ≈ sim 363 ≈ noon CT at ≈ 12 sim min per wall hour; pay lags. Sim-day reset at sim 1440 is ≈ 4 days out. `bench_analyze.py`: per weight
 update, UID 210's gap change minus the field's median change, summed per mode slot → per-round level vs the rolled-off rounds. Dry run
 05:45 UTC: verbatim (4 h before) −0.261, generic (1.1 h, 4 updates) −0.652 — early and noisy.
+**§1211 addendum 18 (18:15 UTC 11-03), noon read.** MVTRX UID 213 overnight (hourly readouts): credit 282 → 792 (rank 5-6 of 256), quality
+0.21 → 0.33 (window still holds part of the pre-switch stretch), live making rank 0.79 → 0.994, combined 0.39 → 0.497; pay $41 → $183/mo
+and rising (lags). Skill stays 0: live skill_books_kept 1, net alpha −176. Cause: the validator's per-book alpha is the inventory PATH
+INTEGRAL Σ inventory × Δmark (debeta.py ≈ l. 1556) minus mean inventory × drift — the spread earned at the fill is NOT in it — and since
+0.6.2 a book counts only if |alpha| ≥ 2.3 bp of our filled notional on it (skill_hurdle_bps; floor_scale 0). skill_est.py counted cash, so
+its kappa +3…+5.7 was making profit, not skill (withdrawn). A making-only UID tops out at combined ≈ 0.5 (field pay at combined 0.45-0.50
+≈ $306 median). Skill needs held inventory that predicts the mark by ≥ 2.3 bp of notional on ≥ 4 books, and making volume inflates the
+notional — a separate problem. Tag101 bench (bench_analyze.py, per-round level vs the rolled-off rounds, field-shift corrected): verbatim
+before −0.26, generic −0.41, keywords −0.80, hashtag −0.20, fixed −0.23, genre −1.04, summary −0.17, verbatim control −0.31 — no family
+near the ≈ 0 needed; a constant answer (fixed) scores like our LLM answers. Tag101 closed; m3 left to prune (immunity ends ≈ 19:09 UTC).
+ReadyAI UID 39 deregistered 05:07 UTC; stop_when_pruned.sh only covered r1/r2, so readyai-r3 was stopped and disabled by hand 18:10 UTC.
+**§1211 addendum 19 (18:30 UTC 11-03), x2 live.** Unstake: btcli's batch unstake-all failed twice (MEV-shield "not decrypted", then "would
+exhaust the block limits") with nothing executed; per-hotkey `stake remove --wallet-hotkey <h> --all --no-mev-protection` works. User
+unstaked r3 + m3 and registered x2 → **UID 247** (free balance after 0.0506 TAO; 7 stake positions left). mvtrx-x2 enabled 18:28 UTC
+(calm-books params, port 8102, tape live_tape_x2.jsonl), first fills within 2 min; readout window_est_x2.sh hourly at :25 (UID2=247 →
+window_readouts_x2.txt).
+**§1211 addendum 20 (19:40 UTC 11-03), a skill sleeve from the published fundamental — built, replay-checked, not deployed.**
+`skill_val.py` re-implements the validator's alpha (Σ pre-print inventory × Δmid − mean inventory × drift, mark "mid"; notional = our fills
+at fill price; hurdle 2.3 bp; kappa_floored) and reproduces the live gauge: 1 book kept, negative; our calm making books median −1.0 bp of
+notional. The order-flow predictor as a sleeve (`skill_sleeve.py`, |pred| > 2-6 ticks, hold 30-120 s) is ≈ 40× short: α/notional
+median +0.05 bp. Positions by the published fundamental (`fund_sleeve*.py`: ±Q when (fund − mid)/mid > ±θ, hysteresis, checked every 10 s)
+pass on both halves: θ 5 bp, delay 2 s — all books kept 41 (35 positive) kappa +0.80 / 37 (31) +2.26; delay 5 s 41 (33) +0.66 / 39 (32)
++2.01; REVERSED signal 41 (6) −0.41 / 37 (6) −0.39; calm books 29 (27) +1.15 / 29 (26) +1.84; skipped books 12 (8) +0.75 / 8 (5) +3.29.
+Sizing (`fund_size.py`): on calm books 1 unit earns ≈ $0.095 alpha per book per ≈ 140 sim min against ≈ $220k making notional → ≈ 1,500
+units needed to clear the hurdle: infeasible; on skipped books the ratio is size-free (sleeve notional only). QuoteAgent `sleeve_bp` /
+`sleeve_q` / `sleeve_step` / `sleeve_cool`: with skip_flat, on skipped books steer to ±sleeve_q by the fundamental gap via IOCs (making on
+calm books unchanged). `replay_sleeve.py`: off = live agent (926 instructions); on (5 bp, q 10) only IOCs ≤ 10 units on skipped books,
+calm-book orders identical; targets 56 long / 16 short / 16 in band. Copy at deploy/sn79/QuoteAgent.sleeve.py.
+**§1211 addendum 21 (20:30 UTC 11-03), sleeve live on x1; the validator's per-book VOLUME CAP found.** Sleeve deployed on x1 19:38 UTC
+(sleeve_bp 5, q 10; first sim minute 139 IOCs on 53 skipped books, then ≈ 2/min). But x1's maker fills had been falling since sim ≈ 340
+(≈ 120-150 per 5 sim min → 15-30), before x2 or the sleeve. Diagnosis (temporary `dbg=1` logging: per book inventory, balances, wanted
+sides, open orders): x1 wanted both sides on 16 of 20 books, had 0 open orders, balances frozen — its placements never reached the book.
+Cause, taos/im/validator/query.py ≈ l. 573: once a miner's traded notional on a book over `trade_volume_assessment_period` (24 sim h)
+reaches capital_turnover_cap (10) × miner wealth (≈ $50k → $500k per book), every non-cancel instruction on that book is DROPPED, silently
+for the miner. x1 had used a median $499k on all 40 calm books (15 over) — the 0.994 making rank was a burst at ≈ 4.6× the sustainable
+pace; x2 reached $321k on its hottest book in ≈ 30 sim min. Fixes, all replay-identical when off: books split between UIDs (x1:
+skip_x1.txt, x2: skip_x2.txt, 20 calm books each; x1's sleeve restricted by `sleeve_file` to the original 88 volatile books, so our two
+UIDs never trade with each other); max_units 40 → 100 (one $30-book order is ≈ 100 units); `fit_qty` (quote the affordable part);
+`pace_cap` / `pace_win` / `pace_k`: quote a book only while our trailing-24-sim-h notional < pace_cap (450k) and the trailing 90-sim-min
+notional < pace_cap × 5400 / 86400 (even spending), seeded from the tape at start (x2 1,787 fills, x1 32,955). x1's calm books stay capped
+until that volume ages out (days at the sim's pace); x2 is mostly paced out after its first burst. Sustainable making per UID ≈ 20 books ×
+$62.5k per 3-h window ≈ $1.25M ≈ 1/9 of x1's burst → credit ≈ 90 vs 800 → making rank ≈ 0.4-0.6, not 0.99. Backups QuoteAgent.pre-*.py,
+tape.conf.{calm,sleeve}.bak, mvtrx-x2.service.bak.
+**§1211 addendum 22 (20:45 UTC 11-03), how top makers live with the cap; x2 becomes a broad paced maker with an edge A/B.** Field gauges
+(`field_makers.py`): the top makers quote ALL 128 books — 162: credit 838 on 22.8M notional; 124: 691 on 10.9M, skill 1.46 (61 books
+kept); 126: 517 on 7.9M, skill 1.79 (73 kept); 18: 460 on 8.8M, skill 0.51, combined 0.655 (best). ≈ 8M per 3-h window over 128 books ≈
+$62k per book ≈ the per-book cap pace. UID 213's credit per $M (70.6) is the best of the top group — its only problem was concentration on
+40 books. Makers do earn skill: at ≈ $62k per book the 2.3 bp hurdle is ≈ $14 of inventory alpha per book. x1 is boxed in: 40 calm books
+at ≈ $499k and 38 of 88 volatile books ≥ $450k → x1 = skill only: no making (skip all), sleeve on its 34 volatile books with < $300k used
+(sleeve_books_x1.txt); with sleeve_file set the agent now does NOTHING on other books (6 of 46 unwind IOCs had hit x2 — our UIDs must not
+trade each other; after the fix 0). x2 quotes the other 94 books, paced, with arms=edge:4/edge:8 (book mod 3 → edge 1 / 4 / 8 ticks: 1
+tick is 0.33 bp on a $300 book); first 45 sim s: 265 maker fills on 41 books, 179 / 74 / 12 by arm. window_est_x2.sh scores 3 arms.
+Next: fundamental-tilted inventory on x2's making books (the 124/126 pattern) once the edge arms read.
+**§1211 addendum 23 (21:20 UTC 11-03), early edge read; fundamental tilt for making books built (not deployed).** x2's first 14 sim min
+(394-408) by arm, making_exact with the other group's fills de-attributed: volatile books quality 0.25 / 0.08 / 0.41 (edge 1 / 4 / 8),
+calm 0.57 / 0.56 / 0.62 — paced making on volatile books is positive (it was negative at full speed); samples tiny (C 7-24 per arm).
+Tilt (`tilt_bp` / `tilt_notional`, QuoteAgent.tilt.py): on quoted books the inventory target is ±tilt_notional $ by the fundamental gap
+(hysteresis, every sleeve_step) and skew + unit caps act around it. Sizing: at the paced ≈ $62k per book per window the hurdle is ≈ $14;
+making inventory alpha ≈ −1 bp ≈ −$6; the sleeve measurements give ≈ $1.2 per unit per window on $300 books → ≈ $5k targets (≈ 17 / 170
+units on $300 / $30 books, ≈ 10% of book wealth). replay_tilt.py: off = live agent (1,262 instructions); on (5 bp) targets on all 128
+books (67 long / 19 short), placements 541 → 521, net buy notional shifted +$9.6k.
+
+## §1212 — Subnet re-screen 11-03 (user: look for other subnets): nothing new beyond the §1164-§1205 list; CliqueAI's diversity gap is the one open lead (S11)
+
+**No trial (desk).** `deploy/subnet_scan.py` (chain, 126 subnets, TAO ≈ $226): 103 pay the median miner $0; median > $100 only on SN82 Noah
+(31 miners, burn 9.8 TAO), SN5 Hone $1,020 (line $617, burn 0.225), SN83 CliqueAI $439 (p90 $1,155, burn 0.10), SN101, SN79, SN32 ItsAI,
+SN33, SN92 REAX, SN22 Desearch, SN61 RedTeam, SN50 Synth $163, SN13. All were studied before: Synth §1164-§1170 + §1205 (median-level
+forecaster, regime-dependent, ≈ break-even per 0.8 TAO slot — hold), Hone §1180 (needs a frontier coding agent, $3-18k/month to answer
+everything; Claude-output terms question; open-weight only), CliqueAI §1165/§1172/§1195 (size ties 93/98 but diversity 0.57 vs 0.85 →
+2nd percentile; open item: enumerate each problem's maximum cliques and return an unclaimed one). Code lives in src/futuresres/synth/
+(clique_*.py, numvc.c, dlsmc2.c, s50_*.py) and /opt/clique on the lab box — not in a top-level synth/ folder.
+**§1211 addendum 24 (21:30 UTC 11-03), edge read 2 and x1 back to making (user: go).** x2 since the restart (sim 405.2-413.5, only 8 sim
+min — the sim runs ≈ 12 sim min per wall hour) on volatile books: quality 0.29 / 0.08 / 0.20 (edge 1 / 4 / 8; first read 0.25 / 0.08 /
+0.41) — paced making on volatile books stays positive at every width; edge 4 worst twice; no winner yet (≈ 20 units of C per cell). Calm
+books idle (paced out after the first burst). x1: its 34 budget-left volatile books split — 20 with the most headroom ($116-216k used)
+for paced making at edge 1 (skip_x1.txt = all but those), 14 for the sleeve (sleeve_books_x1.txt); disjoint from x2's 94. First sim
+minute after the 21:20:44 restart: 89 maker fills on 18 books, 0 trades with x2.
+**§1211 addendum 25 (21:50 UTC 11-03), scaling helper.** `deploy/sn79/add_uid.sh <hotkey> <port> [skip_file]` on the lab box: refuses
+without the hotkey file; writes mvtrx-<hk>.service from x2's unit (paced making, fit_qty, max_units 100; edge arms and sleeve removed;
+own tape), a readout script, looks up the UID; with START=1 enables the unit and an hourly readout timer. Overlapping making books
+between our UIDs are fine (two passive post-only quotes cannot cross); IOC trading (sleeve / unwind) must stay on books no other UID of
+ours quotes. x1's dbg logging removed (restart 21:50 UTC).
+
+## §1213 — SN83 CliqueAI diversity: full enumeration infeasible, vertex-deletion answers still claimed — CLOSED (S11)
+
+**No trial (offline, 98 logged problems from 10-27).** (1) `deploy/sn83/enum_maxclique.c` (bitset B&B, greedy-colouring bound, enumerates
+every clique of the known maximum size) found none within half the time limit on any problem: maximum cliques have 21-109 vertices in
+dense graphs of 290-900 (median n 692, ω 39.5). (2) `clique_delete.py`: from our 8-restart answer delete its 1/2/3 highest-degree
+vertices, re-solve with NuMVC (3 seeds each, 0.4 × time limit), keep a full-size clique from the deepest deletion — reaches the size at
+depth 3 on 59/98, depth 1-2 on 17 — chosen without the logged answers. Scored with clique_rank.py: mean reward 2.394 vs 2.386 base
+(field p10 2.518, median 2.652) → still beats 2% of hotkeys. Our pick equals a logged answer on 66/98 (base 65/98); short of the best size on
+4/98; field mean diversity 0.843, optimality 0.977. The maximum-clique space is already covered by the field (multi-UID operators spread
+across it), so a newcomer cannot buy uniqueness with a different search. CliqueAI closed.
+
+## §1214 — SN50 Synth refresh 11-03 (user: start step 1): still a median-level forecaster that loses on volatile days (S11)
+
+**No trial (backtest).** `s50_backtest.py`, Crypto-24h, last 5 days (≈ 121 prompts per asset; old 5-day caches archived as
+scores_*_5.until20261031.json; Binance cache 09-16 → 11-03, no gaps > 5 min). Best variant todg_12_144_c_ou20@1.0: transformed score
+BTC 68.3 vs field median 50.2 (share 0.014% vs median UID 0.21%), ETH 78.5 vs 64.2 (0.023% vs 0.198%), SOL 72.1 vs 67.7 (0.099% vs 0.19%),
+XRP 91.7 vs 74.5 (0.006% vs 0.084%); current todg_12_36 and GARCH todv worse. Raw CRPS ÷ field median by day (BTC / ETH): 10-28 1.009 / 0.994,
+10-29 1.005 / 0.995, 10-30 1.028 / 1.060, 10-31 1.098 / 1.117, 11-01 1.020 / 1.040, 11-02 1.003 / 1.009; the worst prompts are 50-100 bp days.
+Same as §1205: at the median in raw terms, slow on regime shifts, and the steep payout turns 1-10% into ≈ 0.1× pay. Bar to register: a
+consistent 3-5% raw improvement incl. volatile days. Next: implied volatility (Deribit DVOL / option prices) as the level input.
+
+## §1215 — SN50 Synth step 2 (user: yes): Deribit DVOL as a regime multiplier makes the volatile window WORSE — Synth stays parked (S11)
+
+**No trial (backtest).** `data/synth/dvol.json` (Deribit public get_volatility_index_data, hourly, 08-25 → 11-03, BTC and ETH; SOL / XRP use
+BTC's). `s50_backtest.iv_ratio`: the last DVOL hour closed before t0 ÷ the mean of the prior 7 days; model suffix `_iv<γ>` scales the path
+volatility by ratio^γ. Share vs median UID, volatile 5 days (to 11-03), base / γ 0.5 / 1 / 1.5: BTC 0.017 / 0.011 / 0.010 / 0.009% (median 0.21%),
+ETH 0.020 / 0.015 / 0.013 / 0.010% (0.198%), SOL 0.106 / 0.069 / 0.046 / 0.025% (0.19%), XRP 0.006 / 0.004 / 0.002 / 0.002% (0.083%). Calm 10 days
+(to 10-29): γ 0.5 helps BTC 0.341 → 0.366% and ETH 0.238 → 0.262%, hurts SOL / XRP. Widening with implied vol hurts on the volatile days → our
+forecasts there are already too WIDE (the EWMA level jumps after a big move and the market calms faster), not too slow; a forward-looking vol
+input cannot fix overreaction. The fast variant todg_12_36_c_ou20_iv1@0.95 wins the calm window (BTC 0.604%, ETH 0.599%, SOL 0.513% vs medians
+0.33 / 0.36 / 0.21%) and loses the volatile one — the §1205 coin flip. Parked; MVTRX first.
+
+## §1216 — SN50 Synth deep dive (user: keep diving): horizon calibration, vol-of-vol, and Crypto-1h still above the median (S11)
+
+**No trial (backtest).** (1) `s50_calib.py` (PIT of realized changes inside our 1,000 paths, non-overlapping intervals): 5 min ≈ calibrated
+(central-50% hit 0.48-0.55, tails 0.12); 30 min-3 h TOO WIDE (central 0.55-0.69, worst ETH volatile 3 h 0.68; tails ≤ 0.10); 24 h tails too
+thin on volatile days (0.15-0.19 vs 0.10) with drift bias (ETH below-median 0.38). (2) `_vv<pct>` (per-path mean-one lognormal level) in
+`ensemble`: vv25_ou40 lifts the calm window BTC 0.356 → 0.449% (median 0.331) and ETH 0.262 → 0.330% (0.362); no variant helps the volatile
+window (all 0.004-0.019% vs ≈ 0.20%) and stronger OU hurts it → the volatile loss is trend (paths pulled to the start while prices ran), not width.
+(3) Crypto-1h refresh (`s50_1h.py tod1_120_240`, last 3 days ≈ 435 prompts, old caches archived): share BTC 0.482% vs median UID 0.368%,
+ETH 0.312 vs 0.343, SOL 0.929 vs 0.364, XRP 0.289 vs 0.373 — ≈ 1.4× the median on average through the volatile days. Per-UID ≈ $100-200/month
+(1h ≈ $100, 24 h ≈ $0-80, Com/Equ ≈ 0), registration ≈ 0.8 TAO; no duplicate-submission penalty (§1167) → scales linearly with UIDs. Next:
+vol-of-vol on the 1-h model, a trend-regime drift for 24 h, HYPE.
+
+## §1217 — SN50 Com/Equ: session-aware model with session shock pools puts SP500 above the median and NVDA at 4.7×; MVTRX x2 → edge 1 + tilt (S11)
+
+**No trial (backtest) + MVTRX param change.** (1) Com/Equ 5-day baseline (old todg_*_yp/_wk models): SP500 share 0.114% vs median UID 0.341%
+(L 25.4 vs 18.1), AAPLX 0 (L 158 vs 116, best ≈ 10), XAU 0.10 vs 0.28, GOOGLX 0.002 vs 0.16, TSLAX 0.002 vs 0.34, NVDAX 0.004 vs 0.16, WTIOIL
+0.05 vs 0.19, SPCX 0. (2) `s50_session.py` (realized 5-min vol by New-York session from the validator's Hyperliquid feed; PIT by horizon ×
+session): SP500 cash 6.2 bp / closed 3.4 / weekend 2.3 (weekend median |Δ| 0.4 bp); our model far too NARROW in cash hours (3 h central 0.18,
+tails 0.46) and far too WIDE on weekends (central 0.75-0.79, tails ≤ 0.04); NVDAX the same. (3) `ses_ensemble` (model `ses…`): weekday
+volatility per New-York 5-min slot (unsmoothed, keeps the open), one weekend level, from 16 days of the validator's own feed; `_lv<hl>`
+recent cash level, `_vv`, `_sp` session-specific bootstrap pools (weekend shocks from weekend bars), `_cd<pct>` per-path cash-hour drift.
+5-day results (share vs median UID): SP500 old 0.034 → ses 0.078 → ses_lv40 0.10 → **ses_sp 0.269, ses_sp_cd20 0.402** (median 0.34; L 19.2 vs
+20.3); NVDAX old 0.002 → ses 0.019 → **ses_sp 0.733** (median 0.156; L 46 vs 57); AAPLX L 121-149 vs median ≈ 125 (the median UID earns 0 there
+too; best ≈ 10). Thin (≈ 50 prompts per asset) and several variants tried on one window — running all 8 assets on the 5-day and an earlier
+10-day window before choosing. (4) Crypto-1h grid (vv / ou on tod1_120_240): no consistent gain (BTC vv25 0.453 → 0.505, ETH vv15 0.277 →
+0.318, SOL 0.897 → 0.754) — the base model stays. (5) MVTRX x2: edge A/B over all books (window to 23:25 UTC): credit 24.5 / 20.0 / 12.7,
+quality 0.50 / 0.33 / 0.37 (edge 1 / 4 / 8) → edge 1 everywhere; fundamental tilt live on x2 (tilt_bp 5, tilt_notional 5000), replay off =
+previous live agent (864 instructions); restart 00:19 UTC 11-04. x2 is mostly paced out after its first-hour burst: at ≈ 12 sim min per
+wall hour a 90-sim-min pace window refills over ≈ 7.5 wall hours.
+
+## §1218 — SN50: combined Com/Equ score, the earlier window, the volatile-day hunt closed, and a daily forward test on frozen models (S11)
+
+**No trial.** (1) `s50_combined.py` rebuilds the validator's competition score (asset-weighted average of per-prompt transformed scores,
+softmax β): Com/Equ 5 days — old 71.8 vs field median 47.4 (rank 246/257), ses_sp 58.6 (198), ses_sp_cd20 57.8 (197), ses_sp@1.1 56.7
+(196/257): below the median; SP500 / XAU / NVDAX wins are outweighed by TSLAX (77 vs 41), GOOGLX (71 vs 40), WTIOIL. (2) Earlier 10-day window
+(to 10-29, ≈ 165 prompts per asset, SES_LOOK=9 because Hyperliquid serves ≈ 17 days of 5-min bars): SP500 old 0.137 / ses_sp 0.101 /
+ses_sp_cd20 0.067 (median 0.348), XAU 0.171 / 0.086 / 0.091 (0.238), NVDAX 0.007 / 0.017 / 0.016 (0.248). `_yc` (cash-hour shape from 60 days
+of Yahoo in New-York slots, level from the feed): SP500 0.136 / 0.120, XAU 0.086 / 0.108, NVDAX 0.024 / 0.950 (earlier / recent) — NVDAX swings
+from 10× below to 6× above the median between windows: Com/Equ cannot be validated on two short windows with capped history. With 9 days of
+history the recent-window SP500 ses_sp share falls 0.29 → 0.14: history length matters. (3) Crypto-24h volatile days: regime-conditional OU
+(`_ouc`, off when the EWMA level > 1.15 × the 7-day level) ≈ no change; momentum (`_mo`, drift from the last 3 h when hot) collapses the volatile
+window (0.000-0.003%); faster level half-life (3 / 6 steps) worse on both windows. Five explanations ruled out (implied vol, vol-of-vol,
+momentum, conditional OU, faster memory); the loss sits in a two-day episode — parked. Monte-Carlo noise: the same model gives BTC-calm 0.366
+and 0.425 in two runs (1,000 paths) → differences < ≈ 0.05 pp are noise. (4) **Forward test** (`deploy/sn50/s50_forward.sh`, lab box
+/opt/synth with its own venv, transient timer synth-forward daily 06:30 UTC): scores the last day's real prompts with models frozen 11-04 —
+24 h crypto todg_12_144_c_ou20@1.0 and todg_12_144_c_vv25_ou40@1.0, 1 h tod1_120_240, Com/Equ todg_12_36_c_yp@1.0 / ses_sp@1.0 / ses_sp_yc@1.0
+— archiving per-prompt rows by date (data/synth/forward/<date>/) and combined competition scores; it also grows the Hyperliquid 5-min cache.
+First run started 01:40 UTC 11-04. Register a Synth UID only on ≥ 5 forward days with the 1-h and at least one other competition at or above
+the median.
+**§1218 addendum (02:40 UTC 11-04), forward day 1 (prompts scored in the 24 h to 01:40 UTC 11-04, models frozen beforehand).** Crypto-1h
+tod1_120_240 share vs median UID: BTC 0.742 vs 0.261 (2.8×), ETH 0.691 vs 0.256, SOL 1.385 vs 0.246 (5.6×), XRP 0.324 vs 0.286, HYPE 0.411
+vs 0.348 — above on all five (≈ 148 prompts each). Crypto-24h ou20: BTC 0.217 vs 0.278, SOL 1.005 vs 0.265, ETH 0.033 vs 0.404, XRP 0.004 vs
+0.071, HYPE 0.003 vs 0.364 (vv25_ou40 not better). Com/Equ combined (83 prompts): old rank 243, ses_sp / ses_sp_yc 201 of 257. The 24 h
+combined score failed only on this run (rows moved before combining; fixed for the timer runs). Off-hours OU (`_oux`, 5-day): TSLAX 72.6 →
+66.1, GOOGLX 49.1 → 46.1 at oux5, but SP500 18.5 → 23-31 and NVDAX 41.5 → 51-78 — rejected; TSLAX / GOOGLX / WTIOIL stay ≈ 70-90% behind
+(hypothesis: the field uses the live underlying markets — extended-hours stocks, oil futures). `fwd_read.py` summarises a day's run.log.
+**§1211 addendum 26 (04:25 UTC 11-04), first live skill read: the tilt and the sleeve do not produce counted skill yet.** `skillread.sh`
+(skill_val.py on the live tapes; the sim runs ≈ 18 sim min per wall hour, now sim ≈ 500): x2 (tilt since sim ≈ 428), last 30 / 45 sim
+min — 12 books clear the 2.3 bp hurdle, 2 / 1 positive, Σα −199 / −192, kappa −0.56 / −0.72: held making inventory loses and the static
+±$5k tilt does not offset it. x1's 18 volatile making books 14-17 kept, mixed (5 / 9, 9 / 8), kappa −0.19 / −0.03. x1's sleeve books: 0
+books — the validator's per-book inventory is the sum of OUR FILLS INSIDE ITS WINDOW (no account balances), so a position built before the
+window and held without trading is invisible; skill needs positions re-established within each window (flatten and re-enter on a schedule).
+x2 quality split on calm books (whole tape): all 0.503 (credit 72.8), bot-taken 0.760, background-taken 0.325, small fills negligible —
+no cheap quality lever (the §1209 "bot fills lose" finding does not hold on the calm books). x2 03:25 UTC: credit 98.5 (our est. 105.8),
+making rank 0.32, combined 0.16; x1 03:20: making 180, rank 0.53, combined 0.267.
+**§1211 addendum 27 (04:35 UTC 11-04), why the sleeve never counted, and a live test of the de-meaned reversed sleeve on x1.** Validator code:
+per-book inventory IS carried across batches (debeta.py ≈ l. 1516), but alpha = Σ inv × Δmark − mean inv × drift strips a constant position
+to exactly zero, and hurdle_filter needs OUR notional on the book in the window > 0 → only position CHANGES inside the window count.
+x1's live sleeve traded 40 times at sim 390-405, once at 420-435, then never: its 14 books sit +377 bp from the fundamental (within-book
+gap sd 10.7 bp; calm books +3.5 / 2.4; other volatile +47.5 / 3.7), so a ±5 bp threshold never flips and a proportional target saturates.
+Backtests on the x1 tape (validator alpha, delay 2 s, halves): proportional 20 bp all books 35 (31 +) kappa +0.91 / 18 (18 +) +4.16, calm
+books 22 (22 +) +6.40 / 12 (12 +) +6.64 — the fundamental sleeve works where the gap oscillates around zero (the calm books); de-meaned gap
+(minus its own 30-min EMA) FAILS (kappa −0.40 / −0.58), and its REVERSED control is positive on both halves (all +0.79 / +1.37, x1's 14 books
+4 (2 +) +0.59 / 4 (3 +) +1.93): on volatile books the price keeps moving away from the fundamental when the gap deviates. Picked after seeing a
+control, few books → live test only on x1 (declining, sleeve earning nothing): QuoteAgent `sleeve_prop` / `sleeve_band` / `sleeve_dm` /
+`sleeve_sign` (off = live agent, 1,006 instructions); x1 sleeve_prop=10 sleeve_dm=1800 sleeve_sign=-1 from 04:33:54 UTC. Judge with
+skillread.sh after ≈ 3-4 wall hours. If the calm-book sleeve is the only robust skill source, a fresh UID (full calm budget) can run making +
+a calm-book sleeve — a reason to replace x1.
+**§1211 addendum 28 (04:40 UTC 11-04), calm-book sleeve on x2 (user: the same constraint applies to any UID — test on x2).** The hurdle
+(2.3 bp of our notional per book) makes a sleeve on a MAKING book a sizing problem, not a blocker: under pacing ≈ $56k per calm book per
+window → hurdle ≈ $13; sleeve ≈ $0.12 per unit per window on a $30 book plus making's ≈ −$6 → ≈ 150 units (≈ 9% of book wealth). The
+simpler design used here: sleeve-ONLY calm books (no making notional, so the hurdle is size-free; calm backtest kappa +6.4 / +6.6, all kept
+positive). x2: sleeve books = every fifth calm book [32, 64, 69, 74, 79, 84, 89, 94] (fixed rule), raw-gap proportional sleeve (sleeve_prop 20,
+sleeve_q 50, take_size 25), making on its other 86 books; tilt removed (its kept books were mostly negative and would drag kappa). Sleeve
+books are quoted by no other UID of ours (x1 quotes no calm books). Live 04:39:51 UTC: first 45 sim s 27 sleeve IOCs, all on sleeve books,
+none against x1; 16 maker fills elsewhere. Scaling rule: every UID = making on most calm books + its own disjoint set of sleeve-only calm books.
+
+## §1219 — Subnets to prepare while income builds (user: get ahead of the income) + a weekly screen (S11)
+
+**No trial (desk).** From the 11-03 scan, not studied before: SN61 RedTeam (median $167, p90 $400, 230 wallets, top wallet 1% — scored
+per miner; public repo is the validator only; read docs.theredteam.io next); SN123 MANTIS (median $65, p90 $191; miners upload small signal
+vectors every ≈ 60 s to their own Cloudflare R2 bucket, timelock-encrypted, for challenges — 1-h direction across assets, hit-first, breakout,
+4-h cross-sectional rank, 8-h funding-rate change — scored by AUC gates and marginal contribution to a walk-forward meta-model: measurable
+offline, but contribution-based, so a duplicate UID adds ≈ nothing → one-UID side stream); SN22 Desearch (search / summaries, ≈ 50% of the
+score from X results → paid X API, LLM-judged; burn 0.009 TAO; poor fit); SN92 REAX (median $188, p90 $2,940; nothing public found yet).
+Tag101 / ReadyAI not reopened with capital: more UIDs fix feedback speed but not the hidden-target problem, and winning Tag101 by UID count
+would mean outvoting the incumbent's consensus (sybil-style; declined). `deploy/screen_weekly.sh` (lab box, transient timer subnet-screen,
+Mondays 14:00 UTC): re-runs subnet_scan.py, keeps screens/scan_<date>.json, appends NEW PASS (median > $100, top wallet < 50%) and MOVED
+(median ± 50%) to screens/changes.txt; baseline scan 2026-11-03.
+**§1219 addendum (05:45 UTC 11-04), SN61 RedTeam read (user: start on RedTeam; MANTIS dropped — median too small).** RedTeam (Innerworks, a
+bot / fraud-detection company): miners submit a solution as a private Docker Hub image referenced in active_commit.yaml (≈ 24 h commit
+cooldown; each new commit stops the previous one's rewards); validation → originality comparison (similarity to all accepted + same-day
+earlier submissions; penalty = highest similarity) → central scoring; final score = raw − similarity penalty, decaying over ≈ 10-15 days;
+miners get 41% of emissions by stake-weighted validator scores. Active challenges: FlowRadar v2 (train.py + submissions.py, train on the
+mandatory 100,000 × 110 v2_train_data.csv, classify 400,000 test flows, F1 on the VPN class; no pretrained weights; training / model-size /
+inference limits) — the best fit, but its flowradar-challenge repo is not public (data access to confirm); AB Sniffer (JS detection of
+automation frameworks, public repo + testing manual); ADA Detection (identify commercial anti-detect browsers; testing needs paid licences);
+BEX Tracer (extension fingerprinting — skipped, user tracking); Humanize Behaviour (human-mimicking bots — skipped, detection evasion).
+Next: per-challenge emission split and competitor counts (dashboard.theredteam.io), FlowRadar data access, AB Sniffer repo.
+**§1219 addendum 2 (06:05 UTC 11-04), RedTeam's live reward split — parked.** RedTeam 4.10.10 (10-13) `challenge_pool/active_challenges.yaml`
+lists only bex_tracer_v1 (challenge_incentive_weight 0.6, min acceptable 0.8) and ada_detection_v3 (0.4, min acceptable 0.9; tested against
+commercial anti-detect browsers via the challenge's verification / bot-runner servers); config ALPHA_BURN_WEIGHT 0.5 (half of miner weight
+burned). FlowRadar v2 and AB Sniffer are documented but not active. BEX Tracer (60%) stays skipped (browser-extension fingerprinting doubles
+as user tracking); ADA is defensive but needs paid anti-detect browsers to develop against and a 0.9 bar. Parked; the weekly screen now
+logs SN61's active challenges and weights so FlowRadar going live is caught.
+
+## §1220 — SN92 REAX: verified inference pools; full-stack GPU hotkeys earn ≈ $2.6k/month, token down 35% in 14 days — top lead outside MVTRX/Synth, needs capital (S11)
+
+**No trial (desk + chain).** reaxlabs/reax-subnet (identity on chain): miners serve pinned reference models in a runtime sidecar;
+validators recompute answers on the same model and compare in logit space (correctness is a gate); inside a pool weight ∝ ema ×
+min(cap, verified capacity / target) from unannounced probes (a struck probe → capacity 0). Pools 80 / 15 / 5 by tier: s1-pro (now
+mammoth-1, 48 GB+, 10/s unit, 16 units cap) and s1-fast (Plumb-4B, 24 GB+, 40/s unit, 16 units), s1-lite (Plumb-4B Q8, ≥ 8 GB GPU, 4 units)
+and s1-cpu (Gutsy 0.8B Q8, 4 cores / 4 GB, 4 units); in lite / cpu a coldkey's 3rd+ hotkeys count 0.7× each (≈ 4.33 max); fast / pro linear.
+A hotkey may serve several pools (multi-model commitments `reax-s1m/1:…`). Chain (TAO $227, REAX 0.02158 TAO, pool 3,648 TAO): miners paid
+≈ $300k/month; top 3 = $57k / $57k (`reax-spec/1:generalist` model-training competition) and $39k (lite + cpu). By commitment: cpu-only 10
+UIDs median $14; lite-only 19 UIDs median $183; s1-pro-only 36 UIDs ≈ $3; full stacks (pro / fast + lite + cpu) ≈ $3.1-3.65k each at
+ranks 4-12. Archive history (`reax_hist.py`, 15 daily snapshots): alpha per day of ranks 4-60 median 12-18 (stable), REAX price 0.0333 →
+0.0216 TAO (−35%), total miner alpha 2,944 → ≈ 2,000 per day since day −4 (cause to find). Today ≈ $2,600/month per strong UID. GPU rental
+(public sources, mid-2026): RTX PRO 6000 96 GB ≈ $1.09-2.09/h, H100 80 GB ≈ $1.49-2.99/h → margin ≈ $1.1-1.8k per hotkey per month at
+today's price. Capital + token-price bet (unlike MVTRX / Synth); possible pilot: one rented 96 GB GPU for a week + one UID (0.5 TAO), alpha
+sold regularly — user's decision. Before a pilot: the day −4 pay drop, reax-selfcheck on the rented card, the multi-model rules' status.
+**§1220 addendum (06:30 UTC 11-04), the inference pool is shrinking — REAX moved to WATCH (user: run the count now).** `reax_count.py`
+(archive, every 2 days, top 3 excluded): UIDs earning ≥ 8 alpha/day 137 (day −14) → 65-78 (days −12…−6) → 29-41 (days −4…0); their total
+1,681 → 1,192-1,605 → 436-858 alpha/day; median per strong UID 10.5 → 10-12 → 16-24; other paid UIDs' total 547 → 278-477. About four days
+ago the inference pools' total roughly halved while the reax-spec generalist (model-TRAINING) winners took ≈ 1,000 alpha/day (≈ $150k/month
+for 3 UIDs) — the subnet is shifting emissions from serving to training (GENERALIST-RELEASE.md / SPECIALIST-TRACKS.md / COMPETITIONS.md).
+The per-UID rise (≈ 20 alpha/day ≈ $2.9k) comes from fewer UIDs splitting a smaller pool; a new full-stack hotkey would take ≈ 1/39 of
+≈ 730 alpha/day and the pool may keep shrinking. REAX inference → watch (pilot only after ≥ 2 weeks of a stable inference pool); the training
+competition is winner-take-most against established teams — not a fit now.
