@@ -292,9 +292,12 @@ def ensemble(closes: np.ndarray, s0: float, model: str, rng, n=1000, steps=288, 
             vv = float(model.split("_vv")[1].split("_")[0].split("@")[0]) / 100.0   # fattening the 24 h tails (realized 24 h tails 0.15-0.19 vs 0.10)
             z = z * np.exp(rng.normal(-0.5 * vv ** 2, vv, (n, 1)))
         hot = level > 1.15 * long                            # volatile regime: the recent level well above the 7-day level (§1218)
-        if "_mo" in model and hot:                           # momentum: drift per step = mo/100 × the last 3 h's mean 5-minute log return
+        if "_mo" in model and "_moa" not in model and hot:                           # momentum: drift per step = mo/100 × the last 3 h's mean 5-minute log return
             mo = float(model.split("_mo")[1].split("_")[0].split("@")[0]) / 100.0
             z = z + mo * float(np.mean(r5[-36:]))
+        if "_moa" in model:                                  # ALWAYS-ON momentum (§1224): same drift as _mo without the hot-regime gate
+            moa = float(model.split("_moa")[1].split("_")[0].split("@")[0]) / 100.0
+            z = z + moa * float(np.mean(r5[-36:]))
         if "_ouc" in model and hot:                          # conditional mean reversion: off in the volatile regime
             model = model.replace("_ouc", "_nou")
         if "_ou" in model and "_nou" not in model:          # mean reversion of log price toward the start: x_{t+1} = (1 - theta) x_t + z_t
@@ -373,10 +376,23 @@ def main(asset: str, days: int, models=("boot_7d", "tod_1d", "tod_6h", "tod_6h@0
         kk = lambda m: (float(m.split("@")[1]) if "@" in m else 1.0) * (ivr ** float(m.split("_iv")[1].split("@")[0].split("_")[0]) if "_iv" in m else 1.0)
         ens = lambda m: (ses_ensemble(hist, s0, m.split("@")[0], rng, t0, k=kk(m), Y=Y) if m.startswith("ses") else
                          ensemble(hist[-6 * 288:] if hl else hist, s0, m.split("@")[0], rng, slot0=slot0, k=kk(m), stride=stride, day0=day0, hprof=hp))
-        ours = {m: crps_sum(ens(m),
-                            np.array(real, float), 300, INTERVALS) for m in models}
-        rl = np.log(np.array(real, float)); rows.append({"start": st, "field": P[st], **ours, "_move24": float(rl[-1] - rl[0]),
-                                                          "_rv": float(np.sqrt(np.sum(np.diff(rl) ** 2)))})
+        def ensx(m):                                         # "mix:A|B[|wA]" — a mixture: wA of the paths from model A, the rest from B (§1222)
+            if not m.startswith("mix:"):
+                return ens(m)
+            parts = m[4:].split("|"); wa = float(parts[2]) if len(parts) > 2 else 0.5
+            pa, pb = ens(parts[0]), ens(parts[1]); na = int(round(wa * len(pa)))
+            return np.concatenate([pa[:na], pb[:len(pb) - na]], axis=0)
+        paths = {m: ensx(m) for m in models}
+        ours = {m: crps_sum(paths[m], np.array(real, float), 300, INTERVALS) for m in models}
+        rl = np.log(np.array(real, float)); row = {"start": st, "field": P[st], **ours, "_move24": float(rl[-1] - rl[0]),
+                                                   "_rv": float(np.sqrt(np.sum(np.diff(rl) ** 2)))}
+        if __import__("os").environ.get("S50_PIT"):           # calibration (§1229): where the realized log return sits in our paths, and our width
+            for m in models:
+                lp = np.log(paths[m])
+                for h in (12, 72, 288):
+                    f = lp[:, h] - lp[:, 0]; r = rl[h] - rl[0]
+                    row[f"_pit_{m}_{h}"] = float(np.mean(f < r)); row[f"_sd_{m}_{h}"] = float(np.std(f))
+        rows.append(row)
     out = summarise(rows, models)
     (CACHE / f"bt_{asset}_{days}.json").write_text(json.dumps({"summary": out, "n_prompts": len(rows)}, indent=1))
     (CACHE / f"rows_{asset}_{days}.json").write_text(json.dumps([{k: v for k, v in r.items() if k != "field"} | {"_field_median": float(np.median(

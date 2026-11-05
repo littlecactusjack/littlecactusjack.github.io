@@ -20044,3 +20044,217 @@ for 3 UIDs) — the subnet is shifting emissions from serving to training (GENER
 The per-UID rise (≈ 20 alpha/day ≈ $2.9k) comes from fewer UIDs splitting a smaller pool; a new full-stack hotkey would take ≈ 1/39 of
 ≈ 730 alpha/day and the pool may keep shrinking. REAX inference → watch (pilot only after ≥ 2 weeks of a stable inference pool); the training
 competition is winner-take-most against established teams — not a fit now.
+**§1211 addendum 30 (17:55 UTC 11-04), overnight: the calm-book sleeve is positive in every read; x2's making books cancel it; x1 fell to 0.**
+skill_reads.txt (2-h, last 30 sim min): x2 sleeve books kept 1/1, 1/1, 3/3, 5/5 (kappa +8.13), 3/3, 3/3 — all positive, median α/notional
++1.8…+2.7 bp; x2 making books kept 6 (6 −), 1 (1 −), 6 (3 −), 12 (11 −), 6 (4 −), 3 (3 −) → live skill 0 (losing kept books dominate kappa's
+cubed downside). x1 live: skill 0.27 → 0.32 → 0.45 (rank 0.61) by 10:20 UTC, then 0 from 12:20; making 41 → 10.5 → 0 (10:20). Exact making on
+x1's last 90 sim min (570-660): captured 7.2 vs field median 241, R −0.7, 25 of 30 books one side ≤ 0 → credit 0 — paced volatile-book making
+is worthless for x1; its de-meaned reversed sleeve traded 100-150 times per 10 sim min and turned negative (failed). x1 pay $264 (11:00 UTC)
+→ $121 (17:00), prune line ≈ $100. No sim reset (sim time continuous), x1 present 1.0, still UID 213. Changes 17:53 UTC: x2 skew 6 → 10,
+max_units 100 → 40 (smaller making inventory → its losing |alpha| stays under the 2.3 bp hurdle, leaving the sleeve's positive books to set
+kappa); x1 sleeve_bp 5 → 0 (sleeve off, positions unwound). Plan: replace x1 with a fresh UID on the x2 template once x2's skill turns
+positive. Synth forward day 2: Crypto-1h above the median on all five assets again (BTC 0.43 / 0.378, ETH 0.476 / 0.306, SOL 1.372 / 0.261,
+XRP 0.26 / 0.215, HYPE 0.406 / 0.262); Crypto-24h weighted 0.054% vs 0.361%.
+
+## §1221 — SN50 Synth miner staged on the lab box (disabled), all 18 prompt types pass Synth's validator; funding status (S11)
+
+**No trial (staging).** synth-subnet acc8579 (latest, 10-28) in /opt/synth/synth-subnet with the shared /opt/synth/venv (bittensor 10.4.1);
+neurons/miner.py imports generate_simulations from futuresres.synth.miner_model (copy at deploy/sn50/miner.patched.py). miner_model now uses
+the forward test's frozen 24 h crypto model (todg_12_144_c_ou20 @ 1.0; 1 h tod1_120_240 unchanged) and an optional Com/Equ session model via
+SYNTH_CE_MODEL (e.g. ses_sp_yc@1.0; empty keeps the per-asset defaults). `synth_vcheck.py`: all 18 prompt types (Crypto-1h × 5, Crypto-24h × 5,
+Com/Equ × 8) → validate_responses "CORRECT"; 0.3-3 s warm, ≈ 6-7 s cold. synth-s1.service (hotkey s1, axon 8103, validator_min_stake 65000,
+ConditionPathExists hotkey s1) and synth-warm.timer (every 15 min, one small forecast per asset and horizon) created DISABLED. To go live: the
+user creates hotkey s1, copies it (and s1pub.txt to the droplet for reports), registers on netuid 50 (0.8 TAO), then enable synth-warm.timer
+and synth-s1. Funding 11-04: free 0.051 TAO + ≈ 0.11 TAO unstakable (9 small positions) ≈ 0.16 TAO; SN79 burn 0.153 TAO (x1 replacement
+just fits), SN50 burn 0.8 TAO (≈ 0.64 short). Register only at the forward bar (≥ 5 days, Crypto-1h + one more competition ≥ median).
+
+## §1222 — SN50 forward test expanded to all 3 competitions (2026-11-04)
+- Goal: by the 5-day bar (~11-08/09) know $/month per UID for every competition, not only Crypto-1h.
+- Crypto-24h variants (frozen): SLOW todg_12_144_c_ou20@1.0, VV todg_12_144_c_vv25_ou40@1.0, mix FAST|SLOW 50/50 and 30/70, mix VV|SLOW.
+  `mix:A|B[|wA]` = wA of the paths from A, the rest from B (the fast model wins on calm 10-d windows, loses badly on the volatile 5-d one).
+- Com/Eq variants (frozen): todg_12_36_c_yp, ses_sp, ses_sp_yc @1.0 and @1.1, ses_sp_cd20, mix todg_12_36_c_yp|ses_sp_yc.
+- Crypto-1h tod1_120_240 now scored at competition level too (rows1h_/scores1h_ archived; s50_combined S50_PREFIX=1h).
+- s50_rollup.py pools every forward folder, dedups (asset, prompt, model), rebuilds each competition's score and prints $/month per UID
+  from ≈ $53k/3 per competition. Runs daily after the forward test → data/synth/forward/rollup.txt.
+- 2026-11-03-backfill (2 days) is IN-SAMPLE: the variants were picked on those prompts. Only folders from 11-05 on are true forward days.
+
+## §1223 — MVTRX: skill is paid above the median, and the top skill UIDs are 60-s faders (2026-11-04)
+- Validator (reward.py allocate_trading): making is paid PROPORTIONALLY to captured-spread credit; skill is paid on a Pareto ladder with a
+  soft floor at the median of positive skill (tapered to 0 below). Newcomer EMA: standing tracks live performance (alpha = 1/(k+1)).
+  Check: emission score ≈ 4.5e-6 × making credit (x2 230 → 0.0010; x1 700 → 0.0033). Prune floor ≈ 0.0015.
+- x2 pruned 11-04 18:52 UTC: the book SPLIT left x2 on low-volume calm books (~230 credit) and x1 on volatile books (~0 credit), so both were weak.
+  Multi-UID owners (41/16/15/13/12 UIDs) stack every UID on the SAME books (124-127 of 128 overlap) and each earns 165-420 credit,
+  because the volume cap is per UID per book. A stacked second UID needs all taking off on both (no self-trades).
+- Two owners (10 UIDs each) get the TOP scores with zero making credit, from skill alone. Top-20 live-skill UIDs: pure takers, ~$1k clips, 40-90 books.
+  They trade AGAINST the prior 60 s move 70% of the time and ignore the fundamental gap (52%) and order flow (49%). Mid moves their way
+  +2.1 bp at 10 s (74% hit) and +2.0 bp at 15 min. skill_val replica: positive for 114/238/120 with kept counts similar to the gauges.
+- Naive 60-s fade backtest (mid-to-mid, no own impact): +0.3 to +1.2 bp/notional median per book, few books past the 2.3 bp hurdle.
+  The top UIDs reach +1.3 to +3.1, so either better timing or own impact (which the validator counts). This is decided live.
+- LIVE TEST on x1 from 19:37 UTC: rev_look=60 rev_hold=180 rev_usd=1000 sleeve_bp=4 sleeve_step=20 on 40 books (skip_x1 = sleeve_books_x1),
+  making on the other 88. Backups: QuoteAgent.pre-rev.py, skip_x1.pre-rev.txt, sleeve_books_x1.pre-rev.txt, tape.conf.pre-rev.
+  Replay check: rev off identical to live (926 instructions), rev on only IOC on the sleeve books.
+- §1223 add. 1 (20:38 UTC): top-taker rules from 36,100 trades: hold median 630 s (p75 1,440), fade signal strongest at 300 s lookback
+  (68% against; median prior move 2.9 bp), clip median $1,013, own impact only +0.34 bp then drift +1.65 bp (64% hit). They mostly trade the
+  calm ~$30 books (spread 6.8 bp). x1 test switched to rev_look=300 rev_hold=600 sleeve_bp=3 on the same 40 books (backup tape.conf.rev60).
+  First 14 sim min of the 60-s version: reversal books α ≈ 0 (3 kept of 22), making books net α −32 (13 kept), so the making books drag skill.
+- §1223 add. 2: their REAL trades scored with the backtest formula match skill_val (114 +1.27/+1.29, 238 +1.89/+1.87), so the scale is right.
+  The lever is FEWER bets per book: the hurdle is per book, so 2-4 larger bets per book swing past ±2.3 bp, and a positive mean makes most of
+  those passes positive. 400 MB backtest, all books: thr 8 / look 300 / hold 1200 / one bet per 1200 s → pass 27%, fail 9% (net +23 books),
+  median +1.33 (cf. UIDs 42/114: 30-35% pass, live skill > 2). thr 3 / re-check 20 s → 1%/2%. x1 switched to sleeve_bp=8 sleeve_step=1200
+  rev_hold=1200 (backup tape.conf.rev300). Calm-only books are no better than the others for this rule.
+- §1223 add. 3: maker/taker LOCK handshake (lock_dir, lock_max) so a skill-only taker UID and x1 (maker) can share all 128 books without ever
+  trading with each other: taker writes lock_<book>_<maker side>, maker pulls that side and writes ack only once its account shows no order
+  there, taker fires only on an ack ≥ its lock time, releases when at target or after lock_max s. Replay: off identical to live (926);
+  maker never places on a locked side and acks; taker fires 0 IOCs without acks (82 with). NOT deployed (needs the second UID).
+- §1223 add. 4 (go-live prepared 17:00 CT): 3-sim-hour backtest (the validator's kappa lookback) with the validator's kappa_of_alpha:
+  ours 12 bp / look 600 / hold 2400 / one bet per book per sim hour → 60 kept (38% pass / 16% fail), kappa +0.59; top UIDs on the same proxy
+  +0.20 (238, live 3.21) … +4.35 (42, live 2.30). User approved a skill-only UID (reusing hotkey x2). /opt/mvtrx/go_skill.sh: x2 = skill-only
+  taker on all 128 books with the lock handshake (taker); x1 = making on all 128, no taking, handshake maker. Replay of the skill-only config:
+  120 placements, all IOC, none post-only. Backups: QuoteAgent.pre-golive.py, mvtrx-x2.service.pre-skill, tape.conf.pre-golive.
+
+## §1224 — SN82 Noah deep dive (2026-11-04 evening, user asked): a capital-for-yield loop, not mining; parked until MVTRX earnings exist (S11)
+- Repo Vora-Inc/NOAH (fa9c0c2, 11-04): no miner software or GPU. Pay = √(age-decayed NOAH contribution credit) × multiplier, where multiplier =
+  min((PCI/0.5)², 2) and PCI = contributions / spendable earnings. Contributions to the Ark (coldkey 5EL1nNeb…, delegated to hotkey 5DLQGc9D…)
+  are PERMANENT, and 50% of all earnings must keep flowing back. Starter entry (from 11-03) gives ~5 NOAH per coldkey, lifetime, from a 0.25% pool.
+- Chain 11-04: miner pool 1,282 NOAH/day ≈ $350k/month (NOAH 0.0387 TAO, TAO $235). 30 paid UIDs, 45-50 NOAH/day each; two coldkeys
+  (12 and 11 UIDs) take ~85%. Ark holds 53,436 NOAH ≈ $486k. Burn 8.4 TAO ≈ $2k per UID.
+- Rough estimate (assumes ~1,700 credit per established UID): 100 NOAH in → ~11 NOAH/day, net ~5.5 after paybacks (≈ $1.5k/month), upfront ≈ $2.9k,
+  payback ~2 months; 400 in → net ≈ $3k/month for ≈ $5.6k. Risks: NOAH has no use outside the loop (price rests on contributors; the two big wallets
+  earn ~$300k/month); contributions are lost; the credit level isn't verified (needs a scan of all receipts). Earlier memory of "needs a GPU" was wrong.
+- §1223 add. 5 (01:00 UTC 11-05): x2 (UID 169) crashed 2,214 times/hour in _record (tape writer): its event stream delivers pydantic
+  Cancellation objects with no .side, so respond_simulation aborted and sent NO orders on those steps (x1 unaffected). Fix: x2 tape off (x1's
+  tape has every trade), getattr guard in _record. x2 restarted 00:59 UTC, 0 errors after. x2's live skill read before this is understated.
+- §1223 add. 6 (01:07 UTC 11-05): x1 (UID 213) PRUNED. Its service is stopped. x2's lock handshake is off (no maker left to ack). An x2 tape
+  re-enable crashed in the framework's lazy loader ('list' object has no attribute 'get', 18 in 2 min), so x2 runs with no tape; an
+  "IOC FLOW" log line gives its order flow. Each restart wipes 600 sim s of mid history (~33 wall min with no bets); x2 last restarted 01:22 UTC.
+
+## §1225 — SN5 Hone trial 5: first passes on both task types with open-weight models via OpenRouter (2026-11-05 01:30 UTC)
+- Cerebras (free tier): qwen-3.8-27b and gpt-oss-120b are fast (835 / 1,240 tok/s) but qwen overruns 32k replies, the free
+  tokens-per-minute limits throttle the agent, and the ~$5 credit ran out. 0 passes.
+- OpenRouter, fastest host per model, logprobs off, 32k reply limit, 6 correction rounds, 2 attempts × 2 retired fixtures:
+  GLM-5.2 passed yaml-cpp 6/6 TWICE (224 s, 124 s; $1.04, $0.81; 1.8-2.0M tokens in, ~40 steps), terminal failed / no answer.
+  DeepSeek V4 Pro 0813 passed the terminal task 6/6 once (168 s, $0.22), timed out on yaml-cpp twice. MiniMax M3 and gpt-oss-120b: 0/4 each.
+  Total ≈ $6 of the key's $18.61.
+- Economics: ~$0.9 per bug-fix attempt × ~2,000 tasks/day ≈ $30-50k/month, more than 30 UIDs earn (~$1,050 each). Levers: prompt caching (the
+  re-sent conversation dominates input), fewer steps, routing by task type (GLM for patches, DeepSeek for terminal). Next: ~20 public
+  SWE-bench / Terminal-Bench style tasks for a real pass rate and average cost.
+- §1226 (02:10 UTC 11-05): SWE-bench Verified, 10 random tasks (seed 1225), Hone's own agent loop + GLM-5.2 via OpenRouter (fastest host,
+  260 s of model time, 6 correction rounds), graded by the official harness (swebench 5.0.2, dataset SWE-bench/SWE-bench_Verified):
+  RESOLVED 6/10 (8 answered, 2 timeouts at 260 s; 6 of the 8 answers pass). $2.47 total = $0.25 per task, $0.41 per resolved task.
+  Answers took 7-102 s. Caveat: SWE-bench issues are clearer than Hone's vague instructions, so this is GLM's best case on bug fixes.
+  Scripts: deploy/sn5/{pick_tasks.py, prep_ws.sh, swe_agent.py, run_swe.sh, eval.sh} (lab box /opt/swe).
+- §1223 add. 7 (02:29 UTC 11-05): ROOT CAUSE of x2's missing trades. Its unit lacked lean=1 (x1 had lean=1 raw=1 lazy_load=1), so the agent
+  got pydantic books/events and every _quote call raised; the error was swallowed by `except Exception: continue` (that also explains the
+  'Cancellation has no side' tape crash). Balances didn't move between gauge reads 02:10-02:27. Fix: lean=1 + tape on (live_tape_x2c.jsonl),
+  swallowed _quote errors are now logged once per sim minute ("QUOTE ERROR"), IOC FLOW log time-based. After the restart: tape writes, 0 errors.
+  x2's live record before 02:29 UTC is mostly non-trading; judge x2 from ≈ 03:00 UTC on.
+- §1227 (03:05 UTC 11-05): Terminal-Bench, 10 random easy/medium single-container tasks, security category/tags EXCLUDED (seed 1227), as
+  Hone terminal_script_v1 (the agent reads the task's build files, writes one Bash script; graded in the task container by its own tests).
+  DeepSeek V4 Pro: 2/10 pass (hello-world, ilp-solver); 4 timeouts after only 2-3 steps (slow host), $0.40.
+  GLM-5.2: 3 of the 5 tasks it reached pass (csv-to-parquet, hello-world, prove-plus-comm; attention-mil 10/11 tests), $0.22. The other 5
+  got HTTP 402: the OpenRouter key's $20 limit is used up (account balance ≈ $7.9 left). Read: GLM-5.2 is the stronger model on both
+  Hone task types. Scripts: deploy/sn5/tb/.
+
+## §1228 — MVTRX skill-UID variant set for scaling (2026-11-05 03:10 UTC): six low-overlap reversal configs ready (S11)
+- deploy/sn79/variants.py on x1's last 850 MB (181 sim min ≈ the validator's 3 h window), validator kappa_of_alpha on kept books:
+  V0 x2 (12bp/600/2400/3600) kept 49, kappa +0.56 | V1 8bp/600/2400/3600 50, +0.38 | V2 15bp 44, +0.30 | V3 12bp/300/1200/2400 39, +0.34 |
+  V4 12bp/900/3600/3600 55, +0.45 | V5 10bp/1200/3600/5400 70, +0.26 | V6 8bp/300/1200/1200 26, +0.49 | V7 20bp 41, +0.04 (drop) |
+  V8 x2 on even books 20, +0.73 | V9 x2 on odd books 29, +0.46.
+- Entry overlap (same book & direction within ±30 s): V0/V1/V3/V4/V5/V6 pairwise 2-15% → a 6-UID stack that rarely crowds the same trade.
+  V2 overlaps V0 by 32% (second tier). V8/V9 are disjoint halves of V0 (0% overlap) but V8 keeps only 20 books (at the bar).
+- Plan once x2 shows live skill above the median: register UIDs in this order: V4, V1, V5, V3, V6, then new lookbacks (450/750/1500 s) to reach 20+.
+- §1228 add. 1: 10 more variants (variants2.py, same 3 h slice). Strong and low-overlap: N3 14bp/1500/4800/5400 kept 63 kappa +0.74 (overlap ≤ 8%),
+  N4 10bp/1800/5400/7200 68, +0.47 (≤ 6%), N9 8bp/900/3600/5400 56, +0.32 (≤ 12%), N8 13bp/1200/2400/4800 56, +0.51 (21% with V5).
+  Second tier (≥ 15% overlap with a first-tier variant): N10 +0.43, N5 +0.36, N2 +0.34, N1 +0.27; weak: N6 +0.17, N7 +0.25 (33% with V0).
+  Stack order for registration: V0 (x2), V4, V1, V3, V6, N3, N4, N9, N8, V5 = 10 low-overlap UIDs; then the second tier → 14.
+  Beyond that: split each variant across even/odd books (halves never overlap; each keeps ~20-30 books, near the bar). add_skill_uid.sh knows all.
+
+## §1229 — Synth tail check: our 24 h forecasts are calibrated on average; the big-move-day loss is not a fixable width error (2026-11-05 04:05 UTC) (S11)
+- S50_PIT=1 in s50_backtest (realized log return's percentile inside our 1,000 paths at 1 h / 6 h / 24 h, plus forecast sd), 10 days × BTC/ETH/SOL/XRP,
+  fast todg_12_36_c_ou20@0.95 and slow todg_12_144_c_ou20@1.0.
+- All prompts: realized lands in our outer 10% (5% each side) 8-12% of the time at every horizon for BTC/ETH/XRP (calibrated); SOL 5-7% (slightly too wide).
+- Big-move third: 24 h tail hits 25-36%, |move|/sd ≈ 1.2-1.5. That's expected when conditioning on the realized move (any calibrated
+  forecast shows it), so it is not evidence of narrow tails. Widening would cost the other two thirds; IV scaling (§1211) didn't help.
+- Read: Synth's big-move losses come from moves that aren't predictable from price history at prompt time. No width fix; at most a small SOL narrowing (k ≈ 0.9) to test in the forward run.
+
+## §1230 — MVTRX: the top skill takers fade SMALL moves with depth on their side; x2 switched to S5 (2026-11-05 04:18 UTC) (S11)
+- featstudy.py (3 h slice): our V0 entries LOSE raw (−7.1 bp over the hold, 38% hit); they score only because the validator strips each book's
+  drift. The top-20 skill takers' 68,552 trades gain +2.4 bp in 10 min (60% hit): median move 5 bp (ours 12+), smaller moves better (+3.0 vs +1.6 bp),
+  and top-5 depth imbalance on their side helps (+3.0 bp / 65% hit vs +1.5 / 56%).
+- variants3.py, validator kappa, studied slice → UNSEEN earlier slice (ending 900 MB back): V0 +0.56 → +0.25; V0+depth +0.61 → +0.18;
+  S5 4bp/300/600/3600 + depth ≥ 0.17: +1.01 (31 kept) → +0.49 (37 kept); S4 5bp/300/900/2400+depth +0.78 → +0.44; S3 6bp/…/1800 +7.92 → +2.13 but 16 kept (< 20).
+- Agent: rev_imb (depth filter, off by default; off = identical to live in replay). x2 switched to S5 at 04:18 UTC (sleeve_bp=4 rev_look=300
+  rev_hold=600 sleeve_step=3600 rev_imb=0.17); backup mvtrx-x2.service.pre-s5, QuoteAgent.pre-imb.py. Live skill before the switch: 0.18 (28 kept).
+- Hone cost note: input is ~2% of GLM's bill; we paid ~2.4× list via fastest-host routing → for live use price-sorted routing with a speed floor.
+
+## §1231 — SN67 Harnyx deep look: submit a research agent; ~40 "main participants" earn ≈ $590/month each; offline eval built in (2026-11-05 04:40 UTC) (S11)
+- Repo harnyx/harnyx (b0ac419, 11-04). Miners SUBMIT a Python deep-research agent (miner SDK: llm_chat, search_web, fetch_page through the platform
+  tool proxy, billed to the MINER's own provider keys; per-task session budget $0.50). Validators run it in a sandbox on a DAILY batch
+  (cutoff 15:00 UTC): 10 qualifying + 20 main tasks; score = F1 vs a stronger reference answer + a pairwise judge (Overall = 0.3 F1 + 0.7 judge).
+- Pay (public MCP api.harnyx.ai/mcp get_champion, 11-05): champion UID 218 (Overall 0.388, F1 0.801) ≈ 32% of the pool ≈ $17.8k/month;
+  40 main participants at 1.067% ≈ $591/month each; ~70 more at $39-236; ~160 get $0. Participant weight = stage (top 50% 1 / top 10% 2 /
+  main 5) × novelty (near_duplicate 1 / notable_change 3 / novel 10). Exact duplicates get nothing. Chain: pool ≈ $55k/month, burn 0.072 TAO.
+- Main round: up to 30 per title (F1, Overall) must pass the dethroning comparison against the incumbent on the 10 qualifying tasks:
+  beat it by 10 points, OR match its score ≥ 10% cheaper, OR ≥ 10% and ≥ 1 s faster. Then rank by qualifying score, cost, runtime.
+- The champion's script is public (get_miner_script include_content): 2,720 lines, planner + two research lanes (driver openai/gpt-6.1-terra
+  via OpenRouter, writer deepseek-v4.1-flash), adjudicator, quoted-passage answers; stops at $0.27/task. ~275 artifacts/day.
+- Offline: harnyx-miner-local-eval scores a local agent on any completed public batch. Needs a Chutes key (judge), OpenRouter (agent models)
+  and a search key (champion uses Parallel; Desearch/Exa/Tavily/Firecrawl also supported).
+- Economics per UID at the main tier: ≈ $591 − model/search spend (≈ $0.27 × 30 tasks ≈ $8/day ≈ $240/month at the champion's spend;
+  ≈ $3/day if it only qualifies) → net ≈ $350/month; a notable/novel change ×3/×10. Next: reproduce the champion locally, then a ≥ 10%-cheaper,
+  equal-score variant (main-tier entry) and real improvements (novelty / title).
+- §1231 add. 1 (06:10 UTC 11-05): batch 436e959b (11-04) comparisons via MCP list_miner_task_batch_artifact_comparisons: 52 of 273 artifacts
+  scored. New champion UID 218 (the public script we run) = 0.388 (F1 0.80, deep 0.21) at selection median cost $4.77/task; #2-#25 = 0.27-0.35
+  at ≈ $0.8/task. The ENTERING incumbent (UID 92) scored only 0.063, so the dethroning bar was ≈ 0.16 and ~51 artifacts got main slots →
+  today's 40 × $591 tier reflects an easy batch. Next batch's bar: match 0.388 at ≥ 10% lower cost (or 0.49). The champion is ~5× costlier
+  than its peers, so the entry plan is a cheaper variant that holds ≈ 0.39. One-task local check: champion code answered the NPS task correctly
+  (matches the reference) for $0.22, yet pairwise judge = 0 (as for all recorded agents on that task); full 30-task local run under way.
+
+## §1232 — S5 has no live raw edge; the top takers' trigger is a combination, not one rule (2026-11-05 06:15 UTC) (S11)
+- x2exec2.py, x2's 381 live S5 ENTRIES (live_tape_x2c): fade a +4.3 bp 300 s move (83% against), no signal lag (+0.0 bp in the last 5 s),
+  half spread paid 2.3 bp, then mid our way +0.06 bp at 60 s and −0.54 bp at 600 s (49% hit) → no raw edge; live skill (0.18 V0, 0.095 S5)
+  comes from the validator's drift strip, not prediction.
+- trigger.py, top-20 skill takers' 28,381 ENTRIES (x1 tape, 600 MB): +2.40 bp at 60 s, +1.69 at 600 s, 58% hit. Agreement: fund change 60 s 46%
+  (agree +2.57 vs disagree +0.87 bp), gap change 10 s 66%, big other trade 5 s 34% (fade), mid 5 s 40% (fade), gap now 51%, flows 45-54%.
+  No single feature separates good from bad entries → fit a multi-feature predictor and test it on an unseen slice (remember §1199: a lab fit
+  was backwards live).
+- §1232 add. 1 (06:18 UTC): correction. V0's positive skill is NOT a quirk: the validator's skill = P&L minus mean inventory × book drift (position
+  timing relative to one's own average), the subnet's definition; V0 is positive on both backtest slices and was 0.18 live after ~30 min.
+  Switching to S5 mid-test was a mistake (S5 live 0.095 after 2 h). x2 back on V0 at 06:18 UTC (backup mvtrx-x2.service.s5).
+  The predictor work continues as a raw-edge upgrade, not a replacement.
+- §1231 add. 2: Harnyx champion code, local eval of batch 436e959b, 30 tasks: mean 0.483 (local pairwise scale), 16/30 nonzero, $5.57 total
+  ($0.19/task), 0 errors. Variants A (no Claude) and C (GLM-5.2 driver) running.
+
+## §1233 — MVTRX reversal predictor: a real raw edge on an unseen slice (2026-11-05 06:20 UTC) (S11)
+- predfeat.py: every 5 sim s per book: Δmid 1/5/30/60/300 s, Δfund 1/10/60 s, gap (fund−mid) and its 10 s change, top-5 depth imbalance,
+  spread, other takers' signed flow 10 s, new-minus-cancelled book flow 10 s, big trades 5 s; targets: mid move 60 s / 600 s (bp).
+  TRAIN = x1 tape slice ending 1,800 MB back (252,928 rows); TEST = latest 850 MB (254,976 rows), unseen.
+- predfit.py, ridge on z-scores: test corr +0.25 (60 s) / +0.17 (600 s), above in-sample (+0.20 / +0.12). Weights (600 s, per sd): depth imbalance
+  +0.66, Δfund 60 s +0.48, Δmid 60 s −0.41, gap −0.24, spread +0.24, flow +0.24, gap change +0.20.
+- Trading sim on TEST (one bet per book per hour, 600 s hold, mid-to-mid): S5 +0.97 bp / 57% hit, books pass 23% fail 9% |
+  model top 2% |forecast| +4.24 bp / 72%, 95 books pass 42% fail 5% | top 0.5% +5.95 bp / 76%, 53 books pass 53% fail 6%.
+- Next: a second unseen slice (ending 900 MB back), then a live implementation + replay check. Live test after x2's V0 verdict (or on a new UID).
+  Remember §1199: an offline-fit predictor was backwards live.
+- §1233 add. 1 (07:00 UTC): second unseen slice (ending 900 MB back) confirms: corr +0.22 / +0.17; top 2% +5.30 bp, 67% hit, books pass 47% fail 7%;
+  top 0.5% +7.23 bp, 72%; S5 +0.62 bp. Model exported (predexport.py → agents/rev_model.json, threshold |forecast| ≥ 3.19 bp = top 2% of train).
+  Live features in revfeat.py, shared with revfeat_parity.py: replaying the tape through the live code reproduces the training forecast at
+  corr 0.997, 1,919 vs 1,907 entries, 1,872 identical. Bugs found and fixed on the way: trades filed under the snapshot second (dropped),
+  flow means folded before the second's trades (always 0), flow scale before warm-up (exploded) → 600 s warm-up.
+- QuoteAgent rev_model=<json>: feeds each step's events and book to RevFeatures, enters sign(forecast) × rev_usd when |forecast| ≥ threshold,
+  one bet per book per sleeve_step, hold rev_hold. Replay: off = identical to live (120 placements); on = 0 errors, 128 books tracked.
+  Deployed agent file (x2 unaffected until a restart; off = identical). x3 unit = hotkey x1, port 8101, variant M1 (rev_hold 600, one bet per
+  book per 3600 s, $1k clips), own tape live_tape_x1.jsonl; waits for registration. User: x2 stays on V0 and lives or dies on its own.
+- §1231 add. 3 (06:50 UTC 11-05): local eval, batch 436e959b, 30 tasks: champion 0.483 / 16 nonzero / $5.57 | A (Claude → DeepSeek, gpt-oss)
+  0.517 / 17 / $5.66 (no loss from dropping Claude) | C (A + GLM-5.2 driver) 0.117 / 4 / $4.81 → the gpt-6.1-terra driver carries the score;
+  GLM is barely cheaper and far worse. Cheaper-entry next: keep terra, trim spend (SPEND_STOP / MAX_TURNS) — variant B, ~$5.
+- §1222 roll-up 11-05 (first true forward day + 2 in-sample days): Crypto-1h tod1_120_240 rank 213/257 ≈ $52/month; Crypto-24h ≈ $1-2 (rank 225-250;
+  the new @0.85 narrower model is worst, rank 250); Com/Eq $0 → ≈ $54/month per UID vs a 0.8 TAO (~$190) burn. Synth stays unregistered.
+- §1231 add. 4 (07:35 UTC 11-05): CORRECTED ECONOMICS. Each selected validator runs the artifact separately on our provider keys
+  (mining-runbook "Account for repeated execution"); batch 436e959b ran on 4 validators. At variant B's $0.155/task: main round 30 × 4 =
+  120 runs ≈ $18.6/day ≈ $560/month vs ≈ $590 pay → ≈ break-even; qualifying only 40 runs ≈ $186/month vs $0-236 → mostly a loss.
+  Worth mining only at ~3× lower cost for the same score, a novelty bonus (×3 notable → ≈ $1.2k/month net), or the champion title (+10 pts).
+  Plan: finish B's clean rerun (spend/score curve), then park Harnyx as novel-agent R&D; MVTRX stays the main line.
+- §1231 add. 5 (07:42 UTC 11-05): clean B rerun (0 errors): 0.500, 16/30 nonzero, $4.78 ($0.159/task, −14% vs champion), 108 s mean (−16%).
+  So the champion's spend can be cut ~14% and runtime ~16% with no score loss (0.48-0.52 across champion/A/B, ±noise). Cost curve:
+  champion $0.186/task, A $0.189, B $0.159, C (GLM driver) $0.160 but score 0.117. With 4 validators, B's main-tier cost ≈ $570/month ≈ the
+  ≈ $590 pay → Harnyx PARKED as novel-agent R&D; revisit only with an approach ~3× cheaper or clearly better (novelty / title).

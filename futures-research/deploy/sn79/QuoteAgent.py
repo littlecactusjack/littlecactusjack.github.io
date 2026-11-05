@@ -14,6 +14,7 @@ validator's own capture code.
 """
 
 import json
+import os
 from collections import defaultdict
 
 from taos.common.agents import launch
@@ -142,6 +143,22 @@ class QuoteAgent(FinanceAgent):
         self.sleeve_step = int(getattr(c, "sleeve_step", 10))   # sim s, one IOC per SLEEVE_COOL s: de-beta skill counts held inventory × Δmid
         self.sleeve_cool = int(getattr(c, "sleeve_cool", 5))    # and its 2.3 bp hurdle is per own notional (§1211 add. 20)
         self._sleeve, self._sleeve_at = {}, {}
+        self.rev_look = float(getattr(c, "rev_look", 0.0))       # >0: REVERSAL sleeve (§1223) on the sleeve books — when mid moved ≥ SLEEVE_BP over the
+        self.rev_hold = float(getattr(c, "rev_hold", 180.0))     # last REV_LOOK sim s, steer the position to −sign(move) × REV_USD of notional, hold
+        self.rev_usd = float(getattr(c, "rev_usd", 1000.0))      # REV_HOLD sim s, then back to flat (the top live-skill UIDs are 60-s faders)
+        self.rev_imb = float(getattr(c, "rev_imb", -9.0))        # §1230: enter only when top-5 depth imbalance × our direction ≥ REV_IMB (off at -9)
+        self.rev_model = str(getattr(c, "rev_model", "") or "")  # §1233: path to the fitted predictor (rev_model.json); set = model entries
+        self._rf = None
+        if self.rev_model:
+            import os as _os, sys as _sys
+            _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+            from revfeat import RevFeatures
+            self._rf = RevFeatures(self.rev_model)
+        self._mid_hist, self._rev = {}, {}
+        self.lock_dir = str(getattr(c, "lock_dir", "") or "")   # §1223: our UIDs must never trade with each other. A taker UID writes
+        self.lock_max = float(getattr(c, "lock_max", 120.0))       # lock_<book>_<maker side> before its IOC; the maker UID pulls that side and
+        self._lock_at = {}                                          # writes ack_<book>_<side> only once it has NO order left there; the taker
+                                                                    # fires only on an ack at least as new as its lock, releases when done or after LOCK_MAX s
         self.sleeve_prop = float(getattr(c, "sleeve_prop", 0.0))   # >0: proportional sleeve — target = sleeve_q × clip(gap_bp / sleeve_prop, ±1),
         self.sleeve_band = float(getattr(c, "sleeve_band", 0.2))
         self.sleeve_dm = float(getattr(c, "sleeve_dm", 0.0))      # >0: use the gap minus its own EMA (half-life sleeve_dm sim s) — volatile books sit
@@ -212,6 +229,9 @@ class QuoteAgent(FinanceAgent):
             if self._sec % 60 == 0 and self.own_stats[1]:
                 n, t, q, qt = self.own_stats
                 bt.logging.info(f"OWN FLOW: our share of order/cancel events {n / t:.1%} by count, {q / max(qt, 1e-9):.1%} by size")
+        if self._sec - getattr(self, "_ioc_logged", -10 ** 9) >= 60 and getattr(self, "_ioc_n", 0):
+            self._ioc_logged = self._sec            # §1223 add. 6: x2 runs without a tape, so log its IOC flow once per sim minute
+            bt.logging.info(f"IOC FLOW: {self._ioc_n} IOCs, ${self._ioc_usd:,.0f} since start; rev targets open {sum(1 for t, _ in self._rev.values() if t)}; model entries {getattr(self, '_model_n', 0)}")
         if self.tape is not None:
             self._record(state)
         if self.pace_cap:
@@ -227,7 +247,12 @@ class QuoteAgent(FinanceAgent):
                 continue
             try:
                 self._quote(response, book_id, book, acct)
-            except Exception:
+            except Exception as ex:                        # §1223 add. 7: never swallow silently — count and log once per sim minute
+                self._qerr = getattr(self, "_qerr", 0) + 1
+                if self._sec - getattr(self, "_qerr_at", -10 ** 9) >= 60:
+                    self._qerr_at = self._sec
+                    import traceback
+                    bt.logging.warning(f"QUOTE ERROR x{self._qerr} book {book_id}: {type(ex).__name__}: {ex} | {traceback.format_exc(limit=3)[-400:]}")
                 continue
         return response
 
@@ -256,7 +281,7 @@ class QuoteAgent(FinanceAgent):
                 row[0 if bid_side else 1] += e.quantity
                 if (bid_side and e.price >= b0 - 2 * tick) or (not bid_side and e.price <= a0 + 2 * tick):
                     row[2 if bid_side else 3] += e.quantity
-            elif kind == "c" and e.side is not None:
+            elif kind == "c" and getattr(e, "side", None) is not None:   # pydantic Cancellation has no side (x2 crash 11-05)
                 row[4 if e.side == 0 else 5] += e.quantity or 0.0
         for d, keep in ((mids, 125), (fl, 6), (ofl, max(6, self.flow_win + 1))):
             for s in [s for s in d if s < sec - keep]:
@@ -403,7 +428,45 @@ class QuoteAgent(FinanceAgent):
                 return                                     # sleeve_file set: trade only the sleeve books (another UID of ours quotes the rest)
             units = acct.base_balance.total - base0
             target, cool = 0.0, self.take_cool
-            if self.sleeve_bp and fundamental and (self.sleeve_books is None or int(book_id) in self.sleeve_books):
+            if self._rf is not None and (self.sleeve_books is None or int(book_id) in self.sleeve_books):
+                trades, of = [], 0.0                            # §1233: feed this step's events, then trade the forecast's sign when it is strong
+                for e in book.events or []:
+                    kind = getattr(e, "y", "")
+                    if kind == "t":
+                        trades.append(((e.timestamp // 1_000_000_000) if e.timestamp else self._sec, e.price, e.quantity, getattr(e, "Ta", None)))
+                    elif kind == "o" and getattr(e, "price", None) is not None:
+                        of += (e.quantity or 0.0) if e.side == 0 else -(e.quantity or 0.0)
+                    elif kind == "c" and getattr(e, "side", None) is not None:
+                        of -= (e.quantity or 0.0) if e.side == 0 else -(e.quantity or 0.0)
+                bd = sum(l.quantity or 0.0 for l in (book.bids or [])[:5]); ad = sum(l.quantity or 0.0 for l in (book.asks or [])[:5])
+                self._rf.update(int(book_id), self._sec, mid, fundamental, (bd - ad) / (bd + ad) if bd + ad else 0.0, (ask - bid) / mid * 1e4,
+                                trades, of, own_uid=self.uid)
+                tgt, at = self._rev.get(book_id, (0.0, -10 ** 9))
+                if self._sec - at >= self.rev_hold:
+                    tgt = 0.0
+                if self._sec - at >= self.sleeve_step:
+                    pr = self._rf.predict(int(book_id), self._sec)
+                    if pr is not None and abs(pr) >= self._rf.th:
+                        tgt, at = (1.0 if pr > 0 else -1.0) * self.rev_usd / mid, self._sec
+                        self._model_n = getattr(self, "_model_n", 0) + 1
+                self._rev[book_id] = (tgt, at)
+                target, cool = tgt, self.sleeve_cool
+            elif self.rev_look > 0 and (self.sleeve_books is None or int(book_id) in self.sleeve_books):
+                h = self._mid_hist.setdefault(book_id, [])
+                h.append((self._sec, mid))
+                while len(h) > 1 and h[1][0] <= self._sec - self.rev_look:
+                    h.pop(0)                               # h[0] = the newest sample at least REV_LOOK old
+                tgt, at = self._rev.get(book_id, (0.0, -10 ** 9))
+                if self._sec - at >= self.rev_hold:
+                    tgt = 0.0
+                if h[0][0] <= self._sec - self.rev_look and self._sec - at >= self.sleeve_step:
+                    r = (mid - h[0][1]) / h[0][1] * 1e4
+                    d = -1.0 if r > 0 else 1.0
+                    if abs(r) >= self.sleeve_bp and (self.rev_imb <= -1.0 or d * self._depth_imb(book) >= self.rev_imb):
+                        tgt, at = d * self.rev_usd / mid, self._sec
+                self._rev[book_id] = (tgt, at)
+                target, cool = tgt, self.sleeve_cool
+            elif self.sleeve_bp and fundamental and (self.sleeve_books is None or int(book_id) in self.sleeve_books):
                 if self._sec - self._sleeve_at.get(book_id, -10 ** 9) >= self.sleeve_step:
                     u = (fundamental - mid) / mid * 1e4; cur = self._sleeve.get(book_id, 0.0)
                     if self.sleeve_dm > 0:
@@ -418,8 +481,12 @@ class QuoteAgent(FinanceAgent):
                     self._sleeve_at[book_id] = self._sec
                 target, cool = self._sleeve.get(book_id, 0.0), self.sleeve_cool
             gap = target - units
+            if self.lock_dir and abs(gap) < self.min_order_size(book_id):
+                self._lock_release(book_id)
             if self.skip_flat and abs(gap) >= self.min_order_size(book_id) and self._sec - self._last_take.get(book_id, -10 ** 9) >= cool:
                 side = OrderDirection.BUY if gap > 0 else OrderDirection.SELL
+                if self.lock_dir and not self._lock_ok(book_id, OrderDirection.SELL if side == OrderDirection.BUY else OrderDirection.BUY):
+                    return                                 # waiting for the maker UID to clear that side of the book
                 q = round(min(abs(gap), self.take_size, qb if side == OrderDirection.SELL else qa), vd)
                 px = bid if side == OrderDirection.SELL else ask
                 funded = (acct.base_balance.free >= q) if side == OrderDirection.SELL else (acct.quote_balance.free >= q * px)
@@ -427,6 +494,7 @@ class QuoteAgent(FinanceAgent):
                     response.limit_order(book_id=book_id, direction=side, quantity=q, price=px, stp=STP.CANCEL_OLDEST, postOnly=False,
                                          timeInForce=TimeInForce.IOC)
                     self._last_take[book_id] = self._sec
+                    self._ioc_n = getattr(self, "_ioc_n", 0) + 1; self._ioc_usd = getattr(self, "_ioc_usd", 0.0) + q * px
             return
         if self.pace_cap and self._paced_out(int(book_id)):
             for o in acct.orders:                          # over the volume pace on this book: pull our quotes and wait
@@ -481,6 +549,17 @@ class QuoteAgent(FinanceAgent):
                 want.pop(side, None)
         if self.trend_z and abs(trend) > self.trend_z and trend * inv < 0:
             want.pop(OrderDirection.BUY if inv > 0 else OrderDirection.SELL, None)   # long into a fall / short into a rise: unwind only
+        if self.lock_dir:
+            for side in (OrderDirection.BUY, OrderDirection.SELL):
+                lk, ak = f"{self.lock_dir}/lock_{book_id}_{int(side)}", f"{self.lock_dir}/ack_{book_id}_{int(side)}"
+                if os.path.exists(lk):
+                    want.pop(side, None)                   # a taker UID of ours is about to trade into this side: stay off it
+                    if not any(o.side == side for o in acct.orders):
+                        with open(ak + ".tmp", "w") as fh:
+                            fh.write(str(self._sec))
+                        os.replace(ak + ".tmp", ak)
+                elif os.path.exists(ak):
+                    os.remove(ak)
         # the validator adds 5-25 ms to every instruction after a book's first: cancel the side the prediction says is exposed first
         orders = sorted(acct.orders, key=lambda o: (o.side == OrderDirection.SELL) != (pred > 0)) if self.cancel_first else acct.orders
         for o in orders:
@@ -512,8 +591,8 @@ class QuoteAgent(FinanceAgent):
                         of["n" + side] += e.quantity
                         if (side == "b" and e.price >= b0 - 2 * tick) or (side == "a" and e.price <= a0 + 2 * tick):
                             of["n" + side + "2"] += e.quantity
-                    elif kind == "c" and e.side is not None:
-                        of["c" + ("b" if e.side == 0 else "a")] += e.quantity or 0.0
+                    elif kind == "c" and getattr(e, "side", None) is not None:   # pydantic Cancellation has no side (x2 crash 11-05)
+                        of["c" + ("b" if e.side == 0 else "a")] += getattr(e, "quantity", 0.0) or 0.0
                 self.tape.write(json.dumps({"ts": ts, "book": book_id, "of": {k: round(v, 4) for k, v in of.items()}}) + "\n")
                 self.tape.write(json.dumps({"ts": ts, "book": book_id, "bid": book.bids[0].price, "ask": book.asks[0].price,
                                             "bids": [[l.price, l.quantity] for l in book.bids[:5]], "asks": [[l.price, l.quantity] for l in book.asks[:5]],
@@ -534,6 +613,37 @@ class QuoteAgent(FinanceAgent):
                 if q:
                     self.tape.write(json.dumps({"ts": ts, "book": book_id, "queue": q}) + "\n")
         self.tape.flush()
+
+    @staticmethod
+    def _depth_imb(book):
+        """(bid depth − ask depth) / total over the top 5 levels: > 0 means more resting buyers (§1230)."""
+        bd = sum(l.quantity or 0.0 for l in (book.bids or [])[:5]); ad = sum(l.quantity or 0.0 for l in (book.asks or [])[:5])
+        return (bd - ad) / (bd + ad) if bd + ad > 0 else 0.0
+
+    def _lock_ok(self, book_id, maker_side):
+        """Taker half of the handshake: request the lock, and report whether the maker UID has acknowledged it (no orders left there)."""
+        lk, ak = f"{self.lock_dir}/lock_{book_id}_{int(maker_side)}", f"{self.lock_dir}/ack_{book_id}_{int(maker_side)}"
+        key = (book_id, int(maker_side))
+        if key not in self._lock_at or not os.path.exists(lk):
+            with open(lk + ".tmp", "w") as fh:
+                fh.write(str(self._sec))
+            os.replace(lk + ".tmp", lk); self._lock_at[key] = self._sec
+            return False
+        if self._sec - self._lock_at[key] > self.lock_max:
+            self._lock_release(book_id)                    # maker never cleared: give the side back, try again later
+            return False
+        try:
+            return float(open(ak).read()) >= self._lock_at[key]
+        except (OSError, ValueError):
+            return False
+
+    def _lock_release(self, book_id):
+        for side in (OrderDirection.BUY, OrderDirection.SELL):
+            self._lock_at.pop((book_id, int(side)), None)
+            try:
+                os.remove(f"{self.lock_dir}/lock_{book_id}_{int(side)}")
+            except OSError:
+                pass
 
     @staticmethod
     def _reserved(acct, side):
