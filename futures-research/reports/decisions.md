@@ -20258,3 +20258,383 @@ just fits), SN50 burn 0.8 TAO (≈ 0.64 short). Register only at the forward bar
   So the champion's spend can be cut ~14% and runtime ~16% with no score loss (0.48-0.52 across champion/A/B, ±noise). Cost curve:
   champion $0.186/task, A $0.189, B $0.159, C (GLM driver) $0.160 but score 0.117. With 4 validators, B's main-tier cost ≈ $570/month ≈ the
   ≈ $590 pay → Harnyx PARKED as novel-agent R&D; revisit only with an approach ~3× cheaper or clearly better (novelty / title).
+
+## §1234 — x3's fitted predictor works LIVE: skill 0.58 (above the 0.49 median), entries +3.5 bp / 64% hit (2026-11-05 16:25 UTC) (S11)
+- x3 = UID 114, rev_model since 06:36 UTC: live debeta_skill 0.581, kept 41, combined 0.307, score 0.0008 (EMA catching up); 202 model entries,
+  862 IOCs, $474k, 0 errors. x3exec.py on its own tape, 266 entries: mid our way +1.09 bp at 60 s (64% hit), +3.47 bp at 600 s (64% hit),
+  no adverse pre-fill drift (−0.6 bp in the last 5 s), half spread 1.95 bp. Matches the offline test (+4.2-5.3 bp, 67-72%): the edge is real live.
+- x2 (V0) at the same time: skill 0.225, kept 48, combined 0.177, score 0.0001.
+- Harnyx D (context diet: KEEP_TURNS 3, smaller pages/search): 0.46 at $5.34 — MORE expensive than B ($4.78): trimming the re-sent context
+  breaks prompt caching (cached input is what kept terra cheap). E ran out of OpenRouter credit (952 × 402) → invalid. Cheap route closed;
+  Harnyx stays parked. OpenRouter balance ≈ $0.
+
+## §1235 — Making + model in ONE UID hurts the model's skill; keep them on separate UIDs (2026-11-05 17:27 UTC) (S11)
+- mkmodel.py over the old x1's making period (UID 213 maker fills, 1,127 on 56 books) = the predictor's unseen test slice (205 model entries on
+  102 books); per-book alpha net of drift, 2.3 bp hurdle, validator kappa_of_alpha:
+  MODEL alone 34 kept (25+/9−), median +0.96 bp, kappa +0.99 | MAKING alone 23 kept (8+/15−), −1.03, kappa −0.14 |
+  BOTH on the same books 35 kept (21+/14−), +0.42, kappa +0.48 (HALVED) | SPLIT (making only where the model never traded) = model alone (+0.99).
+- Making inventory is adversely selected, so on a shared book it drags the model's alpha. A static split leaves the model too few books:
+  half the books → ~17 kept per window, under the 20-book bar. And this slice had only 56 making books; making on all books would hurt more.
+- Recommendation: never combine. For a fast-paying second miner use a MAKER-ONLY UID on all books (making pays in proportion to credit, outside
+  the skill floor; the old x1 reached ≈ 700 credit / score 0.0033 ≈ 2× the floor within ~15 h), with the §1223 lock handshake so our model
+  UIDs' IOCs never hit its quotes. Model UIDs stay pure takers.
+- §1235 add. 1 (17:46 UTC 11-05): x3 = UID 58 registered, MAKER-ONLY on all books (old-x1 all-book making params, pacing, no taking,
+  lock_dir maker side), live 17:40 UTC; first fills within minutes (97, then 265). Lock handshake turned on for x1 (UID 114) and x2 (UID 169)
+  at 17:46 UTC (restart; backups mvtrx-x?.service.pre-lock). selftrade.sh counts x3 fills taken by x1/x2: 0 in the recent tape (1 earlier hit in
+  the whole file is probably UID 58's previous owner). Test: does x3's paid score rise faster than x1's (making pays in proportion to credit, no floor)?
+- §1235 add. 2 (18:50 UTC 11-05): handshake stall: 38 lock requests vs 2 acks, locks up to 449 wall s old; x1 placed 14 trades vs 64 wanted. The
+  maker wrote acks near the end of _quote, but paced-out / toxic books return early → never acked. Fix: maker-side ack (and cancel of its
+  quotes on a locked side) moved to the top of the making path; later code only keeps the locked side out of `want`. Replay: lock off identical,
+  maker never quotes a locked side and acks, takers wait for acks. Deployed; only x3 restarted. After: 12 locks / 9 acks, max lock age 2 s.
+- §1236 (19:10 UTC 11-05): housekeeping. Removed the SWE-bench / Terminal-Bench test images and the leftover Harnyx eval container (≈ 33 GB; the
+  disk went from 64% → 42%, 90 GB free; re-pullable). Nightly mvtrx-taperotate.timer (09:07 UTC): a live tape over 2 GB keeps its last 1 GB
+  as .prev and is truncated in place (the agent opens tapes with mode "a"). add_maker_uid.sh: one-command maker-only UID from x3's unit
+  (dry run on a throwaway name: unit written with the right hotkey/port/lock_dir; refuses to start unregistered).
+- §1236 add. 1: model warm start. RevFeatures.preload(tape, mb) replays the tail of a live market tape on the box through update() (the parity-
+  tested path); QuoteAgent rev_preload=<tape> rev_preload_mb (default 300). Frozen-tape check vs a 690 MB-history reference: 150 MB in 15 s →
+  forecast corr 0.9997 (max diff 0.27 bp); 300 MB in 39 s → 1.0000 (0.06 bp). A first test on the live, growing tape read 0.61-0.78 only because the
+  reference read further ahead (latest depth/spread values). Guard: time going backwards (sim restart, or an old recorded replay) drops a book's
+  history. Replay: off identical; on 0 errors. add_skill_uid.sh M1 now includes rev_preload (x1's tape) + lock_dir. x1 itself is NOT restarted
+  (user's untouched test); it gets preload on its next restart.
+- §1236 add. 2 (19:25 UTC 11-05): V0 (and the V/N variant stack built from it, §1228) RETIRED for new UIDs. Its kappa halves out of sample
+  (+0.56 → +0.25), its trades lose raw (−0.5 to −7 bp), and its live skill swings (0.10-0.22 most of 11-05, 0.67 at 19:16 UTC), so its score
+  rests on the drift-strip timing term. New skill UIDs run the fitted model (M1); making runs on maker-only UIDs. Model diversity later =
+  variants of the model (threshold / hold), overlap-checked like §1228. x2 keeps V0 only because the user chose live-or-die.
+
+## §1237 — Model v2 + settings sweep on TODAY's unseen x1 tape: v1 holds (kappa +2.0), 15-min hold is better; v2 too narrow (2026-11-05 20:07 UTC) (S11)
+- predfeat2.py (tape path + 300/600/900 s targets): slices A/B/C of the old x1 tape (745k rows) train v2; D = today's x1 tape (218k rows, unseen).
+- Forecast corr with the 600 s move on D: v1 +0.179, v2 +0.232. v2 weights: gap −1.28 (dominant), depth imbalance +0.72, Δmid 300 s +0.61, Δfund 60 s +0.45.
+- Sweep on D (2% threshold, kept books per 3 sim h, pass/fail, validator kappa, raw move, hit):
+  v1 600/3600 (x1 now): 67, 45%/5%, +2.04, +5.69 bp, 77% | v1 900/3600: 81, 55%/6%, +2.57, +7.69 bp, 82% (best) | v1 300/3600: 56, +1.81 |
+  v2 900/3600: only 34 books traded, 38 kept, 88%/0%, +6.88, +10.9 bp | v2 600/3600: 28 kept. v2's top-2% forecasts cluster on the books with a
+  persistent large fundamental gap → too few books for the 20-book bar. Follow-up: per-book gap normalisation.
+- Changes: add_skill_uid.sh M1 now rev_hold=900. x1 stays on 600 (user's test); switching it to 900 after tonight costs ~1 min (warm start).
+- §1237 add. 1 (20:35 UTC 11-05): x1 switched to rev_hold=900 + rev_preload (user: yes) after reading 19 kept / skill 0 at 2:16 PM CT.
+  First restart (20:20 UTC) ran the PREVIOUS agent file: the preload build had only been copied to /tmp for the replay checks, never
+  installed → no warm start, 0 model bets in 13 min. Installed the current agent (preload + ack fix) and restarted at ≈ 20:34 UTC:
+  "REV PRELOAD: 487,389 snapshots, 128 books warm". Lesson: after a replay check, install the file and grep the deployed copy before restarting.
+- §1235 add. 3 (21:05 UTC 11-05): x3 making credit flat at ≈ 158 for 1.5 h (rank 132/156; median 374) → ≈ 0.19/tempo at steady state vs a prune
+  line ≈ 0.29-0.31. making_exact.py on x3's fills: captured 506 (field median 292), quality 0.50 (median 0.58), but only 327 of 532 positive
+  capture counted by the per-book min (61%; 26 books one-sided) → credit 163. Balance is the leak (+63% if balanced). x3 → skew 10, max_units 40
+  (x2's 11-03 maker setting: 73% of capture counted). Backup mvtrx-x3.service.pre-skew. Next lever if needed: drop the 20 worst-R books (quality 0.50 → 0.56).
+
+## §1238 — Maker study: top makers avoid being picked off (small fills); our model flags the losing fills → maker guard A/B live on x3 (2026-11-05 21:03 UTC) (S11)
+- makerstudy.py on today's frozen x1 tape (157 makers with ≥ 100 fills; markout = mid move in the maker's favour after the fill):
+  TOP quartile: fill $469, half spread +2.67 bp, markout 20 s −0.27 → keeps 90% | MEDIAN: $1,095, +3.23, −0.64 → 77% | BOTTOM: $1,813, +3.14, −1.50 → 52% |
+  x3: $1,193, +1.55, −0.65 → 58%. The top makers win on adverse selection (small fills), not on width.
+- All 452,542 maker fills scored by our v1 forecast at the fill (f × maker side): AGAINST (< −2 bp, 10.9% of fills) markout −2.72 bp, keeps 8% |
+  neutral 80.4% −0.86 bp, 78% | WITH (> +2 bp) 8.7% +0.21 bp, 111%. Pulling the side the model says loses removes the worst ~11% of fills.
+- Agent: mk_model (feeds RevFeatures on every book before the paced/toxic returns, warm-started via rev_preload) + mk_pull_bp (pull the quote side
+  a forecast ≥ X bp says will lose). Replay: off identical to live (987 instructions); on 0 errors, 128 books fed.
+- LIVE A/B on x3 since 21:03 UTC via arms (book mod 3): arm 0 = control (current x3), arm 1 = guard 2 bp, arm 2 = guard 2 bp + size 0.025 (≈ $500 fills).
+  Read with making_exact.py <x1 tape> 58 3 --since <sim min> after ~1-2 h. Backups mvtrx-x3.service.pre-arms, agents/QuoteAgent.pre-mkguard.py.
+
+## §1239 — Model v2.1 (per-book gap deviation) REJECTED; v1 still holds on the newest tape (2026-11-05 21:17 UTC) (S11)
+- predfeat3.py adds gapdev = gap − the book's own 30-min average gap (1,800 s history); v21fit.py drops the raw gap. Train A/B/C (630k rows),
+  test = the latest 760 MB of x1's tape (unseen, later than §1237's D).
+- Forecast corr with the 600 s move: v1 +0.145, v2.1 +0.015 → v2's extra power came from persistent per-book gap levels, not a general signal.
+- Trading (1 bet/book/h): v1 900 s hold: 77 kept/3h, pass 43% fail 9%, kappa +0.30, +3.82 bp, 75% hit | v2.1: 48 kept, 47%/14%, kappa −0.01, −0.67 bp.
+- v1 stays (x1 + maker guard). Note kappa swings a lot between windows (+2.04 on §1237's D vs +0.30 here); raw edge + hit rate are steadier.
+- §1240 (21:45 UTC 11-05): maker heartbeat + per-maker acks. Makers (any UID not skipping all 128 books) write lock_dir/maker_<uid>.hb (sim second)
+  every state; takers handshake only while some OTHER maker's heartbeat is within lock_hb_s (30 sim s); with none alive they trade at once
+  (no stall if x3 dies or restarts). Acks are per maker (ack_<book>_<side>_<uid>); a taker fires only when EVERY live maker acked → safe with
+  several makers. Replay: off identical (926); maker acks + heartbeat; no live maker → 82/82 IOCs; live maker no ack → 0; acked → 82; two live
+  makers, one acked → 0. Bug caught in replay: a mixed-role agent waited on its own heartbeat → own uid excluded. Installed; restarts of
+  x3 → x1/x2 together after the x3 A/B read.
+- §1238 add. 1 (23:47 UTC 11-05): x3 A/B VERDICT with ≈ 45 sim min (989.4 → ≈ 1035 sim min), validator-exact per arm:
+  arm 0 control: captured 161.9, quality 0.519, two-sided 79.6, credit 41.3 | arm 1 guard 2 bp: 154.4, 0.345, 50.7, 17.5 |
+  arm 2 guard + size 0.025: 108.0, 0.481, 46.7, 22.4. The first read (16 sim min) had favoured arm 1 by noise. The guard HURTS quality
+  live; the field-level finding (fills the model is against keep 8%) does not transfer to our own quoting (a lone remaining quote in moving
+  moments gets picked off too). Smaller fills cut volume more than they raise quality. → x3 back to control on all books (skew 10,
+  max_units 40, no arms, no guard) at 23:48 UTC. Guard code stays (off by default). Making credit at the switch: 294.5.
+- x2 (UID 169) PRUNED ≈ 23:40 UTC 11-05 after its 24 h immunity (paid score 0.0001, emission 0.019 vs line 0.29), the expected outcome.
+  Its service is stopped and disabled.
+- §1238 add. 2 (00:12 UTC 11-06 = 6:12 PM CT; first logged as 23:51 by mistake): x3 skew A/B via arms (book mod 3): arm 0 control skew 10 / max_units 40, arm 1 skew 16 / max_units 25,
+  arm 2 skew 10 / max_units 20. Start T = 61,660 sim s (1,027.7 sim min); judge with making_exact.py … 58 3 --since 1027.7 after ≥ 45 sim min.
+  Backup mvtrx-x3.service.pre-skewab.
+- §1241: SKILL-ONLY NEW UIDs DON'T SURVIVE their 24 h immunity on SN79 (x1: live skill 0.45-0.87, edge +3.5 bp/bet, yet emission 0.005/tempo
+  vs a prune line ≈ 0.29 with 6.5 h left). The paid score is a long average of combined score, which is capped at ≈ 0.5 without making, under
+  a soft floor at the field median. New UIDs should be makers (x3: ≈ 295 credit within ~6 h) or hybrids (making on all books + the model;
+  §1235: the model's kappa halves but stays positive while making pays from day one). x1 left untouched until it is pruned.
+- §1241 CORRECTED (00:05 UTC 11-06): skill-only new UIDs DO establish fast. UIDs 80 (4.1 h old, skill 0.58, combined 0.185) and 160 (5.3 h, 0.65,
+  0.205) earn 0.234 / 0.338 per tempo: their paid score reset to 0.0 at registration (the validator's newcomer rule: a re-occupied slot's EMA
+  is cleared, standing tracks live score) and rose to 0.0024 / 0.0027 within ~3 h. x1's slot 114 NEVER reset: its paid score started at an
+  inherited 0.0013 and decayed 0.0007 → 0.0005 while combined ran 0.16-0.30, i.e. the validator kept the previous owner's long track record
+  (apply_track_record_ema clears a slot only when the uid is in deregs; apparently missed for 114). Not a skill-only limitation.
+  Rule: one hour after any registration, check the paid score went to ≈ 0 then climbs; a slot that keeps an inherited value is stuck.
+- §1240 add. 1 (00:20 UTC 11-06): the self-trade counter showed 1 = an x3 maker fill taken by UID 169 minutes earlier; x2 lost UID 169 when
+  pruned (≈ 23:40 UTC) and its service has been stopped since 23:48 UTC → 169 is someone else's miner, not ours. selftrade.sh/.py now read
+  our current UIDs and roles from /opt/mvtrx/our_uids.txt (58 maker x3, 114 taker x1) → 0 self-trades in 9,215 x3 fills.
+- §1238 add. 3 (03:30 UTC 11-06): skew A/B verdict, 38 sim min since 1027.7, validator-exact per arm: arm 0 skew 10 / max 40: quality 0.371,
+  two-sided 20.8, credit 7.7 | arm 1 skew 16 / max 25: 0.078, 3.4, 0.3 | arm 2 skew 10 / max 20: 0.246, 10.9, 2.7. Over-skewing / tight
+  inventory caps wreck quality (3-25× gap). x3 back to skew 10 / max_units 40 on all books (no arms) at ≈ 03:25 UTC. Skew tuning done in
+  that direction. x3 at 21:00-03:00 UTC: emission 0.104 → 0.147/tempo ($39 → $57/month), credit 321; projected over the prune line ≈ 12:00-13:00 UTC.
+
+## §1242 — x3 fill study: tight-spread fills and thin-queue fills carry the losses → quality-rule A/B live (2026-11-06 03:50 UTC) (S11)
+- x3fills.py, 10,775 x3 fills since the skew fix (x1's tape): mean half spread +1.41 bp, markout 20 s −0.78 → keeps 45%.
+  Spread at fill: ≤ 1.03 bp → half +0.51, markout −0.66, kept −29% (a third of fills) | 1.03-2.67 → 35% | ≥ 2.67 → 63%.
+  Our-side / other-side top size: < 0.77 → kept 29% | 0.77-5.78 → 51% | > 5.78 → 60%. 60-s volatility: weak (46/49/41%).
+- Agent: mk_min_spread_bp (no quotes while spread < X bp) and mk_thin_ratio (pull our side when its top size < ratio × the other side's).
+  Replay: off identical to live (987); arms on 0 errors (32 tight skips, 218 thin sides pulled; placements 438 vs 517).
+- LIVE A/B on x3 since T = 64,042 sim s (1,067.4 sim min; x3 restart 03:30 UTC = 9:30 PM CT per systemd): arm 0 control (skew 10 / max 40), arm 1 mk_min_spread_bp 1.05,
+  arm 2 mk_thin_ratio 0.77. Judge after ≥ 45 sim min. Backup mvtrx-x3.service.pre-mkq, agents/QuoteAgent.pre-mkq.py.
+
+## §1243 — Field comparison (2026-11-05, 10 PM CT): pay by miner type; x3's gap is quality, not volume
+
+**Correction to my 9:55 PM read.** I had joined on-chain emission (bittensor metagraph SN79, read-only) to the live gauges for only a handful
+of miners and concluded that the combined score held makers back. With all 256 UIDs joined, that is wrong. Maker-only miners (skill ≤ 0,
+credit > 50): n 73, median $209/month, 39 at $200+. Skill-only: n 101, median $194, 48 at $200+. Both: n 63, median $227, 43 at $200+.
+Maker-only pay by gauge credit: under 300 → $196 (4 of 13 at $200+); 300–450 → $181 (5/13); 450–600 → $191 (9/24); 600–800 → $238 (17/19);
+800+ → $353 (4/4). Rough target: about 600 gauge credit for a reliable $200+. x3 (357 credit, $63) is low because its paid average is
+still catching up.
+
+**Credit decomposition (making_exact.py, same 500 MB tape slice, validator code)** for x3 vs six top maker-only UIDs:
+
+| uid | captured C | R/C quality | two-sided Σ2·min | books one side ≤ 0 | credit (rank) |
+|---|---|---|---|---|---|
+| 58 (x3) | 850 | **0.317** | 522 | **30** | 166 (89) |
+| 144 | 1591 | 0.717 | 1235 | 2 | 885 (1) |
+| 76 | 1532 | 0.618 | 999 | 4 | 618 (3) |
+| 42 | 1082 | 0.665 | 911 | 3 | 606 (4) |
+| 252 | 769 | 0.726 | 555 | 6 | 403 (8) |
+| 127 | 831 | 0.604 | 600 | 7 | 362 (17) |
+| 107 | 575 | 0.691 | 412 | 12 | 285 (36) |
+
+Field: quality median 0.606. x3 captures as much as the top makers. It loses on R/C, and on 30 books its realized capture on one side is
+≤ 0. At field-median quality, x3's credit would roughly double (522 × 0.6 ≈ 315 on this slice). **Next step:** raise quality, which is what
+the §1242 A/B targets. If neither arm moves R/C much, the next study is the 30 books with a non-positive side.
+
+## §1244 — Skill side (2026-11-05, 10:10 PM CT): the top skill miners' score is not trading profit
+
+Same 200 MB tape slice (38 sim min), x1 (114) vs ten top skill-only UIDs (skill gauge 3–4.3, $430–740/month).
+
+**Behaviour (skillcmp.py).** All are pure takers: ~1,250–1,500 fills per 38 sim min, median fill $490–1,000, 62–86 books, mean |inventory|
+about $130–170k, round trip about 320–610 s, notional $1.8–3.5M/h. Their fills' mid markouts are negative at 30, 120 and 600 s (about −0.7 to
+−2.7 bp; UID 48 is the exception at +1.5 to +2.1). x1: 267 fills, median $268, mean |inv| $3.6k, notional $0.14M/h (15× less).
+
+**Score (skill_val.py, validator formula).** Top UIDs: 44–71 books kept by the hurdle, almost all positive (UID 8: 64 of 64), α/notional median
++3.1 to +3.9 bp, kappa +2.2 to +4.5. x1: 45 kept (26 positive, 19 negative), +0.42 bp, kappa +0.28.
+
+**Decomposition (skill_decomp.py).** The scorer's alpha is Σ inventory × Δmid − mean inventory × drift. It never charges the fill price.
+
+| uid | alpha bp | own impact (first mid move after own print) | rest of holding | drift adjustment | true P&L at fill prices |
+|---|---|---|---|---|---|
+| 8 | +4.18 | +1.20 | +1.41 | +1.57 | −0.41 |
+| 103 | +7.25 | +1.87 | +3.62 | +1.76 | −2.39 |
+| 48 | +5.12 | +1.08 | +3.83 | +0.21 | +1.56 |
+| 181 | +4.16 | +0.52 | +1.97 | +1.66 | −0.64 |
+| 114 (x1) | +0.56 | +0.10 | +0.51 | −0.00 | −0.53 |
+
+**Reading.** The top skill miners mostly score high while losing money at fill prices (3 of 4 checked). The score comes from three parts:
+1. the mid moving after their own taking (their own impact);
+2. holding sizeable inventory while the mid moves their way;
+3. the drift adjustment, which is positive when mean inventory leans against the book's drift over the window.
+
+x1 is small on all three because its size and inventory are about 40× smaller. A better predictor is not the main lever. Scale is: bigger
+fills, real inventory held for minutes, and a lean against the drift.
+
+**Caveats.**
+- 38 sim min, scored from inventory 0; the validator's window and starting state differ.
+- Unknown whether a sim-account drawdown from negative P&L is penalised.
+- The subnet owner could patch the scorer to charge fill prices, so this is not durable by design.
+
+**Next step:** an offline replay of x1's taker with 3–5× size and longer holds through skill_val.py before tomorrow's x1 registration.
+Live is the only true test. Our UIDs must still never trade each other (the handshake covers it).
+
+## §1245 — x1 scaled taker live test (2026-11-06 04:11:51 UTC = 10:11 PM CT 11-05, T = 64,561 sim s)
+
+The user's call: test the §1244 lever on x1 live in its last ≈ 2.4 h, before it is pruned around 12:35 AM CT, so tomorrow's new x1 does not
+risk it. Changes (QuoteAgent.py):
+- **`rev_th_k`** scales the fitted model's entry threshold.
+- **Pace gate on the taker path:** once a book is over the volume pace, new exposure there is refused; exits always go. This guards the
+  validator's capital_turnover_cap (10 × wealth ≈ $500k per book per 24 sim h ≈ 5 wall days; over it every non-cancel instruction on that
+  book is silently dropped, §1211 add. 21). That cap killed the old x1's momentum on 11-03, which the user recalled. At pace_cap 450k with
+  pace_win 5400, the budget is ≈ $28k per book per 90 sim min, which leaves room to flatten.
+
+Replay: the old settings are identical to the old agent (120 placements, all IOC). x1 params: take_size 25 → 60, rev_usd 1000 → 5000,
+rev_th_k 0.7, pace_cap 450000, pace_win 5400. The unit is backed up as mvtrx-x1.service.pre-scale and the agent as QuoteAgent.pre-scale.py.
+The agent file is shared with x3, which keeps running its loaded code; the change is identical with these params unset, and x3 takes no
+taker path.
+
+Start: PACE seeded 3,054 own fills on 127 books; preload 128 books warm. First sim minute: 26 model entries, $36.5k (before: $330k over
+≈ 6 wall h). Read with /opt/mvtrx/x1scale_read.sh (skill_val + skill_decomp on x1's fills since T 64,561). Baseline on the earlier
+38-sim-min slice: +0.56 bp, kappa +0.28; top skill UIDs +4 to +7 bp, kappa 2.2–4.5.
+
+## §1246 — Pace ledger: a restart no longer forgets volume under the turnover cap (2026-11-05, 10:30 PM CT)
+
+The user asked whether we could hit the volume cap again. Gap found: the pace was seeded only from the live tape, which holds about 20 wall
+hours. The validator's window is 24 sim h, about 5 wall days. So every restart forgot most of the volume that counts toward the cap. With a
+miner that runs for days and gets restarted for tests, this would have hit the cap again. The tape's .prev file was never read either.
+
+**Fix: `pace_ledger=<path>`.** Our own fills are appended live (book, sim sec, notional, id, ts) and loaded at start, de-duplicated against
+the tape seed. Details:
+- "UIDN" in the path becomes our UID, because the cap is per UID and a re-registered hotkey starts clean.
+- At the first step, and whenever the sim clock goes backwards (a new simulation), stored times shift so the newest sits at the current
+  step. This is conservative: the volume is kept, and no gap is assumed.
+
+Tests:
+- Without the param, the replay is identical to the live agent.
+- A ledger with 64 books at $460k and a far-future clock is loaded and shifted; 64 of 64 of those books are paced out and 0 of the other 64.
+- The UIDN path resolves (replay uid 93 → /tmp/pace_93.ledger).
+
+The agent is installed; running x1 and x3 keep their loaded code. add_skill_uid.sh has a new **M1S** variant (the §1245 scaled taker:
+take_size 60, rev_usd 5000, rev_th_k 0.7, pace 450k/5400, pace_ledger=/opt/mvtrx/pace_UIDN.ledger). x3 gets
+`pace_ledger=/opt/mvtrx/pace_UIDN.ledger` at its next restart, after the §1242 A/B verdict.
+
+**Still open.** The pace budget (≈ $18.75k per book per sim hour) is below the top skill UIDs' observed $22–40k (§1244). Their wealth may be
+higher, or they may run into the cap themselves. If §1245 shows the score scales with size, the remaining room is more books per UID, not
+more per book.
+
+## §1247 — x3 bad books, scaling capacity, and a lab test of what skill rewards (2026-11-05, 10:55 PM CT)
+
+**#1 x3's bad books (making_exact_dump.py --books, 500 MB slice, x3 = 58).**
+- Over the whole slice: quality 0.322. Dropping the 30 worst-R books (in-sample) gives 0.449 with C 882 → 860.
+- Large fills carry almost all of it (C 859 of 882); small fills are irrelevant; bot-taken C 302 at 0.335.
+- **Out of sample** (worst books picked on the first half, scored on the second): 0.330 → 0.358 / 0.365 / 0.367 / 0.375 for 10/20/30/40
+  dropped, vs random drops of the same size at median 0.33 and p95 0.35–0.38. **Individual books do not hold.**
+- The **regime** holds in both halves. Volatile ids 0–62: quality −0.54 / −0.02. Calm 63–101: +0.54 / +0.47. 4-decimal 102–127: +0.14 / +0.41.
+  Without the volatile group, quality would be 0.50 / 0.46. Rough credit effect (C kept × quality): +28% / +2%.
+- New `mk_skip_vol=1` (no making on books 0–62). Replay with x3's params: off identical (517 placements); `arms=mk_skip_vol:1` gives the odd
+  volatile books 0 placements and leaves the even ones (115) and calm/4-dec (297) quoting. The agent is installed; running miners keep
+  their loaded code.
+- Proposed next x3 test, after the §1242 verdict: arms=mk_skip_vol:1 (book mod 2), read per arm with making_exact after ≥ 45 sim min.
+
+**#2 Scaling capacity (lab box, measured).**
+- Per miner: ≈ 320 MB RAM (process tree), 6–13% of one core, ≈ 120 KB/s inbound. Inbound is free on DO; outbound 2 KB/s.
+- One 4 vCPU / 8 GB box ($48/month) fits ≈ 12–15 miners with headroom for analysis, so ≈ $3–4 per miner-month.
+- Registration burn 0.113 TAO now (≈ $23). SN79 targets 1 registration per 360 blocks (72 min) subnet-wide, and the burn rises with
+  demand, so our own registrations push it up. Immunity is 7,200 blocks; there are 256 slots.
+- **Constraint:** the no-self-trade handshake (lock_dir) is files on one box, so all our makers and takers must share one box, or the
+  lock must become networked. One larger box (8 vCPU / 16 GB ≈ $96) would hold ≈ 30.
+- **Unknown, and the real scaling test:** whether a second UID running the same strategy on the same books cannibalizes the first. Makers
+  compete for the same takers, and their credit comes from one pool; takers take the same liquidity. Each UID gets its own volume cap.
+- Rough path to $10k: ≈ 40 UIDs × $250. Cost ≈ $1k of burns plus ≈ $150–200/month of boxes, before re-registrations.
+
+**#3 Lab: does skill reward direction, or size and impact?** The lab sim publishes no fundamental ("fund": null), so the fitted model
+cannot trade there (no forecast). Instead the rule-based reversal (rev_look 300, sleeve_bp 8, hold 900, step 900, $5k, take 60) runs as
+three agents in one market: real direction (agent 0), random (1, `rev_rand=1`), opposite (2, `rev_rand=2`). Same timing and size, scored
+with skill_val + skill_decomp. Three runs (seeds 1–3, ≈ 25 wall min each) via /opt/mvtrx/labrand_runner.sh →
+/opt/mvtrx/labrand_scores.txt. The scorer's alpha equals Σ (inventory − its mean) × Δmid, so §1244's "drift adjustment" is not a separate
+source; that correction is noted here.
+
+## §1248 — Overnight automation on the lab box (2026-11-05, 11:10 PM CT; laptop closed)
+
+Session crons stop when the laptop sleeps, so overnight work runs on the lab box itself: **mvtrx-overnight.timer** (every 10 min) →
+deploy/sn79/overnight.sh → /opt/mvtrx/overnight_log.txt, with state in /opt/mvtrx/ov_state/. It does four things:
+1. Logs a status line (x1/x3 gauges, errors, flow, memory, lab progress).
+2. Self-trade guard: stops mvtrx-x1 on any self-trade.
+3. When UID 114 is no longer our hotkey (metagraph check): saves the §1245 final read to /opt/mvtrx/x1scale_final.txt (x1scale_read.sh,
+   now 350 MB of tape), stops mvtrx-x1 and drops 114 from our_uids.txt.
+4. When x3's sim minute is ≥ 1112.4 (45 sim min after the §1242 start): making_exact (3 arms, --since 1067.4) on the x1 tape plus x3's own
+   tape → ov_state/ab_final.txt. **Fixed rule:** an arm wins only if credit ≥ 1.15 × control AND R/C ≥ control's. The winner's param (if
+   any) goes on all books, and the §1247 test starts at the same restart: arms=mk_skip_vol:1 (book mod 2; odd volatile books stop making)
+   from the sim minute in ov_state/ab2_since. Unit backup: mvtrx-x3.service.pre-ab2. Parser and unit edit were dry-tested (win / no win /
+   both unit forms).
+
+**x3 restarted 04:56 UTC (10:56 PM CT), A/B arms unchanged.** It now has its own tape (/opt/mvtrx/live_tape_x3.jsonl, added to
+tape_rotate.sh), because x1's tape (the only one) stops when x1 is pruned. It also has `pace_ledger`: /opt/mvtrx/pace_58.ledger was
+pre-filled with x3's 22,072 fills from x1's tape (per-book notional median $230k, max $295k vs the $450k budget). "PACE ledger added 22072
+fills" confirmed at start. Before this, x3's pace had restarted from zero at every restart, because x3 had no tape to seed from. Unit
+backup: mvtrx-x3.service.pre-tape.
+
+**x1 §1245 first read (10.8 sim min):** 120 books, 31 kept (14 positive, 17 negative), −0.18 bp median, kappa −0.17. Decomposition
+−0.28 bp = own impact +0.22 (before +0.10) + rest +0.13 + drift −0.63; true P&L −1.04 bp. Notional $604k in 10.8 sim min (≈ $3.4M/h,
+the top-UID rate). Early: the first 900-s holds were still open.
+
+**Morning:** read overnight_log.txt, x1scale_final.txt, ov_state/ab_final.txt and labrand_scores.txt; read the §1247 A/B per arm (arms 2,
+--since $(cat ov_state/ab2_since)); then disable mvtrx-overnight.timer.
+
+**§1248 results (read 2026-11-06 5:16 AM CT):**
+- **x1 §1245 final.** UID 114 was pruned at 06:51 UTC (12:51 AM CT). Over 31.1 sim min of the scaled taker, $1.26M notional: 128 books,
+  28 kept (9 positive, 19 negative), kappa −0.39. Decomposition −0.25 bp = own impact +0.02 + rest −0.19 + drift −0.07; true P&L −1.64 bp.
+  **Worse than the unscaled baseline** (+0.56 bp, kappa +0.28; live skill 0.58 on 11-05). Size did not buy score.
+- **Lab #3** (3 runs, 16 books; rule reversal at the same timing and size; alpha bp / kappa):
+
+  | run | real direction | random | opposite |
+  |---|---|---|---|
+  | 1 | +11.2 / +0.89 | +0.2 / 0.00 | −10.3 / −0.37 |
+  | 2 | +10.2 / +0.57 | +0.3 / +0.01 | −9.5 / −0.43 |
+  | 3 | −1.6 / −0.09 | −2.2 / −0.14 | +1.6 / +0.08 |
+
+  Random direction scores about 0 in every run, and opposite mirrors real. Own impact is at most ±0.8 bp. **The score comes from direction
+  (prediction over the hold), not from size or own impact.** This corrects §1244's "scale is the lever" reading: the top skill UIDs' "rest"
+  component (inventory held while the mid moves their way) is prediction. Their negative fill markouts are the spread they pay. The lab
+  market is simpler than live (16 books, basic background agents), and run 3 reversed.
+- **x3 A/B (§1242) verdict** at sim min 1114.2, by the fixed rule: arm 2 (mk_thin_ratio 0.77) won on credit 8.3 vs control 5.3 (1.57×) and
+  R/C 0.386 vs 0.302; arm 1 credit 5.5, R/C 0.270. The sample is small: about 47 sim min, credit 5–8 per arm, because most of the window
+  fell during pacing (below). x3 restarted 07:22 UTC with mk_thin_ratio=0.77 on all books, and the §1247 arms=mk_skip_vol:1 from sim min 1114.2.
+- **x3 was paced out for about 4 hours.** MK QUALITY decisions grew only ≈ 120 per 10 min from about 1:20 to 5:00 AM CT, then resumed
+  (9,917 → 22,382 by 05:15 CT). The ledger (22k fills) made the agent see x3's real volume: per book ≈ $230k in ≈ 2.3 sim h (≈ $100k/book/sim
+  h, 5× the even pace of ≈ $18.75k/h). The 90-sim-min window (= 7.5 wall h) was full. Before the ledger, every restart forgot this, and x3
+  was on course to hit the hard cap within about a day (the 11-03 x1 failure). Cost: making gauge 385 → ≈ 175, combined 0.227 → 0.094.
+  Emission is still rising on the lag: $95.8 at 4 AM, $101.2/month at 5 AM CT, vs the prune line ≈ $110. Immunity ends ≈ 11:40 AM CT.
+
+## §1249 — The top skill miners run our kind of strategy; the difference is how often they re-enter (2026-11-06, ≈ 6:00 AM CT)
+
+**Clone (clone.py).** Train: x1's tape, 600 MB ending 250 MB before its end. Test: x3's own tape, last 400 MB; independent, later.
+- Entries (taker trades that grow |inventory|) of the ten top skill-only UIDs: 23,705 train / 8,396 test joined to our 15 features.
+- A ridge-logistic clone predicts **their direction with 85.4% accuracy on test** (train 83.2%, base 51.2%). Per UID 0.78–0.92, except UID 48
+  at 0.52, which runs something else.
+- The dominant weight is dmid300 (z −2.5), then dfund60 −0.8 and dmid60 −0.8: **they fade the last 5 minutes**, as v1 does. v1 agrees with
+  their direction on 63% of test entries.
+- Their entries are right by +1.53 / +1.51 / +1.34 / +0.55 bp at 300 / 600 / 900 / 1800 s, so their hold is ≈ 5–10 min, matching the
+  320–610 s round trips in §1244.
+
+**Paper skill (validator hurdle_filter 2.3 bp + kappa_floored; no own impact, no spread; one position per book, re-entry right after the
+hold). Test slice:**
+- random ≈ 0 everywhere, so the scorer is sane.
+- **v1 beats the clone** at every setting. Best v1: q 0.05 with H 300–900 → kappa 5.7–6.0, 16–17 kept, all positive. The clone's best is
+  1.8.
+- Imitating them does not beat our model; v1's direction is better than the clone's.
+
+**Calibration (same training slice, the M1 live period).**
+- Paper v1 at x1's settings (q 0.02, H 900): 25 kept / 24 positive, median +1.78 bp, kappa +1.11.
+- The validator formula on x1's real fills: 17 kept / 12 positive, median +0.55 bp, kappa +0.41.
+- **The paper scorer is optimistic by ≈ 2–3×**, the same direction as v1's offline-to-live shrink (≈ half). Use it for ranking only, never
+  for levels. Part of the gap is structural: live M1 re-enters a book at most once per sim hour (sleeve_step 3600), while the paper
+  re-enters after each hold.
+
+**Threshold.** v1's threshold 3.19 is now the top 5% of |forecast| on both slices (forecast scale drifted), so live x1 already trades
+≈ q 0.05.
+
+**What differs from the top UIDs** is entry spacing. They are in a position almost continuously: ≈ 1,300 entries per 38 sim min over ≈ 80
+books. M1 bets once per book per sim hour. The §1245 scaled test kept sleeve_step 3600, so "more entries" was never tested; it changed size
+and threshold.
+
+**Proposal for the new x1:** M1 at normal size plus `arms=sleeve_step:900` (re-enter after each 900-s hold on odd books; even books stay
+on M1 at 3600), read per arm with skill_val on book subsets. Arms are generic attribute overrides in _quote, so this works on the taker
+path. Correction (same session): the paper scorer always re-enters after the hold, so it has NOT tested M1's once-per-hour spacing against step = hold. The spacing lever is a hypothesis from the top UIDs' behaviour, not a paper result. The live A/B decides.
+
+**§1249 add. 1 (≈ 6:00 AM CT): paper test of entry spacing, inconclusive.** v1 at th 3.19, hold 900, minimum gap between entries per book
+3600 / 1800 / 900 s:
+- Train slice: kappa 2.76 / 4.19 / 6.48 (kept 38 / 36 / 26, nearly all positive).
+- Test slice: 0.98 / 0.85 / 0.56 (kept 17 / 17 / 13).
+
+The two independent slices disagree on direction, so the paper gives no reliable evidence that faster re-entry helps. kappa also jumps when
+fewer books are kept and all are positive, which makes it a noisy ranking metric on 1–2 sim-h slices.
+
+**Decision for the new x1:** plain M1 (proven live: skill 0.58) with pace_ledger. Spacing is tested only as a live arm, and only after the
+new x1 is established above the prune line, so the test cannot cost its survival.
+
+**Housekeeping (2026-11-06 6:25 AM CT):** stopped three leftover transient timers: mvtrx-window-est (UID 213, the 11-02 size test on
+live_tape_x1_size6), mvtrx-window-est-x2 (UID 247) and mvtrx-skillread. They had kept scoring dead UIDs every hour; the running
+making_exact (PID 436079) used ≈ 3 GB on x3's box and was killed by exact PID. Free memory went from 4.2 to 6.8 GB. x3 was unaffected.
+
+## §1250 — New x1 = UID 22 on plain M1; a re-used UID's tape history belongs to its previous owner (2026-11-06, 7:30 AM CT)
+
+The user registered hotkey x1 → **UID 22**. Started 13:25:02 UTC (7:25 AM CT, T = 71,209 sim s) on the §1249 decision: plain M1 (unit from
+mvtrx-x1.service.pre-scale) + pace_cap 450000 / pace_win 5400 / pace_ledger. rev_preload now reads x3's tape, because x1's tape went stale
+when UID 114 stopped. The scaled unit is kept as mvtrx-x1.service.scaled-114.
+
+**Two false readings from the first start, same cause.** Every UID on the tape is whoever held it at the time, so UID 22's earlier fills
+belong to its previous owner.
+1. selftrade.sh reported 1 self-trade. The fills were at sim s 64,008 and 64,091, ≈ 2 sim h before our start, previous owner vs x3. The
+   watchdog stops x1 on any self-trade, so it would have killed the new miner within 10 minutes; I paused the timer first.
+2. PACE seeded 5,975 "own" fills on 128 books, which could have paced x1 out for hours, as x3 was last night.
+
+**Fixes.**
+- `pace_since=<sim s>`: the tape seed ignores fills before our registration.
+- our_uids.txt takes an optional 4th field (start sim s), and selftrade.py ignores fills before it (now "22 taker x1 71209").
+- overnight.sh logs UID 22. The timer was restarted after x1 came back: PACE seeded 28 own fills on 15 books, 0 self-trades.
+
+**Rule for every future UID:** set pace_since and the our_uids start time at first start. add_skill_uid.sh does not do this yet.
