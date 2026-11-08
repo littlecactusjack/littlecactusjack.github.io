@@ -7,7 +7,7 @@
 exec 9>/tmp/overnight.lock; flock -n 9 || exit 0
 S=/opt/mvtrx/ov_state; L=/opt/mvtrx/overnight_log.txt; mkdir -p $S
 now() { echo "$(date -u +%H:%MZ) / $(TZ=America/Chicago date +%I:%M%p) CT"; }
-simmin() { journalctl -u mvtrx-x1 --since "-15min" --no-pager | grep -o "SIMULATION TIME : [0-9:]*" | tail -1 | awk -F'[ :]+' '{print $3*60+$4+$5/60}'; }
+simmin() { journalctl -u mvtrx-x3 --since "-15min" --no-pager | grep -o "SIMULATION TIME : [0-9:]*" | tail -1 | awk -F'[ :]+' '{print $3*60+$4+$5/60}'; }
 SM=$(simmin)
 N0=$(wc -l < $L)
 
@@ -18,7 +18,7 @@ N0=$(wc -l < $L)
     systemctl is-active -q mvtrx-${u##*:} || { echo "ALERT ${u##*:} UID ${u%%:*}: service is DOWN"; continue; }
     printf "  %s " "${u##*:}"; UIDQ=${u%%:*} /opt/mvtrx/x1_gauge.sh
     st=$(systemctl show mvtrx-${u##*:} -p ActiveEnterTimestamp --value)
-    ne=$(journalctl -u mvtrx-${u##*:} --since "$st" --no-pager | grep -c "QUOTE ERROR\|Traceback")
+    J=$(journalctl -u mvtrx-${u##*:} --since "$st" --no-pager); ne=$(( $(echo "$J" | grep -c "QUOTE ERROR\|Traceback") - $(echo "$J" | grep -c "keepalive ping timeout") ))   # chain-connection keepalive timeouts are not agent errors
     [ "$ne" -gt 0 ] && echo "ALERT ${u##*:} UID ${u%%:*}: $ne errors since its last start"
     echo "    errors since start $ne | $(journalctl -u mvtrx-${u##*:} --since "-15min" --no-pager | grep -E "IOC FLOW|MK QUALITY" | tail -1 | cut -c60-200)"
   done
@@ -43,5 +43,6 @@ for l in open("/opt/mvtrx/our_uids.txt"):
         print(f"  {p[2]} UID {p[0]} registered" if m.hotkeys[int(p[0])] == hk else f"ALERT {p[2]} UID {p[0]}: NOT REGISTERED (pruned)")
 PY
 python3 /opt/mvtrx/pace_sync.py >> $L 2>&1
+nice -n 15 python3 /opt/mvtrx/livecheck.py >> $L 2>&1   # §1268: live rollback of an auto-refit model
 tail -n +$((N0 + 1)) $L | grep "^ALERT" | sort -u >> /opt/mvtrx/alerts.txt
 echo "HEARTBEAT $(date +%s)" >> /opt/mvtrx/alerts.txt
