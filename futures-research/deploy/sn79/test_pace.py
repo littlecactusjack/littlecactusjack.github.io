@@ -279,4 +279,287 @@ def hold_attack(seed, days=3, step=5):
 for sd in (11, 12):
     w, tot = hold_attack(sd)
     check("hold: 3-day full path, signals every 60 s, exits every 600 s", w < CAP and tot > 3 * 300000, f"worst 24h ${w:,.0f} of ${CAP:,.0f} | 3-day ${tot:,.0f}")
+
+# §1293 batched cancel: pulling many orders is ONE instruction
+class _RespB:
+    def __init__(s): s.instructions = []
+    def cancel_order(s, book_id, order_id): s.instructions.append(("one", book_id, order_id))
+    def cancel_orders(s, book_id, order_ids): s.instructions.append(("many", book_id, tuple(order_ids)))
+cb = agent(new_path, pace_cap=450000); r = _RespB(); cb._cancel_all(r, 7, [_O(i, Bd, 299.0) for i in range(8)])
+check("batched cancel: 8 orders → 1 instruction", len(r.instructions) == 1 and r.instructions[0][0] == "many" and len(r.instructions[0][2]) == 8, f"{len(r.instructions)} instruction(s)")
+r = _RespB(); cb._cancel_all(r, 7, [_O(1, Bd, 299.0)]); check("batched cancel: 1 order → plain cancel", r.instructions == [("one", 7, 1)], f"{r.instructions}")
+r = _RespB(); cb._cancel_all(r, 7, []); check("batched cancel: no orders → nothing", r.instructions == [], "none")
+
+# §1295 calm-book distance: MK_CALM_HS half-spreads from the mid, away from the mid, never more aggressive than the normal target
+cz = agent(new_path, pace_cap=450000, mk_calm_hs=1.67)
+nb, na = cz._calm_px(30.00, 30.02, 0.01, 2, 30.00, 30.02)
+check("calm: 2-tick spread → one tick behind the touch", (nb, na) == (29.99, 30.03), f"{nb} / {na}")
+nb, na = cz._calm_px(30.00, 30.06, 0.01, 2, 30.00, 30.06)
+check("calm: 6-tick spread → 1.67 hs out (mid 30.03 ∓ 0.05)", (nb, na) == (29.98, 30.08), f"{nb} / {na}")
+nb, na = cz._calm_px(30.00, 30.02, 0.01, 2, 29.97, 30.05)
+check("calm: never more aggressive than the normal target", (nb, na) == (29.97, 30.05), f"{nb} / {na}")
+nb, na = cz._calm_px(30.00, 30.02, 0.01, 2, None, 30.02)
+check("calm: a pulled side stays pulled", nb is None and na == 30.03, f"{nb} / {na}")
+off = agent(new_path, pace_cap=450000); check("calm: off by default", off.mk_calm_hs == 0.0, "0")
+
+# §1303 calm-book ladder reuses _vol_ladder with its own levels
+CL = agent(new_path, pace_cap=450000, mk_calm_lad="1:2:4", mk_calm_lad_size=0.036)
+o = []; nid = 500
+for step in range(4):
+    r = _Resp(); CL._vol_ladder(r, 80, list(o), {Bd: 30.00, Sd: 30.02}, {}, 60.0, 60.0, tick, 2, levels=CL.mk_calm_lad)
+    for i in r.instructions:
+        if i.kind == "place": nid += 1; o.append(_O(nid, i.side, i.price))
+check("calm ladder: touch + 1/2/4 ticks behind on both sides", sorted(x.price for x in o) == [29.96, 29.98, 29.99, 30.0, 30.02, 30.03, 30.04, 30.06], f"{sorted(x.price for x in o)}")
+worst = 0
+for trial in range(1500):
+    bid = round(30 + rng.randint(-30, 30) * tick, 2); ask = round(bid + rng.randint(1, 6) * tick, 2)
+    orders = [_O(i, rng.choice((Bd, Sd)), round(bid + rng.randint(-12, 12) * tick, 2)) for i in range(rng.randint(0, 10))]
+    r = _Resp(); CL._vol_ladder(r, 80, orders, {Bd: bid, Sd: ask}, {}, 60.0, 60.0, tick, 2, levels=CL.mk_calm_lad); worst = max(worst, len(r.instructions))
+check("calm ladder: never more than 5 instructions per book", worst <= 5, f"worst {worst} over 1,500 random books")
+
+# §1311 calm-book order expiry (fleet calm orders rest up to ≈ 500 s; ours expired at 60 s)
+class _InsE:
+    def __init__(s, kind, price, expiry): s.kind, s.price, s.expiry = kind, price, expiry
+class _RespE:
+    def __init__(s): s.instructions = []
+    def limit_order(s, book_id, direction, quantity, price, **k): s.instructions.append(_InsE("place", price, k.get("expiryPeriod")))
+    def cancel_order(s, book_id, order_id): s.instructions.append(_InsE("cancel", None, None))
+CE = agent(new_path, pace_cap=450000, mk_calm_lad="1:2:4", mk_calm_lad_size=0.036, mk_calm_expiry=500)
+r = _RespE(); CE._vol_ladder(r, 80, [], {Bd: 30.00, Sd: 30.02}, {}, 60.0, 60.0, tick, 2, levels=CE.mk_calm_lad, expiry=CE.mk_calm_expiry or None)
+ex = {getattr(i, "expiry", None) for i in r.instructions if i.kind == "place"}
+check("calm expiry: every calm ladder order gets 500 s", ex == {500_000_000_000}, f"{ex}")
+r = _RespE(); CL._vol_ladder(r, 80, [], {Bd: 30.00, Sd: 30.02}, {}, 60.0, 60.0, tick, 2, levels=CL.mk_calm_lad, expiry=CL.mk_calm_expiry or None)
+ex = {getattr(i, "expiry", None) for i in r.instructions if i.kind == "place"}
+check("calm expiry: off by default → the normal 60 s", ex == {CL.expiry} and CL.mk_calm_expiry == 0, f"{ex}")
+r = _RespE(); IN0 = agent(new_path, pace_cap=450000, mk_vol_lad="2:5:10", mk_calm_expiry=500); IN0._vol_ladder(r, 7, [], {Bd: 299.00, Sd: 299.03}, {}, 5.0, 10.0, tick, 2)
+ex = {getattr(i, "expiry", None) for i in r.instructions if i.kind == "place"}
+check("calm expiry: $300 ladder keeps 60 s", ex == {IN0.expiry}, f"{ex}")
+
+# §1313 fleet-style 4-dec quoting: ahead of the OTHERS' best (never our own), one deep order, ≤ 5 instructions
+class _Lv:
+    def __init__(s, price, quantity): s.price, s.quantity = price, quantity
+class _Bk:
+    def __init__(s, bids, asks): s.bids, s.asks = [_Lv(*x) for x in bids], [_Lv(*x) for x in asks]
+class _OQ:
+    def __init__(s, i, side, price, quantity): s.id, s.side, s.price, s.quantity = i, side, price, quantity
+DC = agent(new_path, pace_cap=450000, mk_dec_size=0.09, mk_dec_inside=1, mk_dec_deep=0.27); t4 = 0.0001
+bk = _Bk([(298.0000, 5.0), (297.9990, 8.0)], [(298.1000, 4.0)])
+check("dec: others' best ignores none of theirs", DC._others_best(bk, []) == (298.0, 298.1), f"{DC._others_best(bk, [])}")
+bk = _Bk([(298.0001, 5.0), (298.0000, 8.0)], [(298.1000, 4.0)])
+check("dec: our own best bid is removed from the others' best", DC._others_best(bk, [_OQ(1, Bd, 298.0001, 5.0)]) == (298.0, 298.1), f"{DC._others_best(bk, [_OQ(1, Bd, 298.0001, 5.0)])}")
+w = {Bd: 298.0, Sd: 298.1}; k = DC._dec_targets(_Bk([(298.0, 5.0)], [(298.1, 4.0)]), [], w, t4, 4)
+check("dec: one tick ahead of the others on both sides; deep = 0.27 spreads", w == {Bd: 298.0001, Sd: 298.0999} and k == 270, f"{w} k {k}")
+w = {Bd: 297.95, Sd: 298.1}; DC._dec_targets(_Bk([(298.0, 5.0)], [(298.1, 4.0)]), [], w, t4, 4)
+check("dec: a side skewed behind the touch stays put", w[Bd] == 297.95 and w[Sd] == 298.0999, f"{w}")
+w = {Bd: 298.0, Sd: 298.0002}; k = DC._dec_targets(_Bk([(298.0, 5.0)], [(298.0002, 4.0)]), [], w, t4, 4)
+check("dec: 2-tick spread → no move, falls back", k is None and w == {Bd: 298.0, Sd: 298.0002}, f"{w} {k}")
+# no walking: our order becomes the best each round; the target must stay the same price
+orders = []; prices = []
+for rnd in range(6):
+    bb = sorted([(298.0, 5.0)] + [(o.price, o.quantity) for o in orders if o.side == Bd], key=lambda x: -x[0])
+    aa = sorted([(298.1, 4.0)] + [(o.price, o.quantity) for o in orders if o.side == Sd], key=lambda x: x[0])
+    bk = _Bk(bb, aa); w = {Bd: bb[0][0], Sd: aa[0][0]}; k = DC._dec_targets(bk, orders, w, t4, 4)
+    r = _RespE(); DC._vol_ladder(r, 110, list(orders), w, {}, 15.0, 15.0, t4, 4, levels=[k], tol=max(1, k // 2))
+    for i in r.instructions:
+        if i.kind == "place": orders.append(_OQ(1000 + len(orders), Bd if i.price < 298.05 else Sd, i.price, 15.0))
+    prices.append(max(o.price for o in orders if o.side == Bd))
+check("dec: never steps inside its own order (no walk)", len(set(prices)) == 1 and prices[0] == 298.0001 and len(orders) == 4, f"best bids {prices}, orders {len(orders)}")
+deep = sorted(o.price for o in orders if o.side == Bd)[0]
+check("dec: deep bid 270 ticks behind the touch target", abs(deep - (298.0001 - 0.027)) < 1e-9, f"{deep}")
+worst = 0
+for trial in range(1500):
+    bid = round(298 + rng.randint(-500, 500) * t4, 4); ask = round(bid + rng.randint(3, 1500) * t4, 4)
+    ords = [_OQ(i, rng.choice((Bd, Sd)), round(bid + rng.randint(-600, 600) * t4, 4), 15.0) for i in range(rng.randint(0, 8))]
+    w = {Bd: bid, Sd: ask}; k = DC._dec_targets(_Bk([(bid, 5.0)], [(ask, 5.0)]), ords, w, t4, 4)
+    if k is None: continue
+    r = _RespE(); DC._vol_ladder(r, 110, ords, w, {}, 15.0, 15.0, t4, 4, levels=[k], tol=max(1, k // 2)); worst = max(worst, len(r.instructions))
+    assert all(i.price is None or i.price > 0 for i in r.instructions)
+check("dec: never more than 5 instructions per book", worst <= 5, f"worst {worst} over 1,500 random books")
+off = agent(new_path, pace_cap=450000); check("dec: off by default", off.mk_dec_size == 0.0, "0")
+
+# §1314 $300 inside quoting must step inside the OTHERS' best, not our own order (no walk over rounds)
+IW = agent(new_path, pace_cap=450000, mk_vol_lad="2:5:10", mk_vol_inside=5); ords = []; best = []
+for rnd in range(8):
+    bb = sorted([(299.00, 5.0)] + [(o.price, o.quantity) for o in ords if o.side == Bd], key=lambda x: -x[0])
+    aa = sorted([(299.08, 5.0)] + [(o.price, o.quantity) for o in ords if o.side == Sd], key=lambda x: x[0])
+    bk = _Bk(bb, aa); w = {Bd: bb[0][0], Sd: aa[0][0]}
+    r = _RespE(); IW._vol_ladder(r, 7, list(ords), w, {}, 5.0, 10.0, tick, 2, inside=5, obest=IW._others_best(bk, ords))
+    for i in r.instructions:
+        if i.kind == "place": ords.append(_OQ(5000 + len(ords), Bd if i.price < 299.04 else Sd, i.price, 5.0))
+    best.append((max(o.price for o in ords if o.side == Bd), min(o.price for o in ords if o.side == Sd)))
+check("inside fix: one tick ahead of the others every round (no walk)", set(best) == {(299.01, 299.07)}, f"{sorted(set(best))}")
+w = {Bd: 299.00, Sd: 299.03}; r = _RespE(); IW._vol_ladder(r, 7, [], w, {}, 5.0, 10.0, tick, 2, inside=5, obest=(299.00, 299.03))
+check("inside fix: 3-tick spread → stays at the touch", (299.0 in [i.price for i in r.instructions]) and (299.03 in [i.price for i in r.instructions]), f"{[i.price for i in r.instructions]}")
+w = {Bd: 298.97, Sd: 299.08}; r = _RespE(); IW._vol_ladder(r, 7, [], w, {}, 5.0, 10.0, tick, 2, inside=5, obest=(299.00, 299.08))
+pl = [i.price for i in r.instructions if i.kind == "place"]
+check("inside fix: a skewed-back bid stays back; the ask still steps inside", 298.97 in pl and 299.07 in pl, f"{pl}")
+
+# §1317 calm hold + soft pace gate (fleet calm orders rest ≈ 107 s and are filled as the price comes to them)
+PH = agent(new_path, pace_cap=450000, pace_steady=450000, pace_start=100000, mk_calm_lad="1:2:3", mk_pace_hold=5000, mk_calm_hold=2)
+bk = _Bk([(30.00, 9.0), (29.99, 5.0)], [(30.02, 9.0)])
+ords = [_OQ(1, Bd, 30.00, 3.0), _OQ(2, Bd, 29.99, 3.0), _OQ(3, Bd, 29.98, 3.0), _OQ(4, Sd, 30.02, 3.0), _OQ(5, Sd, 30.04, 3.0), _OQ(6, Bd, 30.01, 3.0)]
+dr = sorted(o.id for o in PH._pace_hold_drop(bk, ords, 0.01))
+check("soft gate: pulls touch + inside orders only, deep ones stay", dr == [1, 4, 6], f"drop {dr}")
+PH._sec = 1000; PH._tok[80] = [-100.0, 1000]
+check("soft gate: calm book, small debt → hold", PH._pace_hold_ok(80) is True, "bucket -100")
+PH._tok[80] = [-6000.0, 1000]; check("soft gate: debt past −mk_pace_hold → full cancel", PH._pace_hold_ok(80) is False, "bucket -6000")
+PH._tok[7] = [-100.0, 1000]; check("soft gate: $300 book → full cancel", PH._pace_hold_ok(7) is False, "book 7")
+PH._tok[81] = [-100.0, 1000]; PH._pace[81] = [(900, 450000.0)]; check("soft gate: 24-h ledger at pace_cap → full cancel", PH._pace_hold_ok(81) is False, "ledger 450k")
+check("soft gate + hold: off by default", agent(new_path, pace_cap=450000).mk_pace_hold == 0 and agent(new_path, pace_cap=450000).mk_calm_hold == 0, "0")
+# hold: target moved 1 tick behind our resting touch bid → keep it, no new touch bid; 3 ticks → cancel
+o = [_OQ(10, Bd, 30.00, 3.0)]; r = _RespE(); w = {Bd: 29.99, Sd: 30.02}
+PH._vol_ladder(r, 80, list(o), w, {}, 60.0, 60.0, 0.01, 2, levels=PH.mk_calm_lad, hold=2, obest=(30.00, 30.02))
+check("hold: target 1 tick behind → resting bid kept, no new touch bid", not any(i.kind == "cancel" for i in r.instructions) and 29.99 not in [i.price for i in r.instructions if i.kind == "place"], f"{[(i.kind, i.price) for i in r.instructions]}")
+r = _RespE(); w = {Bd: 29.97, Sd: 30.02}
+PH._vol_ladder(r, 80, list(o), w, {}, 60.0, 60.0, 0.01, 2, levels=PH.mk_calm_lad, hold=2, obest=(30.00, 30.02))
+check("hold: target 3 ticks behind → cancelled", any(i.kind == "cancel" for i in r.instructions), f"{[(i.kind, i.price) for i in r.instructions]}")
+o2 = [_OQ(11, Bd, 30.01, 3.0)]; r = _RespE(); w = {Bd: 30.00, Sd: 30.02}
+PH._vol_ladder(r, 80, list(o2), w, {}, 60.0, 60.0, 0.01, 2, levels=PH.mk_calm_lad, hold=2, obest=(30.00, 30.02))
+check("hold: an order inside the others' best is not held", any(i.kind == "cancel" for i in r.instructions), f"{[(i.kind, i.price) for i in r.instructions]}")
+# CAP: adversary fills every order whenever the gate is open AND drains the resting deep orders (3 per side x $1.8k) every second the soft gate holds
+def attack_hold(a, days=3, seed=3, order=1800.0):
+    rng = random.Random(seed); b = 80; fills = collections.deque(); roll = worst = 0.0
+    for t in range(0, days * DAY, 1):
+        a._sec = t
+        if a._paced_out(b):
+            if not a._pace_hold_ok(b): continue
+            v = 6 * order                                       # worst case: every resting deep order filled at once
+        else:
+            v = order * rng.uniform(1.0, 2.0) * 2
+        fill(a, b, t, v, True); fills.append((t, v)); roll += v
+        while fills and fills[0][0] <= t - DAY: roll -= fills.popleft()[1]
+        worst = max(worst, roll)
+    return worst
+for sd in (3, 4):
+    w_ = attack_hold(agent(new_path, pace_cap=450000, pace_steady=450000, pace_start=100000, mk_pace_hold=5000, mk_calm_hold=2), seed=sd)
+    check(f"CAP soft gate (seed {sd}): worst rolling 24 h under $500k", w_ < 500000, f"${w_:,.0f}")
+
+# §1323 no-chase + calm no-touch
+NC = agent(new_path, pace_cap=450000, mk_nochase_bp=1.0, mk_nochase_s=10)
+for sec in range(100, 111):
+    NC._sec = sec; w = {Bd: 299.00 + (0.05 if sec >= 108 else 0.0), Sd: 299.08 + (0.05 if sec >= 108 else 0.0)}
+    n = NC._nochase(7, w, w[Bd], w[Sd], (w[Bd] + w[Sd]) / 2, 2)
+check("no-chase: bid rose 5 ticks (1.7 bp) in 10 s → our bid stays at the old best; the ask is not capped", w[Bd] == 299.0 and w[Sd] == 299.13 and n == 1, f"{w} n {n}")
+NF = agent(new_path, pace_cap=450000, mk_nochase_bp=1.0, mk_nochase_s=10)
+for sec in range(100, 111):
+    NF._sec = sec; w = {Bd: 299.00, Sd: 299.08}; n = NF._nochase(7, w, 299.00, 299.08, 299.04, 2)
+check("no-chase: flat book → unchanged", w == {Bd: 299.0, Sd: 299.08} and n == 0, f"{w}")
+NA = agent(new_path, pace_cap=450000, mk_nochase_bp=1.0, mk_nochase_s=10)
+for sec in range(100, 111):
+    NA._sec = sec; b_ = 299.00 - (0.05 if sec >= 108 else 0.0); w = {Bd: b_, Sd: b_ + 0.08}; n = NA._nochase(7, w, b_, b_ + 0.08, b_ + 0.04, 2)
+check("no-chase: ask fell 5 ticks → our ask stays at the old best; the bid is not capped", w[Sd] == 299.08 and w[Bd] == 298.95 and n == 1, f"{w} n {n}")
+NY = agent(new_path, pace_cap=450000, mk_nochase_bp=1.0, mk_nochase_s=10); NY._sec = 100; w = {Bd: 299.05, Sd: 299.13}
+check("no-chase: no history 10 s back yet → unchanged", NY._nochase(7, w, 299.05, 299.13, 299.09, 2) == 0 and w[Bd] == 299.05, f"{w}")
+check("no-chase + no-touch: off by default", agent(new_path, pace_cap=450000).mk_nochase_bp == 0 and agent(new_path, pace_cap=450000).mk_calm_touch_min == 0, "0")
+CT = agent(new_path, pace_cap=450000, mk_calm_lad="1:2:3", mk_calm_touch_min=3)
+r = _RespE(); CT._vol_ladder(r, 80, [_OQ(20, Bd, 30.00, 3.0)], {Bd: 30.00, Sd: 30.02}, {}, 60.0, 60.0, 0.01, 2, levels=CT.mk_calm_lad, no_touch=True)
+pl = sorted(i.price for i in r.instructions if i.kind == "place"); cn = sum(1 for i in r.instructions if i.kind == "cancel")
+check("calm no-touch: resting touch bid cancelled, only ladder orders placed (none at 30.00 / 30.02)", cn == 1 and 30.0 not in pl and 30.02 not in pl and 29.99 in pl and 30.03 in pl, f"cancel {cn} place {pl}")
+worst = 0
+for trial in range(1500):
+    bid = round(30 + rng.randint(-30, 30) * 0.01, 2); ask = round(bid + rng.randint(1, 6) * 0.01, 2)
+    ords = [_OQ(i, rng.choice((Bd, Sd)), round(bid + rng.randint(-8, 8) * 0.01, 2), 3.0) for i in range(rng.randint(0, 10))]
+    r = _RespE(); CT._vol_ladder(r, 80, ords, {Bd: bid, Sd: ask}, {}, 60.0, 60.0, 0.01, 2, levels=CT.mk_calm_lad, no_touch=rng.random() < 0.5, hold=2, obest=(bid, ask))
+    worst = max(worst, len(r.instructions))
+check("calm no-touch + hold: never more than 5 instructions per book", worst <= 5, f"worst {worst} over 1,500 random books")
+had = bool(NC._bbo); NC._sec_prev = 86000; NC._sec = 50; NC._clock_check()
+check("no-chase: a sim-day reset clears the best-price history", had and not NC._bbo, f"had {had}, after {dict(NC._bbo)}")
+
+# §1326 no-chase history is recorded while a book is paced out (via _bbo_rec), so the cap fires on the first quote after the block
+NP = agent(new_path, pace_cap=450000, mk_nochase_bp=1.0, mk_nochase_s=10)
+for sec in range(100, 115):
+    NP._sec = sec; NP._bbo_rec(7, 299.00 + (0.05 if sec >= 110 else 0.0), 299.08 + (0.05 if sec >= 110 else 0.0))   # paced out: only recorded
+NP._sec = 115; w = {Bd: 299.05, Sd: 299.13}; n = NP._nochase(7, w, 299.05, 299.13, 299.09, 2)
+check("no-chase: history kept through a pace block → first quote after it is capped", w[Bd] == 299.0 and n == 1, f"{w} n {n}")
+
+# §1328 flow pull on the $300 books only: check the gating expression the main path uses
+FV = agent(new_path, pace_cap=450000, flow_pull_vol_only=1)
+on = lambda a, b: bool(a.flow_pull and not (a.flow_pull_vol_only and b >= 63))
+check("flow_pull_vol_only: on for $300 books, off for calm / 4-dec", on(FV, 7) and not on(FV, 80) and not on(FV, 110), "7 on, 80/110 off")
+check("flow_pull_vol_only: off by default (pull everywhere as before)", on(agent(new_path, pace_cap=450000), 80), "80 on")
+src = open(new_path).read()
+check("flow_pull_vol_only: main path uses the same gate", "fp_on = self.flow_pull and not (self.flow_pull_vol_only and int(book_id) >= 63)" in src and "if fp_on and near > self.flow_pull" in src, "gate present")
+
+# §1332 4-dec: a touch order left behind by a price move must NOT be kept as a ladder order (pile-up); real cancel ids applied
+class _RespC:
+    def __init__(s): s.instructions = []
+    def limit_order(s, book_id, direction, quantity, price, **k): s.instructions.append(("place", direction, price))
+    def cancel_order(s, book_id, order_id): s.instructions.append(("cancel", order_id, None))
+    def cancel_orders(s, book_id, ids): s.instructions.append(("cancels", list(ids), None))
+DP = agent(new_path, pace_cap=450000, mk_dec_size=0.09, mk_dec_inside=1, mk_dec_deep=0.27); ords = []; nid = 9000
+for rnd in range(10):                                     # the others' best rises 20 ticks per round; we are never filled
+    ob = round(298.0 + rnd * 0.002, 4); oa = round(ob + 0.1, 4)
+    bk = _Bk(sorted([(ob, 5.0)] + [(o.price, o.quantity) for o in ords if o.side == Bd], key=lambda x: -x[0]), sorted([(oa, 5.0)] + [(o.price, o.quantity) for o in ords if o.side == Sd], key=lambda x: x[0]))
+    w = {Bd: bk.bids[0].price, Sd: bk.asks[0].price}; k = DP._dec_targets(bk, ords, w, 0.0001, 4)
+    r = _RespC(); DP._vol_ladder(r, 110, list(ords), w, {}, 15.0, 15.0, 0.0001, 4, levels=[k], tol=max(1, k // 2))
+    gone = {x for kind, a_, _ in r.instructions if kind == "cancel" for x in [a_]} | {x for kind, a_, _ in r.instructions if kind == "cancels" for x in a_}
+    ords = [o for o in ords if o.id not in gone]
+    for kind, d, px in r.instructions:
+        if kind == "place": nid += 1; ords.append(_OQ(nid, d, px, 15.0))
+per_side = max(sum(1 for o in ords if o.side == Bd), sum(1 for o in ords if o.side == Sd))
+check("4-dec: no pile-up of left-behind touch orders over 10 rising rounds", per_side <= 3, f"max {per_side} resting orders per side")
+cn = _RespE(); o7 = [_OQ(i, Bd, round(298.0 - i * 0.0010, 4), 15.0) for i in range(7)]
+DP._vol_ladder(cn, 110, o7, {Bd: 298.0, Sd: 298.1}, {}, 15.0, 15.0, 0.0001, 4, levels=[270], tol=135)
+check("4-dec: 7 stale orders → at most 5 instructions in one reply", len(cn.instructions) <= 5, f"{len(cn.instructions)} instructions")
+
+# §1334 $300 no-touch: gate expression + ladder-only behaviour on a $300 book
+VT = agent(new_path, pace_cap=450000, mk_vol_lad="2:5:10", mk_vol_touch_min=4)
+src = open(new_path).read()
+check("vol no-touch: main path gate present", "nt_v = bool(self.mk_vol_touch_min and ob_v" in src and "no_touch=nt_v" in src, "gate")
+r = _RespE(); VT._vol_ladder(r, 7, [_OQ(30, Bd, 299.00, 5.0)], {Bd: 299.00, Sd: 299.03}, {}, 5.0, 10.0, 0.01, 2, no_touch=True)
+pl = sorted(i.price for i in r.instructions if i.kind == "place"); cn = sum(1 for i in r.instructions if i.kind == "cancel")
+check("vol no-touch: touch bid cancelled, only 2/5/10 ladder placed", cn == 1 and 299.0 not in pl and 299.03 not in pl and 298.98 in pl and 299.05 in pl, f"cancel {cn} place {pl}")
+check("vol no-touch: off by default", agent(new_path, pace_cap=450000).mk_vol_touch_min == 0, "0")
+
+# §1342 live settings reload: whitelisted quoting knobs only; pacing/cap never; bad files change nothing
+import tempfile as _tf, time as _tm
+lpd = _tf.mkdtemp(); lpf = os.path.join(lpd, "lp.json")
+LP = agent(new_path, pace_cap=450000, pace_steady=450000, live_params=lpf, live_params_s=30)
+LP._sec = 1000; LP._live_reload()
+check("live: no file → nothing changes", LP.flow_pull == 0.3, f"flow_pull {LP.flow_pull}")
+json.dump({"flow_pull": 0, "mk_vol_inside": 5, "pace_cap": 999999, "pace_steady": 900000, "mk_vol_size": 0.5, "mk_calm_expiry": 300}, open(lpf, "w"))
+LP._sec = 1040; LP._live_reload()
+check("live: whitelisted knobs applied", LP.flow_pull == 0.0 and LP.mk_vol_inside == 5 and LP.mk_calm_expiry == 300_000_000_000, f"flow_pull {LP.flow_pull} inside {LP.mk_vol_inside} expiry {LP.mk_calm_expiry}")
+check("live: pacing / cap settings can NOT change", LP.pace_cap == 450000 and LP.pace_rate == 450000 / 86400, f"pace_cap {LP.pace_cap} rate {LP.pace_rate:.3f}")
+check("live: out-of-range size ignored", getattr(LP, "mk_vol_size", 0.0) != 0.5, f"mk_vol_size {getattr(LP, 'mk_vol_size', None)}")
+_tm.sleep(0.01); open(lpf, "w").write("{broken"); os.utime(lpf, None)
+LP._sec = 1080; LP._live_reload()
+check("live: broken file → values unchanged", LP.flow_pull == 0.0 and LP.mk_vol_inside == 5, f"flow_pull {LP.flow_pull} inside {LP.mk_vol_inside}")
+_tm.sleep(0.01); json.dump({"flow_pull": 0.3}, open(lpf, "w")); os.utime(lpf, None)
+LP._sec = 1090; LP._live_reload()
+check("live: not re-read sooner than live_params_s", LP.flow_pull == 0.0, f"flow_pull {LP.flow_pull} at +10 s")
+LP._sec = 50; LP._live_reload()                                # sim-day reset: clock went back
+check("live: works after a sim-day reset (clock back)", LP.flow_pull == 0.3, f"flow_pull {LP.flow_pull}")
+check("live: off by default", agent(new_path, pace_cap=450000).live_params == "", "''")
+
+# §1346 live ladder levels
+LL = agent(new_path, pace_cap=450000, mk_calm_lad="1:2:4", mk_vol_lad="2:5:10", live_params=lpf, live_params_s=30)
+_tm.sleep(0.01); json.dump({"mk_calm_lad": "1:2:3", "mk_vol_lad": "3:6:10"}, open(lpf, "w")); os.utime(lpf, None)
+LL._sec = 5000; LL._live_reload()
+check("live ladders: applied as sorted int lists", LL.mk_calm_lad == [1, 2, 3] and LL.mk_vol_lad == [3, 6, 10], f"{LL.mk_calm_lad} {LL.mk_vol_lad}")
+_tm.sleep(0.01); json.dump({"mk_calm_lad": "1:2:3:4:5", "mk_vol_lad": "0:40"}, open(lpf, "w")); os.utime(lpf, None)
+LL._sec = 5100; LL._live_reload()
+check("live ladders: > 4 levels or out-of-range ticks ignored", LL.mk_calm_lad == [1, 2, 3] and LL.mk_vol_lad == [3, 6, 10], f"{LL.mk_calm_lad} {LL.mk_vol_lad}")
+r = _RespE(); LL._vol_ladder(r, 80, [], {Bd: 30.00, Sd: 30.02}, {}, 60.0, 60.0, 0.01, 2, levels=LL.mk_calm_lad)
+check("live ladders: new calm levels used by the ladder (≤ 5 instructions)", len(r.instructions) <= 5 and 29.99 in [i.price for i in r.instructions], f"{[i.price for i in r.instructions]}")
+
+# §1304 $300 inside quoting inside _vol_ladder
+IN = agent(new_path, pace_cap=450000, mk_vol_lad="2:5:10", mk_vol_inside=5)
+r = _Resp(); IN._vol_ladder(r, 7, [], {Bd: 299.00, Sd: 299.06}, {}, 5.0, 10.0, tick, 2, inside=5)
+pl = sorted((i.side == Sd, i.price) for i in r.instructions if i.kind == "place")
+check("inside: 6-tick spread → touch orders one tick inside", (False, 299.01) in pl and (True, 299.05) in pl, f"{pl}")
+r = _Resp(); IN._vol_ladder(r, 7, [], {Bd: 299.00, Sd: 299.03}, {}, 5.0, 10.0, tick, 2, inside=5)
+pl = sorted((i.side == Sd, i.price) for i in r.instructions if i.kind == "place")
+check("inside: 3-tick spread → stays at the touch", (False, 299.0) in pl and (True, 299.03) in pl, f"{pl}")
+r = _Resp(); IN._vol_ladder(r, 7, [], {Bd: 299.00}, {}, 5.0, 10.0, tick, 2, inside=5)
+check("inside: one side pulled → no inside move", all(i.price != 299.01 for i in r.instructions if i.kind == "place"), "bid stays 299.00")
+r = _Resp(); IN._vol_ladder(r, 7, [], {Bd: 299.00, Sd: 299.06}, {}, 5.0, 10.0, tick, 2)
+check("inside: off unless asked", all(i.price not in (299.01, 299.05) for i in r.instructions if i.kind == "place"), "default 0")
+
+# §1308 trade-flow pull helper
+TF = agent(new_path, pace_cap=450000, mk_tflow_usd=1000, mk_tflow_win=10); TF._sec = 100
+TF._sflow = {7: {91: 5.0, 95: 3.0, 99: 2.0, 85: 50.0}}
+check("trade flow: sums only the last 10 sim s, in $", abs(TF._tflow_usd(7, 300.0) - 3000.0) < 1e-6, f"${TF._tflow_usd(7, 300.0):,.0f} (85 s is outside)")
+TF._sflow = {7: {95: -4.0}}; check("trade flow: sellers give a negative sum", TF._tflow_usd(7, 300.0) < 0, f"${TF._tflow_usd(7, 300.0):,.0f}")
+check("trade flow: off by default", agent(new_path, pace_cap=450000).mk_tflow_usd == 0.0, "0")
 print("ALL PASS" if not bad else f"{bad} FAILED")

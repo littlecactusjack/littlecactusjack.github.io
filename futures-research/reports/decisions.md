@@ -21248,3 +21248,573 @@ The front-loaded budget (§1270) is saved for the next new maker (memory). Watch
 - Overnight gauges (6:08 AM): x2 (thin rule off) making 313, x4 ($3.6k orders) 276, vs fleet 216 501, 252 387, 87 357 (10:36 UTC: 478 / 387 / 357).
   x2/x4 ≈ 11 h old vs the ≈ 15 wall h making window, and the tests began at 12:51 AM, so their gauges mix pre-test and test periods.
   Pay 6 AM CT: x2 $56.6, x4 $54.6, x1 $28.7 (x1 was $0.4 at midnight).
+
+## §1292 — 2026-11-08 7:20 AM CT — x1 converted to a maker; instruction counter; quality-gap study (first pass)
+- User: (1) scale more makers tonight if x2/x4 hold up; (2) test winner read ≈ 10 AM; (3) quality study by 10 AM; (4) switch x1 to a maker now (it would be pruned
+  as a taker anyway); (5) find the dropped instructions.
+- (5) QuoteAgent.py: after each reply, log once per sim minute "INS OVER 5" with the excess by book group and an example instruction list (backup
+  agents/QuoteAgent.pre-ins.py / repo QuoteAgent.pre-inscount.py); test_pace ALL PASS. Live on x1 first (x2/x4 pick it up at their next restart).
+- (4) x1 (UID 194) unit = x2's unit (thin rule off, all books, size 0.036, pace_cap 450k / steady 350k / start 100k) with hotkey x1, port 8101 (backup
+  /opt/mvtrx/mvtrx-x1.service.pre-maker); our_uids "194 maker x1 3617" (backup .bak-x1maker); ledger kept (17,246 fills reloaded). Registration checked 7:19 AM;
+  restarted 7:20 AM CT. No taker of ours remains → self-trades are impossible (makers' post-only orders cannot fill each other); guard reads 0.
+- (3) qualgap.py, first pass, 13 sim min since sim s 19,330 (fleet 5F1F2JMu 7 UIDs 14–28 d vs x2, x4): edge at fill fleet +3.63 bp vs x2 +2.00 / x4 +1.94;
+  mid 20 s later −0.56 vs −1.04 / −0.84; kept÷edge 0.84 vs 0.48 / 0.57. Calm books edge +7.31 vs +3.44 / +3.07; fills 1–2 behind the touch edge +5.74 vs +1.89.
+  $300 books kept +1.69 vs +0.09 / +0.64. Two-sided books 38% vs x2 39% / x4 10% (x4 keeps the thin rule). Rerun with ≈ 45 sim min at 10 AM.
+
+## §1293 — 2026-11-08 8:37 AM CT — x1 pruned as a new maker; dropped-instruction source found and fixed (batched cancels)
+- x1 (UID 194) pruned ≈ 7:58 AM CT, 38 min after its maker conversion (past protection, pay fading from its taker days; a fresh maker starts low).
+  Cleanup: mvtrx-x1 stopped + disabled; our_uids "194 maker x1 3617" removed (backup .bak-x1pruned); maker_194.hb removed; selftrade.py 0. Live: x2 (212), x4 (58).
+- §1292 counter (x1, before the prune): every excess is on $300 books and is 7–8 CancelOrders instructions in one reply = the pull-all paths (book paced out /
+  paused / skipped / locked side) cancelling the ladder's up-to-8 resting orders one by one; the validator kept 5, DROPPED the rest — so those orders stayed on a
+  book that was supposed to be paused (a hole in the pace, bounded by our 450k-vs-500k margin).
+- Fix: _cancel_all → ONE response.cancel_orders(book_id, ids) (a single CancelOrdersInstruction with many cancellations; checked in protocol/response.py) in the
+  four pull-all paths (QuoteAgent.py, backups agents/QuoteAgent.pre-bc.py, repo QuoteAgent.pre-batchcancel.py). test_pace: 3 new checks (8 orders → 1 instruction,
+  1 → plain cancel, 0 → nothing) — ALL PASS. Registration checked 8:38 AM; x2 + x4 restarted 8:38 AM CT (tests unchanged); clean, tape recording (x4).
+- Pay 8 AM CT: x2 $63.0 (7 AM $63.1), x4 $60.3 (7 AM $60.4) — flat for the first time; gauges making x2 335, x4 292 (fleet 87 332, 216 439).
+
+## §1294 — 2026-11-08 8:50 AM CT — test winner = thin rule off; pay is NOT stale; the remaining gap = calm-book quoting distance
+- Pay "stale" 7→8 AM was hourly-snapshot noise: paid score rises steadily (x4 0.0001 at 8 PM → 0.0013 at 8:50 AM, ≈ +0.0001/h; x2 0.0014). Fleet 87 paid 0.0033
+  (≈ $208), 216 0.0045 ($272). Projection: x2 ≈ 0.0024 at 6:40 PM ≈ $110–150/month vs a prune line ≈ $90–100 — likely clear, not by much; x4 similar.
+- Test winner (gauges + qualgap.py on 30 sim min of fresh tape since sim s 19,330): x2 (thin rule off) making 336 vs x4 ($3.6k) 291; two-sided books x2 73%,
+  x4 45%, fleet 61%; edge per fill x2 +1.90 / x4 +1.80 vs fleet +3.53 bp (kept after 20 s 0.99 / 0.99 vs 2.96). Bigger orders did not raise the edge.
+  → x4 switched to x2's setup (size 0.036, mk_vol_size 0.034, mk_thin_ratio 0; tape kept; unit backup .pre-winner); registration checked; restarted 8:54 AM CT.
+- Remaining gap (m300copy.py since sim s 19,330; fleet 7 UIDs 14–28 d vs x2): CALM books — fleet fills sit 1.67 half-spreads from the mid (behind the touch),
+  edge +7.80 bp, net @120 s +6.43, 1.4 fills/book/sim h per UID; x2 at the touch (1.00), +3.19, +1.90, 1.0. $300 books — fleet fill $2.9k (x2 $1.1k), mid after
+  +0.47 bp at 30 s (x2 −0.60). Next candidate: calm-book quotes at ≈ 1.7 half-spreads from the mid (new code), on ONE maker with the other as control — user's yes.
+
+## §1295 — 2026-11-08 9:04 AM CT — x4 tests the fleet's calm-book distance (user go); x2 = control
+- From §1294: on calm books (63–101) the long-lived fleet's fills sit 1.67 half-spreads from the mid (edge +7.8 bp, net +6.4, 1.4 fills/book/sim h per UID)
+  vs ours at the touch (+3.2, +1.9, 1.0).
+- Code: mk_calm_hs → _calm_px: calm-book quotes at mid ∓ k half-spreads, rounded away from the mid with a 5%-of-a-tick tolerance (1.67 × a 6-tick spread = 5.01
+  ticks → 5), never more aggressive than the normal target, a pulled side stays pulled; default 0 = off (QuoteAgent.py, backups agents/QuoteAgent.pre-calm2.py,
+  repo QuoteAgent.pre-calm.py). On a 2-tick calm spread this is one tick behind the touch. test_pace: 5 new checks — ALL PASS.
+- x4 unit: mk_calm_hs=1.67 (backup .pre-calm); everything else = x2 (thin rule off, size 0.036). Registration checked 9:04 AM; restarted 9:04 AM CT
+  (sim 5:54:03, T ≈ 21,243). x2 unchanged = control. Read ≈ 12:30 PM: m300copy.py / qualgap.py since 21,243 (calm rows) + gauges (making, live, paid score).
+
+## §1296 — 2026-11-08 9:18 AM CT — audit after the prunes; leftovers fixed; scaling prep
+- Audit: x2/x4 active, x1/x3 disabled; units as intended (both thin rule off, size 0.036, all books, front-loaded budget; x4 also mk_calm_hs 1.67 + tape); deployed
+  agent md5 = repo (435d575f36f2); our_uids = 212, 58; tape rotation truncates in place (x4 keeps appending). Validator "dropped" gauge now 0 for both (§1293 fix confirmed).
+- Fixed: mvtrx-autorefit.timer stopped + disabled (no taker left; its next run would read a model from x1's maker unit and fail); overnight.sh simmin() now reads
+  mvtrx-x4's log (backup overnight.sh.bak-simmin).
+- Scaling prep: the x1 and x3 hotkeys are unregistered and reusable — mvtrx-x1 (port 8101) and mvtrx-x3 (port 8103, old unit backup .pre-reuse) = x2's unit with
+  their hotkey/port; both DISABLED until the user registers. Burn 0.1367 TAO each. New-UID checklist: our_uids line with the start sim s BEFORE start.
+
+## §1297 — 2026-11-08 9:25 AM CT — Discord alert cleanup (user)
+- Removed from Discord: "the validator dropped N instructions" (pace_sync.py now logs it as a status line; backup pace_sync.py.bak-alerts) and
+  "NOT REGISTERED (pruned)" (overnight.sh logs it only; the droplet's minerwatch push-out alert covers it; backup overnight.sh.bak-alerts).
+- Ghost alerts ("x3 no fills" after x3 was pruned): labalerts.py read the last 60 lines of alerts.txt with a 6-h repeat window, so old lines were re-posted once their
+  window ran out. Fix: overnight.sh stamps each ALERT line with its epoch ("ALERT <epoch> text"); labalerts.py (droplet, backup labalerts.py.bak-ts) posts only
+  lines stamped after the last one posted (state _last_ts); unstamped legacy lines are ignored; the 6-h repeat window still applies per text. Watchdog + forwarder
+  ran clean; offline check of the filter passed. Heartbeat / box-unreachable alerts unchanged.
+- §1297 add. (9:28 AM CT, user): "volume check failed" alert removed from Discord as well (pace_sync.py logs it; backup pace_sync.py.bak-volalert). Remaining
+  pace_sync alerts: book within 10% of the hard cap; no fills lately. Note: the near-cap alert uses the same dashboard API, so it is silent while the API is down —
+  the in-agent pace gate (ledger, 450k vs 500k) is what enforces the cap regardless.
+
+## §1298 — 2026-11-08 9:32 AM CT — launch_maker.sh: the new-UID checklist as one command
+- /opt/mvtrx/launch_maker.sh <name> (repo deploy/sn79/launch_maker.sh): (1) fresh chain check that the hotkey holds a UID on SN79 (else stop),
+  (2) our_uids.txt "<uid> maker <name> <current sim s>" BEFORE start (backup .bak-launch-<name>), (3) moves an old pace ledger for that UID aside and removes a stale
+  heartbeat, (4) enables + starts mvtrx-<name>, (5) verifies active / heartbeat / errors / paced books. Dry check: refuses x3 (unregistered) without changes.
+  Units ready: mvtrx-x1 (8101), mvtrx-x3 (8103) = x2's setup. Droplet already has x1–x4 pub files (earnings + push-out alerts discover them).
+
+## §1299 — 2026-11-08 11:20 AM CT — the making-credit dip = the front-loaded budget's lower steady rate; steady pace back to 450k
+- Gauges: making x2 343 → 296–302, x4 306 → 270–273 between 10:14 and 11:14 AM while the fleet held (216 442–454, 87 328–338). Not overlap (making is not split
+  between makers, §1289) and not the §1293 batched cancels: fillrate.py (current sim) — x2 fills/$ per sim min unchanged across 8:38 (23.5 / $29.3k → 23.2 / $29.1k).
+- Cause: PACE. x2 had ≈ 110 of 128 books paced out all morning, trading ≈ $13.6k per book per sim h = its front-loaded steady rate (pace_steady 350k/day ≈ $14.6k/sim h).
+  Fleet per UID ≈ $36k per sim min ≈ $16.9k per book per sim h ≈ $405k per book per day. The $100k start inflated the first sim hours' making credit; as those hours
+  left the scoring window the credit settled to the 350k steady level (the dip).
+- Fix: pace_steady 350000 → 450000 (pace_start 100000 KEPT: removing it would make the restart replay charge the spent start and block both makers for hours;
+  pace_cap 450000 backstop kept). Cap test for this exact combination (captest450.py): worst 24h $454.6k typical / $465.1k $10k orders / $478.8k $50k sweeps,
+  first 24 h $451.0k — all < $500k. Units x1–x4 (backups .pre-steady450); registration checked; x2 + x4 restarted 11:20 AM CT; clean; paced books 58 / 44 of 128.
+
+## §1300 — 2026-11-08 12:19 PM CT — calm-book distance test LOST; x4 rolled back
+- m300copy.py since sim s 21,243 (≈ 37 sim min), calm books: x4 (1.67 hs) fills at 2.00 half-spreads, spread at fill 3.5 bp, edge +5.32, mid after 120 s −2.48,
+  net +2.84 bp, 1.2 fills/book/sim h; x2 (touch) 1.00, 6.7 bp, +3.39, −1.04, net +2.36, 1.8; fleet 1.67, 6.8 bp, +8.09, −1.50, net +6.59, 1.3.
+  Per book x4 ≈ 3.4 vs x2 ≈ 4.2; gauge making x4 241 vs x2 298 (fleet 216 472, 87 344). x4's deep orders get hit when the spread is TIGHT and the price is running
+  through them; the fleet's deep fills come at normal spreads with less adverse move — distance alone does not copy it (they may sit deep only at some times, or
+  anchor to a typical spread rather than the live one). Not applied to x2.
+- Rollback (standing rule; x4's protection ends ≈ 7:05 PM): mk_calm_hs removed — x4 = x2's unit + tape (backup .pre-calmrollback). Registration checked;
+  restarted 12:23 PM CT; clean; tape recording. Pay noon: x2 $89.2, x4 $83.7.
+
+## §1301 — 2026-11-08 1:37–1:43 PM CT — prune risk high; quality gap by book group; x4 tests the thin rule on the $300 books only
+- Chain 1:37 PM: if protection ended now both would be the LOWEST unprotected (x2 $93, x4 $88; lowest unprotected $99, 102, 107, 107, 108, 110…).
+  Protection left: x2 5.0 h (≈ 6:40 PM), x4 5.4 h (≈ 7:05 PM). x2 projected ≈ $110–115 at 6:40 PM if the +$4–5/h climb holds — roughly even odds; x4 worse.
+- Since 11:20 we trade MORE than the fleet (x2 $38–61k per sim min vs 216 ≈ $33–35k) but capture less than half the spread: making_exact since 11:20 x2 C 89 /
+  quality 0.46 / two-sided 42 / credit 19 vs 216 153 / 0.78 / 84 / 66. The §1293 batched cancels did NOT remove deep capture (x2 $300 fills ≥ 3 ticks behind
+  0.95 → 1.89 per sim min after 8:38, edge +2.1 → +2.5). x2's quality ≈ 0.45 all along; the overnight "on pace" read (§1290) rested on a too-short window.
+- Validator-exact quality by group since 6:17 AM (making_exact on group-filtered tape): $300 x2 0.26 vs 216 0.65 (captured 83 vs 101); calm 0.61 vs 0.86
+  (144 vs 281); 4-dec ≈ 0 vs 0.52 (13 vs 42). The $300 books are the main drag. Overnight hint: x4 with the thin rule ON kept 0.44 of its $300 edge vs x2's 0.07.
+- Test (user: "run tests on x4 while we still have it"): mk_thin_only_vol (the thin rule applies only on books 0–62; QuoteAgent.py, backups agents/QuoteAgent.pre-tv.py,
+  repo QuoteAgent.pre-thinvol.py); test_pace ALL PASS; rule check: $300 True, calm False, 4-dec False. x4 unit: mk_thin_ratio 0.77, mk_thin_vol_off 0,
+  mk_thin_only_vol 1 (backup .pre-thinvol). Registration checked; restarted 1:42 PM CT at sim 6:45:49 (T ≈ 24,349); clean; tape recording. x2 = control.
+- Read ≈ 3:00 PM and ≈ 3:45 PM: making_exact on $300-filtered tape since 24,349 for 58 vs 212 (quality, two-sided, credit) + all books + gauges.
+
+## §1302 — 2026-11-08 1:50 PM CT — 4-dec books skipped on both makers; x4 runs three quality arms at once
+- Why 4-dec / $300 books drag: the validator's making quality is ONE number per miner (total R ÷ total C over all books) multiplying every book's two-sided
+  capture. x2 since 6:17 AM: calm alone credit 65.0 (q 0.61); all books 64.9 (q 0.45) — the $300 + 4-dec books add nothing net. Projections: 4-dec skipped
+  ≈ 74 (+13%); $300 at the fleet's 0.65 ≈ 90 (+38%). Volume is not scored; pace/cap are per book; 102 books still ≫ the 80-book skill-coverage bar.
+- Change: skip_file=books_skip_4dec.txt (102–127) on x2 AND x4 (backups .pre-skip4dec). x4 also arms=sticky:2/sticky:5 → book mod 3: arm 0 = base (thin rule on
+  $300 only), arm 1 = + sticky 2 ticks, arm 2 = + sticky 5 ticks (keep a resting order when the target moves up to N ticks more aggressive — keeps its queue place;
+  §1207: 62% of our fills came at the back of a swept level vs 41% for the field). sticky acts on calm books (the $300 books use _vol_ladder's own keep logic).
+- Registration checked; both restarted 1:50 PM CT (sim 6:47:15, T ≈ 24,435); clean; no 4-dec fills since. Read: /opt/mvtrx/qread.sh (making_exact per group;
+  x4 per arm vs x2 vs fleet 216) at ≈ 2:50 PM and ≈ 3:30 PM.
+
+## §1303 — 2026-11-08 2:02 PM CT — every-route fill probe (user rule saved: check every route before acting); calm-book ladder built
+- Memory: feedback-search-every-route.md (don't stop at the first find; measure every candidate cause deeply before acting).
+- fillprobe.py (x2 vs fleet 5F1F2JMu 7 UIDs, since 6:17 AM): CALM — fleet edge +7.46 / kept +6.04 vs x2 +3.31 / +2.33 (kept÷edge 0.81 vs 0.70): the gap is WHERE fills
+  happen. x2 91% of calm $ at the touch; fleet touch 38%, 1–2 behind 46% (edge +8.7), 3+ behind 14% (+13.2); fleet fills at 1-tick spreads still +9.5 bp edge =
+  deep resting orders being swept → the fleet runs touch + resting ladder (§1295 failed because it MOVED the touch order back). $300 — fleet kept÷edge 1.22 vs x2
+  0.51 in EVERY bucket (size, depth, spread, inventory); fleet 27% of $ right after the price ran into the order (kept +2.75) vs x2 10%; x2 70% of $ with no prior
+  move (kept÷edge 0.37 = informed takes); fleet quotes inside on 20% of $300 $ (kept÷edge 1.67), x2 never; fleet order size $2–4k for 84% of $ vs x2 $1–2k.
+  Loss concentration (x2 $300: 5 books = 92% of negative kept) does NOT persist (bookpersist.py: worst-7 overlap 1 book; first half's worst 7 made +$7 next) → rejected.
+- Built: calm-book ladder — mk_calm_lad (ticks behind) + mk_calm_lad_size reuse _vol_ladder (levels now a parameter; level-coverage tolerance = half the smallest gap:
+  1:2:4 → 0, 2:5:10 → 1) (QuoteAgent.py, backup repo QuoteAgent.pre-calmlad.py). test_pace: 2 new checks (touch + 1/2/4 both sides; ≤ 5 instructions over 1,500
+  random books) + all earlier ladder checks — ALL PASS. To deploy on x4 right after the 2:50 PM sticky-arm read.
+
+## §1304 — 2026-11-08 2:12 PM CT — $300 inside quoting built; combined all-books test staged for after the 2:50 read
+- User: combine the calm ladder and $300 inside quoting in ONE test on EVERY book of x4 (no book split; splits caused problems before), right AFTER the 2:50 read
+  (current tests keep running until then). Rule saved: every problem and solution goes to memory permanently (mvtrx-lessons.md + feedback-record-every-lesson.md).
+- Built: mk_vol_inside → _vol_ladder moves the $300 touch orders one tick inside when both sides are wanted and the spread is ≥ N ticks (fleet's trigger 5); ladder
+  levels follow the moved touch (QuoteAgent.py, backup repo QuoteAgent.pre-inside.py). test_pace: 4 new checks (6-tick spread → inside; 3-tick → touch; one side
+  pulled → no move; off by default) — ALL PASS.
+- Staged x4 config (after the 2:50 read): no arms; calm mk_calm_lad 1:2:4 size 0.036; $300 mk_vol_inside 5 + the thin rule (mk_thin_only_vol 1); 4-dec skipped.
+  Caveat: the $300 read will show thin rule + inside together (thin already on); the calm-ladder read is clean.
+- Slip: an interrupted read's cleanup used pgrep -f with a pattern that matched its own ssh command and killed it (exit 255; nothing else hit). Logged in mvtrx-lessons.
+
+## §1305 — 2026-11-08 2:15 PM CT — book state before $300 fills (stateprobe.py, offline; no live change)
+- x2 vs fleet since 6:17 AM, $300 books (share of $ / kept÷edge): our touch queue < 0.5 × the other side's — x2 35% / 0.28, fleet 41% / 1.05; queue > 2× — 47% / 0.62
+  vs 41% / 1.42; 10 s trade flow hitting the OTHER side — x2 44% / 0.25, fleet 32% / 1.04; flow hitting OUR side — 34% / 0.74 vs 54% / 1.40; < 1 s since the last
+  trade — 52% / 0.40 vs 54% / 1.33.
+- Reads: (1) our worst $300 fills are on a thin queue → exactly what the thin rule pulls → the running x4 test (thin rule on $300 only) is aimed right; (2) second
+  candidate = a TRADE-flow pull (step off a side while recent trades hit the other side); (3) the fleet does well in every state → also check the size of the incoming
+  trades that fill each (sweeps vs small informed takes) — next offline route.
+
+## §1306 — 2026-11-08 2:18–2:21 PM CT — the $300 quality gap is the fleet's BEHAVIOUR (presence), not size, state, fair value, a liquidity wall or book choice
+- takersize.py ($300, since 6:17 AM): fleet fills come more from $10k+ incoming sweeps (59% of $ vs x2 37%), but it keeps more at EVERY incoming size (k÷e 1.13–1.72
+  vs x2 0.35–0.86); x2 worst: $3–10k incoming (0.35) and 2–3 levels swept (0.32). Calm: fleet's edge higher at every size (fits the ladder finding).
+- fundprobe.py: no lean toward the sim's fundamental (fleet 50% / 46% of $ toward / against fair, same as x2; outcome flat across the gap) → closed.
+- Maker-volume share since 6:17 AM: $300 books fleet 7% / other miners 23% / background 69% → no "liquidity wall" → closed.
+- pairbook.py: on the 60 $300 books both traded, the fleet kept more per $ on 57 (+1.98 vs +0.70 bp) → behaviour, not book selection → closed.
+- Conclusion: the fleet is PRESENT at better times — per UID about half our $300 fill rate (≈ 7 vs 12–21 fills per sim min) with ≈ 3× the kept per fill; it avoids the
+  bad fills, likely via pull rules. Queue: thin rule on $300 (live, read 2:50) → combined calm ladder + $300 inside (2:55) → a trade-flow pull (step off a side while
+  recent trades hit the other side; that bucket is 44% of x2's $300 $ at k÷e 0.25).
+
+## §1307 — 2026-11-08 2:49–2:52 PM CT — 2:50 read; combined all-books test live on x4
+- Read since 1:50 PM (≈ 11 sim min; per arm too thin, as the noise check predicted — 1/3 of books per arm): x4 $300 books (all arms = thin rule on) C 9.4 / R 6.2 →
+  quality 0.66 vs x2 0.37 (C 13.7) vs fleet 216 0.63 → the thin rule lifts $300 quality to the fleet's level at the cost of less capture. Calm: x4 sticky arms 1+2 C 17.0 /
+  R 10.9 → 0.64 vs arm 0 (no sticky) 0.33 vs x2 0.40 → sticky positive but small sample. Rule saved: 1-wall-hour tests for large effects (feedback-test-duration.md).
+- Deployed on x4, EVERY book, no arms (user): calm ladder mk_calm_lad 1:2:4 size 0.036 + $300 mk_vol_inside 5 + thin rule on $300 (mk_thin_only_vol 1) + 4-dec
+  skipped (unit backup .pre-combo; agent md5 bfc802b9cdd5 = repo). Registration checked; restarted 2:50 PM CT at sim 6:58:37 (T ≈ 25,117). Clean; calm fills at 1/2/4
+  ticks behind already. Read ≈ 3:50 PM (qread.sh 25117) per group vs x2.
+- §1307 CORRECTION (2:56 PM CT): the "thin rule lifts $300 quality to the fleet's level" claim was wrong — it rested on making_exact's R/C over a tiny captured base
+  (x4 $300 C 9.4). Fill-level test 1:50–2:50 PM with block-bootstrap noise (abtest.py): $300 kept per fill x4 +0.75 vs x2 +0.69 bp, diff +0.07 ± 0.24 (0.3 noise
+  widths) → NO effect; calm x4 vs x2 +0.43 ± 0.27 (1.6 widths, not significant); sticky vs no sticky within x4 calm +0.41 ± 0.46 (0.9) → noise. Neither is a large fix.
+  Reads now lead with the fill-level difference ± noise; the validator's R/C ratio only when the captured base is large.
+
+## §1308 — 2026-11-08 3:00 PM CT — prune check; validator-style per-fill A/B tool; trade-flow pull built
+- Rank 3:00 PM (chain, scaled to x2 = $92.3): lowest unprotected $97, 99, 99, 101, 102, 108, 111, 113; x2 ≈ $92 (3.6 h left), x4 ≈ $88 (4.1 h) — both below ALL 195
+  unprotected; pay flat to slightly down → both likely pruned; one-miner-per-day plan is the likely next step.
+- Why the two quality measures disagreed: the validator marks fills against PRINT-centred mids (size-weighted ±15 prints) and realizes at the first print ≥ 20 s later
+  vs background-sided prints (Ma or Ta < 0), not the book mid. vfill.py replicates that per fill (simplified: no size floors, no 0–1 clamp → absolute levels run above
+  making_exact; use it for A/B only) with a 1-sim-min block bootstrap. 1:50–2:50 PM: $300 x4 1.28 vs x2 1.13, +0.15 ± 0.43 (0.4 widths) → thin rule no effect
+  (confirms the §1307 correction); calm +0.45 ± 0.32 (1.4) → not significant. Sanity: fleet 216 vs x2 since 6:17 AM separates at 6.1 ($300) and 5.8 (calm) widths.
+- Built for the next x4 test: mk_tflow_usd / mk_tflow_win — on $300 books pull the bid while 10-s taker flow buys more than $X (pull the ask while it sells), from the
+  agent's own per-second trade flow (kept ≥ window) (QuoteAgent.py, backup repo QuoteAgent.pre-tflow.py). test_pace: 3 new checks — ALL PASS. Default off.
+
+## §1309 — 2026-11-08 3:25 PM CT — Tag101 leftovers disabled on the futures droplet (user yes)
+- tag101-m3 (hotkey m3 5FA4YBDT) was still running although Tag101 closed 11-03 (§1211 add. 18); chain check: m3 holds NO UID on SN101 (UID 210 now 5Gs3CDjh);
+  last earnings row 11-03 19:00 UTC → it had been pruned and ran for nothing ≈ 5 days.
+- `systemctl disable --now tag101-m3.service tag101-bench-read.timer` (bench-read was a transient timer → gone). KEPT: tag101-earnings.timer (earnings_all.py writes
+  the MVTRX rows of /opt/tag101/earnings_all.csv), minerwatch/labalerts. futures-bot untouched and active.
+
+## §1310 — 2026-11-08 3:30 PM CT — does the long-lived fleet pull? (pullprobe.py, tape only, no live change)
+- Fleet = coldkey 5F1F2JMu: 38 UIDs, 21 of them < 6 days old (the fleet rotates too); study uses the 17 aged 12.5–28.6 d (7,31,40,52,59,87,102,111,133,134,147,156,
+  210,216,241,252,255). Tape since sim s 22,000 (≈ 10:25 AM CT), $300 + calm books; kept = book mid 20 s later vs fill (not the validator's print mark).
+- Method check: x2/x4 run flow_pull 0.3 (near-touch new-order imbalance, 10 s, side off 3 s) → only 3.2–3.4% ($300) / 1.1–1.2% (calm) of their $ in that state. ✔
+- FLEET DOES NOT USE IT: 44.1% of its $300 $ and 23.3% of calm $ fill exactly when our rule has us off that side, and those fills are as good or better
+  ($300 kept +2.14 vs +1.91 rest; calm +6.45 vs +6.09). Thin-queue state (own top < 0.77 × other): fleet 47.9% / 39.6% of $, kept +2.08 / +6.69 → no thin rule either.
+- ORDER AGE (fill's maker order id Mi vs our own orders' ids per book — ids are per-book counters, monotone: 7 inversions in 23,655; a global map was wrong,
+  27% inversions): calm fleet median 110 s, 63% > 60 s, 12% > 300 s; x2 6.4 s / x4 3.0 s, 0% > 60 s — our orders never live past 60 s (expiry=60 s GTT) → re-placed
+  at the back of the queue every minute at most. $300: fleet median 9.8 s, 0% > 60 s (reprices fast there too); x2 4.6 s, x4 1.7 s.
+- Candidates (user decides; one at a time on all books): (1) flow_pull off; (2) longer expiry on calm books. Caveat: the fleet profiting in a state doesn't prove
+  our fills there would be as good.
+
+## §1311 — 2026-11-08 3:35 PM CT — x4 combined test stopped early; x4 now copies the long-lived fleet as closely as measured (user)
+- User: stop any test part the fleet doesn't do; copy the fleet as exactly as possible. From §1310: fleet uses neither our flow_pull nor the thin rule; its calm orders
+  live up to ≈ 500 s (p99 408 s, max 500 s; 17 UIDs aged 12.5–28.6 d), its $300 orders ≤ 63 s (= our 60 s expiry).
+- Combined test final read (vfill.py, 2:50–3:35 PM, sim 25,117–25,640, ≈ 45 wall min): $300 x4 (thin rule + inside 5) quality 1.67 vs x2 0.02, +1.65 ± 0.70 (2.4 noise
+  widths) on a small captured base (C ≈ 10 each); calm +0.61 ± 13.9 (no information). The thin rule alone showed nothing 1:50–2:50 (§1307/§1308), so the $300 gain
+  most likely comes from inside quoting (a fleet behaviour, kept). Treat as tentative (small base, 45 min).
+- Code: mk_calm_expiry (sim s; calm-book ladder orders only; 0 = normal 60 s expiry) (QuoteAgent.py md5 b51d3ebc, backups agents/QuoteAgent.pre-calmexp.py /
+  repo QuoteAgent.pre-calmexp.py). test_pace: 3 new checks (calm 500 s; off by default 60 s; $300 keeps 60 s) — ALL PASS.
+- x4 unit (backup mvtrx-x4.service.pre-fleetcopy): flow_pull 0.3 → 0, mk_thin_ratio 0.77 → 0, + mk_calm_expiry=500; kept: calm ladder 1:2:4 size 0.036, $300 inside 5,
+  $300 ladder 2:5:10, sizes, pace (cap/steady 450k, start 100k, ledger), 4-dec skipped (fleet quotes 4-dec, but our 4-dec quality ≈ 0 and its behaviour there is
+  unmeasured — the one deliberate difference). Registration checked 3:34 PM; restarted 3:34:58 PM CT (sim ≈ 25,620); ActiveEnterTimestamp changed; clean; filling; tape on.
+- x2 unchanged (control; still runs flow_pull 0.3, thin off, 60 s expiry, no ladder on calm, no inside). Read ≈ 4:35 PM CT: vfill.py 25620 <now> x4=58 x2=212 + gauges.
+
+## §1312 — 2026-11-08 3:41 PM CT — fleet-gap audit: every remaining observable difference (fleetgap.py, tape only, no live change)
+- Long-lived fleet (17 UIDs 12.5–28.6 d) vs x2 / x4, sim 22,000–25,691 (≈ 10:25 AM–3:40 PM CT; x2/x4 4-dec data is from before 1:50 PM, when they still quoted it).
+- $300: fleet uses ONE order size ≈ $3.6k (filled $ per order median 3,560 = p90 3,603) vs ours touch $1.7k + ladder $3.5k; fleet fill depth inside 25% / touch 21% /
+  1–4 behind 38% / 5+ 17% vs x2 14 / 45 / 34 / 7; fleet 397 fills/UID/sim h vs ours ≈ 1,150 (fewer, bigger fills); $ per book per sim h fleet 14.6k vs ours ≈ 22k
+  (our pace_start credit is still front-loading; bucket keeps ≤ 450k / 24 h); when loaded, fleet fills cut the position 64% vs x2 54% / x4 44%; kept +2.00 vs +0.63 / +0.76.
+- Calm: same order size ($1.8k); fleet depth touch 41% / 1 behind 33% / 2: 16% / 3: 6% / 4: 1% → looks like a 1:2:3 ladder (ours 1:2:4); kept +6.12 vs +2.30 / +2.41.
+- 4-dec: fleet quotes INSIDE the spread for 65% of its $ (touch 9%, 5+ behind 24%) at ≈ $4.5k per order, kept +1.18 bp; ours (touch, $1.76k) +0.25 / −0.09 → our
+  ≈ 0 quality there came from touch quoting; a fleet-style 4-dec setup (inside + $4.5k) is a new candidate (needs code: inside quoting only exists on $300 books).
+- Prior results to weigh: $3.6k orders alone did not raise edge (§1294, with flow_pull + thin rule still on); fleet-pattern lazy orders cut skill (§1284).
+
+## §1313 — 2026-11-08 3:49 PM CT — fleet 4-dec pattern measured; fleet-style 4-dec quoting built (off); $300 inside quoting chases our own order (bug found)
+- decprobe.py (17 long-lived fleet UIDs, sim 22,000–25,700): 4-dec spreads ≈ 1,000 ticks (p10 571, p90 1,400; ≈ $0.10 ≈ 3.3 bp on ≈ $298). Fleet 4-dec $: 1–2 ticks
+  ahead of the best 51% (kept +1.04/+1.47 bp), further inside 14% (median 8% of the spread), touch 9%, 20+ ticks behind 23% (median 0.27 spreads, IQR 0.13–0.49);
+  filled $ per order ≈ $3.9–5.4k everywhere.
+- Built (QuoteAgent.py md5 0b40ebb0, NOT deployed; backup repo QuoteAgent.pre-dec.py): mk_dec_size (4-dec order size, fraction of wealth; fleet ≈ 0.09), mk_dec_inside
+  (ticks ahead of the OTHER makers' best — _others_best removes our own resting quantity level by level), mk_dec_deep (one deep order at k = 0.27 spreads behind the
+  touch target, keep tolerance k/2 via the new _vol_ladder tol parameter); a side the inventory skew already put behind the touch is not moved; spread < 3 ticks →
+  normal path. test_pace: 9 new checks incl. "never steps inside its own order" and ≤ 5 instructions over 1,500 random books — ALL PASS. Needs skip_file without
+  the 4-dec books to take effect.
+- BUG in the live $300 inside quoting (mk_vol_inside, §1304, on x4 since 2:50 PM): the main path's "best" includes our own order, so after we penny, the next round
+  pennies OURSELVES. walk300.py (real _vol_ladder): an 8-tick spread walks to 4 ticks; we end 2 ticks ahead of the others instead of 1 with 5 bid orders. Tape check
+  (selfpenny.py, x4 queue records) inconclusive (sparse queue logging; no visible collapse to 4-tick spreads). Fix = use _others_best for the $300 inside move too;
+  not applied mid-test — proposed with the 4:35 PM read.
+
+## §1314 — 2026-11-08 3:54 PM CT — $300 inside-quoting self-penny bug fixed live on x4 (user); read windows split
+- User: fix the §1313 bug now if its effect can be told apart from the fleet-copy test, else wait. It can: the bug only touches the $300 books (inside quoting runs
+  only there), so the calm read keeps its window (3:35 PM →, sim 25,620) and the $300 read restarts at the fix (sim 25,844 → +1 wall hour ≈ 4:55 PM CT);
+  3:35–3:54 $300 data = fleet copy WITH the bug (separate, short).
+- Fix: _vol_ladder(obest=…) — when obest (others' best from _others_best) is given, the inside move goes one tick ahead of the OTHER makers' best when their spread
+  is ≥ INSIDE ticks; a side the skew put behind the touch stays; the main $300 call passes obest. Old path kept only for calls without obest (tests).
+  QuoteAgent.py md5 e03a3f4f (= repo; backups agents/QuoteAgent.pre-insidefix.py / repo QuoteAgent.pre-insidefix.py; includes the §1313 4-dec code, off).
+  test_pace: 3 new checks (no walk over 8 rounds: always 299.01/299.07; 3-tick spread stays; skewed-back bid stays) — ALL PASS.
+- Registration checked 3:53 PM; x4 restarted 3:54:09 PM CT (unit unchanged); ActiveEnterTimestamp changed. x2 unchanged (does not use inside quoting).
+
+## §1315 — 2026-11-08 4:01 PM CT — tonight's prep: prune trend, wallet short for a registration, next-miner units = fleet copy, launcher fixed
+- Chain 3:59 PM: lowest unprotected 1.05 / 1.08 / 1.12 × x2 (3:16 PM: 1.10); x4 0.94 × x2; 195 unprotected; 60 registrations in 24 h (≈ 2.5/h) → each of ours is
+  likely pruned within ≈ 30 min of its protection ending (x2 ≈ 6:35 PM, x4 ≈ 7:05 PM CT) unless it passes the lowest.
+- Registration cost 0.1173 TAO; coldkey free balance 0.0138 TAO → the user must top up ≥ ≈ 0.104 TAO before the one-miner-per-day plan can start.
+- mvtrx-x1 (8101) and mvtrx-x3 (8103) units (DISABLED) now = x4's fleet-copy params (flow_pull 0, thin 0, calm expiry 500, calm ladder, $300 inside 5) minus tape
+  (backups mvtrx-x{1,3}.service.pre-fleetcopy).
+- launch_maker.sh (backup .bak-1315): (a) start sim s falls back to the fresh tape's last line, else is read from the new miner right after start (it used to stop
+  when no maker was running — exactly tonight's case); (b) waits for "PACE STATUS" (≈ every 6 min) as well as "MK QUALITY" (not logged with the thin rule off),
+  up to 10 min; (c) if the tape was not written for ≥ 2 min, adds tape= to the new unit so the tape never stays blind. sh -n OK; dry run on unregistered x3
+  stopped at step 1 with no changes (our_uids md5 unchanged).
+
+## §1316 — 2026-11-08 4:40 PM CT — fleet-copy test: CALM read (3:35–4:36 PM, sim 25,620–26,334); abtest.py rebuilt
+- abtest.py (the fill-level tool the rules cite, §1307) was never saved anywhere → rebuilt (deploy/sn79/abtest.py): dollar-weighted edge / kept bp per maker fill
+  (book mid at the prior second; kept = mid 20 s later), 1-sim-min block bootstrap of the A − B kept difference. Sanity, same window: fleet 216 vs x2 calm +3.86 ±
+  0.66 (5.9 widths), $300 +1.02 ± 0.23 (4.5).
+- CALM, x4 (fleet copy: no flow_pull, calm expiry 500 s, ladder 1:2:4) vs x2: kept +2.65 vs +1.71 bp, diff +0.94 ± 0.39 → 2.4 noise widths (90 / 97 fills).
+  vfill (validator-style marks): quality 1.66 vs 1.19, +0.47 ± 0.70 (0.7) on a small captured base (≈ 15 each) → per the rules the fill-level read leads.
+  Same pair earlier: 2:50–3:35 (ladder, pull ON) −0.12 ± 0.61 (0.2); 1:50–2:50 (sticky arms, no ladder) +0.55 ± 0.28 (2.0). Before/after diff-in-diff
+  (+1.06 ± 0.72, 1.5 widths) is not conclusive alone. Verdict: KEEP on calm (beats the control at 2.4 widths, no sign of harm); a partial fix only — the fleet
+  is still +3.9 bp ahead of x2 per calm fill.
+- ORDER AGE (pullprobe, same window): x4 calm median 8.0 s, 5% > 60 s, 0% > 300 s vs fleet 68.5 s / 54% / 4% → the 500 s expiry is NOT what limits our order
+  life: the agent re-prices (cancel + replace) its calm orders every few seconds as the touch / fair / skew move. Holding orders like the fleet needs a
+  re-pricing rule change, not an expiry change. Next candidate (offline study first: what moves our target — touch moves vs skew vs fair).
+- x4 calm fills in the old flow-pull state: 23% of $, kept +1.63 vs +2.94 rest (n 25, too small to judge).
+- $300 since 3:35 includes the bug stretch: −0.35 ± 0.23 (1.5) — not used; the clean $300 read is from sim 25,844 at ≈ 4:55 PM CT.
+
+## §1317 — 2026-11-08 4:46 PM CT — how the fleet re-prices calm orders vs ours; hold + soft pace gate built (off; for x4 after the $300 read)
+- repricestudy.py (calm books, sim 22,000–26,600; fleet = 17 UIDs 12.5–28.6 d): FLEET places at the touch 28% / 1 behind 33% / 2 behind 23% / 3+ 14% of $,
+  order age at fill median 107 s (IQR 30–220), the own-side best moved TOWARD/through the order before the fill 37%, no move 41%, away 21% → it lays a 0–3-tick
+  ladder and waits for the price to come to it. x4: placed at touch 69% / 1 behind 24%, age median 4 s, no move 90%; x2: touch 83%, 7 s, 85% → we are hit
+  seconds after joining (informed fills).
+- What ends our calm orders: the PACE GATE first (≈ 90 of 128 books blocked at any time, PACE STATUS; a blocked book cancels everything), then re-pricing on
+  fair (micro price) / inventory-skew moves (an order ahead of the target is cancelled at once). The 500 s expiry never binds (§1316).
+- Built (QuoteAgent.py md5 50af05a3, NOT deployed; backup repo QuoteAgent.pre-hold.py), calm books only, off by default:
+  mk_calm_hold N — keep a resting order up to N ticks AHEAD of the target (the fair / skew moved) as our touch order if it is not inside the others' best;
+  mk_pace_hold $X — soft pace gate: a paced-out calm book pulls only its touch / inside orders (vs the others' best), keeps orders ≥ 1 tick behind resting and
+  places nothing, while the bucket > −$X and the 24-h ledger < pace_cap; else full cancel as before. Ladder 1:2:3 (fleet's 1/2/3-tick placements) = a param.
+- test_pace: 11 new checks (drop list = touch + inside only; hold/full-cancel switches incl. ledger at pace_cap and $300 books; hold keeps / cancels / never
+  holds an order inside the others' best; off by default) + CAP attack with an adversary filling all 6 deep orders ($10.8k) EVERY second the soft gate holds:
+  worst rolling 24 h $460.7k / $460.5k < $500k — ALL PASS.
+- Plan (user asked to match the fleet): after the $300 read (≈ 4:55 PM), x4: mk_calm_lad 1:2:3 + mk_calm_hold 2 + mk_pace_hold 5000; 1-hour all-books read
+  (calm group) ≈ 6:00 PM CT.
+
+## §1318 — 2026-11-08 4:52 PM CT — do fleet-pattern UIDs survive from day one? (fleetage.py, chain, read-only)
+- Emission ÷ the prune line (lowest unprotected UID = 1.00): fleet 5F1F2JMu UIDs aged 0.7–1 d 2.06 / 2.42 / 2.50 / 6.20; 1–2 d (8) median 3.48 (min 2.98);
+  2–6 d (8) median 2.14 (min 1.65); 12–28 d (17) median 2.42 (min 1.89). Field median 2.30. Ours at ≈ 1 d: x2 0.93, x4 0.86. The fleet added a UID ≈ 30 min ago (135).
+- → A fleet-pattern miner clears the line by ≈ 2–3.5× within its first day and the long-lived ones hold ≥ 1.9× → matching their behaviour would mean surviving
+  for weeks; we are ≈ 2.5× short of that today. Caveat: we see only their fills (not their orders), so a full copy can't be verified directly; judge by our
+  emission ÷ line at 6 h / 24 h on the next registration (target ≥ 2).
+
+## §1319 — 2026-11-08 4:56 PM CT — $300 read of the fleet copy (3:54–4:54 PM); calm hold + soft pace gate live on x4; 5 PM prune check
+- $300, x4 (fleet copy: no flow_pull, no thin rule, inside 5 via the others' best) vs x2, sim 25,844–26,546 (≈ 1 wall hour): abtest kept +0.47 vs +0.96 bp,
+  diff −0.49 ± 0.25 (1.9 widths, x4 worse, under the bar); vfill quality 1.07 vs 0.87, +0.19 ± 0.40 (0.5) on a small base (C ≈ 17). With-bug stretch 3:35–3:54:
+  −0.03 ± 0.27 (0.1). Sanity fleet 216 vs x2: +0.79 ± 0.19 (4.1). → Neither a clear win nor a clear loss; kept (fleet behaviour); the $300 read continues
+  unchanged into a 2nd hour (the calm deploy does not touch the $300 path) → re-read ≈ 5:55 PM.
+- Deployed on x4 (registration checked 4:54 PM; agent md5 50af05a3 = repo, backup agents/QuoteAgent.pre-hold.py; unit backup mvtrx-x4.service.pre-hold):
+  mk_calm_lad 1:2:4 → 1:2:3, + mk_calm_hold 2, + mk_pace_hold 5000 (§1317). Restarted 4:55:56 PM CT (sim ≈ 26,565); ActiveEnterTimestamp changed.
+  Calm read ≈ 5:56 PM CT: abtest/vfill 26565 → now, x4 vs x2, + repricestudy (order age / placement vs fleet).
+- Prune check 4:57 PM: lowest unprotected 1.08 / 1.08 / 1.12 × x2; x4 0.93 × x2; 195 unprotected; ≈ 2.5 registrations/h. Pay 4 PM: x2 $90.1, x4 $84.6.
+
+## §1320 — 2026-11-08 5:01 PM CT — user away (laptop closed): server-side reads scheduled; user's point on history
+- User: x2/x4 ran non-fleet strategies + the self-penny bug since last night, so their emission vs the line understates a fresh fleet-copy UID. Agreed in part:
+  the paid score ≈ the mean of all rounds since registration, so 0.86–0.93× mostly reflects that history; the per-fill gap measured on the CURRENT setup
+  (calm kept +2.65 vs fleet +5.6, $300 +0.47 vs +1.75) is real today. Judge the next UID at 6 h / 24 h vs the line (target ≥ 2×).
+- Session crons stop while the laptop is closed → transient timers on the lab box run awayread.sh (deploy/sn79): 5:57 PM CT "read" (calm hold/soft-gate read
+  since 26,565, $300 2-hour read since 25,844, fleet sanity, order life, errors, pace) and prune/registration/wallet snapshots at 6:45, 7:15, 8:00 PM CT →
+  /opt/mvtrx/away_<tag>.txt + an "ALERT <epoch>" line (Discord #miners). No live changes while away (rules); a pruned miner is cleaned up on return.
+
+## §1321 — 2026-11-08 6:08 PM CT — away read (5:57 PM): calm hold/soft gate inconclusive; $300 fleet copy borderline worse; prune check
+- CALM since 4:56 PM (hold 2 + soft gate 5000 + ladder 1:2:3), x4 vs x2: abtest kept +2.49 vs +1.82, +0.67 ± 0.38 (1.8 widths); vfill 1.15 vs 1.63, −0.49 ± 0.49
+  (1.0) → the measures disagree in sign; no verdict. Order life improved: x4 calm age median 17 s (p75 42) vs 4–8 s before; placed touch 69% / 1 behind 17% /
+  3+ 12%; price moved toward the order before the fill 15% (fleet 46%, age median 140 s). Still far from the fleet (fleet vs x2 calm +4.75 ± 0.45, 10.6 widths).
+- $300 fleet copy, 2 hours (since 3:54 PM): abtest −0.40 ± 0.20 (2.0 widths, x4 worse); vfill −0.24 ± 0.36 (0.7). Borderline loser on the fill-level measure only.
+  NOT rolled back while the user is away (not clearly hurting on both measures; x4 likely pruned within ≈ 1–1.5 h). The $300 difference vs x2 = flow_pull off
+  + inside quoting 5 (thin rule is off on both) → for the next miner: keep inside quoting off on $300 until tested alone, decide flow_pull with the user.
+- Prune 6:08 PM: lowest unprotected 1.08 / 1.11 / 1.13 × x2 (a 0.81 UID seen at 5:57 was pruned since); x4 0.91 × x2; x2 protection ends ≈ 6:35 PM. Pay 6 PM:
+  x2 $90.4, x4 $82.3. Burn 0.1167 TAO; wallet 0.0138 TAO. Dashboard gauges blank at 6 PM (API down; miners fine). One UnknownSynapseError (an empty request to
+  x4's axon at 5:36 PM) = external probe, harmless.
+
+## §1322 — 2026-11-08 6:22 PM CT — WHY our fills keep less than the fleet's: every tape route (whygap.py, why300.py, whotakes.py; x2 vs 17 long-lived fleet UIDs, sim 22,000→now)
+- Rule added (user 6:10 PM): keep searching until nothing else can be found; the first problem can hide a bigger one (CLAUDE.md + feedback-search-every-route.md).
+- Decomposition gap = WHERE (mix) + HOW (same bucket). Calm gap +3.64 bp, $300 +1.20 bp. NOT the cause (mix ≈ 0 and same-bucket gap everywhere): taker type
+  (background vs miner), incoming trade size, spread at fill, fill clustering, inventory direction; no specific sniper (the same taker UIDs 68/158/146 hit both;
+  ours lose, the fleet's win). PAIRED same book + same sim minute: $300 fleet +1.21 bp (71% of cells), calm +3.01 (85%) → not book/time selection.
+- kept = edge at fill + mid move after: CALM fleet +6.52 − 0.64 vs us +2.98 − 0.75 → the calm gap is EDGE (where in the book), not adverse selection.
+  Fleet 56% of calm $ fills 1–3 ticks behind the touch (edge +7.5 to +11.2) at CROWDED levels ($10k+ resting — its 17 UIDs stack the same prices; 82% of its
+  calm $ vs 33% of ours); 90% of ours at the touch, 21% at 1-tick spreads (edge ≈ 2). Our deep orders sit BEHIND the fleet's older orders in time priority.
+  $300 fleet +1.70 + 0.22 vs us +1.29 − 0.57 → the $300 gap is mostly the MOVE AFTER: we CHASE. 33% of our $300 $ fills right after the own-side best moved
+  away (> 1 bp in 10 s) and we re-joined at the new best: kept +0.03, move after −1.35; the fleet has 13% there. The fleet's best bucket = price ran INTO its
+  resting order (26% of $, kept +2.47, reverts +0.95); ours 10%. Mechanism: join=1 re-prices to the best every round, so we buy after rises / sell after falls.
+- Candidates (largest first): (1) calm: rest orders 1–3 behind EARLY and KEEP them (priority at crowded levels), touch only at wider spreads (fleet's touch $
+  is 28–42%; its 1-tick-spread fills are deep orders); (2) NO-CHASE on all books: when the own-side best moved away > X bp in the last N s, keep the old price
+  (order left behind) instead of re-joining; (3) inside quoting / flow pull on $300 (§1321, unclear). Each needs code + test_pace; 1-hour all-books test.
+
+## §1323 — 2026-11-08 6:30 PM CT — the two §1322 fixes live on x4 (user: before it gets pruned)
+- Code (QuoteAgent.py md5 3cad84cf = repo; backups agents/QuoteAgent.pre-nochase.py / repo QuoteAgent.pre-nochase.py), off by default:
+  mk_nochase_bp X / mk_nochase_s N — records the book's best each sim second; if the bid ROSE (ask fell) by > X bp over the last N s, our bid is capped at the
+  bid of N s ago (ask floored at the ask then): our order stays where the price was instead of re-joining the moved best (all quoted books; applied before the
+  $300/calm ladder routing, so the $300 inside step treats a capped side as "behind the touch" and leaves it); history cleared on a sim-day reset.
+  mk_calm_touch_min T — calm books place NO touch order while the others' spread is < T ticks (a resting one is cancelled; ladder 1/2/3 behind stays).
+- test_pace: 8 new checks (rise → bid capped, ask not; fall → ask floored; flat unchanged; no history → unchanged; off by default; no-touch cancels the touch and
+  places only ladder levels; ≤ 5 instructions over 1,500 random books; reset clears the history) + all cap tests — ALL PASS.
+- x4 unit (backup mvtrx-x4.service.pre-nochase): + mk_nochase_bp=1 mk_nochase_s=10 mk_calm_touch_min=3 (all earlier fleet-copy settings kept). Registration checked
+  6:29 PM; restarted 6:29:48 PM CT (sim ≈ 27,703); ActiveEnterTimestamp changed. Read: abtest/vfill/why300 from 27,703 vs x2 as long as x4 lives (protection
+  ends ≈ 7:05 PM; ≈ 2.5 prunes/h after that) — read at ≈ 7:00 PM and every ≈ 20 min after; a short read will be noisy (say so).
+
+## §1324 — 2026-11-08 6:37 PM CT — x2 (UID 212) PRUNED ≈ 6:35 PM CT; cleanup; x4's no-chase read now uses the fleet as benchmark
+- 6:36 PM chain: x2 NOT REGISTERED (its hotkey holds no UID) right after its protection ended. Cleanup (safety): mvtrx-x2 stopped + disabled; "212 maker x2 11249"
+  removed from our_uids.txt (backup .bak-x2pruned; now only "58 maker x4 11544"); locks/maker_212.hb removed; selftrade 0. Stale ack_* files of old UIDs
+  (194/201/212) left (harmless without takers).
+- x4 (UID 58): registered, protection ends ≈ 7:05 PM; 0.91 × x2's last emission vs lowest unprotected 1.11× → likely next. The no-chase test (§1323) has no
+  control now → read as fleet − x4 kept gap after 6:29:48 PM (sim 27,703) vs the same gap 4:56–6:29 PM (sim 26,565–27,703) (diff-in-diff; noisy).
+- x4 PACE STATUS after the deploy: 86 of 128 books blocked (90 before).
+- mvtrx-x1 / mvtrx-x3 (DISABLED) now = x4's full current params minus tape (fleet copy + hold + soft gate + 1:2:3 + no-chase + calm no-touch; backups mvtrx-x{1,3}.service.pre-nochase); launch_maker.sh adds tape= if the tape is idle.
+- User 6:40 PM: hold the next registration until x4 is pushed out; then read everything from x4's tests and put the winners on the new miner (mvtrx-x3 unit) before registering.
+
+## §1325 — 2026-11-08 7:14 PM CT — first no-chase / calm no-touch read (x4 vs fleet, diff-in-diff; ≈ 45 wall min, sim 27,703–28,248)
+- Calm: fleet − x4 kept gap 2.24 ± 0.37 bp (4:56–6:29) → 1.18 ± 0.59 (after) = closer by 1.06 ± 0.70 (1.5 widths, not significant); x4 calm edge at fill
+  +3.97 → +5.26 bp (no-touch moves fills behind the touch, as intended).
+- $300: gap 1.19 ± 0.20 → 1.67 ± 0.32 = worse by 0.48 ± 0.38 (1.3 widths, noise). x4's "price moved away > 1 bp in the 10 s before the fill" share 24% → 22%
+  (kept +0.69 → −0.59): no-chase did NOT cut that bucket. Open question (keep searching): that bucket is mid-based — a mid move can come from the OTHER side
+  (spread widening) without our order chasing; the cap acts on our own side's best only. Next: measure chasing directly (our order's price vs the own-side best
+  N s before ITS placement, from order ids) before judging no-chase.
+- x4 still registered at 7:14 PM (protection ended ≈ 7:05).
+
+## §1326 — 2026-11-08 7:29 PM CT — $300 underperformance traced to after-move placements; no-chase history bug found and fixed
+- why300b.py (placement vs the own-side best 1 s before EACH order's placement, from order ids): x4 since the fleet copy, $300 fills placed while the best was
+  flat/came toward kept +1.00 (≈ x2 +0.93) but those placed right after the own-side best moved AWAY (49% of $) kept +0.14 / +0.28 (x2 +1.14 / +1.35, 39%; fleet
+  +1.87 / +1.66) — bad in every placement type (inside −0.05, touch −0.55, behind +0.39; move after ≈ −1 bp). After moves the fleet places DEEP (14% of $ 1–5+
+  behind vs 4% inside/touch); x4 re-quoted inside/at the touch. x2's pull (flow_pull 0.3) kept it out of those states (4% of $ in pull state).
+- No-chase barely fired: its best-price history was recorded only on QUOTED rounds, and ≈ 86/128 books are paced out at any time → no history when a book came
+  back (exactly when new orders go in). Fix: _bbo_rec() records every book every round BEFORE the pace gate (QuoteAgent.py md5 8a1caf86, backup repo
+  QuoteAgent.pre-bborec.py); test "history kept through a pace block → first quote capped" + all — ALL PASS. Deployed 7:31 PM onto an already-pruned x4 (§1327).
+
+## §1327 — 2026-11-08 7:35 PM CT — x4 (UID 58) PRUNED ≈ 7:16 PM CT; both makers gone; final read of all x4 tests
+- Tape last write 7:16:31 PM CT = x4 pruned (its hotkey holds no UID). 7:31 PM I restarted x4 although the deploy's fresh check printed NOT REGISTERED (the one-liner
+  printed, did not stop) → regcheck.py now EXITS 1 when a hotkey is not registered (call it without a pipe in gates). Cleanup: mvtrx-x4 stopped + disabled;
+  our_uids.txt empty (backup .bak-x4pruned); maker_58.hb removed. No MVTRX miner is live; the tape is blind until the next miner records it.
+- FINAL READ (fill-level kept bp; ≥ 2 noise widths = real):
+  CALM fleet copy (no flow_pull, 500 s expiry, ladder) vs x2: +0.94 ± 0.39 (2.4) → WIN. Hold + soft gate + 1:2:3 vs x2: +0.64 ± 0.38 (1.7), vfill −0.25 ± 0.32 →
+  no gain beyond the copy (it captured ≈ 50% more: C 36.3 vs 23.6). Calm no-touch (< 3-tick spreads) + no-chase: fleet gap 2.24 → 1.18 (1.5), edge +3.97 → +5.26 →
+  promising, unproven.
+  $300 fleet copy (no flow_pull + inside 5) vs x2: −0.49 ± 0.25 (1.9), −0.40 ± 0.20 over 2 h (2.0), −0.50 ± 0.26 (1.9) → consistent LOSER (≈ −0.45 bp): restore x2's
+  $300 behaviour (flow_pull on, no inside). No-chase never ran properly (bug) → untested.
+
+## §1328 — 2026-11-08 7:45 PM CT — flow pull on $300 only (code); x3 unit = proven-only launch setup (DISABLED, awaiting the user)
+- flow_pull_vol_only (1 = flow_pull acts only on books 0–62): QuoteAgent.py md5 1b1425b9 = deployed agents/QuoteAgent.py (backups agents/QuoteAgent.pre-fpvol.py /
+  repo QuoteAgent.pre-fpvol.py); test_pace 3 new checks + all — ALL PASS. No miner was running.
+- mvtrx-x3 unit (backup mvtrx-x3.service.pre-launchcfg) = PROVEN winners only: $300 like x2 (flow_pull 0.3 on $300 via flow_pull_vol_only, no inside quoting,
+  thin off, ladder 2:5:10); calm = the fleet copy that won (no pull, expiry 500 s, ladder 1:2:4); 4-dec skipped; pace cap/steady 450k + start 100k + ledger.
+  NOT included (tests to run one at a time, 1 h each, judged vs the fleet gap since launch): calm no-touch < 3 ticks (promising), no-chase (fixed, untested),
+  hold + soft gate (neutral), ladder 1:2:3, fleet 4-dec quoting. launch_maker.sh adds tape= (tape idle).
+- User 7:47 PM: launch x3 with the PROVEN-only setup (as staged); then 1-hour tests one at a time: calm no-touch → no-chase → hold + soft gate → 4-dec fleet quoting, each judged vs the fleet gap since launch.
+
+## §1329 — 2026-11-08 7:55 PM CT — x3 = UID 64 LIVE (proven-only setup)
+- User registered hotkey x3 → UID 64 (block 9,465,415 ≈ 7:46 PM CT; protection ≈ 24 h → ≈ 7:46 PM CT 11-09). Agent md5 1b1425b9 = repo. Unit = §1328 proven-only:
+  $300 like x2 (flow_pull 0.3 on $300 only, no inside, thin off, ladder 2:5:10), calm fleet copy (no pull, expiry 500 s, ladder 1:2:4), 4-dec skipped,
+  pace cap/steady 450k + start 100k + fresh ledger.
+- launch_maker.sh x3 (all §1315 fallbacks used): registration ✔; no running maker / no fresh tape → start sim s read from x3 itself → our_uids "64 maker x3 28750";
+  no old ledger; tape idle 2,270 s → tape= added to mvtrx-x3 (it records /opt/mvtrx/live_tape_x3.jsonl); started 7:54:22 PM CT; active, heartbeat, 0 errors.
+  x3pub.txt already on the droplet.
+- Plan (user): first hour = BASELINE (fleet − x3 kept gap, per group, sim 28,750 → ≈ 29,440); then 1-hour tests in order: calm no-touch → no-chase → hold + soft
+  gate → 4-dec fleet quoting, each judged as the change in the fleet gap vs the previous hour (diff-in-diff). Survival yardstick: emission ÷ prune line at 6 h /
+  24 h (target ≥ 2×, §1318).
+
+## §1330 — 2026-11-08 9:16 PM CT — x3 baseline read; test 1 (calm no-touch) live
+- BASELINE (proven-only setup, 7:55–9:14 PM CT, sim 28,750–29,734; 19 min longer than planned — no turn fired at 8:55): fleet − x3 kept per fill: $300 +1.31 ± 0.08 bp
+  (fleet +1.92 vs x3 +0.61; 5,402 x3 fills), calm +2.19 ± 0.16 (+4.65 vs +2.46; 2,841 fills). Gauge 9:15 PM: making 355, combined 0.236 (the $100k pace start
+  front-loads the first hours — x3 out-filled the 17 fleet UIDs combined in the first hour; that fades as books hit their steady pace, 61/102 blocked at 9:14).
+- Test 1: + mk_calm_touch_min=3 (unit backup mvtrx-x3.service.pre-notouch); registration gate passed; restarted 9:15:57 PM CT (sim ≈ 29,740); ActiveEnterTimestamp
+  changed. Read ≈ 10:16 PM CT: change in the calm gap vs 2.19 ± 0.16 (and $300 as a check: no change expected). Caveat: the pace front-load fading is a time trend
+  that also moves the gap.
+- User 9:50 PM: 4-dec fleet quoting moved up to test 2 (the only real volume lever: the cap is per book and 26 books are skipped); order now no-touch → 4-dec → no-chase → hold + soft gate. Making credit peaks then falls back as the $100k head start leaves the ≈ 3-sim-h scoring window (≈ 10–11 AM CT 11-09); the steady pace (450k/day) is already the cap rate, so volume can't hold the peak.
+
+## §1331 — 2026-11-08 10:20 PM CT — test 1 (calm no-touch) WINS; test 2 (fleet 4-dec quoting) live
+- Test 1, 9:16–10:18 PM CT (sim 29,740–30,515), fleet − x3 kept gap: calm 2.19 ± 0.16 (baseline) → 0.38 ± 0.59 = closed by +1.81 ± 0.61 bp (3.0 widths) → WIN, kept.
+  x3 calm kept +2.46 → +3.87, edge +3.20 → +4.80. $300 unchanged (1.31 → 1.36 ± 0.19), as expected. Calm orders still young (median 3 s) and 76% placed at the
+  touch when the spread is ≥ 3 ticks. Gauges 10:19 PM: making 420, combined 0.303 (fleet 216: 484 / 0.370). Pay 10 PM: $0.1 (young UID).
+- Test 2 (user moved it up): skip_file books_skip_4dec → books_none (empty, checked) + mk_dec_size 0.09 / mk_dec_inside 1 / mk_dec_deep 0.27 (unit backup
+  mvtrx-x3.service.pre-dec); registration gate passed; restarted 10:20:23 PM CT (sim ≈ 30,530). Read 11:23 PM CT (one-shot cron).
+
+## §1332 — 2026-11-08 10:23 PM CT — 4-dec order pile-up bug found 3 min into test 2; fixed; test-2 window restarted
+- INS OVER on book 122 (4-dec) at 10:22 PM: 7 cancels + 1 place in one reply. Cause: with the wide 4-dec keep tolerance (k/2 ≈ 135 ticks, span ≈ 1.5 k) every touch
+  order left behind by a price move was KEPT as if it were a ladder order and a new touch order placed → orders piled up (real-cancel test: 10 per side after
+  10 rising rounds on the live agent); when the spread then fell below 3 ticks the fallback base path cancelled them one by one (8 instructions > 5).
+- Fix (QuoteAgent.py md5 dd1e5d40 = deployed; backups agents/QuoteAgent.pre-decfix.py / repo QuoteAgent.pre-decfix.py): with a tolerance given, _vol_ladder keeps
+  only orders within tol of a level (others between the touch and the level are cancelled as stale); 4-dec books with a too-tight spread pull everything with
+  ONE cancel_orders. test_pace: real-cancel pile-up test (fixed: max 2 per side; live agent FAILS with 10) + 7 stale orders → ≤ 5 instructions — ALL PASS.
+- Registration gate passed; x3 restarted 10:23:31 PM CT (sim ≈ 30,570); test-2 read moved to 11:27 PM CT. Dropped gauge was 0 throughout.
+
+## §1333 — 2026-11-08 10:25 PM CT — x3's $300 gap broken down (why300b.py, sim 28,750–30,570, vs the 17 long-lived fleet UIDs)
+- x3 $300 kept +0.60 (edge +1.31, move −0.71) vs fleet +1.86 (+1.67, +0.19). Biggest leak: 44% of x3's $300 $ comes from orders placed right after the own-side best
+  moved AWAY ≥ 3 ticks: kept −0.05 (move −1.25); fleet 24% of $ there at +1.87. → test 3 (no-chase, history-fixed) targets it.
+- Placement: x3 joins the touch on 53% of $ (fleet 16%); the fleet sits one tick inside when wide (29%) or 5+ behind (27%, kept +2.92; x3 9%). Even x3's flat-placed
+  fills keep less (+1.18 vs +1.95). → candidate test 5: $300 no-touch at tight spreads (the calm no-touch won by 3.0 widths, §1331).
+- Pull: fleet fills 43% of its $300 $ in the flow-pull state (kept +2.04, its best bucket); x3 (pull on, $300) 1%. Whether the $300 pull should stay is open (x2 vs x4
+  said it helped in x4's setup, §1326); test after no-chase.
+- INS OVER since the §1332 fix: 0. Fill counts: x3 5,583 $300 fills vs 4,114 for all 17 fleet UIDs in the window (the $100k head start: constant re-placing).
+- User ≈ 10:30 PM: after test 2 the user is away until morning; pre-approved any x3 changes I see fit (judged in the morning); spending/keys still need a yes. Overnight queue: no-chase → hold + soft gate → $300 no-touch → next by the data.
+
+## §1334 — 2026-11-08 10:35 PM CT — $300 no-touch built (off; test 5 candidate)
+- mk_vol_touch_min T: $300 books place NO touch order while the others' spread is < T ticks (ladder 2:5:10 stays; inside quoting is skipped on those rounds).
+  QuoteAgent.py md5 df70f19e (staged as /opt/mvtrx/agents/QuoteAgent.voltouch.py; behaviour identical to the live dd1e5d40 with the new setting off; backup repo
+  QuoteAgent.pre-voltouch.py). test_pace 3 new checks + all — ALL PASS. Goes live with the test-3 restart. Pick T from the fleet's $300 touch-fill spreads first.
+
+## §1335 — 2026-11-08 11:28 PM CT — test 2 (fleet 4-dec quoting) KEPT; test 3 (no-chase) live
+- Test 2, 10:23–11:27 PM CT (sim 30,570–31,339), vs the 17 long-lived fleet UIDs: 4-dec x3 kept +0.72 bp (1,018 fills; edge +1.55) vs fleet +1.40 (gap 0.68 ± 0.10);
+  calm gap 0.38 → 0.96 ± 0.36 (worse by 0.58 ± 0.69, 0.8 widths = noise); $300 1.36 → 1.34 (no change). Gauges: making 420 → 488, combined 0.303 → 0.374 (part = the
+  $100k head start on the 26 newly quoted books, will fade). INS OVER 0, dropped 0, 4-dec resting orders per side max 4 / mean 1.9 (pile-up fixed). → KEEP:
+  positive fills, no measurable harm, more books = more cap budget (the volume lever, §1330).
+- Test 3: agent df70f19e (= repo; staged voltouch build — identical behaviour with the new $300 no-touch off; backup agents/QuoteAgent.pre-voltouch.py) + unit
+  mk_nochase_bp=1 mk_nochase_s=10 (backup mvtrx-x3.service.pre-nochase2); registration gate passed; restarted 11:28:21 PM CT (sim ≈ 31,351). Read 12:31 AM CT.
+- From here the user is asleep; overnight changes pre-approved (memory feedback-overnight-2026-11-08.md). Queue: no-chase → hold + soft gate → $300 no-touch.
+
+## §1336 — 2026-11-09 12:32 AM CT — test 3 (no-chase) WINS on $300; test 4 (calm hold + soft gate) live
+- Test 3, 11:28 PM–12:31 AM CT (sim 31,351–32,136), fleet − x3 kept gap: $300 1.34 ± 0.18 → 0.70 ± 0.15 = closed by 0.64 ± 0.23 bp (2.8 widths) → WIN, kept.
+  x3 $300 kept +0.58 → +1.17; share of $300 $ placed right after the best moved away ≥ 3 ticks 44% → 10% (exactly the targeted leak, §1333).
+  Calm 0.96 → 1.65 ± 0.40 (worse 0.69 ± 0.54, 1.3 widths, 110 fills = noise). 4-dec 0.68 → 1.21 ± 0.19 (worse 0.53 ± 0.21, 2.5 widths) BUT confounded: the test-2 hour
+  was mostly head-start fills on the freshly opened books (1,018 vs 91 fills) and the fleet's own 4-dec kept rose 1.40 → 1.62; a plausible mechanism exists
+  (no-chase caps 4-dec targets after moves, so the 1-tick-ahead step is skipped). OPEN: if the 4-dec gap stays wide, test no-chase on $300 only.
+- Gauges 12:25 AM: x3 making 521 / combined 0.386 vs fleet 216 489 / 0.358 (x3 ≥ a long-lived fleet UID for the first time; head start still in the window).
+- Test 4: + mk_calm_hold=2 mk_pace_hold=5000 (ladder kept 1:2:4; unit backup mvtrx-x3.service.pre-hold2); gate passed; restarted 12:32:33 AM CT (sim ≈ 32,154). Read 1:35 AM.
+
+## §1337 — 2026-11-09 1:39 AM CT — test 4 (calm hold + soft gate) WINS; 6-h survival check; test 5 = $300 inside quoting (fixed)
+- Test 4, 12:32–1:35 AM CT (sim 32,154–32,974): calm fleet − x3 gap 1.33 ± 0.27 (2-hour average before; last hour 1.65) → 0.44 ± 0.21 = closed by 0.89 ± 0.34 bp (2.6
+  widths) → WIN, kept. x3 calm kept +4.69 (fleet +5.13); order age at fill median 4 → 10 s, p75 13 → 61 s; price came toward the order before the fill 25% of $.
+  $300 0.69 ± 0.17 (steady); 4-dec 0.15 ± 0.27 (38 fills) — the §1336 4-dec worry looks like head-start noise; closed unless it reappears.
+- 6-h survival (survive.py, UID 64 at 5.8 h): emission ÷ prune line 1.03 (lowest unprotected 1.00, 1.08, 1.17 …; field median 2.14; fleet 216 2.34). Live combined
+  ≈ fleet's (0.38 vs 0.36) but chain emission lags (paid score = average of all rounds since registration; 0.0025 vs fleet 0.0041, rising ≈ 0.0003 per 50 min).
+  24-h check ≈ 7:46 PM CT is the one that decides.
+- Test 5 choice (spread300.py, sim 28,750–32,974): fleet $300 touch fills are spread evenly over spreads (≈ 2% of $ each); the difference is at WIDE spreads (5+
+  ticks): fleet inside 22.5% / touch 14% of $ vs x3 inside 8.7% / touch 30.5% → "no touch at tight spreads" would change little; test instead $300 inside quoting
+  at ≥ 5 ticks (mk_vol_inside=5, others'-best fix §1314) now with no-chase + the $300 pull. Unit backup mvtrx-x3.service.pre-inside2; gate passed; restarted
+  1:39:24 AM CT (sim ≈ 33,011). Read 2:42 AM. ($300 no-touch code stays built, unused.)
+
+## §1338 — 2026-11-09 2:50 AM CT — test 5 ($300 inside quoting) rolled back; restart penalty on calm; survival 1.21×; no more restarts until morning
+- Test 5, 1:39–2:42 AM CT (sim 33,011–33,835): $300 fleet − x3 gap 0.69 ± 0.17 → 0.91 ± 0.20 (worse 0.22 ± 0.26, noise); inside share at spreads 5+ 8.7% → 18.4%
+  (fleet 23%) but x3 $300 kept +0.99 → +0.80. Second weak negative for $300 inside quoting (x4 §1326 ≈ −0.45 with confounds) → ROLLED BACK (unit restored from
+  mvtrx-x3.service.pre-inside2; the test unit kept as .inside2-rolledback); gate passed; restarted 2:44:57 AM CT (sim ≈ 33,856); filling, 0 errors.
+- RESTART PENALTY (calm): every restart cancels and re-places all orders (queue priority lost) — what the calm hold needs. First ≈ 20 min after a restart vs the rest
+  of the hour: test 4 gap 0.53 ± 0.29 vs 0.18 ± 0.33 (order age p75 14 s vs 312 s); test 5 1.79 ± 0.64 vs 0.79 ± 0.53. Suggestive (≈ 1.5 widths pooled), clear
+  mechanism. The calm 0.44 → 1.38 swing in the test-5 hour is likely this, not test 5 (which did not touch calm). → x3 runs UNCHANGED until the morning (clean
+  multi-hour read of the full setup); future calm reads skip the first ≈ 20 min after a restart or run ≥ 2 h.
+- Survival (survive.py) at 6.9 h: emission ÷ prune line 1.21 (5.8 h: 1.03); field median 1.97; fleet 216 2.16. Gauge 2:26 AM: making 589 / combined 0.377 vs 216 515 / 0.352.
+- Final overnight setup: $300 x2-style + flow pull on $300 + no-chase (all books); calm fleet copy + no-touch < 3 ticks + hold 2 + soft gate 5000; 4-dec fleet quoting.
+
+## §1339 — 2026-11-09 5:13 AM CT — user closing the laptop; morning read moved server-side
+- Survival at 9.1 h: emission ÷ prune line 1.82 (vs the second-lowest unprotected UID ≈ 1.41; the lowest sits far below the rest); field median 2.29; fleet 216 2.59.
+  Gauge 4:50 AM: x3 making 664 / combined 0.409 vs 216 468 / 0.327. x3 unchanged since 2:44:57 AM; 0 errors, 0 INS OVER.
+- Laptop closing = session crons stop → the 6:15 AM summary read now runs on the lab box (transient timer mvtrx-morningread, 12:15 UTC → morningread.sh →
+  /opt/mvtrx/morning_read.txt + ALERT line to Discord). The MORNING_2026-11-09.md write-up is done when the session resumes. Watchdog mvtrx-overnight.timer active.
+
+## §1340 — 2026-11-09 6:25 AM CT — remaining $300 gap: not order size, not depth, (probably) not latency; next-miner unit = x3's setup
+- mvtrx-x1 unit (DISABLED; backup mvtrx-x1.service.pre-x3copy) = x3's full current params minus tape, so a new registration starts with every winner.
+- size300.py ($300, sim 34,155–36,619, x3 undisturbed): fleet orders mostly $2.5–4.5k (88% of $) vs x3 mostly < $2.5k (79%) — but the fleet's SMALL orders still keep
+  +1.76 vs ours +0.98, and at every depth the fleet keeps ≈ 1 bp more (5+ behind +3.98 vs +0.80; touch +2.07 vs +0.92) → neither size nor depth explains it; the
+  gap is uniform, with the price moving against our fills (−0.6) and with theirs (+0.2).
+- Latency (validator code taos/im/validator/delays.py): base delay = min_delay + (e^{5t}−1)/(e^5−1)·(max−min), t = process_time / timeout (defaults: 10 ms, 1 s,
+  timeout 3 s, policy curve) + a random 5–25 ms on every instruction after a book's first. Public gauges (validator 5EWwdZB7): call_time_median x3 0.212 s vs fleet
+  216 0.061 / 87 0.129 / 241 0.158 → x3 slowest, but ≈ 12.8 vs 10.7 ms base delay under the default curve (≈ 2 ms) → not the main cause unless mainnet uses another
+  policy (not visible). Validator 5E7RbxVy reports call_time 0 and "timeouts 100" for x3 AND fleet 216 → a reporting quirk, not ours.
+- Other gauges worth using: debeta_at_best_seconds (x3 91.9k ≈ fleet 51.7k–121k), debeta_presence_share (1 for all), debeta_best_size, debeta_bg_share
+  (x3 0.54 vs fleet 0.56–0.83), placements_sent / cancels_sent. Open: what else differs per $300 fill (next: queue position at the fill from x3's queue records).
+
+## §1341 — 2026-11-09 6:20 AM CT — morning summary (deploy/sn79/MORNING_2026-11-09.md); clean 3-hour read of the full setup
+- Server-side morning read (morningread.sh, 6:15 AM; x3 unchanged since 2:44:57 AM; sim 34,155–36,618): fleet − x3 kept gap $300 1.11 ± 0.24 (x3 +0.94 vs +2.05),
+  calm 0.60 ± 0.24 (+4.10 vs +4.71), 4-dec 0.50 ± 0.22 (+0.93 vs +1.43). Calm order age p75 76 s. $300 after-move (≥ 3 ticks) placements 13% of $.
+- Survival 10.5 h: emission ÷ prune line 1.48 (field median 1.75, fleet 216 1.97). Gauges: x3 making 707 / combined 0.389 vs 216 534 / 0.338. 0 errors / INS OVER /
+  self-trades. Recommendation in the summary: leave x3 untouched through protection (≈ 7:46 PM); keep researching the $300 gap offline.
+
+## §1342 — 2026-11-09 6:35 AM CT — live settings reload (no-restart tests); one restart to install it; $300 pull on/off ABAB test scheduled
+- User: test on the $300 books without disturbing standing orders; survival not required (x3 is a test subject; if it survives, scale UIDs on its strategy).
+  $300 orders turn over in seconds anyway; the restart is what hurts (it resets every book's queue, §1338) → build a live reload, one last restart.
+- Code (QuoteAgent.py md5 f31e1325 = deployed; backups agents/QuoteAgent.pre-livereload.py / repo QuoteAgent.pre-livereload.py): live_params=<json> (UIDN → uid),
+  re-read every live_params_s = 30 sim s when its mtime changes; applies ONLY whitelisted quoting knobs (LIVE_KNOBS: flow_pull, flow_pull_vol_only, flow_win,
+  flow_cool, mk_vol_inside, mk_vol_touch_min, mk_nochase_bp/_s, mk_calm_touch_min, mk_calm_hold, mk_pace_hold, sizes, mk_dec_*, mk_thin_*, skew,
+  mk_calm_expiry) with type casts and range limits (LIVE_LIMITS); pacing / cap / ledger knobs and ladders are NEVER live-changeable; a bad file changes nothing;
+  every change logged "LIVE PARAMS applied: …". test_pace: 8 new checks (no file; applied; pacing can NOT change; out-of-range ignored; broken file; re-read
+  interval; works after a sim-day reset; off by default) — ALL PASS.
+- Deployed: /opt/mvtrx/live_params_64.json = {} ; unit + live_params=/opt/mvtrx/live_params_UIDN.json (backup mvtrx-x3.service.pre-livereload); gate passed;
+  restarted 6:27:03 AM CT (sim ≈ 36,774); "LIVE PARAMS applied: no change" logged.
+- Test: $300 flow pull OFF vs ON (calm already has no pull; the fleet does not pull — 43% of its $300 $ fills in the pull state at its best kept, §1333) as
+  A/B/A/B 30-min windows (A = off 6:47, B = on 7:17, A 7:47, B 8:17, END 8:47 CT) via server-side timers (liveswitch.sh → live_params_64.json + liveswitch_log.txt
+  with the sim s of each switch); read 8:50 CT server-side (abread.sh → abwin.py: per-window fleet − x3 gap, pooled A vs B with a window bootstrap → ab_read.txt
+  + ALERT). The first 20 min after the restart are excluded by design.
+
+## §1343 — 2026-11-09 6:45 AM CT — one validator only; x3 $300 queue position; next live-test candidates
+- Validators: only UID 0 (hotkey 5EWwdZB7) holds a permit + stake on SN79 (100%); x3's journal shows only 5EWwdZB7 rounds (792 in an hour). The dashboard's
+  5E7RbxVy series (call_time 0, timeouts 100) is an old sim (sim_id 20261107_0534) → ignore it in every gauge query (filter wallet 5EWwdZB7).
+- Response time: x3 0.21 s vs fleet 0.06–0.16 s ≈ +2 ms delay under the default curve (§1340) — parked (small); optimise only in a later restart.
+- queuepos.py ($300, sim 34,155 →, x3 queue records, 455 of 672 fills): 66% of x3's $300 $ fills while it is FIRST in line (nothing ahead) kept +0.84 vs +0.95 with
+  < $5k ahead, +0.95 $5–20k, +1.21 $20k+ → being alone at the front is mildly worse (fits "we are the first order an informed taker hits"), not the main cause.
+  Fleet queue position is not observable.
+- Next live-reload test candidates on $300 (no restarts needed now), after the pull ABAB: skew 10 → 5 (inventory lean shifts our quotes), mk_vol_size 0.034 →
+  0.07 (fleet's one size ≈ $3.6k), stronger no-chase (mk_nochase_bp 1 → 0.5).
+
+## §1344 — 2026-11-09 6:55 AM CT — pay vs the fleet (fleetpay.py) + scaling plan draft (deploy/sn79/SCALING_PLAN_2026-11-09.md)
+- earnings_all.py formula on all UIDs (TAO $217.82, alpha 0.003016, tempo 360): x3 $183/mo at 10.8 h (rank 166/256); prune line $128 (x3 1.43×); field median $216.
+  Fleet 5F1F2JMu 41 UIDs $9,736/mo (top $506, median $232). By age: 0–1 d $0–229; 1–3 d $257–506 (head start); 3–7 d $147–193 (post-head-start dip);
+  14+ d $182–298 (median $231). → x3 already ≈ the fleet's settled bottom at < 11 h; expect the same dip (≈ $170, ≈ 1.2–1.3× the line) before settling.
+- Scaling draft: ≈ $25 per registration, ≈ 15–20 more UIDs per $48 box; 10 UIDs ≈ $1.7–2.3k/mo, 45 ≈ $7.7–10.4k/mo if they perform like x3/fleet (unproven
+  beyond one UID; fixed pool). Gate: x3 survives protection and holds ≥ 1.3× the line through its dip; then one UID/day, then 5 at a time.
+- §1344 correction (user, 7:00 AM): a new UID replaces the pruned lowest miner (all 256 slots always full), so most of its pay comes from that slot; proportional dilution of our other UIDs ≈ 0.1% per new UID (≈ 5% at 45). Real scaling risks: fill competition among identical makers (fleet proves 41 coexist at ≈ $237) and a creeping prune line.
+
+## §1345 — 2026-11-09 8:58 AM CT — $300 pull off/on ABAB (6:47–8:47): not separable yet → extended 2 h; x3 at 2.01× the prune line
+- Per window (fleet − x3 $300 kept gap): A(off) 0.49, B(on) 1.01, A 0.41, B 0.53. Pooled (fill-level 1-sim-min block bootstrap): gap off 0.45 vs on 0.74 → pull off
+  closes the $300 gap by +0.29 ± 0.39 (0.8 widths); x3 $300 kept off +1.45 vs on +1.00. Calm −0.62 ± 0.66 and 4-dec +0.13 ± 0.32 (untouched groups) = noise.
+  The direction matches the fleet (no pull); a 0.3 bp effect needs ≈ 4× the data → small-effect test, extended (rule allows longer for small effects):
+  A 9:00, B 9:30, A 10:00, B 10:30, END 11:00 CT (server timers), re-read 11:03 CT over all 8 windows (abread.sh → ab_read.txt + ALERT).
+- abwin.py bug: `for _ in 2000` (not range) crashed the 8:50 summary line; the window-level bootstrap was also meaningless with 2 windows per side → rewritten as a
+  fill-level 1-sim-min block bootstrap of the pooled A vs B diff-in-diff.
+- Survival 8:47 AM (13.0 h): emission ÷ prune line 2.01 (field median 2.09, fleet 216 2.33). Gauges x3 803 / 0.408 vs 216 563 / 0.336. Switches all applied ≤ 1 min.
+
+## §1346 — 2026-11-09 9:10 AM CT — volume safety check; live ladder levels built and installed (x3 keeps its loaded code); x1 unit live_params_s 5
+- Pace: x3 busiest book $159,367 of $450,000 (validator traded volume agrees, pace_sync_64.json); 104/128 books paced after the head start. Safe.
+- Code (QuoteAgent.py md5 = deployed agents/QuoteAgent.py; backups agents/QuoteAgent.pre-livelad.py / repo QuoteAgent.pre-livelad.py): LIVE_LISTS mk_calm_lad /
+  mk_vol_lad live-changeable as "a:b:c" (ticks 1–20, ≤ 4 levels, no duplicates; bad values ignored). test_pace: 3 new checks + all — ALL PASS. Running x3 keeps
+  its loaded f31e1325 code until its next restart (the new file only adds ladder knobs; behaviour unchanged otherwise).
+- mvtrx-x1 unit (disabled; backup mvtrx-x1.service.pre-lps5): + live_params_s=5 (switches apply within ≈ 25 wall s instead of up to ≈ 2.5 min).
+- Next live tests ($300, after the pull test ends 11:00): skew 10 → 5; mk_vol_size 0.034 → 0.07; mk_nochase_bp 1 → 0.5 — each as 2 h of 30-min A/B windows.
+
+## §1347 — 2026-11-09 9:05 AM CT — expected multiple after the head start leaves: ≈ 1.2–1.3× the prune line
+- making_exact.py (validator code) on the last 1 sim h (sim 35,239–38,839 ≈ 4–9 AM CT, steady pace): x3 captured 289 / two-sided 196 / quality 0.578 / credit 113.5
+  (rank 106); fleet 87 (15.5 d) 313 / 201 / 0.718 / 144.4; fleet 216 (28 d) 339 / 226 / 0.920 / 208.4. → x3 trades and captures like the fleet; the gap is QUALITY
+  (kept ÷ captured), mostly the $300 kept-per-fill gap.
+- Steady pay estimate: x3 ≈ 0.54× fleet 216's credit (216 ≈ 2.3× line) and ≈ 0.79× fleet 87's → ≈ 1.2–1.3× the line once the head start leaves the window (live
+  score ≈ 11 AM–4 PM; pay lags as a running mean: ≈ 1.6–2.0× at 7:46 PM, drifting to ≈ 1.2–1.3× over 1–2 days) — the fleet's own 3–7-day cohort sits ≈ 1.3×.
+  Lever: quality 0.58 → 0.72 (fleet 87) ≈ +25% credit ≈ 1.5× the line.
+
+## §1348 — 2026-11-09 9:15 AM CT — user closing the laptop; next live test scheduled server-side: skew 5 vs 10 (pull on)
+- Skew (inventory lean, all books) A = 5 vs B = 10 (current), flow_pull held at 0.3 so it does not mix with the pull test: A 11:10, B 11:40, A 12:10, B 12:40, END
+  1:10 PM CT (liveswitch_skew.sh → liveswitch_skew_log.txt; separate log so abwin does not pool the two tests), read 1:13 PM CT (abread_skew.sh → ab_read_skew.txt
+  + ALERT). END restores skew 10 / pull 0.3. If the pull test (read 11:03) says pull OFF wins, apply it after the skew test with the user.
