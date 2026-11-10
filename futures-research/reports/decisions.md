@@ -21818,3 +21818,176 @@ The front-loaded budget (§1270) is saved for the next new maker (memory). Watch
 - Skew (inventory lean, all books) A = 5 vs B = 10 (current), flow_pull held at 0.3 so it does not mix with the pull test: A 11:10, B 11:40, A 12:10, B 12:40, END
   1:10 PM CT (liveswitch_skew.sh → liveswitch_skew_log.txt; separate log so abwin does not pool the two tests), read 1:13 PM CT (abread_skew.sh → ab_read_skew.txt
   + ALERT). END restores skew 10 / pull 0.3. If the pull test (read 11:03) says pull OFF wins, apply it after the skew test with the user.
+
+## §1349 — 2026-11-09 11:40 AM CT — $300 pull ABAB final (8 windows): no clear effect → pull stays ON; x3 above the field median; skew test running
+- 8 windows (6:47–11:00 CT): x3's own $300 kept, pull OFF 1.50 / 1.39 / 1.47 / 1.03 vs ON 0.88 / 1.10 / 1.05 / 1.36 (paired A−B +0.62, +0.29, +0.42, −0.33; mean +0.25,
+  ≈ 1.2 widths). Pooled diff-in-diff vs the fleet +0.41 ± 1.74 (0.2 w) — the fleet's $300 kept SPIKED to +3.84 / +7.14 / +5.94 in 9:30–11:00 (x3 ≈ +1) and swamped the
+  gap read. Calm −0.17 ± 0.50, 4-dec +0.26 ± 0.27. → no clear effect: keep pull ON (status quo). Lesson: with ABAB alternation x3's own kept per paired window is
+  the drift-controlled measure; the fleet gap adds the fleet's own events.
+- Open (keep searching): what happened 9:30–11:00 — the fleet kept +4–7 bp per $300 fill while x3 kept ≈ +1 (event / big move where the fleet's deep resting orders
+  paid off?).
+- Pay 11 AM: x3 $223.4/mo (field median $215.6). Survival 15.9 h: emission ÷ prune line 2.43 (field median 2.38, fleet 216 2.56). Live making 510 / combined 0.301
+  (dip under way; fleet 216 673 / 0.353). 0 errors, 0 INS OVER since 6:27 AM. Skew test (§1348) running since 11:10 (skew 10 → 5 applied 11:10:39).
+- Session restarted ≈ 11:35 AM: session crons were lost; the 30-min brief re-created. Briefs 9:43–11:13 missed (laptop closed).
+
+## §1350 — 2026-11-09 11:50 AM CT — head start still in the making window, and where credit settles (windowproj.py)
+- Making window = scoring.kappa.lookback = 10,800 sim s (3 sim h). Pace ledger pace_64.ledger [book, start, notional, id, ts_ns]; sim clock ≈ 782 sim s per wall h
+  (from the ABAB switch log).
+- Window now (sim 30,151–40,951): $300 $3.29M, calm $2.13M, 4-dec $3.96M (its head start, opened 10:20 PM, is the biggest leftover) = $9.38M. Steady rate:
+  $300 $1.01M, calm $0.64M, 4-dec $0.49M per sim h → a full steady window ≈ $6.44M.
+- Projection at constant quality (credit ∝ window volume, from 481 now): +1 h ≈ 409, +2 h (≈ 1:45 PM CT) ≈ 344, then flat ≈ 330–342 → x3's steady making ≈ 335
+  ≈ ½ of fleet 216 (650–670) ≈ fleet 87 — consistent with §1347 (≈ 1.2–1.3× the line once pay catches up). Only quality can raise it now (volume is at the cap pace).
+
+## §1351 — 2026-11-09 12:00 PM CT — the fleet's 9:30–11:00 $300 "spike" = a flash dislocation on books 45/47 that x3 missed (pace-blocked) (spike300.py)
+- Fleet $300 kept before 1.85 bp (move after ±1.3) vs 9:30–11:00 5.65 bp (move ±4.8); its 5+-behind fills +18.1 bp. 69% of the spike profit from 2 books: 45 ($1,925,
+  kept +272 bp/fill) and 47 ($1,257, +53 bp). Book 45 mid: 298.7 → 337.65 (sim ≈ 39,874, +13%) → 272.2 (≈ 39,960, −9%) within ≈ 100 sim s; the fleet (118 fills,
+  295.3–328.2) sold into the spike before it reverted. x3: 0 fills on book 45 in sim 38,900–40,400 (137 fills / $163k there otherwise) — most likely PACE-BLOCKED
+  (a paced-out $300 book cancels everything; 106–108 of 128 books blocked at any time).
+- Structural finding: x3 burns its per-book budget on ordinary fills (≈ $22k per $300 book per sim h vs the fleet's ≈ $14.6k) and is absent from most books most of
+  the time → it misses the rare dislocations where makers earn the most. Next test (replaces "$300 size up", which would burn the budget faster): spend less on
+  ordinary $300 flow so more books stay quoting — $300 no-touch on tight spreads (mk_vol_touch_min, built, live knob) and/or a smaller $300 touch size; measure
+  the share of books blocked + kept per fill; the event payoff itself needs long runs.
+
+## §1352 — 2026-11-09 12:25 PM CT — test queue re-ordered (user): "spend less on ordinary $300 fills" replaces size-up as test 2; size-up moved to the middle
+- Test 2 = $300 no-touch while the others' spread < 6 ticks (mk_vol_touch_min 6, live knob in the running f31e1325; ladder 2:5:10 kept) — x3 joins the $300 touch on
+  ≈ 45% of $ vs the fleet's 23%; aim: spend less budget on ordinary fills so fewer books are pace-blocked (§1351). A = touch_min 6 / B = 0, both with pull 0.3 and
+  skew 10 (kept separate from the skew test): A 1:15, B 1:45, A 2:15, B 2:45, END 3:15 PM CT (liveswitch_vt.sh → liveswitch_vt_log.txt); read 3:18 PM
+  (abread_vt.sh → ab_read_vt.txt: abwin + PACE STATUS blocked counts per window; ALERT).
+- Queue: 1 skew 5 vs 10 (running, read 1:13 PM) → 2 $300 no-touch < 6 → 3 no-chase trigger 1 → 0.5 bp → 4 one restart (live ladders + live_params_s 5) →
+  5 $300 ladder depth (deeper levels; flash events §1351) → 6 $300 order size 0.034 → 0.07 (moved here) → 7 calm ladder 1:2:4 → 1:2:3 → 8 4-dec tuning →
+  9 $300 pull off/on long re-test.
+
+## §1353 — 2026-11-09 12:40 PM CT — scaling headroom: where x3's steady level ranks (rankpos.py, rankpos2.py)
+- User's frame: to run ≈ 40 UIDs we must beat ≈ 60–70 others (40 to replace + a buffer below).
+- Live making gauge is misleading for rank (≈ 25% of UIDs make 0 — taker/skill miners). Live COMBINED: x3 now 0.259 (making 444) → projected steady ≈ 0.195 (making
+  335, same combined/making ratio). Below 0.195: 69 of 195 UNPROTECTED UIDs (98 of 256 incl. the 60 protected newcomers). Below 0.25: 117/256; below 0.30: 139/256.
+- Chain pay lags live performance strongly: settled (≥ 3 d) unprotected UIDs' pay/line barely tracks live combined (fit 2.47 + 0.50 × combined); UIDs with live ≈ 0
+  are still paid ≈ 2.3× the line from past rounds (they will decay) — so "only 4 UIDs below 1.25× pay" (chain) and "69 below on live score" both hold; live score
+  is where pay converges.
+- Verdict: at today's quality x3 sits just above ≈ 69 weaker unprotected miners — borderline for 40 UIDs (buffer ≈ 29). At live ≈ 0.30 (fleet 87's level) ≈ 139
+  below → room for 40 with a ≈ 100 buffer. → improve quality on x3 first ($300 tests), then scale in steps, re-checking rank each step.
+
+## §1354 — 2026-11-09 1:30 PM CT — skew 5 WINS (event-capped read); flash events need capped reads; test 3 (no-chase 0.5) scheduled
+- Skew ABAB 11:10–1:10 PM (A = 5, B = 10, pull 0.3): uncapped, window 0 had x3 $300 kept +9.54 bp (x3 caught a flash dislocation this time) → pooled +6.20 ± 4.12
+  (1.5 w). abwin.py --clip=20 (each fill's kept capped at ±20 bp; flash events no longer dominate): $300 x3 kept A 1.33 / 1.10 vs B 0.41 / 0.81 → pooled gap
+  closed by +0.96 ± 0.46 (2.1 widths) → WIN; calm +1.03 ± 0.70 (1.5) and 4-dec +0.84 ± 0.59 (1.4), same direction. → skew 5 adopted.
+- Pull ABAB re-read capped: +0.16 ± 0.28 (0.6 w) → still no effect (pull stays on).
+- Server timers: 3:15 PM END of test 2 writes {pull 0.3, skew 5, touch_min 0} (the original END timer stopped); test-2 read 3:18 PM now capped; TEST 3 no-chase
+  trigger A = 0.5 bp vs B = 1 bp (skew 5, touch_min 0) 3:20 / 3:50 / 4:20 / 4:50 / END 5:20 PM, read 5:23 PM (abread_nc.sh → ab_read_nc.txt, capped). If test 2
+  wins, switch $300 no-touch back on after test 3.
+- mvtrx-x1 unit (disabled; backup .pre-skew5): skew 10 → 5.
+
+## §1355 — 2026-11-09 1:50 PM CT — flash events sized (flashcount.py): ≈ 15% of making profit for BOTH; §1351's "x3 is absent from events" corrected
+- Sim 34,155–42,601 (≈ 10.8 wall h), events = mid ≥ 2% off its 300-s median: concentrated in 5 $300 books in a turbulent regime (mainly 12 and 45, repeated ±10% swings;
+  the detector's "435 events" counts seconds of turbulence, not distinct shocks).
+- Making profit (kept × size, 20 s mark): fleet 17 UIDs $36,805 (≈ $2,165/UID), 16% inside event periods from 272 fills (≈ 16 per UID); x3 $1,225, 14% inside events
+  from 17 fills. → x3's presence in events ≈ a fleet UID's; the book-45 miss (§1351) was one case, not a pattern. The fleet out-earns x3 ≈ 1.8× per UID both inside
+  and outside events (≈ the 0.54 credit ratio, §1347) → the gap is everyday fill quality. "Stub" far-out orders parked (small vs the main gap).
+
+## §1356 — 2026-11-09 2:15 PM CT — validator score anatomy (factors.py, share.py): no hidden penalty; pay ∝ smoothed making share; skill side pays most
+- All published factors x3 vs fleet (validator 5EWwdZB7): p11 0.978 (fleet 0.94–0.98), s3 1, presence 1, pnl 1, making_basis 1, w_make 0.5, coverage 120 books (fleet
+  128). combined_score = debeta_score = 0.5 × debeta_making_rank (skill 0) — a display/rank number.
+- Pay: score ≈ making_share / 2 for makers; making_share sums to 1 over makers, ≈ proportional to making credit (corr 0.78 linear > √ 0.64) but SMOOTHED over a longer
+  horizon: published ÷ current share = x3 1.89 (head start in its history), 216 1.10, 52 1.33, 87 2.83, 7 4.17, 113 0.70. (A "compressed share" reading at 2:05 PM
+  was wrong — it was this lag.)
+- Pool split: 145 makers 0.537 of score (avg 0.0037); 111 non-makers 0.460 (avg 0.0041); top earners are skill miners (score ≈ 0.013–0.014, skill 1.5–2.0) ≈ 4× a maker.
+- x3 forecast refined: current making share 0.00369 → ≈ 0.0030 when credit settles at ≈ 335 → ≈ $185/mo ≈ 1.4–1.5× the prune line ($128). Scaling headroom (§1353) stands.
+- User 2:20 PM: skill miners are revisited only after the makers run well with little prune risk and are scaling (later this week if needed); target = many maker UIDs + many skill UIDs (separate UIDs).
+
+## §1357 — 2026-11-09 3:30 PM CT — test 2 ($300 no-touch < 6 ticks) REJECTED; test 3 (no-chase 0.5 bp) running
+- ABAB 1:15–3:15 PM (skew 10, pull 0.3; capped ±20 bp): x3 $300 kept A (no-touch) 0.29 / 0.92 vs B 0.61 / 1.50 → pooled A +0.60 vs B +1.05; gap −0.43 ± 0.39 (1.1 w)
+  — worse in both pairs. Pace-blocked books (PACE STATUS every ≈ 4.5 min): A windows 97–111 of 128, B windows 97–109 → NO budget saving (skipping $300 touch orders
+  does not keep more books quoting). Calm −0.64 ± 0.65, 4-dec +0.03 (noise). → off (END at 3:15 already wrote touch_min 0 + skew 5).
+- Test 3 live since 3:20 PM (mk_nochase_bp 1 → 0.5, skew 5), read 5:23 PM.
+- Survival 19.7 h: emission ÷ prune line 3.39 (lowest unprotected 1.00, next 1.25, 1.32; field median 3.21; fleet 216 3.42). Gauge making 434 / combined 0.194.
+
+## §1358 — 2026-11-09 3:55 PM CT — $300 depth profile (depth300.py) → test 5 = ladder 2:5:10:20; gated restart + test 5 scheduled server-side
+- $300 kept (capped ±20) by depth behind the own-side best, sim 34,155 → now. Fleet: inside 24% +1.4 | touch 26% +1.5 | 1: 16% +1.6 | 2: 10% +1.9 | 3–4: 10% +2.0 |
+  5–6: 5% +2.4 | 7–9: 4% +2.9 | 10–14: 3% +3.6 | 15–24: 2% +5.0 | 25–49: 1% +6.0. x3: inside 8% +1.4 | touch 48% +0.9 | 1: 10% +1.1 | 2: 15% +1.0 | 3–4: 9% +1.5 |
+  5–6: 5% +1.2 | 7–9: 2% +1.0 | 10–14: 1% +1.7 | 15+: ≈ 0. → the fleet keeps more the deeper it sits and has 6% of $ at 10+ ticks; x3's deepest level is 10.
+- restart_x3.sh (gated: regcheck exit code + agent md5 88322390; adds live_params_s=5; verifies ActiveEnterTimestamp; ALERTs) at 5:26 PM CT (after test 3's read).
+- Test 5: $300 ladder A = 2:5:10:20 vs B = 2:5:10 (skew 5, no-chase 1, touch_min 0; live list knob mk_vol_lad), 5:50 / 6:20 / 6:50 / 7:20 / END 7:50 PM CT,
+  read 7:53 PM (abread_lad.sh → ab_read_lad.txt, capped, blocked counts). If test 3 (no-chase 0.5) wins, apply it after test 5.
+
+## §1359 — 2026-11-09 4:05 PM CT — calm depth profile (depthcalm.py): x3 ≈ fleet behind the touch; test 7 changed
+- Calm kept (capped) by depth: fleet touch 57% +4.0 | 1: 28% +5.9 | 2: 8% +7.0 | 3–4: 3% +5.8; x3 touch 62% +3.3 | 1: 21% +5.6 | 2: 11% +6.9 | 3–4: 3% +5.4 → placement mix
+  and kept behind the touch ≈ the fleet's; the remaining calm gap is AT the touch (+3.3 vs +4.0).
+- Queue change: test 7 "calm ladder 1:2:3" dropped (fills at 3–4 ticks are 3% of $ → nothing to gain); replaced by calm no-touch threshold 3 → 4 ticks (live knob
+  mk_calm_touch_min; the < 3 version won by 3.0 widths, §1331).
+
+## §1360 — 2026-11-09 5:50 PM CT — test 3 (no-chase 0.5 bp) no effect; gated restart done; test 5 (ladder 2:5:10:20) starting
+- ABAB 3:20–5:20 PM (skew 5, capped): x3 $300 kept A (0.5 bp) 0.58 / 1.25 vs B (1 bp) 1.29 / 0.79 → pooled −0.17 ± 0.33 (0.5 w); calm +0.50 ± 0.69, 4-dec +0.39 ± 0.77
+  → no effect; mk_nochase_bp stays 1.
+- restart_x3.sh 5:26 PM: registered, agent 88322390, live_params_s 5 added; restarted 5:26:17 PM CT (ActiveEnterTimestamp changed); the live file re-applied skew 5
+  at start; 0 errors / INS OVER since.
+- Today's tally: wins kept — skew 5 (+0.96, 2.1 w); no effect — pull off/on, no-chase 0.5; lost — $300 no-touch < 6. Test 5 5:50–7:50 PM, read 7:53 PM.
+
+## §1361 — 2026-11-09 6:05 PM CT — overnight test queue prepared (NOT scheduled; needs the user's approval tonight)
+- deploy/sn79/overnight_queue.sh (copied to /opt/mvtrx): `LAD=<test-5 winner> sh /opt/mvtrx/overnight_queue.sh "<start UTC>"` creates server timers for 4 ABAB tests
+  (30-min windows, capped reads, ALERTs): calm no-touch 4 vs 3 → $300 size 0.07 vs 0.034 → 4-dec inside 2 vs 1 → $300 pull off vs on (8 windows), each on the base
+  (pull 0.3, skew 5, touch_min 0, no-chase 1, ladder LAD). Test 5 (ladder 2:5:10:20) switch applied 5:50:27 PM (17 s after the file — live_params_s 5 works).
+- Survival 6:24 PM (22.6 h): x3 emission ÷ prune line 1.92 (field median 1.99, fleet 216 2.02; lowest unprotected 1.00–1.17); pay 6 PM $199.7/mo (field median $203.2) → clears the bottom group when protection ends ≈ 7:46 PM.
+
+## §1362 — 2026-11-09 7:57 PM CT — test 5 ($300 ladder 2:5:10:20) no effect; x3 past protection, still registered
+- ABAB 5:50–7:50 PM (skew 5, no-chase 1; capped): x3 $300 kept A 0.64 / 0.98 vs B 0.34 / 1.17 → pooled 0.78 vs 0.78; gap +0.09 ± 0.27 (0.3 w); calm +0.23 ± 0.43,
+  4-dec +0.09 ± 1.19; blocked books 86–106 of 128 in both. A 20-tick level fills rarely (mostly in flash moves) — 2 h cannot show its value; no harm. Rule → ladder
+  stays 2:5:10; candidate for a long overnight run.
+- 24-h protection ended ≈ 7:46 PM; regcheck 7:56 PM: x3 REGISTERED (2.02× the prune line at 6:56 PM).
+
+## §1363 — 2026-11-09 8:05 PM CT — overnight test queue started (user approved; awake for the first two)
+- `LAD=2:5:10 sh /opt/mvtrx/overnight_queue.sh "2026-11-10 02:05"` (registration gate passed): calm no-touch 4 vs 3 — 8:05–10:05 PM CT, read 10:08;
+  $300 size 0.07 vs 0.034 — 10:15 PM–12:15 AM, read 12:18 AM; 4-dec inside 2 vs 1 — 12:25–2:25 AM, read 2:28 AM; $300 pull off vs on 8 windows — 2:35–6:35 AM,
+  read 6:38 AM. All capped (±20 bp) reads → /opt/mvtrx/ab_read_<name>.txt + Discord ALERT. Base: pull 0.3, skew 5, touch_min 0, no-chase 1, ladder 2:5:10.
+- The 3:07 AM CT tape rotation falls inside the pull test → abread_pull8.sh reads live_tape_x3.jsonl.prev + the live tape (temp concat, deleted after).
+
+## §1364 — 2026-11-09 9:05 PM CT — CORRECTION of §1356's pay forecast: x3 settles ≈ $100–110/mo ≈ the prune line, not $185
+- User asked why credit/pay still fall > 24 h after the head start. Live making credit (3-sim-h window ≈ 14 wall h) is at its steady level (377–440, ≈ the §1350
+  projection). PAY follows the smoothed making_share, whose memory is much longer than 24 h: x3 published ÷ current share 1.81 at 9 PM (1.89 at 2 PM); 216 1.07; 52 1.82.
+- §1356 error: "current share 0.00369 → paid ≈ 0.0030 → $185" forgot that score ≈ making_share / 2. Correct: x3 current share 0.00332 → score ≈ 0.00166 → pay ≈ $103
+  (pay $187 now at score 0.00303). Cross-check: x3 ≈ 0.53× fleet 216's current share; 216 pays ≈ 1.93× the line → x3 → ≈ 1.0× the line.
+- Pay path (earnings log, CT): noon $231 → 3 PM $224 → 6 PM $200 → 9 PM $187, ≈ −$5/h, slowing (time constant ≈ 16 h est.) → ≈ $140 by 9 AM 11-10, ≈ $120 by 9 PM 11-10
+  → near the bottom in ≈ 1–2 days unless quality improves. Scaling on x3's current setup is premature (a new UID would land in the same spot).
+- Pace: 24-h notional median per book $184k → $198k (6–9 PM), blocked 94–102 of 128 — under the 450k cap.
+
+## §1365 — 2026-11-09 10:10 PM CT — overnight test 1 (calm no-touch 4 vs 3) REJECTED; calm ≈ the fleet now
+- ABAB 8:05–10:05 PM (capped): calm x3 kept A (4) 5.33 / 4.90 vs B (3) 4.41 / 6.06 → +0.01 ± 0.98 (0.0 w); but calm fills A 34 / 43 vs B 85 / 77 per window → threshold 4
+  halves calm fills at the same quality = less making credit → keep 3. Calm pooled gap to the fleet ≈ −0.07 bp → x3 ≈ the fleet on calm. $300 −0.23 ± 0.23, 4-dec
+  −0.83 ± 0.83 (untouched groups, noise). The live file's END line has no calm key → x3 stays at the last applied value 3.
+
+## §1366 — 2026-11-09 10:20 PM CT — calm books: x3 ≈ the fleet (calmcmp.py + making_exact on calm-only tape)
+- Since the 5:26 PM restart (sim 45,550–49,236 ≈ 4.7 wall h, skew 5), per UID: x3 104 fills / $146k per wall h, edge +5.61, move −1.02, kept +4.59 bp (capped),
+  two-sided 81%, 36 books; fleet (17 UIDs) 111 fills / $165k, +5.52, −0.68, +4.84, 89%, 38 books.
+- Validator-exact calm-only, last 1 sim h: x3 captured 160 / quality 0.717 / credit 91.3 (rank 73); fleet 52 161 / 0.692 / 79.0 (rank 87); fleet 216 250 / 0.798 / 163.7 (37).
+- → calm gap per fill 2.19 bp this morning → ≈ 0.25 now; x3 out-scores fleet 52 on calm. Remaining calm items: two-sidedness 81% vs 89% (credit counts 2·min per book;
+  skew 5 may let inventory drift) and ≈ 12% less calm volume. The main gap is on the $300 books (≈ 1 bp/fill).
+
+## §1367 — 2026-11-10 5:30 AM CT — overnight reads: $300 size 0.07 REJECTED; 4-dec inside 2 no information; pull test running; session slept 10:20 PM–5:26 AM
+- $300 size (10:15 PM–12:15 AM, capped): x3 $300 kept A (0.07) 0.96 / 0.83 vs B (0.034) 1.29 / 1.39 → −0.49 ± 0.41 (1.2 w), worse in both pairs; fills A 82 / 91 vs B 63 / 61 →
+  bigger orders = more but worse fills → keep 0.034. Calm +0.05, 4-dec +0.03 (noise).
+- 4-dec inside 2 vs 1 (12:25–2:25 AM): 4-dec fills only 14–25 per window → ±1.36 (no information; kept A +0.77 vs B −0.31); keep 1. 4-dec tests need ≥ 6–8 h.
+- Pull off/on 8 windows (2:35–6:35 AM): switches fired and applied (6 "LIVE PARAMS applied: flow_pull" lines by 5:26 AM); read 6:38 AM (reads .prev + live tape).
+- x3 33.7 h: emission ÷ prune line 1.67 (field median 1.92, fleet 216 2.08; lowest 1.00–1.09). Pay (CT): 9 PM $187 → 1 AM $175 → 5 AM $164 (≈ −$3/h, slowing; §1364 path).
+- The session slept ≈ 10:20 PM–5:26 AM (laptop closed): briefs 10:43 PM–4:43 AM missed; server timers ran the queue.
+- User ≈ 6:00 AM 11-10: decision rule 2 — a tie (or a lean toward the fleet below 2 widths) → adopt the long-lived fleet's behaviour; and pre-approval for any x3 changes/tests while away (no spending/keys).
+
+## §1368 — 2026-11-10 6:00 AM CT — $300 gap now = adverse move after the fill only; fleet fills follow fundamental moves (fundmove.py); tape rotation fine
+- whygap.py since the 5:26 PM restart (sim 45,550–55,270): $300 gap 0.62 bp (uncapped; 1.31 at yesterday's baseline): edge fleet +1.46 vs x3 +1.37; move after
+  fleet +0.06 vs x3 −0.47 → the remaining gap is the adverse move after our fills; every split (depth, crowding, age, queue, taker, size, spread, cluster, inventory)
+  is "same situation, worse outcome" (mix ≤ 0.08 bp each).
+- Fundamental (snapshot "fund"): $ share by Δfund over 30 s before the fill (signed to the maker side): fleet with 64% / flat 21% / against 15%; x3 35 / 33 / 33
+  (5 s: fleet with 28% / against 2%; x3 6 / 6) → the fleet's fills cluster after the fundamental moved its way — it uses the fundamental; x3 does not. But within
+  every bucket x3's move after stays ≈ −0.4…−0.6 vs the fleet ≈ 0, and the fleet's "with" fills keep less (+1.36) than flat (+1.80) → not the kept-gap cause.
+  Candidate (restart needed — `fund` is not a live knob): fair += fund × (fundamental − mid); judge under rule 2.
+- Tape rotation ran 3:07 AM but the tape was 1.83 GB (< 2 GB) → no rotation; .prev still = sim 21,888–34,154 (no overlap with the live tape).
+- §1369 (6:10 AM): `fund` (range 0–1) and `micro` (0–1) added to the live whitelist (QuoteAgent.py = deployed agents/QuoteAgent.py; backups agents/QuoteAgent.pre-livefund.py /
+  repo QuoteAgent.pre-livefund.py); test_pace 2 new checks + all — ALL PASS. x3 keeps its loaded 88322390 code until the next restart (restart_x3.sh's md5 check must
+  be updated to the new md5 before using it). Next restart → a fund-lean A/B (fund 0 vs ≈ 0.3) becomes a live switch.
+
+## §1370 — 2026-11-10 6:45 AM CT — pull ABAB (4 h) tie → pull OFF (rule 2); ladder 2:5:10:20 adopted (rule 2); $300 inside 4-h test running; morning summary
+- 8 windows 2:35–6:35 AM (capped): x3 $300 kept A (off) 0.88 / 0.41 / 0.92 / 0.87 vs B (on) 0.74 / 1.22 / 0.76 / 0.72 → pooled gap −0.05 ± 0.28 (0.2 w); fills A 87 / 116 /
+  108 / 92 vs B 85 / 84 / 80 / 81 (≈ +17% with pull off, same quality); calm −0.24 ± 0.62, 4-dec +1.12 ± 0.79 → TIE → rule 2 (fleet does not pull, §1310): pull OFF.
+- Applied 6:42:44 AM (live switch, registration gate passed): {flow_pull 0, skew 5, touch_min 0, no-chase 1, ladder 2:5:10:20} — ladder adopted under rule 2 (tie §1362,
+  fleet 6% of $300 $ at 10+ ticks §1358). mvtrx-x1 unit (disabled; backup .pre-pull0): flow_pull 0, ladder 2:5:10:20.
+- Test: $300 mk_vol_inside 5 (A) vs 0 (B) on that base, 8 windows 6:50–10:50 AM CT (liveswitch_inside8.sh), read 10:53 AM (abread_inside8.sh → ab_read_inside8.txt + ALERT).
+- Pay (CT): 4 AM $169 → 5 AM $164 → 6 AM $160; survival 35.0 h 1.59× (lowest 1.00–1.04, field median 2.10, fleet 216 2.06).
+- deploy/sn79/MORNING_2026-11-10.md written.
