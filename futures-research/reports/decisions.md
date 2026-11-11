@@ -21991,3 +21991,196 @@ The front-loaded budget (§1270) is saved for the next new maker (memory). Watch
 - Test: $300 mk_vol_inside 5 (A) vs 0 (B) on that base, 8 windows 6:50–10:50 AM CT (liveswitch_inside8.sh), read 10:53 AM (abread_inside8.sh → ab_read_inside8.txt + ALERT).
 - Pay (CT): 4 AM $169 → 5 AM $164 → 6 AM $160; survival 35.0 h 1.59× (lowest 1.00–1.04, field median 2.10, fleet 216 2.06).
 - deploy/sn79/MORNING_2026-11-10.md written.
+
+## §1371 — 2026-11-10 11:00 AM CT — $300 inside quoting tie → ADOPTED (rule 2); gated restart to the live-fund build; fundamental-lean test scheduled
+- inside8 (6:50–10:50 AM, capped): x3 $300 kept A (inside 5) 1.13 / 1.24 / 0.70 / 0.58 vs B 1.08 / 0.93 / 0.66 / 0.95 → pooled 0.91 vs 0.90; gap −0.06 ± 0.22 (0.3 w);
+  fills A 153 / 90 / 125 / 117 (485) vs B 109 / 99 / 110 / 112 (430) ≈ +13% at the same quality; calm +0.32 ± 0.57, 4-dec +0.18 ± 0.47 → TIE → rule 2 (fleet quotes
+  inside on ≈ 25% of its $300 $, §1358): mk_vol_inside 5 applied 10:55:51 AM (live).
+- restart_x3.sh md5 check → c0a67078; gated restart 10:56:03 AM CT (registered, agent c0a67078 with live fund/micro, live_params_s 5); the live file re-applied
+  {pull 0, skew 5, ladder 2:5:10:20, inside 5} at start. Unit files synced to the live settings (x3 backup .pre-unitsync; x1 .pre-inside5) so a cold start matches.
+- Test fund8: fundamental lean fund 0.3 (A) vs 0 (B) on that base, 8 windows 11:20 AM–3:20 PM CT (liveswitch_fund8.sh), read 3:23 PM (abread_fund8.sh → ab_read_fund8.txt
+  + ALERT). Motivation §1368 (the fleet's fills cluster after the fundamental moved its way).
+
+## §1372 — 2026-11-10 12:35 PM CT — x3 vs fleet UID 216 (last sim hour, sim 57,189–60,789): ≈ 65% of 216's live making; the $300 books drag the miner-wide quality
+- Gauges: making x3 ≈ 360 vs 216 ≈ 555; paid score 0.0024 vs 0.0032; vs the prune line 1.88× vs 2.44×.
+- Per fill vs 216 (capped): $300 +0.84 vs +1.85 (−1.0, 4.6 w; fills 733 vs 383); calm +4.61 vs +6.44 (−1.8, 2.6 w; 377 vs 344); 4-dec +0.85 vs +3.04 (−2.2, 3.4 w; 151 vs
+  235). 216 is above the fleet average on calm (x3 ≈ the average, §1366).
+- making_exact by group: $300 x3 C 38.5 / two-sided 14.5 / quality 0.30 / credit 4.3 vs 216 50.9 / 20.5 / 0.59 / 12.2; calm 127.8 / 90.2 / 0.77 / 69.1 vs 141.5 / 100.7 /
+  0.79 / 80.0; 216's 4-dec had a negative-captured hour (all-books totals not comparable this window).
+- Quality is ONE number per miner (§1302): x3 takes 2× 216's $300 fills at half the quality → overall 0.62 vs calm-alone 0.77 → the $300 books cost x3 credit twice.
+  Rough: no $300 making → overall quality ≈ 0.77 → ≈ +8% total credit despite losing the $300 credit. Plan: (1) a "$300 off / selective" switch judged by
+  miner-wide credit (add mk_skip_vol to LIVE_KNOBS → one restart); (2) study 216's calm behaviour vs the rest of the fleet; (3) fundamental tilt (running); (4) long 4-dec.
+
+## §1373 — 2026-11-10 1:00 PM CT — fundamental-tilt test cut to 1:20 PM (user); "$300 off" checked for hidden downsides; $300-off test scheduled
+- User: shorten the fund test to end 1:20 PM; test $300 OFF; make sure not quoting $300 has no hidden downside. Fund8 timers 4–7/end/read stopped; END at 1:20 PM
+  (fund 0) and read 1:23 PM (2 A + 2 B windows).
+- Hidden-downside check (validator code): making_share = making_raw / Σ making_raw (reward.py making_pool_inputs) — proportional, NO book-count requirement;
+  coverage_weight applies only to the skill leg (x3 skill 0); the making magnitude floor (0.5 × median positive maker) affects only the rank; S3 tether reads 1.0
+  for every miner (off). P11 (counterparty concentration): x3 top-2 miner takers 1.8% of $ on all books → 3.5% on calm + 4-dec only (216: 1.9% → 3.0%) → still
+  diverse, negligible. REAL downside: flash dislocations happen on $300 books (§1355: ≈ 14–16% of making profit for x3 and the fleet) — "$300 off" forgoes them, and a
+  4-h test may see none (biased toward "off"); the read reports 1%+ one-second $300 mid jumps per arm.
+- Code: mk_skip_vol added to LIVE_KNOBS (QuoteAgent.py md5 52798500 = deployed agents/QuoteAgent.py; backups agents/QuoteAgent.pre-liveskip.py / repo
+  QuoteAgent.pre-liveskipvol.py); test_pace 2 new checks (applied; an empty want cancels resting $300 orders and places none) + all — ALL PASS.
+- abcredit.sh: pooled A vs B windows → making_exact (x3 + fleet 216) = whole-miner credit; dry run on inside8: x3 A 28.8 vs B 29.1 (tie confirmed; the 216 reference
+  is unreliable when windows are pooled).
+- Schedule (server timers): gated restart_x3.sh (md5 52798500) 1:25 PM; skip8 A = mk_skip_vol 1 / B = 0 on the base (pull 0, skew 5, ladder 2:5:10:20, inside 5, fund 0)
+  1:50 / 2:20 / … / END 5:50 PM CT; read 5:55 PM (abread_skip8.sh → ab_read_skip8.txt: whole-miner credit first, per-fill second). Decide by whole-miner credit
+  and flash exposure; if "off" wins, a selective variant (deep $300 levels only) is the follow-up.
+- §1373 add. (1:05 PM, user): $300-off test read at 2 h (3:53 PM, ab_read_skip8_2h.txt) and decide then if clear; the 4-h read stays as fallback. State handoff: deploy/sn79/STATE_2026-11-10_1PM.md.
+
+## §1374 — 2026-11-10 1:27 PM CT — gated restart OK (52798500); fund8 read incomplete (abwin stops silently); false alarm on fills
+- restart_x3.sh 1:25:09 PM CT: registered, agent 52798500, ActiveEnterTimestamp changed, "LIVE PARAMS applied: no change" (unit files already match), 0 errors.
+- Fund tilt read (ab_read_fund8.txt, 1:23 PM) printed only "$300 window 0" then nothing, no traceback (also when rerun by hand) — suspect the ulimit -v 3000000 cap;
+  x3 fills were normal in all 4 windows (99–139 $300 / 37–64 calm / 17–31 4-dec per ≈ 400 sim s). TODO: rerun abwin for fund8 with a larger memory cap, then decide
+  (rule 2). The $300-off test (1:50 PM) uses the same abwin per-fill read → check it works BEFORE 3:53 PM (abcredit is unaffected).
+- False alarm: counted fixed sim windows past the tape's end right after the restart → "0 fills"; the miner was fine (lesson saved).
+
+## §1375 — 2026-11-10 1:31 PM CT — read scripts were blind after sim 60,000; fixed; fund8 (fundamental lean) result
+- Cause of the truncated fund8 read (§1374): every tape script skipped lines with sim ts ≥ 60,000 (an old pre-reset guard). The sim passed 60,000 ≈ 1 PM.
+  Raised to 90,000 in all scripts on the lab box and in the repo (backup pre-guard90.tgz). live_tape_x3 spans sim 34,154–61,660 only, so nothing old leaks in.
+  The skip8 ($300 off) reads at 3:53 / 5:55 PM now use the fixed scripts.
+- fund8 read (fund 0.3 = A vs 0 = B, 4 half-hours, capped per fill):
+  - $300: A closes the gap to the fleet by +0.29 ± 0.28 (1.1 widths) — lean toward the fleet-like fund lean; but 212 vs 249 $300 fills (−15%).
+  - calm: −0.33 ± 0.79 (noise). 4-dec: −0.51 ± 0.35 (1.5 widths, ≈ 45 fills per arm) — lean against.
+  - Verdict: no clear result. Rule 2 would adopt the fleet-like fund 0.3 for $300, but it costs 15% of $300 fills and leans worse on 4-dec.
+    Deferred: decide after skip8 — if $300 OFF wins, fund on $300 is moot; if $300 stays ON, re-test fund 0.3 for 2 h on the then-current base.
+
+## §1376 — 2026-11-10 3:39 PM CT — why fleet UID 216's live making fell (≈ 670 → ≈ 460 today)
+Validator-exact credit (making_exact.py, 3-sim-h windows on live_tape_x3; reproduces the gauges: 705 vs gauge 671, 463 vs 462):
+| window (sim) | UID | captured C | quality R/C | two-sided (2·min buy,sell) | credit |
+|---|---|---|---|---|---|
+| morning 44,800–55,600 | 216 | 1,076 | 0.891 | 792 | 705 |
+| now 52,500–63,300 | 216 | 803 | 0.957 | 484 | 463 |
+| morning | x3 64 | 746 | 0.640 | 590 | 378 |
+| now | x3 64 | 747 | 0.630 | 585 | 369 |
+- 216 did NOT get worse per fill (quality rose to 0.96). Its drop is volume (−25%) and above all balance: its fills became one-sided per book
+  (two-sided share 0.74 → 0.60), so 2·min(buy, sell) fell 39%. The long-lived fleet's median captured volume per hour also fell ≈ 40% over the tape
+  (why216.py), so it is mostly the market/fleet, not a 216 strategy change. x3 stayed flat (balance 0.79 both windows — skew 5 keeps it two-sided).
+- Our whole gap to 216 is QUALITY: x3 now has MORE two-sided volume than 216 (585 vs 484) but keeps 0.63 of it vs 216's 0.96.
+  x3 at 216's quality would score ≈ 560 (top ≈ 15%). Field quality median 0.68 → x3 is below the median on quality, above on volume.
+- So x3's "76% of 216" is 216 falling, not x3 rising; the lever stays the $300 adverse move (quality), which skip8 tests directly.
+
+## §1377 — 2026-11-10 3:57–4:02 PM CT — "$300 off" (skip8) stopped at 2 h: clear loss, $300 books back ON; fund tilt re-test started
+- skip8 2-h read (A = $300 off, B = on; 2 half-hours each; flash events 0 in both):
+  - Whole-miner validator-exact credit: A 3.6 vs B 8.3 (UID 216 reference 14.5 vs 15.4, flat). Captured volume halves (35 vs 67) and miner quality does NOT
+    improve (0.61 vs 0.60), so the hypothesis "the $300 books drag the whole miner's quality" is false. Even at quality 1.0, A's two-sided 5.9 < B's credit 8.3.
+  - Per fill (secondary): $300 +0.34 ± 0.37 (0.9 w), calm −0.39 ± 0.71, 4-dec −0.48 ± 0.49 — no clear effect.
+  - Decision: clear loss → keep $300 ON (also what the fleet does). Applied 3:57:42 PM ("LIVE PARAMS applied: mk_skip_vol 1→0"); timers sk8-5..7/end/read stopped.
+    Selective-$300 follow-up dropped (its premise was the quality drag).
+- Whole-miner credit run retroactively on fund8 (fund 0.3 = A, 11:20 AM–1:20 PM): x3 quality A 0.645 vs B 0.482 (216 flat 0.652 / 0.647) — the largest quality
+  move seen — but two-sided A 5.4 vs B 14.9 → credit 3.5 vs 7.2 (216 7.2 vs 12.5: the 1-h pools are noisy — 216's own two-sided swung 11 vs 19 unchanged).
+  Plausible mechanism: leaning on the fundamental makes fills one-sided. Not decidable on 2 h.
+- Started fd9: fund 0.3 (A) vs 0 (B), BABA half-hours 4:05–6:05 PM CT; read 6:08 PM pools fund8 + fd9 (8 half-hours, 4 h) → /opt/mvtrx/ab_read_fd9.txt.
+  Judge on whole-miner credit relative to 216 (x3/216 per arm), per fill second, look at two-sided share. If quality rises but balance falls → follow-up: fund 0.3 + stronger skew.
+
+## §1378 — 2026-11-10 6:12–6:20 PM CT — fund tilt: replicated quality gain + balance loss → cause found (lean ≈ 4 spreads); fund_cap built; capped test started
+- fd9 read (fund 0.3 = A vs 0 = B), whole-miner credit, x3 relative to UID 216 per arm:
+  | | x3 quality A / B | x3 two-sided A / B | credit x3/216 A | credit x3/216 B |
+  |---|---|---|---|---|
+  | fd9 alone (2 h) | 0.680 / 0.562 | 6.2 / 14.9 | 0.27 | 0.49 |
+  | pooled fund8+fd9 (4 h) | 0.671 / 0.514 | 22.0 / 46.7 | 0.52 | 0.62 |
+  216 quality flat (0.682 / 0.678). Per fill pooled: $300 +0.17 ± 0.18 (1.0 w), calm −0.09 ± 0.52, 4-dec −0.16 ± 0.35. No flash events.
+  → Clear loss on credit (both runs) → keep fund 0. But the quality gain (+0.16, x3 reaches 216's quality) replicated in both runs.
+- Cause (fundshift.py, last ≈ 2 wall h): the lean 0.3·|fundamental − mid| is median 4.1 spreads on $300 books (p90 16.6), 0.15 on calm (p90 54),
+  51 on 4-dec — > 0.5 spread 84% / 22% / 100% of the time. The fair price leaves the book, so x3 quotes one side only (the side the fundamental favours):
+  better fills, no balance. Stronger skew cannot fix a 4-spread shift (rejected the planned "fund + skew" follow-up).
+- Built: `fund_cap` (live knob, 0–5 spreads; 0 = old behaviour): lean clipped to ±fund_cap × spread (_fund_shift helper). test_pace ALL PASS (+6 checks).
+  Agent ce4049c8 (backup agents/QuoteAgent.pre-fundcap.py = 52798500). Gated restart 6:14 PM CT: registered, ActiveEnterTimestamp changed, "LIVE PARAMS applied: no change", 0 tracebacks.
+- Started fc10: A = fund 0.3 + fund_cap 0.5 vs B = fund 0, ABAB half-hours 6:35–8:35 PM CT (21 min after the restart), read 8:38 PM → /opt/mvtrx/ab_read_fc10.txt.
+
+## §1379 — 2026-11-10 8:45–8:50 PM CT — capped tilt lost; the fundamental LEVEL is the wrong signal, its MOVES predict $300 prices; fund-move lean built + test started
+- fc10 read (A = fund 0.3 + fund_cap 0.5 spread, B = fund 0, ABAB 6:35–8:35 PM): whole-miner credit x3/216 A 5.2/13.8 = 0.38 vs B 8.8/9.0 = 0.98;
+  quality x3 0.583 vs 0.544 (216 0.725 vs 0.644 — no relative gain); two-sided x3 8.9 vs 16.1 (still halved). Per fill: $300 −0.11 ± 0.25, calm +1.75 ± 0.65 (2.7 w),
+  4-dec +1.09 ± 0.66. → Clear loss on credit → keep fund 0 / fund_cap 0. The fundamental LEVEL lean is closed (3 tests: fund8, fd9, fc10).
+- Window-length check (fundflip.py): the short pooled windows (≈ 6 sim min) understate balance for everyone (x3 two-sided 29% there vs 78% over 3 sim h),
+  BUT the fundamental sits on the same side of mid 100% of a 3-sim-h block on $300 and 4-dec books (median 0 side flips per sim hour; calm 5.4/h).
+  So a level lean pins inventory one way for the validator's whole window — the balance loss is real. The level is a near-constant offset from mid.
+- Move signal (fundpred.py, sim 58,000+): on $300 books, Δf over the last 10 s > +0.5 spread → mid moves +0.158 spread over the next 20 s; < −0.5 → −0.139;
+  flat → +0.012 (n 12.6k / 166k / 12.4k). The level predicts only ±0.03–0.04. Calm / 4-dec: a general upward drift swamps it (no clean signal).
+  This matches the fleet's "fills after the fundamental moved its way" (§1368) and targets x3's $300 adverse move.
+- Built: `fund_mv` (live, 0–2), `fund_mv_cap` (live, 0–5 spreads, default 1), `fund_mv_s` (startup, 10 s), `fund_mv_vol_only` (startup, 1 = $300 only):
+  fair += fund_mv × (fundamental now − 10 s ago), clipped. History recorded every book every round (like _bbo_rec). test_pace ALL PASS (+9 checks).
+  Agent b0808f05 (backups pre-fundmv = ce4049c8). Gated restart 8:46:58 PM CT: registered, timestamp changed, "LIVE PARAMS applied: no change", 0 tracebacks.
+- Started fm11: A = fund_mv 0.5 (cap 1 spread) vs B = off, ABAB half-hours 9:10–11:10 PM CT (23 min after the restart), read 11:13 PM → /opt/mvtrx/ab_read_fm11.txt.
+
+## §1380 — 2026-11-10 ≈ 9:05 PM CT — deep dive: why x3 is below the median pay; overnight queue
+- paysplit.py (chain pay + live gauges, all UIDs): field median $212; skill-only median $288 (n 73), skill+making $198 (n 70), making-only $170 (n 106).
+  x3 (making-only) ranks 47 of 88 makers by live making credit. Making-only pay ≈ $0.335 per making point; the field median needs ≈ 632 (x3 ≈ 330).
+- topmk.sh (validator-exact, last 3 sim h): top makers 48/178/119/117/5/146 captured 2,180–2,500 vs x3 737 at the SAME quality (0.60–0.68 vs 0.598);
+  two-sided 0.85–0.90 of captured vs x3 0.79. UID 216: captured 726, quality 0.83 — a low-volume high-quality miner, not a top maker.
+- volbins.py / volper.py: x3 and 216 trade steadily ≈ $17–20k per book per sim hour; the top makers burst ($50–106k/book/sim h for 2–3 sim h, else $3–15k).
+  Several exceed $500k per book on 9.2 sim h of tape (119: 26 books, max $676k) — the cap (§1255) drops new placements only; resting orders keep filling.
+  x3's PACE STATUS: 103–111 of 128 books blocked by its own token bucket at any moment; 24-h ledger median $296k of $450k.
+- Conclusion: the gap is mainly VOLUME (bounded by our cap-safety rule), then balance, then quality. Volume levers need the user's yes (pacing rule).
+- Built fund_scope (live int 0–2: level lean on all / calm only / $300 only); test_pace ALL PASS (+4). Agent 23320fda staged (not loaded).
+  abtest_sched.sh = generic 4-half-hour A/B scheduler. Overnight queue + estimates: deploy/sn79/OVERNIGHT_2026-11-10.md.
+
+## §1381 — 2026-11-10 ≈ 9:45 PM CT — pace_cap 490k (user-approved) NOT applied: fails the cap attacks; top-maker timing study
+- test_pace attack suite at other pace_caps (agent 23320fda; hard cap $500k): 490k — $10k orders worst 24 h $506,159 FAIL, one $50k sweep $531,590 FAIL;
+  480k — sweep $523k FAIL; 470k — sweep $509k FAIL; 460k — sweep $502k FAIL; 455k — sweep $498k PASS (by $2k); 450k (live) — sweep $493k, ALL PASS.
+  → 450k is the safe maximum; no change (my 9:05 PM "+9% still under the cap" was wrong — it ignored the sweep case). Told the user.
+- burst.py (sim 52,000+): share of maker notional by state at fill time. Fast markets: no difference (94–98% of everyone's notional in quiet minutes).
+  Spread: $300 — x3 45% at ≤ 2 bp spreads vs top makers 32% (216: 46%); 4-dec — x3 24% vs top 16%; calm — top makers concentrate at 5–10 bp (55%), x3 at > 10 bp (49%).
+  → Copyable without pacing changes: skip the $300 touch order when the spread is < 6 ticks (mk_vol_touch_min 6; rejected 11-09 on per-fill only).
+  Overnight T4 replaced by vtm6 (whole-miner judged). The top makers' 3× volume itself is not copyable under our cap rule (bursts + resting fills past the cap).
+
+## §1382 — 2026-11-10 9:50 PM CT — CORRECTION: the "top makers" of §1380–§1381 are 0.4–1.1 days old (start-up burst); the real copy target is long-lived UID 46
+- User (≈ 9:55 PM): test trading past the cap on a NEW miner that copies the top makers' quoting; match their quoting before registering.
+- topquote.py / topdepth.py: past-cap fills are minor ($1.4M of $166M); per-UID fill counts/sizes ≈ x3's. ages.py: UIDs 48/178 (coldkey 5EA8Kgeh) and 119/117/5/146
+  (5DkwcgDZ) are 0.4–1.1 d old — newborns in their start-up period (x3 scored 707 on day 1). Copying them broke the CLAUDE.md rule (pacing/lifecycle only from
+  ≥ 7-d UIDs). §1380's "3× volume / bursts" and §1381's spread-timing finding came from them — VOID as copy targets.
+- paysplit2.py by age: making-only ≥ 7 d: n 19, median $178, p90 $210, max $219 (0–3 d median $181, p90 $355 = start-up). x3 $140 ranks 14 of 20 settled makers.
+  Realistic gap ≈ $40/mo (+27%), not 2–3×. → Recommend NOT registering a past-the-cap miner (none of the settled makers exceed $500k/book: llvol.py).
+- Settled top makers (validator-exact, last 3 sim h): 132 credit 710, 46 628, 3 605, 17/193 498, 21 432 vs x3 345 (216 427). UID 46 (7.9 d) trades the SAME notional
+  as x3 ($172k vs $176k/book on the tape, steady ≈ 16k/sim h) but captures 1,421 vs 731 (quality 0.76 vs 0.60).
+- u46.py: UID 46 depth in SPREADS (median / p90): $300 0.10 / 1.0 (x3 0.00 / 0.63); calm 0.33 / 1.13 (x3 0.00 / 1.50); 4-dec 0.17 / 1.10 (x3 0.00 / 0.30).
+  Order $: $300 touch 907 / ladder 1,349 (x3 1,034 / 1,694); calm ≈ 990 (x3 1,796); 4-dec ≈ 360–420 (x3 ≈ 4,400 at 0.09). 46 never steps ahead on $300 (0%).
+  Fills: 46 ≈ 26.7k vs x3 15.1k on the tape — more, smaller fills spread over depth, same dollars.
+- Plan: overnight T2 = "profile46" on x3 (live knobs, cap-safe): mk_vol_inside 0, mk_vol_size 0.022, mk_vol_lad 1:2:4:7, mk_vol_lad_size 0.027, mk_calm_lad 1:2:3,
+  mk_calm_lad_size 0.02, mk_dec_inside 0, mk_dec_size 0.009, mk_dec_deep 0.27 — vs current. Judged on whole-miner credit + fill-depth match to 46 (in spreads).
+  The CLAUDE.md past-cap exception is ON HOLD pending the user (its basis was wrong).
+
+## §1383 — 2026-11-10 11:17 PM CT — fm11 (fundamental MOVE lean) = no effect, kept OFF; restart onto 23320fda; T2 profile46 scheduled
+- fm11 (A = fund_mv 0.5 on $300, B = off; ABAB 9:10–11:10 PM): x3 credit A 7.2 vs B 7.7 (216 reference 16.1 vs 9.8 — too noisy for a ratio); x3 quality 0.646 vs 0.573
+  (216 0.780 / 0.770); two-sided 11.2 vs 13.4. Per fill: $300 −0.10 ± 0.29 (the target — no effect), calm +2.11 ± 1.31 (fund_mv does not touch calm → noise),
+  4-dec −0.85 ± 0.59. → No measurable effect on the $300 adverse move; credit not better → kept OFF (fund_mv 0). APPLY logged 11:17:25 PM.
+  So the Δf signal (§1379) does not convert into kept spread at this size; not pursued further tonight (T4 = skew8).
+- Gated restart 11:17:34 PM CT onto agent 23320fda (fund_scope): registered, timestamp changed, "LIVE PARAMS applied: no change", 0 tracebacks, quoting.
+- T2 profile46 (copy settled UID 46's quoting, §1382) scheduled ABAB 11:45 PM–1:45 AM CT (05:45–07:45 UTC), read 1:48 AM → /opt/mvtrx/ab_read_profile46.txt.
+
+## §1384 — 2026-11-11 1:52–1:58 AM CT — profile46 (copy settled UID 46) = whole-miner tie; adopted for $300 + calm, 4-dec kept; ABAB order bias found
+- profile46 (ABAB 11:45 PM–1:45 AM): x3 credit A 3.8 vs B 3.6 (captured 42.3 vs 40.6, quality 0.648 vs 0.654, two-sided 5.9 vs 5.4) — tie; 216 reference 14.7 vs 8.3 (noise).
+  Per fill: $300 −0.20 ± 0.43, calm +2.03 ± 0.68 (3.0 w), 4-dec −0.60 ± 0.51.
+- depthab.py (fill depth in SPREADS, A vs B windows): $300 A p75 0.22 / p90 1.00 (UID 46 p90 1.00), 0% ahead of touch vs B 34%; $ 223k vs 198k.
+  calm A ≈ B (the calm TOUCH order uses `size`, not live → still $1.76k). 4-dec A: $440 orders → $ 32k vs 148k (−78%): x3 does not get 46's fill count with small orders.
+- ORDER BIAS: calm per-fill "A +≈ 2" appeared in fc10 (+1.75), fm11 (+2.11 — fm11 does not touch calm!) and profile46 (+2.03), all ABAB; BABA fd9 showed −0.09.
+  ABAB puts A at positions 1,3 and B at 2,4 → a steady drift in the calm gap reads as an A effect. → calm per-fill results from ABAB tests are not trusted;
+  remaining tests run ABBA (cancels a linear drift).
+- Decision (rule 2 tie, per group): $300 + calm adopt UID 46's quoting (mk_vol_inside 0, mk_vol_size 0.022, mk_vol_lad 1:2:4:7 @0.027, mk_calm_lad 1:2:3 @0.02);
+  4-dec keeps the 9 PM quoting (dec_inside 1, size 0.09, deep 0.27). Applied 1:55 AM ("LIVE PARAMS applied" OK). T5 confirm will test the package vs the 9 PM base.
+- T3 calmfund scheduled ABBA 2:00–4:00 AM CT, read 4:03 AM.
+
+## §1385 — 2026-11-11 3:25–3:40 AM CT — daily tape rotation would have blinded the A/B reads; fixed
+- Brief 3:25 AM: selftrade.py counted only 143 x3 fills "in the last ~200 MB" (normally ≈ 1,100–1,300). x3 was fine (≈ 25–40 fills/min, 1,765 ON BOOK lines in 10 min,
+  PACE STATUS normal). Cause: mvtrx-taperotate (§1236, 09:07 UTC = 3:07 AM CT daily) moved the last 1 GB to live_tape_x3.jsonl.prev (sim 59,864–71,687) and
+  truncated the live tape (now from sim 71,688). abcredit.sh / abwin reads used ONLY the live tape → the calmfund read (windows from sim 70,895) would have lost 2:00–3:07 AM.
+- Fix: tape_ab.sh builds tape_ab.jsonl = .prev + live; abcredit.sh reads $TAPE (default live tape); abread_calmfund.sh and abtest_sched.sh's read template use it
+  (and delete it after). Syntax-checked. Earlier reads were before the first rotation of the busy tape, so unaffected.
+
+## §1386 — 2026-11-11 4:07 AM CT — calmfund (calm-only capped level lean) LOST → off; T4 skew8 scheduled (ABBA)
+- calmfund (ABBA 2:00–4:00 AM; read on .prev + live tape, §1385): x3 credit A 6.5 vs B 10.3 (x3/216 0.45 vs 0.58); quality 0.538 vs 0.606; two-sided 12.2 vs 17.0.
+  Per fill: calm −0.18 ± 0.58 (the target — no effect), $300 −1.07 ± 0.56 (not touched by a calm lean → B windows held 48 vs 4 one-second ≥ 1% $300 jumps = flash
+  luck), 4-dec 0.00 ± 0.65. → Loss on credit, no calm effect → fund/fund_cap/fund_scope 0. CONFIRMS §1384: the "+2 calm" of the ABAB tests was order bias.
+  The fundamental-lean line is closed (level all books, level capped, move, calm-only: 4 tests, no gain).
+- T4 skew8 (skew 8 vs 5, ABBA 4:15–6:15 AM, read 6:18 AM → /opt/mvtrx/ab_read_skew8.txt).
+
+## §1387 — 2026-11-11 6:22 AM CT — skew8 inconclusive (kept 5); x3 live score drifting since the 1:55 AM quoting change → T5 confirm (ABBA) started
+- skew8 (ABBA 4:15–6:15 AM): x3 credit A 0.0 vs B 1.3 (216 9.0 / 15.5); captured 38.4 / 29.1 (lower than every earlier pooled read, 42–55); two-sided 0.0 / 2.6
+  (earlier reads 5–17). Per fill: $300 −0.06 ± 0.28, calm +0.14 ± 0.67, 4-dec +0.31 ± 0.68 — ties. → not clear → skew 5 kept.
+- bal.py (tape): x3 notional per 391-sim-s block steady ≈ $300k, $300 notional two-sided 17–25% throughout — no collapse in raw trading; the validator's
+  two-sided is CAPTURE-based (2·min of per-side captured spread) → near-0 means one side's fills were marked against x3 on most books in those pools.
+- Live making gauge 330 → 304 since ≈ 1:55 AM (UID 46 quoting on $300 + calm). T5 confirm = exactly that question: A = all overnight winners (current live params)
+  vs B = the 9 PM base, ABBA 6:30–8:30 AM, read 8:33 AM; decision 8:37 AM. A 3-sim-h validator-exact decomposition (now vs 2 sim h earlier) is running (now3h.sh).
+- §1387 addendum (6:45 AM): now3h.sh — validator-exact last 3 sim h (sim 63,202–74,002): x3 credit 341.7, captured 704, quality 0.604, two-sided 566 (0.80 of captured)
+  vs §1380 (sim 56,989–67,789): 344.5 / 731 / 0.597 / 577 (0.79). → x3 UNCHANGED over the validator's real window; the near-0 two-sided of the pooled skew8 read is a
+  pooling artifact (two 30-min chunks per arm), and gauge 304 is noise around ≈ 340. (The "earlier" window was cut by the 3:07 AM rotation — .prev starts at sim 59,864 — ignored.)
