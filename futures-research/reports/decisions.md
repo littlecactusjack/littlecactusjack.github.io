@@ -22184,3 +22184,203 @@ Validator-exact credit (making_exact.py, 3-sim-h windows on live_tape_x3; reprod
 - §1387 addendum (6:45 AM): now3h.sh — validator-exact last 3 sim h (sim 63,202–74,002): x3 credit 341.7, captured 704, quality 0.604, two-sided 566 (0.80 of captured)
   vs §1380 (sim 56,989–67,789): 344.5 / 731 / 0.597 / 577 (0.79). → x3 UNCHANGED over the validator's real window; the near-0 two-sided of the pooled skew8 read is a
   pooling artifact (two 30-min chunks per arm), and gauge 304 is noise around ≈ 340. (The "earlier" window was cut by the 3:07 AM rotation — .prev starts at sim 59,864 — ignored.)
+
+## §1388 — 2026-11-11 8:37–8:50 AM CT — T5 confirm: overnight package WINS (kept); T6 decin0 started; morning draft; x1 unit ready
+- confirm (ABBA 6:30–8:30 AM; A = $300 UID 46 quoting + calm ladder 1:2:3 @0.02 + 4-dec old; B = 9 PM base): x3 credit A 9.9 vs B 4.5 (216 9.2 / 9.8 → x3/216
+  1.08 vs 0.46); quality 0.642 vs 0.546 (216 0.652 / 0.637); two-sided 15.4 vs 8.2. Per fill: $300 own kept +0.88 vs +0.63 (gap −0.33 ± 0.28), calm +0.89 ± 0.55
+  (ABBA — not order-biased), 4-dec −0.47 ± 0.43 (same 4-dec settings in both arms → noise). → Package KEPT, applied 8:4x AM ("LIVE PARAMS applied" OK).
+- T6 decin0: 4-dec no stepping ahead (mk_dec_inside 0 vs 1, same size), ABBA 8:45–10:45 AM, read 10:48 AM.
+- x1 unit: identical to x3 except hotkey x1 / port 8101 / no tape (x3's tape covers all); agent 23320fda, lock_dir shared, pace 450k; disabled. live_params_<uid>.json to be
+  copied from x3 once the UID is known. MORNING_2026-11-11.md drafted.
+
+## §1389 — 2026-11-11 10:52 AM CT — T6 decin0 contaminated by a market event; kept mk_dec_inside 1; morning summary final
+- decin0 (ABBA 8:45–10:45 AM; A = 4-dec no stepping ahead, B = 1 tick ahead): flash exposure A 69 vs B 673 one-second ≥ 1% $300 jumps — a big volatility episode in
+  the B hour (9:15–10:15). Whole-miner: x3 A captured −48.6 (quality 0) vs B 85.0 / credit 8.5; 216 A 135.9 vs B 221.1 (≈ 4× normal) → unusable.
+  Per fill: 4-dec −1.11 ± 0.66 (1.7 w, against A), $300 0.00 ± 1.01, calm −0.21 ± 0.66. → Not a tie and contaminated → kept mk_dec_inside 1 (APPLY 10:52:27 AM).
+- Live gauges: ≈ 9 AM both x3 and 216 dropped (validator-side), then 216 recovered (320 → 399) while x3 slid (273 → 254). A 3-sim-h validator-exact re-score is running.
+- MORNING_2026-11-11.md finalised (pay $138/mo at 10:55 AM; prune line $107 → 1.29×). No new test started (user returning; may register x1).
+- §1389 addendum (11:15 AM): now3h.sh (sim 66,489–77,289, includes the 9:15–10:15 volatility burst): x3 captured 637 (6:45 AM read: 704), quality 0.838 (0.604),
+  two-sided 349 = 55% (80%), credit 293 (342), field share 0.17% (0.44%); 216 captured 949, quality 0.72, two-sided 64%, credit 439, share 0.25%.
+  → x3's quality ROSE (consistent with the UID 46 quoting) but the burst made it one-sided and the field's captured ballooned (our steady pacing cannot scale into
+  high-activity bursts) → share fell. Expected to recover as the burst leaves the 3-sim-h window (≈ 14 wall h). Open idea: let pacing spend more during
+  high-activity episodes within the cap (needs a cap-safety design + the user's yes).
+
+## §1390 — 2026-11-11 ≈ 12:15 PM CT — second maker x1 = UID 27 registered (user) and started on x3's setup
+- User registered hotkey x1 → UID 27 (regcheck: x1 27 REGISTERED, x3 64 REGISTERED). Purpose: measure collisions between our identical makers (memory mvtrx-second-miner-plan.md).
+- Started mvtrx-x1 (enabled): agent 23320fda (= x3), live_params_27.json = copy of x3's (UID 46 quoting on $300 + calm ladder 1:2:3 @0.02, 4-dec 1 tick ahead,
+  skew 5, fund leans 0) — "LIVE PARAMS applied" OK; shared lock_dir (anti-self-trade handshake); pace 450k + 100k start; no own tape (x3's covers all).
+  First minutes: 608 ON BOOK lines, 23 fills, pace ledger written, 0 errors.
+- our_uids.txt: "27 maker x1 78259" (start sim). selftrade.py widened: a self-trade is now ANY fill between two of our UIDs (maker-maker included, not only our
+  takers) — 0 so far. Backups *.pre-x1.
+- Watch plan: self-trades (must stay 0), x3's fills/credit vs its pre-x1 level (≈ 340 over 3 sim h), counterparty overlap (P11), x1's start-up curve.
+
+## §1391 — 2026-11-11 12:20 PM CT — x1's head start crowds x3 at once; history check (§1289); pacing verified
+- User asked: did the last session have our miners quoting against each other? Yes — §1289 (11-08): adding x2 + x4 (identical, same books) cut x3's pay
+  $158 → $56 in 6 h (three makers $94 < x3 alone); self-trades were 0 (lock handshake) — the damage was competition for the same fills (then blamed on x3's
+  skill collapse; x3 is making-only now). The mod-3 book split was undone after 30 min, never measured.
+- x1 (UID 27) head start: pace_start 100,000 per book (bucket starts at max(burst, 100k)); 24-h backstop pace_cap 450k (front-loaded start passes test_pace).
+  First 196 sim s after start (sim 78,259): x1 1,565 fills / $1.28M; x3 34 fills / $27k vs ≈ 104–139 fills / $87–157k per block before → x3 ≈ 25–30%.
+  x1's ledger is recording (pace_27.ledger growing, entries per fill) → cap-safe. Self-trades 0.
+- Expectation: x1's start budget is spent within ≈ 2–3 wall h; afterwards both pace at 18.75k/book/sim h. Before x1, x3 was pace-blocked on ≈ 85% of books (fill
+  supply > one paced maker), so two paced makers may both fill. Test: x3 fills/credit back to its pre-x1 level after the head start (check ≈ 3 PM and tomorrow AM).
+  Fallback if not: book split (each UID half the books) — only helps if competition (not pacing) limits fills.
+
+## §1392 — 2026-11-11 ≈ 12:45 PM CT — how multi-UID owners run 20+ identical makers on the same books (user: book splits can't scale)
+- fleets.py (chain + gauges): 5F1F2JMu 40 UIDs (21 making-only, 22 ≥ 7 d), $7,287/mo total, median $171, making median 384 ≈ x3 alone; 5EA8Kgeh 19 UIDs (median age
+  2.9 d — re-registers for start-up bursts), $8,250 total, median $382; others smaller.
+- fleetcol.py (sim 75,250–78,250, before x1): 10 settled fleet makers (7, 40, 52, 55, 87, 102, 110, 132, 166, 183) each trade 125–128 books (all), $21–31k per book per
+  sim h (x3 $18.2k), fill $ median $1,800 (x3 now $1,016), near-identical depth profiles; 47–71% of each UID's fills land within ±2 sim s of another fleet UID's fill
+  on the same book+side, 61–71% of those at the SAME price → stacked in the same queues, no book split, no staggering. Same-minute fleet UIDs per book: median 2,
+  p90 6, max 10. The 10 together: $231k per book per sim h (≈ 13× x3).
+- → Fill supply is far above one paced maker's take; identical makers add volume, they don't split a fixed pool. §1289's collapse (11-08) lines up with x3's
+  skill loss + the newcomers' head starts, not overlap as such. Scaling on all books without splits looks workable; the x1 test after its head start (≈ 3 PM)
+  is the check. Fleet UIDs pace 1.2–1.7× faster than our 450k/24 h bucket (part of their per-UID edge) — any pacing change needs test_pace + the user's yes.
+- §1391 correction (12:45 PM): the "x3 34 fills" block was INCOMPLETE (still in progress). Full blocks after x1's start: x3 122 fills / $126k and 98 / $104k vs 104–139 /
+  $109–157k before → x3 NOT crowded so far; x1 4,919 / $4.0M then 3,547 / $3.1M (≈ 60% of its $100k-per-book start spent). Self-trades 0. Gauges: x3 242, x1 101.
+
+## §1393 — 2026-11-11 1:35 PM CT — user: one-miner-per-day RETIRED; x3 = the test subject (x1 + later untouched); afternoon x3 tests queued
+- User (≈ 1:20 PM): drop the one-miner-per-day rule (CLAUDE.md + memory updated); (≈ 1:25 PM): keep testing on x3 to lift it toward the median; x3 is the test
+  subject; x1 and every later miner stay untouched unless x3 proves a change without a doubt (memory feedback-x3-test-subject.md).
+- x2 unit rebuilt as an exact copy of x1 (hotkey x2, port 8102; backup mvtrx-x2.service.pre-x1copy), disabled — ready for a ≈ 7 PM go/no-go.
+- x3 tests (liveswitch scripts write ONLY live_params_64.json): decin0b (re-run of §1389's ruined 4-dec test) ABBA 1:45–3:45 PM; vsize ($300 touch $1.7k vs $1.1k)
+  ABBA 4:00–6:00 PM. Decisions 3:52 PM and 6:07 PM (void if flash exposure differs > 3×).
+- §1393 add. (1:50 PM, user): x3 tests are judged against UID 46 ONLY (memory feedback-ref-uid46.md) — no other miners as targets; beyond 46, our own
+  improvements. Reads switched: abwin fleet=46 (per fill), abcredit lists 64 / 46 / 216 (216 = drift check) — abtest_sched.sh, abcredit.sh, abread_decin0b.sh
+  (backups *.pre-46). (The §1392 "$1.8k" size came from settled ≥ 7-d fleet UIDs, but one reference keeps tests clean.) vsize reframed as our own test
+  ($1.7k = x3's old size vs $1.1k = 46's). Note: UID 46 now also earns SKILL (1.40 on 30 books; making 428) → compare making only.
+
+## §1394 — 2026-11-11 3:52 PM CT — decin0b (4-dec no stepping ahead, re-run) LOST → kept 1; vsize started; tape-size false alarm
+- decin0b (ABBA 1:45–3:45 PM; reference UID 46; flash exposure A 0 / B 0 → valid): x3 credit A 0.0 vs B 3.4 (quality 0.119 vs 0.535; captured 24.8 vs 35.8);
+  UID 46 2.7 / 3.3 and 216 2.3 / 1.1 (no big drift). Per fill vs 46: 4-dec −0.40 ± 0.79, calm −0.71 ± 1.00, $300 −0.55 ± 0.47. → Clear whole-miner loss → kept
+  mk_dec_inside 1 (x3 and x1 identical again). Copying 46's 4-dec "rarely step ahead" does not work for x3 (twice: §1384 small sizes, §1394 inside 0).
+- Fill stretches (196 sim s) with x1 at normal pace: x3 81, 100, 129, 90, 107 / x1 98, 109, 99, 101, 107 → x3 within its pre-x1 range (104–139, one 79 before x1).
+- False alarm: `ls -la | cut -c25-` chopped the tape size (showed "19925133"); stat: live 820,196,006 B, .prev 999,999,731 B — no truncation. selftrade.py's
+  "fills in the last ~200 MB" fell because the busier tape packs fewer of our fills per 200 MB.
+- vsize (x3 only; own test): $300 touch 0.034 vs 0.022, ABBA 4:00–6:00 PM, read 6:03 PM (fleet=46 per fill).
+
+## §1395 — 2026-11-11 4:30 PM CT — is UID 216's new skill a viable strategy? No: a market-wide windfall (analysis only, no miner changes)
+- User: is 216's skill strategy viable for weeks (copy it → fewer miners)? (Reminder: make + skill on one miner caused problems before.)
+- skillnow.py (live gauges): 100 of 169 makers (making > 100) have skill > 0 now; fleet settled makers 10 of 11 at 0.26–2.16 with 21–25 skill books kept
+  (yesterday/this morning: skill 0, books kept 13–18). 216 skill 0 for days → 0.82 at 11:24 AM → 2.2–2.8 since. Starts right after the 9–10 AM volatility burst.
+  → For a pure maker, skill = de-beta'd inventory P&L; the burst handed makers positive alpha on many books, lifting them over the 20-book skill bar. Same
+  3-sim-h window + smoothing → expected to fade as the burst rolls out (≈ 14 wall h). 216's pay $196 → $477 is that windfall. Not a copyable strategy.
+- x3 skill books kept 17 (bar 20), x1 10 → just under; books qualify with enough trades in the window — fleet trades 1.2–1.7× per book (pacing; ours is at the
+  cap-safe max). Nothing to build: aiming at skill on makers breaks the user's rule (feedback-no-skill-on-makers.md). Track 216/fleet skill through 11-12.
+
+## §1396 — 2026-11-11 6:07 PM CT — vsize ($300 touch $1.7k vs $1.1k) = tie → kept $1.1k (UID 46); x3 and x1 identical again
+- vsize (ABBA 4:00–6:00 PM; reference UID 46; flash exposure 0 / 0): $300 per fill −0.02 ± 0.66 (the target — tie). Whole-miner pools too thin (x3 captured 24.0 / 13.5,
+  two-sided 0 in both arms; 46 1.5 / 2.8; 216 3.1 / 0.0) → unreadable. 4-dec per fill +1.06 ± 0.37 (2.9 w) — vsize does not touch 4-dec → noise (ignored).
+  → Tie → kept mk_vol_size 0.022. Note: pooled captured per arm has shrunk all afternoon (busier field, x1 sharing) — 2-h pools are getting too thin for
+  whole-miner reads; next x3 tests should run 4 h or read whole-miner over a full 3-sim-h window.
+
+## §1397 — 2026-11-11 ≈ 6:20 PM CT — why x3's live score slid (≈ 340 → 171); x2 go/no-go input
+- now3h.sh (sim 71,744–82,544 — window still contains the 9–10 AM burst AND x1's head start): x3 captured 504 (6:45 AM read 704), quality 0.859, two-sided 225
+  (45% of captured; was 80%), credit 193.5, share 0.12%; x1 captured 725, quality 0.388, two-sided 498 (69%), credit 193.2; UID 46 1,356 / 0.648 / 499 / 323;
+  216 839 / 0.694 / 502 / 349.
+- inv.py (notional): x3 $6.58M over the 3 sim h, notional two-sided 90%, 0 books > 80% one-sided → x3 is NOT trading one-sided; since x1 started (sim 78,300+):
+  x3 $2.53M vs x1 $11.25M (x1's $9M head start dominates).
+- Reading: x3's volume per 3 sim h is unchanged (≈ $6.6M, as on 11-10) but captured per $ fell ≈ 30% and the capture-based two-sided fell 80% → 45% (one side
+  of its fills marked against it on many books) — consistent with the burst + a more crowded book (x1's head start at the same prices + the field's skill-windfall
+  activity); x1 is not taking x3's fills (fills per stretch normal) but its head start sits in the same window. Cannot separate the two causes until both leave
+  the 3-sim-h window (≈ 14 wall h → tomorrow ≈ 8–10 AM).
+- Recommendation: NO-GO for x2 tonight — another head start would add a fresh burst to the window while x3 sits ≈ 1.2× the real prune line, and would hide the
+  answer; re-check tomorrow ≈ 9–10 AM with a clean window (x3 credit back toward ≈ 300+ with x1 at steady pace → GO).
+- §1397 add. (6:48 PM go/no-go): NO-GO for x2 tonight. Self-trades 0; combined pay $176 (x3 $124 + x1 $52) > x3 alone $140; but x3 fills per stretch now steady
+  86–98 ($95–129k) vs pre-x1 104–139 (≈ 15–20% lower) while x1 runs 100–125 — a mild fill collision; x3 live making 173 → 153; x3 ≈ 1.2× the real line.
+  Re-check tomorrow ≈ 9–10 AM on a clean window (burst + x1 head start gone): x3 back toward ≈ 300 with ≈ 100+ fills/stretch → GO; else quantify the per-miner
+  cost vs combined gain for the user.
+
+## §1398 — 2026-11-11 ≈ 7:45 PM CT — where UID 46 out-earns x3: edge per $ on $300 and 4-dec; two x3 tests queued (user: keep improving x3)
+- grpcap.py (last 3 sim h; edge = fill vs pre-trade mid): $300 x3 +2.11 bp on $3.27M ($450k/book/24 h, pace-bound, spread at fill 2.3 bp) vs UID 46 +6.10 bp on
+  $2.37M ($300k, 3.2 bp); calm x3 +5.36 vs 46 +5.57 (equal); 4-dec x3 +1.53 bp on $1.46M ($449k, pace-bound) vs 46 +15.85 bp on $0.71M ($219k).
+  → x3 spends its whole volume budget at the touch where edge is thin; 46 trades less, deeper / at wider spreads, 3–10× edge per $. With x3 pace-bound,
+  swapping thin touch fills for deep fills raises captured spread directly.
+- T1 vtm (x3 only, live): $300 mk_vol_touch_min 6 vs 0, AABBBBAA (1-h blocks, 4 h — 2-h pools too thin, §1396) 7:45–11:45 PM, read 11:48 PM.
+- Built mk_dec_touch (0 = 4-dec deep-only) + mk_dec_deep2 (second deep level, spreads) — live knobs, defaults = old behaviour; test_pace ALL PASS (+7).
+  Agent 50767f6c staged. Plan: 11:52 PM decide vtm → gated x3 restart onto 50767f6c → T2 decdeep (4-dec deep-only 0.27 + 0.6 spreads vs touch + one deep),
+  AABBBBAA 12:20–4:20 AM, decision 4:27 AM. x1 untouched (it loads the new file only on its own restart; identical by default).
+- Note: x3's 3-sim-h window for the 9:37 AM collision check will include test arms.
+
+## §1399 — 2026-11-11 7:55 PM CT — sim day resets ≈ 11:10 PM CT tonight: vtm reshaped to end before it; self-trade guard fixed for the reset
+- Sim 83,735 at 7:45 PM; ≈ 782 sim s per wall h → 86,400 → 0 at ≈ 11:10 PM CT. A/B windows are logged in sim seconds, so a window across the reset breaks the reads.
+- vtm reshaped (x3 only): A 7:45–8:45, B 8:45–10:15, A 10:15–10:55 PM, END 10:55, read 10:58 PM (≈ 105 min A / 90 min B, A-B-A order). Timers vtm-5..7/end/read
+  stopped; new vtm-5c / endc / readc. (First attempt read the JSON from already-fired transient units → empty strings → caught and recreated from the switch log.)
+- selftrade.py / watchdog skip fills before each UID's start sim (x3 28,750, x1 78,259) → after the reset every new fill would be ignored. simreset_uids.sh (timers
+  05:25 + 06:00 UTC) sets the starts to 0 once the live tape shows the new sim (last ts < 20,000), backup our_uids.txt.pre-simreset, alert line.
+- After the reset: decdeep (12:20 AM) and the 9:37 AM check run entirely in the new sim (tape .prev starts at old-sim 59,864+ → no overlap with new-sim times).
+
+## §1400 — 2026-11-12 12:40–12:50 AM CT (11:52 PM step ran 48 min late: laptop off) — vtm no effect → kept; x3 restarted onto 50767f6c; decdeep 1:10–5:10 AM
+- Sim reset handled: simreset_uids.sh 11:25 PM saw tape ts 86,340 (not yet) → no change; 12:00 AM saw ts 854 → our_uids starts set to 0; selftrade 0.
+- vtm (A 7:45–8:45 + 10:15–10:55, B 8:45–10:15; flash 0/0): whole-miner unreadable (x3 two-sided 0 both arms; quality 0.24 / 0.21). $300 per fill vs 46 −0.25 ± 0.32.
+  grpcap per window (x3 $300): A1 edge +1.44 bp / spread at fill 2.1 bp; B +1.39 / 2.2; A2 +1.31 / 1.8 → skipping the touch at tight spreads did NOT move x3's
+  fills to wider spreads or raise edge per $ — it only cut fills (A1 238 vs B 440 per similar time). → kept mk_vol_touch_min 0.
+- Gated restart 12:41:35 AM CT onto agent 50767f6c (mk_dec_touch / mk_dec_deep2, defaults = old): registered, timestamp changed, LIVE PARAMS re-applied, 0 tracebacks,
+  218 ON BOOK lines in the first minute. x1 untouched (old code in memory; identical by default).
+- decdeep scheduled AABBBBAA 1:10–5:10 AM (07:10–11:10 UTC), read 5:13 AM; decision 5:17 AM judged on 4-dec edge per $ / edge $ (grpcap) since pooled
+  whole-miner reads are too thin.
+
+## §1401 — 2026-11-12 ≈ 1:00 AM CT — server-side test queue while the laptop is closed (x3 only; no decisions until I'm back)
+- Laptop closed → session one-shots (5:17 AM decdeep decision, 9:37 AM collision check) fire only when it reopens. Every test's END restores the proven setting,
+  so x3 sits on proven params between tests; nothing is adopted without a read + decision.
+- abgrp.sh <name>: appends per-window edge per $ (grpcap.py, x3 + UID 46 rows) to ab_read_<name>.txt (the deciding read for book-group tests, §1400).
+- Queue (AABBBBAA, 4 h each, lab timers): decdeep 1:10–5:10 AM (+ edge read 5:20); vtouch = $300 touch order 0.011 ($0.55k) vs 0.022 ($1.1k) so more of the
+  paced budget goes to the deep ladder, 5:15–9:15 AM (+ edge read 9:25); decdeep1 = 4-dec deep order 0.5 vs 0.27 spreads (UID 46 4-dec depth p75 0.47),
+  9:20 AM–1:20 PM (+ edge read 1:30 PM). x1 untouched.
+
+## §1402 — 2026-11-12 ≈ 1:00 AM CT — user: laptop stays open; 2-h x3 tests with decisions in between (x3 near the prune line; scaling will hit settled miners)
+- Cancelled the 4-h server-side queue (§1401; no timer had fired). decdeep rescheduled ABBA 1:10–3:10 AM (read 3:13, edge-per-$ 3:16), decision one-shot 3:20 AM.
+- X3_TEST_QUEUE.md: decision procedure (edge per $ in the changed group decides; ≥ ≈ 20% up + edge $ not down + per fill not clearly worse = win; thin → extend
+  2 h; else keep proven) and the ordered queue: decdeep → vtouch → decdeep1 → vlad → vladsz → decsz. Each decision step starts the next test and creates the next
+  decision prompt. x1 never changed.
+
+## §1403 — 2026-11-12 1:00–1:30 AM CT — NEW SIM DAY HAS 256 BOOKS (layout changed); our book groups were wrong on ≈ 90 books; book_map built + tested on x3
+- x3 PACE STATUS after the reset listed 238 traded books (worst book 221). newbooks.py / books2.py (new sim, ts < 30,000): 256 books — 0–127 ≈ $299.5 2-dec (spreads
+  0.7–1.8 bp; the old wide-spread "calm" group is gone), 128–191 ≈ $29.6 2-dec (2-tick = 6.8 bp spreads, NEW), 192–255 ≈ $311 4-dec (0.8–2.7 bp, NEW).
+- Our agent hard-coded groups by id (< 63 vol, 63–101 calm, ≥ 102 dec) → books 102–191 got the 4-dec pattern, which cancels everything when the spread is
+  < 3 ticks → x3 and x1 barely quote ≈ 90 books (x3 ≈ $16–60k per 8 books there vs ≈ $500k+ per 8 on 224–255). Pacing is per book → lost volume / credit.
+- decdeep (4-dec deep-only, would have applied to 154 books) cancelled before it started. My STOP command at 1:05 AM (log not created yet) wrote an EMPTY
+  live_params_64.json for ≈ 1 min — the agent logged "no change" (unreadable file = nothing changes); restored from live_params_27.json (identical proven values).
+- Built book_map (live string, "" = legacy ranges; e.g. "calm:63-101;dec:192-255", unlisted = vol) replacing every hard-coded range (15 sites: sizes, ladders,
+  calm/dec patterns, pulls, fund scopes, ins-over stats); bad specs ignored. test_pace ALL PASS (+4; one source-text check updated). Agent 12372763; gated
+  x3 restart 1:09 AM CT (07:09:00 UTC), "LIVE PARAMS applied", 0 tracebacks. x1 untouched (still legacy ranges in memory).
+- grpcap.py groups by the new layout (LAYOUT=256: $300 0–127 / $30 128–191 / 4dec 192–255).
+- Test bmap on x3: A "calm:63-101;dec:192-255" (102–191 → $300 ladder) vs B "" (legacy), ABBA 1:30–3:30 AM, read 3:33, edge-per-$ 3:36, decision 3:40.
+
+## §1404 — 2026-11-12 ≈ 1:30 AM CT — user: new-regime tests first; when x3 works on all 256 books put x1 + x3 on it (pre-approved); UID 46 on the new books
+- regime46.py (new sim): $30 books (128–191): x3/x1 on 39–46 books, 67–79% of fills AHEAD of the touch (4-dec pattern on a 2-tick spread), $4.5k fills, edge
+  +2.9 bp; UID 46 on all 64 books at the touch, 0% ahead, $1.8k, +4.4 bp. New 4-dec (192–255): x3/x1 ≈ $2.8M each at +0.9 bp (median depth 0 / −1 ticks);
+  46 $0.14M at median 202 ticks deep, +2.6 bp. $300 (0–127): x3/x1 depth ≈ 1 tick, +1.1–1.2 bp; 46 ≈ 3 ticks, +1.5 bp.
+- bmap's A (102–191 → $300 ladder: touch, never ahead, $1.1k) ≈ 46's $30-book behaviour. Queue re-ordered: bmap → decdeep (new 4-dec deep-only) → vlad
+  (deeper $300 ladder) → decdeep1 → vtouch → sizes; each later test runs on the bmap winner's map. A clear 256-book win goes to x1 too (user pre-approval).
+
+## §1405 — 2026-11-12 ≈ 2:40 AM CT — new sim day, validator-exact by book group: $30 books earn, new 4-dec books lose, x3's $300 hurt by its full pace ledger
+- making_grp.py (new sim 0 → ≈ 2,000 s; C = captured, R = realized): x3 $30 C +44.7 / R +50.8, $300 0–101 +9.6 / −20.2, $300 102–127 −2.3 / −6.6, 4dec 192–255
+  +22.0 / −24.4; x1 $30 +70.0 / +62.5, $300 0–101 +69.1 / +5.7, 102–127 −1.0 / −3.0, 4dec +27.5 / −17.4. Worst books for BOTH: 4-dec 214, 195, 230, 240, 203.
+- (1) The $30 books are where the money is (both miners positive) → bmap's A (touch, never ahead, $1.1k there) points the right way (x3 $30 fills 14 → 118 in the
+  first minutes after the switch). (2) The new 4-dec books lose money for both (≈ $2.8M each at/ahead of the touch) → decdeep (deep-only there) is next.
+  (3) x3 trails x1 on $300 because its 24-h ledger is full of 11-11 volume (PACE STATUS 200 of 256 books blocked, median $397k of $450k) while x1 (young,
+  $113k) has budget — a pacing-age effect, not x1 taking x3's fills; it fades as 11-11's volume ages out. Also: pace_start gives every never-seen book a $100k
+  start budget → both miners burst on books 128–255 after the reset (cap-safe: 24-h backstop 450k).
+
+## §1406 — 2026-11-12 3:40–3:50 AM CT — bmap = CLEAR WIN → book map applied to x3 AND x1 (x1 restarted onto 12372763); decdeep started
+- bmap (ABBA 1:30–3:30 AM, flash 0/0). edge-per-$ (grpcap, x3): $30 books A 178 / 180 fills, $196k / $198k, edge +2.86 / +2.93 bp, edge $ 56 / 58 per half-hour vs
+  B 5 / 8 fills, $16k / $29k, +1.69 / +2.04 bp, $3 / $6; $300 0–127 unchanged (+1.31–1.34 bp, edge $ 19–25 both); 4dec unchanged (+0.45–0.83 bp). Whole-miner
+  x3 A captured 48.2 / R +23.0 vs B 4.1 / −3.2. → CLEAR WIN. (Per-fill "calm −1.15" / "4-dec +0.78" rows use the legacy groups and are ignored.)
+- Applied: x3 via liveswitch_bmap.sh APPLY 3:40 AM ("book_map →calm:63-101;dec:192-255"). x1 (user pre-approval for 256-book fixes): live_params_27.json =
+  x3's full JSON (backup .pre-bmap), restart_x1.sh (copy of restart_x3.sh for x1/27) — registered, ActiveEnterTimestamp 18:12:35 → 09:40:57 UTC, LIVE PARAMS
+  applied incl. book_map, 0 tracebacks, 335 ON BOOK lines; selftrade 0. Both miners now quote all 256 books on the same agent (12372763) and params.
+- decdeep (new 4-dec deep-only) on the new map, ABBA 3:50–5:50 AM, read 5:53, edge-per-$ 5:56, decision 6:00 AM (a win goes to both miners).
+
+## §1407 — 2026-11-12 6:00 AM CT — decdeep too thin (new 4-dec books pace-blocked) → kept; vlad started
+- decdeep (ABBA 3:50–5:50 AM, flash 0/0): x3 4-dec fills per half-hour A 9 / 12, B 14 / 27 ($40–82k) — the new 4-dec books spent their $100k start budgets in the first
+  hours after the reset (pace_start) and are now mostly paced out → no measurable test. Whole-miner A 23.5 vs B 24.9 (tie); 4-dec per fill −0.10 ± 0.32. Kept B
+  (mk_dec_touch 1, deep2 0 — x3 lists them explicitly, x1 by default: identical behaviour). Re-run later today. ($300 per-fill "−1.49" ignored: test cannot touch $300.)
+- Note: the $30 books are now x3's best group: ≈ 180–205 fills, $200–224k, edge +3.0–3.2 bp, edge $ 63–68 per half-hour.
+- vlad on x3: $300 ladder 2:4:7:12 vs 1:2:4:7 (now books 0–191), ABBA 6:10–8:10 AM, read 8:13, edge-per-$ 8:16, decision 8:20 AM (a win goes to both miners —
+  it changes how the new $30 books are quoted).
+
+## §1408 — 2026-11-12 8:20 AM CT — vlad (deeper $300 ladder) = tie → kept 1:2:4:7; vtouch started
+- vlad (ABBA 6:10–8:10 AM, flash 0/0), pooled edge-per-$ (x3): $300 0–127 A $311k / edge $42 / +1.35 bp vs B $361k / $44 / +1.22 bp (+11% per $, edge $ −4%);
+  $30 A $413k / $119 / +2.88 vs B $439k / $132 / +3.00. Whole-miner (thin) A credit 8.2 (q 0.475) vs B 3.8 (q 0.331); per fill $300 −0.63 ± 0.47, 4-dec
+  ignored (untouched). → not ≥ 20% / edge $ not up → tie → kept B on both miners.
+- vtouch on x3: $300-ladder touch order 0.011 vs 0.022 (books 0–191), ABBA 8:30–10:30 AM, decision 10:40 AM. decdeep waits for the new 4-dec books' budget.

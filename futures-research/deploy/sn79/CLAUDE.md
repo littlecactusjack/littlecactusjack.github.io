@@ -25,9 +25,11 @@ Re-read this file before every action.
   marks). Quote the validator's R/C quality ratio only when the captured base is large (a ratio on a captured base of ≈ 9 units was
   pure noise and was reported as a win — wrong).
 - **When a miner is clearly and steadily above the median, say so plainly and stop changing it** (only safety fixes/rollbacks).
-- **One miner per day plan:** if x2 and x4 are both pruned (likely tonight), register ONE miner per day and run constant tests on it
-  until a strategy can survive for weeks. No scaling until then.
+- **~~One miner per day~~ — RETIRED by the user 11-11:** register more makers whenever the collision checks pass (self-trades 0, existing
+  miners keep their fills/credit — §1391/§1392); each registration still needs the user's yes (spending) and the user runs btcli.
 - **Scaling** only if the makers clearly clear the prune line (user's condition).
+- **Makers stay making-only** (user 11-11): no skill legs or directional/inventory strategies on maker UIDs — skill breaks collisions between
+  our identical makers (§1289). Skill miners only once ≥ 20 makers run, on separate UIDs (§1235).
 - Explain things in plain terms; keep briefs short. Real clock times only (`TZ=America/Chicago date`); the user is in Texas, **CT = UTC−6**.
   End every message involving runs/tests with an **ETA line in CT**.
 - **30-minute briefs** for every run/test (recurring CronCreate at :13/:43, short brief, until the final reading is in). Crons are
@@ -65,6 +67,8 @@ Re-read this file before every action.
   Log every decision/result as a new § in `reports/decisions.md` (next free number: **§1310**; check the last § in the file).
 - Remote Python via ssh heredocs breaks on quotes — write a script file locally, `scp` it, run it.
 - After every restart verify `ActiveEnterTimestamp` changed (a syntax error once silently skipped a restart).
+- **Restart x3 (and any live miner) as rarely as possible** (user 11-12): tests use live-reload knobs only; new code is held and BATCHED — at most
+  one x3 restart per day unless safety. Each restart costs ≈ 20 min of queue position and dents pay.
 
 ## Current state / where to look
 - Full handoff (live state, infrastructure, status checks, subnet mechanics, next steps): `HANDOFF_BITTENSOR_2026-11-08.md` (this folder).
