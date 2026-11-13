@@ -22384,3 +22384,212 @@ Validator-exact credit (making_exact.py, 3-sim-h windows on live_tape_x3; reprod
   $30 A $413k / $119 / +2.88 vs B $439k / $132 / +3.00. Whole-miner (thin) A credit 8.2 (q 0.475) vs B 3.8 (q 0.331); per fill $300 −0.63 ± 0.47, 4-dec
   ignored (untouched). → not ≥ 20% / edge $ not up → tie → kept B on both miners.
 - vtouch on x3: $300-ladder touch order 0.011 vs 0.022 (books 0–191), ABBA 8:30–10:30 AM, decision 10:40 AM. decdeep waits for the new 4-dec books' budget.
+
+## §1409 — 2026-11-12 9:20–9:30 AM CT — x3 near the prune line (1.25×, 5 below it): x3 tests stopped; fallback ready; morning summary
+- Pay x3 $100 (8:46) → $91 (9:16); real line $73; survive.py: x3 1.25×, lowest five unprotected 1.00 / 1.07 / 1.10 / 1.20 / 1.22, field median 2.45, 216 2.87.
+  Live making x3 135 vs x1 313 (identical params; both ≈ 200 of 256 books blocked; x3 24-h ledger median $408k vs x1 $129k → x3 trades at the refill rate).
+- Stopped vtouch at 9:20 AM (timers stopped; x3 on B = proven, identical to x1) — no more 30-min re-quoting on x3 until it recovers.
+- tape_to_x1.sh (ready, NOT run): only if regcheck says x3 is gone — adds tape= to x1, stops/disables x3, gated x1 restart.
+- MORNING_2026-11-12.md written (recommend: no x2 until x3 ≥ 1.5× the line; fix the new-book start budget at the next batched restart).
+
+## §1410 — 2026-11-12 9:40 AM CT — collision check (new 256-book sim day) + x2: NO-GO for now
+- Registered x3 64 / x1 27. Pay 9:26 AM: x3 $91, x1 $100, together $191 (> x3 alone $140 on 11-11 AM). survive.py: x3 1.17× the line, 5 unprotected below (1.00–1.16).
+- Fills per 196-sim-s stretch (new sim, last 8 complete): x3 261–376 ($199–339k), x1 330–380 ($323–402k) — on 256 books both trade ≈ 2.5–3× the old-layout
+  stretch counts and within ≈ 10–25% of each other; x3's $ ≈ 10–20% lower (pacing age: ledger near cap). No sign of x1 starving x3 at the fill level.
+- now3h (3-sim-h validator-exact) skipped: the new sim day started at sim 0, so its window still contains x3's restarts and test arms (§1405/§1409 cover the read).
+- x2: NO-GO now — x3 sits at 1.17× the line; a new miner's start burst adds field volume / pressure. Revisit when x3 ≥ 1.5× (expected as its window clears tonight).
+
+## §1411 — 2026-11-12 9:50 AM CT — user: test on x1 while it is protected; x1vsize ($1.8k touch) 10 AM–12 PM
+- User asked to test on x1 (protected until ≈ 12:10 PM) instead of waiting for x3 to recover. x1's new 4-dec fills are thin too (19–50 per half-hour, paced out) →
+  4-dec test would be unreadable; chose the next-biggest lever: touch order size matching UID 46 ($1.8k fills on the $30 and $300 books vs our $1.1k).
+- Tools: abtest_sched_x1.sh (switches write ONLY live_params_27.json; reads us=27, abcredit UIDS "27 46 216"), abgrp_x1.sh (x1 + 46 rows), abcredit.sh reads
+  $UIDS (default unchanged). x1vsize ABBA 10:00 AM–12:00 PM CT, read 12:03, edge-per-$ 12:06, decision 12:10 PM (a win goes to x1 and x3 via live switch).
+- §1412 (9:55 AM): tape_guard.sh on a server timer every 15 min (mvtrx-tapeguard): if regcheck says x3 is gone, runs tape_to_x1.sh once (tape → x1, x3 stopped,
+  gated x1 restart) and sets tape_moved_to_x1.flag. Dry run with x3 registered: exits without action. Covers the laptop-closed case.
+
+## §1413 — 2026-11-12 ≈ 12:15 PM CT (laptop was closed ≈ 9:55 AM–12:09 PM) — x3 PRUNED ≈ 10:40 AM; tape guard moved the tape to x1; x1 alone, near the line
+- regcheck: x3 64 NOT REGISTERED (UID 64 re-registered by someone else, age 1.6 h at 12:09 PM). tape_guard.sh (§1412) fired at 16:45 UTC (10:45 AM CT): tape= added to
+  x1, x3 stopped + disabled, gated x1 restart 09:40:57 → 16:45:34 UTC, tape_moved_to_x1.flag set. Tape growing (stat +470 kB / 20 s), x1 0 tracebacks.
+- selftrade showed 4: fills between the NEW owner of UID 64 and x1 (our_uids still listed 64) → 64 removed (backup our_uids.txt.pre-x3prune) → 0. Watchdog
+  "x3 service DOWN / no fills" alerts stop with it.
+- x1vsize (x1 $1.8k vs $1.1k touch, ABBA 10:00 AM–12:00 PM): x1's tape-move restart (10:45) landed in B1 → contaminated. Clean pair (B2 vs A2): $300 edge $ 20 vs 26,
+  $30 40 vs 43, edge per $ equal (≈ 1.3 / 2.9 bp); whole-miner quality A 0.125 vs B 0.205 (thin). → not clear → kept 0.022; re-run later.
+- x1 (now the only miner, protection ended 12:10 PM): pay $106 vs real line $90 (1.18×, ≈ 4 real UIDs below); live making 322 (pay lags, should rise).
+  No x1 tests / restarts until it is ≥ 1.5× the line. Next registration (x2 unit ready): recommend after x1 ≥ 1.5× — the user decides.
+
+## §1414 — 2026-11-12 ≈ 12:40 PM CT — x2 test-day plan ready (user registers x2); "low" ($30) book group built; never-crash rule
+- User: x2 will be registered; a full day of 2-h tests scheduled up front (extend inconclusive ones after all ran); tests aiming ABOVE the median; never repeat
+  x3 (alive 2+ days, crashed in one night).
+- Code: "low" group in book_map (the $30 books) — quotes like vol, with live overrides mk_low_size / mk_low_lad / mk_low_lad_size (unset = vol values).
+  test_pace ALL PASS (+5). Agent 7d4dd4f5 (superset; identical by default). x2 runs it from its first minute; x1 keeps 12372763 in memory (no restart).
+- grpcap.py: UIDS_EXTRA env adds names (e.g. "123:x2"). x2_day.sh: base = x1's params + low map pinned, 9 independent ABBA tests (dec4, decsz, decdp, lowsz,
+  lowlad, lowls, vsz, calmv, skew3), each vs the SAME base, plus edge-per-$ reads; start_x2.sh <uid> does registration check, agent swap, our_uids, the
+  schedule and starts mvtrx-x2. Plan: deploy/sn79/X2_DAY_PLAN.md (confirmation test ≈ h 18.75–20.75; ≥ 3 h clean before protection ends).
+- Memory feedback-never-crash-settled.md: test only new miners while protected; settle clean before protection ends; settled miners: no tests / restarts.
+
+## §1415 — 2026-11-12 12:31 PM CT — x2 = UID 191 started (user registered); 9-test protected day scheduled
+- start_x2.sh 191: registered; agent 7d4dd4f5 swapped in on disk (x1 keeps 12372763 in memory; restart_x1/x3.sh now expect 7d4dd4f5); our_uids "191 maker x2 7628";
+  base live_params_191.json (x1's params + book_map "calm:63-101;low:128-191;dec:192-255", mk_low_* pinned to the vol values); mvtrx-x2 enabled + started:
+  UID 191 running, "LIVE PARAMS applied" incl. the low map, ≈ 1,200 ON BOOK lines in the first minutes, 0 tracebacks; selftrade 0 (x1 + x2).
+- Server timers: x2dec4 19:01 UTC → x2skew3 ends 13:01 UTC 11-13 (9 × 2 h ABBA, switches write ONLY live_params_191.json; reads us=191, UIDS "191 46 216",
+  edge-per-$ via abgrp_x2.sh with UIDS_EXTRA=191:x2). Decision + confirmation one-shot 7:08 AM CT 11-13; x2 protection ends ≈ 12:25 PM CT 11-13.
+- 12:55 PM 11-12 (§1415 add.): tape_guard2.sh timer (every 15 min, :07): if x1 (tape recorder) is gone → tape_to_x2.sh (tape= to x2, stop/disable x1, drop 27 from our_uids, restart x2), flag tape_moved_to_x2.flag. Dry run: no action.
+
+## §1416 — 2026-11-12 ≈ 2:00 PM CT — x2's start burst LOSES money (score 0); test 1 likely distorted; future miners need a smaller start budget
+- x2 live making 0.0 after 80 min despite ≈ $14M maker volume. making_grp.py (UID 191 from its own start, sim 7,628+): captured 163.8, realized −401.4 → quality 0 →
+  credit 0. By group: $30 C +90.5 / R +40.4; $300 0–101 +176.1 / −183.1; $300 102–127 +46.4 / −43.2; new 4-dec −149.1 / −215.6.
+  (A first read from sim 5,000 mixed in the previous owner of UID 191 — re-scored from x2's start.)
+- Cause: pace_start = $100k per book at once → x2 refilled at the touch as fast as possible ($10.6M on $300 books, $2.9M on 4-dec in ≈ 1 h) and was picked off;
+  only the $30 books stayed positive. Same mechanism as the reset's new-book burst (§1407). Fades as the burst leaves the 3-sim-h window (x2 is protected).
+- x2 test 1 (dec4, 1:01–3:01 PM) runs inside the burst → treat its read as likely distorted (re-run after the nine, per the plan).
+- For the next miner: set pace_start much lower in its unit BEFORE it starts (no restart cost); also in the code batch (new books start small / deep).
+- x1: $107, live 312, 1.21× the line (5 below: 1.00, 1.08, 1.15, 1.16, 1.16).
+- §1416 add. (3:30 PM): x2 test 1 (dec4) edge rows were empty — two bugs: (1) abgrp_x2.sh put "UIDS_EXTRA=191:x2" after `nice` (nice tried to run it) → now
+  `env UIDS_EXTRA=… nice …`; (2) grpcap.py printed only the hard-coded rows x3/x1/46 → now every name in U; UID 64 dropped from U (pruned, new owner).
+  Re-read: dec4 A1 (burst) $300 $4.5M edge $552; 4-dec A1 +0.68 bp / A2 +1.14 bp vs B +0.74 / +0.74 bp ($489k A2 vs $1.08–1.77M B) → burst-distorted, promising
+  → re-run after the nine (plan).
+
+## §1417 — 2026-11-12 5:15 PM CT — x2 test 2 (4-dec order size $1.5k vs $4.5k) = tie → keep $4.5k
+- x2decsz (ABBA 3:01–5:01 PM, flash 0/0): pooled 4-dec A ($1.5k) 252 fills / $242k / edge $18 / +0.74 bp vs B ($4.5k) 130 / $229k / $20 / +0.87 bp; per fill 4-dec −0.16 ±
+  0.24; whole-miner 0 / 0 (start burst still in the window). → tie, leaning B → keep mk_dec_size 0.09. Same windows: UID 46 4-dec +1.66–1.81 bp/$ → the gap is
+  depth, not size (test 3 decdp running 5:01–7:01 PM; dec4 deep-only re-run after the nine).
+
+## §1418 — 2026-11-12 5:45 PM CT — x2: test 1 (4-dec deep-only) re-runs after test 3; tests 4–8 pushed back 2 h; inventory-lean test dropped
+User asked to re-run test 1 (it ran inside x2's money-losing start burst, but deep-only looked promising: +1.14 vs +0.74 bp). x2dec4b now runs 7:01–9:01 PM CT,
+the $30-book/$300/calm tests follow in 2-h steps, ending 7:01 AM CT 11-13 as before. To keep ≥3 h of clean scoring before x2's protection ends (≈ 12:25 PM CT),
+the lowest-value test (skew 3 vs 5) was dropped from x2's day and moves to the next miner. The 7:08 AM decision and confirmation times are unchanged.
+
+## §1419 — 2026-11-12 7:45 PM CT — Deep dive: why our makers sit below the median (validator 0.6.7 + live gauges)
+1. **The lab's validator copy is out of date:** upstream shipped 0.6.7 on 11-06 and 11-10 (the 256-book layout, class pools, the skill bar per class, takers charged against the mark). Read-only checkout: /opt/mvtrx/repo067 (git worktree). The running miners still import /opt/mvtrx/repo (0.6.6) — do not pull it under them.
+2. **Each pay half is split by book class 50 / 25 / 25** (books 0–127 / 128–191 / 192–255), shares normalised inside each class. Class making totals now 112k / 35k / 5.4k, so one unit of credit is worth ≈ $0.13 / $0.20 / $1.34 a month. x1's 45 credit on the 4-dec books ≈ $60/mo, half its pay; its $300 books ≈ $14/mo.
+3. **Half of all pay is the skill pool, and our makers get none of it:** eligible per class with kappa > 0 on ≥ 20 / 10 / 10 books whose alpha (MTM P&L − mean inventory × drift) clears 2.3 bp of the miner's own filled notional; paid ∝ net alpha (≈ $65–85/mo per +1,000). 160 of 256 miners qualify. x1: −154 / +5 / −234. UID 46: +683 / +968 / +4 → ≈ 56% of its pay is skill, while its making credit is BELOW x1's. Our high-volume first-level quoting earns ≈ 1 bp, under the 2.3 bp hurdle.
+4. x2 is already skill-eligible on the $300 books (+298 on 42 books) despite its score 0.
+Consequence: tests judged by edge per $ alone can pick the wrong winner (e.g. the deep-only 4-dec arm may raise edge but cut credit in the most valuable class). The 11-13 decision now weighs each arm by pay-weighted credit per class (making_exact per arm × $/credit per class) and by alpha vs the 2.3 bp hurdle.
+
+## §1420 — 2026-11-12 7:20 PM CT — x2 test 3 (4-dec deep order 0.5 vs 0.27) = TIE → keep 0.27; whole-miner credit read found broken
+4-dec x2: A (0.5) $140k + $119k, edge $ 13 + 10 = 23, +0.94 / +0.88 bp, 161 fills; B (0.27) $142k + $93k, edge $ 13 + 10 = 23, +0.91 / +1.07 bp, 191 fills.
+No flash exposure in either arm. Same pay-weighted edge, same edge per $ → TIE, keep 0.27. The whole-miner credit block reads ≈ 0 two-sided for every UID on
+the 256-book layout (lesson); the 7:08 AM decision now uses pay-weighted edge $ from the grpcap rows instead (class weights ≈ 0.13 : 0.20 : 1.34).
+
+## §1421 — 2026-11-12 ≈ 8:15 PM CT — Maker skill: what it is, who earns it, and a per-arm skill read on x2's tests
+- User asked to target the skill score on our makers. 0.6.7 marks skill at the mid and charges only takers their fill price → a maker's skill is
+  inventory timing (Σ inventory × Δmid − mean inventory × drift); the spread captured at the fill counts only in making.
+- Steady maker skill exists: UIDs 98 / 139 on the $300 books (+2k…+8k all day); 46 / 98 / 139 rose together on the $30 books today (to +0.9k…+1.6k)
+  while x1 sat at +5. UID 46 overall swings ±2.5k within a day (noise). Validator replica (skill_cls.py, 150 sim min): $30 books 46 +2.39 bp on 36
+  kept books, 98 +1.66 bp, x1 −0.44, x2 −0.36 (0 kept). Fill markouts are similar (x1 +2.5 bp at 120 s, 46 +2.9, 98 +3.3); the visible difference
+  is depth: 46 gets 17% of $30 volume one tick behind the touch (+4.4 bp) vs x1 5%, and trades 1/3–1/6 of our volume per book.
+- No directional / fundamental tilt (failed §1375–1379; broke stacking §1289). Instead: skill_ab.py (validator alpha per A/B arm) runs ≈ 12 min after
+  every remaining x2 test (dec4b, lowsz, lowlad, lowls, vsz, low46). On test 3 it already separates: $30 books 46 +1.0…+1.2 bp with 7–11 kept books,
+  x2 −0.2 bp with 0. The calm-pattern test (calmv) was replaced by "low46": $30 touch $0.55k + ladder 1:2:3 at $1.8k vs base (5:01–7:01 AM CT).
+- The 7:08 AM decision adds skill: an arm that moves x2's $30 books toward ≥ 10 kept positive books (and kappa > 0) counts as a win even at equal pay-weighted edge.
+
+## §1422 — 2026-11-12 ≈ 8:00 PM CT — Reference switched to UID 252 (user); its owner runs 35 UIDs — what they run
+- User: switch the reference from UID 46 to UID 252 (46 earns mostly 0.6–0.95× the field median; 252 ran 1.23× typical, worst 0.91×, over 7 days at 29.8 d old).
+- 252's coldkey 5F1F2JMu (also 216, 139) runs **35 UIDs** (≈ 14% of the subnet). Pay $35–$251/month, most $115–$235 (≈ 0.5–1.1× median $221).
+- **Core strategy (≈ 25 UIDs, ages 1–32 d): identical-looking pure makers** — no taker volume, ≈ $32–36M/day maker volume once settled (≈ $12–18M at 1 day,
+  $24–27M at 2.5 days), LOW making credit (≈ 10–100 vs x1 265), net alpha positive on the $300 books (+120…+350) and mostly on the $30 books (+10…+270),
+  negative on the 4-dec books (−100…−400) where they make almost no credit (0–24). → identical makers DO collect skill side by side (25 at once), unlike our §1289 fear.
+- **Variants:** 252 (maker $71M/day + taker $3.6M/day; now net α −960, still top pay $241), 251 (taker $22.8M/day), 15 (taker only), 97 / 139 (high-volume makers
+  $84–93M/day; 139 the only one with big making credit 347 and big 4-dec credit 94), 103 ($300-heavy, 576 credit there).
+- x1 by contrast: $17.8M/day maker volume, making 265, net α −217 → $122. The fleet core trades ≈ 2× our volume for ¼ of our making credit but positive alpha.
+- Reads now include 252 (grpcap UIDS_EXTRA, skill_ab uids 191 252 46 216). Caveat: 252 takes; copy its quoting only, never the taker leg.
+
+## §1423 — 2026-11-12 ≈ 8:30 PM CT — Target skill by copying the 5F1F2JMu core makers; tonight's tests 5–9 replaced
+- profile.py (120 sim min, current sim): core pure makers 216/40/52/134 vs x1/x2. $300: avg fill $2.2k vs $0.85k; ≈ 33% of $ inside the spread vs 0%;
+  mid move after the fill +0.3 / +0.7 / +1.2 bp at 20 s / 2 min / 10 min vs ours −0.6 throughout. $30: fill $1.6k vs $1.1–1.4k, 21–24% of $ one tick back vs 3–4%,
+  edge at fill +3.7…+4.0 vs +2.8, $11–17k per book per sim h vs x1 $30k / x2 $72k. 4-dec: the core barely quotes (mostly deep, $3–5k/book/sim h).
+- fundmove256.py ($300, Δfundamental over the prior 10 s): core 47% of $ filled after the fundamental moved WITH the order, 3% against; us 10% / 13%.
+  Move after fill: core +0.35 bp, us −0.65. → the fleet's skill comes from quoting with fundamental moves. fm11 (§1383) tested fund_mv 0.5 but judged it on
+  making credit (no skill read then) — re-tested now on skill.
+- x2 tests replaced (lowsz/lowlad/lowls/vsz/low46 timers stopped): fmv1 (fund_mv 1.0 cap 2) 9:01 PM, vfleet ($300 $2.2k + inside ≥ 3 ticks) 11:01 PM,
+  low30f ($30 touch $1.6k + level 1 $1.6k) 1:01 AM, fmv2 (fund_mv 2.0 cap 3) 3:01 AM, fleet (all three) 5:01 AM CT; each with grpcap + skill reads.
+  The lean applies to the $300 AND $30 books (book_map "low" maps to "vol" in _fund_mv_shift); the skill read splits them.
+
+## §1424 — 2026-11-12 9:15 PM CT — x2 dec4b (re-run: 4-dec deep-only vs touch + one deep) = LOSS for deep-only → keep the touch
+4-dec x2: A (deep-only) $62k + $97k, edge $ 5 + 7 = 12, +0.78 / +0.75 bp, 76 fills; B (touch + deep) $88k + $114k, edge $ 8 + 10 = 18, +0.92 / +0.87 bp, 127 fills.
+Pay-weighted (×1.34) 16 vs 24 → B +50% and better edge per $. Skill on 4-dec: A −0.40 bp vs B −1.00 bp, but no UID qualifies for skill on 4-dec books
+(252 / 46 no fills, 216 negative) → making decides there. No flash exposure. → keep mk_dec_touch 1, mk_dec_deep2 0. Test 1's promise came from the start burst.
+Reference check from the same read: UID 252 on $300 books +0.59 bp with 11–12 kept positive books per 1-h arm (kappa +1.0…+2.6); x2 0–1 kept, −0.35…−0.45 bp.
+fmv1 (fundamental-move lean) started 9:01:01 PM CT on time.
+
+## §1425 — 2026-11-12 11:20 PM CT — fmv1 (fundamental-move lean 1.0) = no skill change; why; fmv2 replaced by fmvin (lean + inside)
+- Skill per arm ($300): A (lean) −0.22 bp, kept +4 −5, kappa −0.32 vs B −0.12 bp, +3 −5, −0.47; $30 −0.23 vs −0.26. Reference 252 $300 +0.36 / +0.42 bp (8–9 kept +).
+  Pay-weighted edge $ A ≈ 44 vs B ≈ 45 (tie). No flash exposure.
+- fundmove256 per arm (x2, $300): fills after the fundamental moved AGAINST the order 4% / 5% of $ (A) vs 11% (B); moved WITH 10% / 6% (A) vs 13% (B);
+  "flat" 86–89% vs the core fleet's ≈ 50% (fleet: 42–48% WITH, 2–4% AGAINST, same windows). → the lean removes bad fills but adds no good ones.
+- Cause (code): bid_px = min(bid (+tick if inside), fair − edge·tick, ask − tick): the lean can only pull a quote back. With mk_vol_inside on, the favourable side
+  steps one tick in while the lean holds the other side back — the fleet's pattern. → fmv2 (lean 2.0, 3:01–5:01 AM) replaced by **fmvin**: fund_mv 1.0 cap 2 +
+  mk_vol_inside 2 vs all off (re-assert, grpcap, skill reads scheduled). The 5:01 AM "fleet" test already combines lean 1.0 + inside 3 + $2.2k + $30 shape.
+
+## §1426 — 2026-11-13 ≈ 5:25 AM CT — overnight x2 reads: vfleet skill gain, fmvin no gain; tape rotation broke two reads (fixed); x1 live making 0 (field-wide)
+- vfleet ($300 $2.2k + inside 3 vs $1.1k, never inside): $300 skill A −0.06 bp, kept +3 −4, kappa +0.20 vs B −0.46 bp, +1 −6, −0.42 → skill better;
+  $300 edge $ A 17 + 20 = 37 (+1.0 bp) vs B 23 + 31 = 54 (+1.4 bp) → making edge −31% in the group that pays least (≈ −2 pay units of ≈ 45–60). Likely WIN on skill.
+- fmvin (lean 1.0 + inside 2 vs off): $300 skill A −0.16 bp, +1 −3, −0.53 vs B −0.10 bp, +5 −4, −0.03; edge $ A 38 (+1.0 bp) vs B 51 (+1.3 bp) → LOSS / no gain.
+  So far the only skill gain came with the larger $2.2k orders (vfleet); the lean (alone or with inside) has not moved skill. 1-h-arm skill reads are noisy
+  (252 swings +0.36…+0.83 bp between tests) — the 5–7 AM "fleet" test and the confirmation decide.
+- low30f: its skill read (live tape only) ran after the 3:07 AM CT tape rotation (mvtrx-taperotate, 09:07 UTC daily — missed last night) → empty; its grpcap read ran
+  DURING the rotation → empty rows. skillread_ab.sh now reads .prev + live; both low30f reads re-queued (chained after fmvin's skill read). Lesson recorded.
+- x1 live making fell 245 (9 PM) → 130 (11:37 PM) → 35 (1 AM) → 0 (2 AM–5 AM): captured 98 but realized clamped at 0. Field-wide: only 130 of 255 UIDs have making > 0,
+  field median making ≈ 40 (≈ 120 last evening); 216 18, 252 33, 46 50. No flash jumps; big moves after ≈ 3 AM (4-dec median |move| 42 bp per 30 sim min).
+  x1 pay still $130 (EMA lag) at 1.29× the prune line; watch through the day.
+
+## §1427 — 2026-11-13 5:20 AM CT — low30f re-read (both tapes): making WIN, skill neutral after reference control
+$30 x2: A (touch $1.6k + one level 1 tick back) edge $ 30 + 30 = 60 on $229k (+2.6 bp, 146 fills) vs B (1:2:4:7) 22 + 26 = 48 on $183k (+2.6 bp, 176 fills) → +25% edge $.
+Skill $30: x2 A −0.01 bp (+4 −3) vs B −0.16 (+1 −3), but the references rose more in the A windows (252 +0.97 vs +0.25, 216 +1.10 vs +0.53) → no relative skill gain.
+Rule from now: skill verdict = Δ(x2) − mean Δ(252, 216) in the same windows. With it: vfleet $300 +0.40 vs refs +0.04 → real skill gain; fmvin $300 −0.06 vs refs ≈ −0.03 → none.
+
+## §1428 — 2026-11-13 ≈ 6:55 AM CT — Why half the field shows live making 0: the current run's making credit is decaying field-wide
+- Dashboard gauges come from ONE validator (5EWwdZB7…, 255 UIDs; the other exporter has 32) and its current run sim_id 20261112_0530 (started 11-12 ≈ 5:30 AM CT —
+  the first full run on validator 0.6.7 final + the 256-book layout). The old run 20261107_1004 is still exported (frozen) — always filter sim_id.
+- No new validator release (last: 0.6.7 final, 11-10). Not the counterparty rules: bg_share 0.93–0.96, p11 ≈ 1.0, capture_cut_share 0 in every class.
+- Current run, class making credit (3-sim-h window): $300 18,682 (11-12 midnight) → 8,770 → 6,250 → 4,678 (6 PM) → 1,947 (8 PM) → 949 (now); $30 22,325 → 21,668 → 17,930 → 5,382;
+  4-dec 3,325 → 996. UIDs with making > 0: 218 → 186 → 127; median 124 → 103 → 32. Field realized ÷ captured 0.44 → 0.18.
+- Previous run (11-07 → 11-11): 144–192 makers, median 270–440, steady for 5 days → this decay is specific to the current run.
+- Even the 5F1F2JMu core has ≈ 0 $300 making credit now despite the best measured fills (+0.4 bp at 20 s); they are paid from skill (net α +300…+1,000 on $300).
+  x1: 0 making in every class, no skill → its share drains to the UIDs still scoring. Pay is a share of a fixed pot: field median pay steady ($212).
+- Not yet explained: why the validator's realized/quality falls while our own 20-s markouts for the core stay positive (centred-mid capture vs our mid). Next: replicate with the 0.6.7 code.
+- Actions: report to the user; suggest raising it on the MVTRX Discord (user's call); keep the skill-first plan; if x2's confirmation passes, move its $300 settings to x1 by live switch (pre-approved 256-book win rule).
+
+## §1429 — 2026-11-13 ≈ 6:55 AM CT — Deep dive of the "test" branch link: nothing new there; the making collapse = the DYNAMIC MAKER FEE (missed until now)
+- github taos-im/sn-79 branch "test" = main = 20e9785 "0.6.7 final" (11-10) — the version already live; open PRs are from August. Only paid-scoring default changed
+  0.6.6 → 0.6.7: none (mark_mode_alt last → median is published, not paid). Missed until now: the engine's FeePolicy type="dynamic" and the making fee netting.
+- Engine (simulate/trading/src/cpp/matching/DynamicFeePolicy.cpp, config simulation_*.xml): base maker 0, taker 2.3 bp; PER BOOK the passive share of MINER volume
+  (agentId ≥ 0; background excluded) over the book's last 300 trade slots, MTR = passive ÷ (passive + aggressive); target 0.4; above it the maker FEE rises as
+  coef × (MTR − 0.4)^2 toward maxMakerRate 1.5% (150 bp) and takers get the same as a REBATE. → too much miner making vs miner taking on a book = high maker fees.
+- Measured (tape, Mf / notional): current run $300 82 → 109 → 114 bp, $30 119 → 128 bp, 4-dec 38 → 90 → 44 bp (rising through the run); previous runs' $300 mostly
+  20–40 bp (−3…+76). Per book now 100–141 bp; differences between makers on a book = timing.
+- Validator: making credit per maker fill = (mid − price)·q − making_fee_weight × Mf, weight 0.005 (help: "stepped… raised at later boundaries") → at 110–140 bp the
+  netting is 0.55–0.7 bp per fill vs our $300 edge ≈ 1.2–1.3 bp before the 20-s markout → realized ≤ 0 for thin-edge makers → the field-wide making decay (§1428).
+  Fees are NOT in skill (debeta mtm: only the taker's fill-vs-mark charge) → taker rebates pay nothing in scoring; skill unaffected (fleet still paid).
+- What still earns $300 making now: wider/deeper quotes — UID 23 (top $300 maker) 79% of $ ≥ 2 ticks back, edge at fill +2.3 bp vs ours +1.3.
+- Levers: (1) live now: mk_vol_touch_min N (no $300 touch order while the spread < N ticks) + a deeper $300 ladder → more edge per fill; (2) next build: read
+  accounts[book].fees maker_fee_rate each round and require half-spread ≥ 0.005 × rate + margin per book (skip/widen high-fee books); (3) the fee is a field-wide
+  per-book state driven by miner maker/taker mix — skill-first remains the robust path.
+
+## §1430 — 2026-11-13 ≈ 7:00 AM CT — x1 restarted onto the 256-book build with the overnight winners (user: "make any change you want on x1"); hidden auto-restarts found + blocked
+- User ≈ 6:50 AM: x1's pay will follow its 0 live score anyway → any change allowed (save it or test on it).
+- x1 restart 6:55:52 AM CT (restart_x1.sh: registered, agent 7d4dd4f5, live_params_s 5) with x2's base + vfleet (mk_vol_size 0.044, mk_vol_inside 3) + low30f
+  (mk_low_size 0.033, mk_low_lad "1", mk_low_lad_size 0.033), fund_mv 0; book_map "calm:63-101;low:128-191;dec:192-255" (x1 now has the separate $30 group).
+  Backup live_params_27.pre-restart-1113.json. Pace ledger carried (230 of 256 blocked). The "SETTLEMENT NOT READY" banner prints at every start (5× since 11-11) and
+  fills kept settling — a standard warning.
+- **Ubuntu unattended-upgrades → needrestart restarted mvtrx-x1 AND mvtrx-x2 at 06:14 UTC (12:14 AM CT)** (apt-daily-upgrade re-exec'd systemd). x2 was in its
+  protection and in vfleet's 2nd B block → vfleet's B arm contaminated; its skill win is provisional. Fixed: /etc/needrestart/conf.d/mvtrx.conf
+  `$nrconf{override_rc}{qr(^mvtrx-.*\.service$)} = 0;` (perl -c OK); automatic reboots are not enabled.
+
+## §1431 — 2026-11-13 7:15 AM CT — x2 test day verdicts; confirmation = the full fleet set; x1 fee-resistance test scheduled
+"fleet" (5:01–7:01 AM: lean 1.0 + $300 $2.2k + inside 3 + $30 shape vs base), no flash: SKILL $300 x2 A −0.00 vs B −0.31 bp (kept +4 −1 vs +2 −5, kappa +0.66 vs −0.18),
+refs Δ 252 +0.12 / 216 +0.09 → net +0.20 bp; $30 x2 +0.22 vs −0.13 (kept +3 vs 0), refs Δ −0.04 / −0.14 → net +0.44 bp. Edge $: $300 39 vs 48 (making ≈ 0 field-wide
+under the fees), $30 55 vs 49 (+12%), 4-dec 16 vs 19 (untouched; noise).
+| test | verdict |
+| decsz / decdp | TIE — keep 0.09 / 0.27 |
+| dec4b (4-dec deep-only) | LOSS — keep the 4-dec touch |
+| fmv1 (lean alone) | no skill change (lean only pulls quotes back) |
+| vfleet ($300 $2.2k + inside 3) | skill WIN, provisional (needrestart restart in its B arm) |
+| low30f ($30 shape) | making WIN (+25% $30 edge $), skill neutral vs refs |
+| fmvin (lean + inside 2) | no gain |
+| fleet (all three) | skill WIN on $300 (net +0.20) AND $30 (net +0.44) — the only arm that lifted $30 skill → lean kept in |
+CONFIRMATION x2conf 7:15–9:15 AM CT (ABBA, live, re-assert 13:15:15 UTC, grp 15:21, skill 15:27 UTC): A = base + fund_mv 1.0 cap 2 + mk_vol_size 0.044 + mk_vol_inside 3 +
+mk_low_size 0.033 + mk_low_lad "1" + mk_low_lad_size 0.033; B = base. END restores base at 9:15; final switch at the ≈ 9:30 decision (≈ 2 h 55 m before protection ends).
+x1 (restarted 6:55 AM onto the no-lean version of the same set) → a natural cross-check of the lean. x1 test x1fee 7:31–9:31 AM CT: A = $300 mk_vol_touch_min 6 + mk_vol_lad
+"2:4:7:11" vs B = touch + "1:2:4:7" (fee resistance: maker fee 105–140 bp netted 0.55–0.7 bp per fill); re-assert, grp (abgrp_x1 now with 252) 15:37, skill
+(skillread_ab_x1.sh, UIDs 27 252 46 216) 15:43 UTC.
