@@ -67,10 +67,11 @@ class _RawBook:
 
 
 class _RawAccount:
-    __slots__ = ("base_balance", "quote_balance", "orders")
+    __slots__ = ("base_balance", "quote_balance", "orders", "fee_m")
 
     def __init__(self, d):
         self.base_balance, self.quote_balance = _Bal(d.get("bb") or {}), _Bal(d.get("qb") or {})
+        self.fee_m = (d.get("f") or {}).get("m")                    # §1440: this book's current maker fee rate (dynamic fee policy, §1429)
         self.orders = [_Ev(x) for x in d.get("o") or []]
 
 
@@ -241,6 +242,21 @@ class QuoteAgent(FinanceAgent):
         self.mk_dec_deep = float(getattr(c, "mk_dec_deep", 0.27))     # §1313: one deep order this many spreads behind the touch (fleet median 0.27, IQR 0.13-0.49)
         self.mk_low_size = float(getattr(c, "mk_low_size", 0.0))       # §1414: >0: touch size on "low" books ($30 books; book_map group low) instead of MK_VOL_SIZE
         self.mk_low_lad_size = float(getattr(c, "mk_low_lad_size", 0.0))   # §1414: >0: ladder size on low books instead of MK_VOL_LAD_SIZE
+        self.mk_vol_jump = int(getattr(c, "mk_vol_jump", 0))         # §1434: >0: on $300 books, when the fundamental-move lean shifts fair, the favourable side may step up to this many ticks
+                                                                     # toward fair (not just one tick inside) — the 5F1F2JMu core fills right after fundamental moves (44% vs our 8%)
+        self.mk_low_touch_min = int(getattr(c, "mk_low_touch_min", 0))   # §1434: >0: $30 books place NO touch order while the others' spread is < this many ticks (mk_vol_touch_min no longer applies to $30 books)
+        self.pace_soft = float(getattr(c, "pace_soft", 0.0))        # §1440 SOFT PACING (unit arg, never live): >0: a book goes dark only below −PACE_SOFT $ of tokens;
+        self.pace_soft_min = float(getattr(c, "pace_soft_min", 0.1))  # between that floor and a full bucket, order sizes scale down to PACE_SOFT_MIN × size — we stay
+                                                                     # present on every book like the fleet (we were dark on ~90%: §1435); the 24-h ledger cap is unchanged
+        self.pace_soft_on = int(getattr(c, "pace_soft_on", 1))      # §1440: LIVE on/off for soft pacing (the floor PACE_SOFT itself is a unit arg) — A/B-testable without a restart
+        self.mk_fee_k = float(getattr(c, "mk_fee_k", 0.0))          # §1440 FEE-AWARE: >0: quotes move MK_FEE_K × (0.005 × maker fee rate × mid) further from the mid per side
+                                                                     # (the validator nets 0.005 × Mf from every maker fill's credit; at 110–140 bp that ate our edge)
+        self._cfg_cache, self._cfg_at = {}, -10 ** 9
+        self.mk_vol_lean_only = int(getattr(c, "mk_vol_lean_only", 0))   # §1435: 1 = on $300 books a touch order only on the side the lean jump favours; otherwise ladder only
+                                                                     # (the 5F1F2JMu core rests behind the touch on ~all books and steps in with fundamental moves; we sat AT the touch,
+                                                                     # got hit, burnt the pace bucket in minutes and were absent from ~90% of books)
+        self.mk_skip_dec = int(getattr(c, "mk_skip_dec", 0))         # §1434: 1 = no making on the 4-dec books (252 quotes none; ours lose alpha and make ≈ 0 credit under the fees)
+        self._jumped = {}
         self.mk_low_lad = [int(x) for x in str(getattr(c, "mk_low_lad", "") or "").replace(":", ",").split(",") if x.strip()]   # §1414: ladder ticks on low books ([] = MK_VOL_LAD)
         self.book_map = str(getattr(c, "book_map", "") or "")      # §1403: book groups by id ranges, e.g. "calm:63-101;dec:192-255" (all others = vol); "" = legacy 0-62 vol / 63-101 calm / 102+ dec
         self._bmap = self._parse_book_map(self.book_map)
@@ -573,14 +589,14 @@ class QuoteAgent(FinanceAgent):
             response.cancel_order(book_id, o.id); n += 1
 
     # §1342 live settings: quoting knobs only. Pacing / cap / ledger settings are NEVER live-changeable (cap safety); list parameters (ladders) neither.
-    LIVE_KNOBS = {"flow_pull": float, "flow_pull_vol_only": int, "flow_win": int, "flow_cool": int, "mk_vol_inside": int, "mk_vol_touch_min": int,
+    LIVE_KNOBS = {"flow_pull": float, "flow_pull_vol_only": int, "flow_win": int, "flow_cool": int, "mk_vol_inside": int, "mk_vol_touch_min": int, "mk_vol_jump": int, "mk_low_touch_min": int, "mk_skip_dec": int, "mk_vol_lean_only": int, "mk_fee_k": float, "pace_soft_on": int,
                   "mk_nochase_bp": float, "mk_nochase_s": int, "mk_calm_touch_min": int, "mk_calm_hold": int, "mk_pace_hold": float,
                   "mk_vol_size": float, "mk_vol_lad_size": float, "mk_calm_lad_size": float, "mk_dec_size": float, "mk_dec_inside": int,
                   "mk_dec_deep": float, "mk_dec_touch": int, "mk_dec_deep2": float, "book_map": str, "mk_low_size": float, "mk_low_lad_size": float, "mk_thin_ratio": float, "mk_thin_only_vol": int, "mk_thin_vol_off": int, "skew": float, "mk_calm_expiry": float,
                   "fund": float, "fund_cap": float, "fund_mv": float, "fund_mv_cap": float, "fund_scope": int, "micro": float, "mk_skip_vol": int}   # §1373: 1 = no making on the $300 books (miner-wide quality test)   # §1369: fundamental lean (the fleet fills after fundamental moves its way, §1368) and the micro-price weight
     LIVE_LISTS = {"mk_calm_lad": (1, 20, 4), "mk_vol_lad": (1, 20, 4), "mk_low_lad": (1, 20, 4)}   # §1346: ladder levels "a:b:c" — ticks 1..20, at most 4 levels (5-instruction budget)
     LIVE_LIMITS = {"mk_pace_hold": (0.0, 10000.0), "mk_vol_size": (0.0, 0.1), "mk_vol_lad_size": (0.0, 0.1), "mk_calm_lad_size": (0.0, 0.1),
-                   "mk_dec_size": (0.0, 0.12), "mk_dec_touch": (0, 1), "mk_low_size": (0.0, 0.1), "mk_low_lad_size": (0.0, 0.1), "mk_dec_deep2": (0.0, 3.0), "skew": (0.0, 30.0), "mk_calm_expiry": (0.0, 3600.0), "fund": (0.0, 1.0), "fund_cap": (0.0, 5.0), "fund_mv": (0.0, 2.0), "fund_mv_cap": (0.0, 5.0), "fund_scope": (0, 2), "micro": (0.0, 1.0)}
+                   "mk_dec_size": (0.0, 0.12), "mk_vol_jump": (0, 20), "mk_low_touch_min": (0, 10), "mk_skip_dec": (0, 1), "mk_vol_lean_only": (0, 1), "mk_fee_k": (0.0, 5.0), "pace_soft_on": (0, 1), "mk_dec_touch": (0, 1), "mk_low_size": (0.0, 0.1), "mk_low_lad_size": (0.0, 0.1), "mk_dec_deep2": (0.0, 3.0), "skew": (0.0, 30.0), "mk_calm_expiry": (0.0, 3600.0), "fund": (0.0, 1.0), "fund_cap": (0.0, 5.0), "fund_mv": (0.0, 2.0), "fund_mv_cap": (0.0, 5.0), "fund_scope": (0, 2), "micro": (0.0, 1.0)}
 
     def _live_reload(self):
         """§1342: every LIVE_PARAMS_S sim s, if the JSON file changed, apply whitelisted quoting knobs (type-cast, range-checked) without a restart.
@@ -785,13 +801,17 @@ class QuoteAgent(FinanceAgent):
         if inside and obest is not None and B in want and S in want:   # §1314: step inside the OTHER makers' best, never our own order (the §1304 version
             ob, oa = obest                                                # pennied itself round after round: 8-tick spreads walked to 4, walk300.py)
             if ob is not None and oa is not None and round((oa - ob) / tick) >= inside:
-                nb = round(ob + tick, pd) if want[B] >= ob - 1e-12 else want[B]   # a side the skew put behind the touch stays put
-                na = round(oa - tick, pd) if want[S] <= oa + 1e-12 else want[S]
+                jd = self._jumped.get(int(book_id), ())          # §1434: a side the lean jump moved further inside keeps its price
+                nb = want[B] if B in jd else (round(ob + tick, pd) if want[B] >= ob - 1e-12 else want[B])   # a side the skew put behind the touch stays put
+                na = want[S] if S in jd else (round(oa - tick, pd) if want[S] <= oa + 1e-12 else want[S])
                 if nb < na - 1e-12: want[B], want[S] = nb, na
         elif inside and B in want and S in want and round((want[S] - want[B]) / tick) >= inside:   # §1304 fleet: one tick INSIDE the spread when it is ≥ INSIDE ticks wide
             want[B] = round(want[B] + tick, pd); want[S] = round(want[S] - tick, pd)
         tgt = dict(want); span = max(levels) + (2 if tol is None else max(2, tol))   # §1313: a wide tolerance widens the keep window too
-        if no_touch:
+        nts = no_touch if isinstance(no_touch, (set, frozenset)) else None   # §1435: a SET = no touch order on those sides only (ladder stays on both)
+        if nts is not None:
+            want = {sd: px for sd, px in want.items() if sd not in nts}
+        elif no_touch:
             want = {}                                     # §1323: ladder only — touch orders are not placed (and a resting one is cancelled below)
         n = sum(1 for i in (response.instructions or []) if getattr(i, "bookId", None) == book_id)
         urgent, stale, keep = [], [], {B: [], S: []}
@@ -800,7 +820,7 @@ class QuoteAgent(FinanceAgent):
             if px is None:
                 urgent.append(o); continue
             behind = round(((px - o.price) if o.side == B else (o.price - px)) / tick, 6)
-            if behind == 0 and no_touch:
+            if behind == 0 and (no_touch is True or (nts is not None and o.side in nts)):
                 urgent.append(o)                          # §1323: no touch order on this book right now
             elif behind == 0 and o.side in want:
                 want.pop(o.side)                          # touch order already resting at the target
@@ -933,7 +953,35 @@ class QuoteAgent(FinanceAgent):
                 or (o.side == OrderDirection.SELL and (oa is None or o.price < oa + tick / 2))]
 
     def _paced_out(self, book_id):
-        return self._tok_accrue(book_id, self._sec)[0] <= 0 or self._pace_day(book_id) >= self.pace_cap
+        floor = -self.pace_soft if (self.pace_soft > 0 and self.pace_soft_on) else 0.0   # §1440: soft pacing goes dark only below the floor
+        return self._tok_accrue(book_id, self._sec)[0] <= floor or self._pace_day(book_id) >= self.pace_cap
+
+    def _pace_factor(self, book_id):
+        """§1440: order-size factor under soft pacing — 1 with a full bucket, falling linearly to PACE_SOFT_MIN at the floor (−PACE_SOFT)."""
+        if not (self.pace_cap and self.pace_soft > 0 and self.pace_soft_on):
+            return 1.0
+        tok = self._tok_accrue(book_id, self._sec)[0]; burst = self.pace_rate * self.pace_burst
+        return max(self.pace_soft_min, min(1.0, (tok + self.pace_soft) / (burst + self.pace_soft)))
+
+    def config_for(self, book_id):
+        """§1440 speed: a book's market config is fixed within a run — cache it (cleared on a clock reset and every 600 sim s)."""
+        if self._sec - self._cfg_at >= 600 or self._sec < self._cfg_at:
+            self._cfg_cache = {}; self._cfg_at = self._sec
+        b = int(book_id); c = self._cfg_cache.get(b)
+        if c is None:
+            c = self._cfg_cache[b] = self.simulation_config.config_for_book(b)
+        return c
+
+    def _fee_ticks(self, acct, mid, tick):
+        """§1440: ticks to move each quote away from the mid so the validator's fee netting (0.005 × maker fee) does not eat the edge."""
+        if not self.mk_fee_k:
+            return 0
+        rate = getattr(acct, "fee_m", None)
+        if rate is None:
+            f = getattr(acct, "fees", None); rate = getattr(f, "maker_fee_rate", None) if f is not None else None
+        if not rate or rate <= 0:
+            return 0
+        return int(round(self.mk_fee_k * 0.005 * float(rate) * mid / tick))
 
     def _pace_sync(self):
         """§1255: pace_sync.py writes the validator's own per-book daily_volume next to the ledger. Where it exceeds what we counted (fills during a restart
@@ -1050,13 +1098,15 @@ class QuoteAgent(FinanceAgent):
         fundamental = getattr(book, "fundamental", None) or getattr(book, "f", None)
         if self.fund and fundamental and self._fund_in_scope(int(book_id)):
             fair += self._fund_shift(fundamental, mid, spread)
+        fmv = 0.0
         if self.fund_mv:
-            fair += self._fund_mv_shift(int(book_id), spread)
+            fmv = self._fund_mv_shift(int(book_id), spread)
+            fair += fmv
         if self.flow:
             fair += self.flow * spread * self._flow_signal(book_id, book)
         trend = 0.0
         pred = 0.0
-        if self.model is not None:
+        if self.model is not None and (self.alpha_k or self.pull or self.take or self.trend_z):   # §1440 speed: pred unused otherwise (cancel order only)
             pred = self._predict(book_id, book, self._sec, mid)
             fair += self.alpha_k * pred
             mids = self._mids.get(book_id, {})
@@ -1071,6 +1121,21 @@ class QuoteAgent(FinanceAgent):
             ask_px = max(ask_px, ask + self.back * tick)
         bid_px = round(round(bid_px / tick) * tick, pd)
         ask_px = round(round(ask_px / tick) * tick, pd)
+        self._jumped[int(book_id)] = set()
+        if self.mk_vol_jump and fmv and self._g(int(book_id)) == "vol" and not self._is_low(int(book_id)):   # §1434 lean jump
+            if fmv > 0:
+                jb = round(math.floor(min(fair - self.edge * tick, ask - tick, bid + self.mk_vol_jump * tick) / tick + 1e-9) * tick, pd)
+                if jb > bid_px + 1e-12:
+                    bid_px = jb; self._jumped[int(book_id)].add(OrderDirection.BUY)
+            else:
+                ja = round(math.ceil(max(fair + self.edge * tick, bid + tick, ask - self.mk_vol_jump * tick) / tick - 1e-9) * tick, pd)
+                if ja < ask_px - 1e-12:
+                    ask_px = ja; self._jumped[int(book_id)].add(OrderDirection.SELL)
+        ft = self._fee_ticks(acct, mid, tick) if acct is not None else 0   # §1440 fee-aware widening (a jumped side keeps its price)
+        if ft:
+            jd = self._jumped.get(int(book_id), ())
+            if OrderDirection.BUY not in jd: bid_px = round(bid_px - ft * tick, pd)
+            if OrderDirection.SELL not in jd: ask_px = round(ask_px + ft * tick, pd)
         if self.snap:                                      # quote only at prices other makers already hold (§1207): 54% of our fills came alone at a
             ours = defaultdict(float)                      # price nobody else quoted, at −3.87 ticks; sharing a level ≈ break-even
             for o in acct.orders:
@@ -1080,7 +1145,8 @@ class QuoteAgent(FinanceAgent):
             ask_px = min((l.price for l in book.asks if l.price >= ask_px - tick / 2 and held(1, l)), default=None)
         sz = self.mk_vol_size if (self.mk_vol_size > 0 and self._g(book_id) == "vol") else self.size   # §1275: own size on the $300 books (long-lived fleet quotes ≈ $3k there)
         if self.mk_dec_size > 0 and self._g(book_id) == "dec": sz = self.mk_dec_size   # §1313: fleet 4-dec order size
-        qty = round(max(sz * wealth0 / mid, self.min_order_size(book_id)), vd)
+        self._pf = self._pace_factor(int(book_id))               # §1440 soft pacing
+        qty = round(max(sz * wealth0 / mid * self._pf, self.min_order_size(book_id)), vd)
         want = {}
         if int(book_id) in self.skip:
             self._cancel_all(response, book_id, acct.orders)   # skipped book: pull our quotes and stay out (§1293: one instruction)
@@ -1336,6 +1402,9 @@ class QuoteAgent(FinanceAgent):
                 extra[side] = lv
         if self.mk_nochase_bp > 0 and want:                # §1323 no-chase (all quoted books)
             self._nc_n = getattr(self, "_nc_n", 0) + self._nochase(int(book_id), want, bid, ask, mid, pd)
+        if self.mk_skip_dec and self._g(book_id) == "dec":  # §1434: no making on the 4-dec books — pull everything with one instruction
+            self._cancel_all(response, book_id, acct.orders)
+            return
         if self.mk_dec_size > 0 and self._g(book_id) == "dec":  # §1313 4-dec books, long-lived fleet pattern: just ahead of the others' best + one deep order
             k = self._dec_targets(book, acct.orders, want, tick, pd)
             if k:
@@ -1346,17 +1415,20 @@ class QuoteAgent(FinanceAgent):
                 self._cancel_all(response, book_id, acct.orders)   # §1332: spread too tight for the fleet pattern: pull all with ONE instruction
             return
         if self.mk_vol_lad and self._g(book_id) == "vol":          # §1278 $300-book ladder (long-lived fleet), §1279: resting ladder + the validator's per-book instruction limit
-            vq = round(max(self.mk_vol_lad_size * wealth0 / mid, self.min_order_size(book_id)), vd)
+            vq = round(max(self.mk_vol_lad_size * wealth0 / mid * self._pf, self.min_order_size(book_id)), vd)
             if self.mk_vol_lazy:
                 self._vol_lazy(response, book_id, orders, want, vq, tick, pd)
             else:
-                ob_v = self._others_best(book, acct.orders) if (self.mk_vol_inside or self.mk_vol_touch_min) else None
-            nt_v = bool(self.mk_vol_touch_min and ob_v and ob_v[0] is not None and ob_v[1] is not None and round((ob_v[1] - ob_v[0]) / tick) < self.mk_vol_touch_min)
+                tm_v = self.mk_low_touch_min if self._is_low(int(book_id)) else self.mk_vol_touch_min   # §1434: $30 books have their own touch minimum
+                ob_v = self._others_best(book, acct.orders) if (self.mk_vol_inside or tm_v) else None
+            nt_v = bool(tm_v and ob_v and ob_v[0] is not None and ob_v[1] is not None and round((ob_v[1] - ob_v[0]) / tick) < tm_v)
             self._vol_ladder(response, book_id, orders, want, sq, qty, vq, tick, pd, inside=0 if nt_v else self.mk_vol_inside,
-                                 obest=ob_v if self.mk_vol_inside else None, no_touch=nt_v)
+                                 obest=ob_v if self.mk_vol_inside else None,
+                                 no_touch=nt_v if (nt_v or not self.mk_vol_lean_only or self._is_low(int(book_id)))
+                                 else {OrderDirection.BUY, OrderDirection.SELL} - set(self._jumped.get(int(book_id), ())))
             return
         if self.mk_calm_lad and self._g(book_id) == "calm":  # §1303 calm-book ladder: the fleet's calm volume is 60% from orders resting 1+ ticks behind the touch
-            vq = round(max(self.mk_calm_lad_size * wealth0 / mid, self.min_order_size(book_id)), vd)
+            vq = round(max(self.mk_calm_lad_size * wealth0 / mid * self._pf, self.min_order_size(book_id)), vd)
             ob_ = self._others_best(book, acct.orders) if (self.mk_calm_hold or self.mk_calm_touch_min) else None
             nt = bool(self.mk_calm_touch_min and ob_ and ob_[0] is not None and ob_[1] is not None and round((ob_[1] - ob_[0]) / tick) < self.mk_calm_touch_min)
             self._vol_ladder(response, book_id, orders, want, sq, qty, vq, tick, pd, levels=self.mk_calm_lad, expiry=self.mk_calm_expiry or None,

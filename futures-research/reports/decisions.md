@@ -22593,3 +22593,184 @@ mk_low_size 0.033 + mk_low_lad "1" + mk_low_lad_size 0.033; B = base. END restor
 x1 (restarted 6:55 AM onto the no-lean version of the same set) → a natural cross-check of the lean. x1 test x1fee 7:31–9:31 AM CT: A = $300 mk_vol_touch_min 6 + mk_vol_lad
 "2:4:7:11" vs B = touch + "1:2:4:7" (fee resistance: maker fee 105–140 bp netted 0.55–0.7 bp per fill); re-assert, grp (abgrp_x1 now with 252) 15:37, skill
 (skillread_ab_x1.sh, UIDs 27 252 46 216) 15:43 UTC.
+
+## §1432 — 2026-11-13 9:30 AM CT — x2 CONFIRMED on the fleet set; x2 settled
+x2conf (7:15–9:15 AM, ABBA, no flash): SKILL $300 x2 A −0.13 vs B −0.40 bp (kept +4 −6 vs +2 −9, kappa −0.08 vs −0.78); refs Δ 252 −0.30 / 216 0.00 → net +0.42 bp
+(third $300 skill gain in a row: vfleet +0.36, fleet +0.20, conf +0.42). $30: x2 −0.24 vs −0.31, refs Δ +0.28 / +0.65 → net −0.39 (fleet test: +0.44) → $30 skill = noise;
+x2's own kept +5 vs +1, kappa +0.37 vs −0.58. Making: $30 edge $ 65 vs 53 (+23%, same +2.96 bp per $); 4-dec 30 vs 18; pay-weighted $30+4dec ≈ 53 vs 35.
+→ CONFIRMED. FINAL applied 9:29:16 AM CT (log 9:29:32 "LIVE PARAMS applied: fund_mv 0→1.0, fund_mv_cap →2.0, mk_vol_size →0.044, mk_vol_inside →3, mk_low_size →0.033,
+mk_low_lad →[1], mk_low_lad_size →0.033"); backup live_params_191.FINAL-1113.json. x2 SETTLED: no more switches/tests/restarts (protection ends ≈ 12:25 PM CT).
+Lean on x1: NOT yet — the $300 skill gain appeared with and without the lean (vfleet had none), $30 effect is noise; x1 (same set minus the lean) vs x2 is the cross-check.
+
+## §1433 — 2026-11-13 9:45 AM CT — x1fee = LOSS (confounded: touch_min also hit the $30 books); x1 stays on B; making/skill status
+- x1fee (7:31–9:31, no flash): A ($300 mk_vol_touch_min 6 + ladder 2:4:7:11) had ZERO $30 fills — in 7d4dd4f5 _g() maps the "low" group to "vol", so mk_vol_touch_min
+  also removed every $30 touch order (spread 1–2 ticks < 6). $300: edge per $ A +1.23 / +1.21 vs B +1.08 / +1.03 bp at similar volume ($330k vs $348k), skill A −0.08 vs
+  B +0.09 bp (refs Δ ≈ −0.03) → net −0.15. → LOSS as a package; x1 stays on B (END 9:31:19: touch_min 0, ladder 1:2:4:7). The 9:47 decision job was cancelled (done here).
+- Validator now (current run, 5EWwdZB7): field making > 0 for 139 UIDs, median 35. x1 / x2 making 0 in every class (19-h window still holds pre-change fills).
+  Skill per class: x1 $300 net α +29 (9 books), x2 $300 +37 (11 books) — both turned POSITIVE on $300 (last night −15…−154); bar 20 books; 252 +510 (28, skill 4.06),
+  216 +551 (33, 4.59). $30: x1/x2 0. 4-dec: x1 −1,132, x2 −1,573 (4-dec quoting loses alpha AND makes ≈ 0 credit under the fees; per-class pools → it does not block $300 skill).
+
+## §1434 — 2026-11-13 ≈ 10:15 AM CT — 252 checked (solid, pure maker on this run); new build 88ab2eab (lean jump, $30 touch minimum, 4-dec off) on x1; two copy tests
+- Is 252 a solid copy target (user ask)? Yes: 30 d old, steady 1.1–1.25× median all week; on this run 4,738 maker fills and 0 taker fills on our tape (pure maker);
+  $300 skill (validator loop, 120 sim min) +1.36 bp, 24 kept books all positive, kappa +7.35, ELIGIBLE — identical to 216 (+1.42 bp, 25 books). No 4-dec quoting.
+  Same $/book as ours (≈ $37k) → the gap is HOW we quote (x2 −0.02 bp, x1 −0.25 bp). Maker-only and all-fills alpha were identical.
+- profile.py (35 sim min after x2 went final) 252/216 vs x2/x1: $300 fills after the fundamental moved WITH the order 44% vs 8% (x2, lean on) / 10% (x1); AGAINST 2% vs 11% / 17%;
+  2-min markout +0.8 vs −0.4 bp; inside ≈ 34% vs 14%; 1 tick back 7–10% vs 17–22%; avg fill $2.2k vs $1.0k. $30: edge +3.9–4.0 vs +2.9 bp on $11–12k vs $19k per book per sim h.
+- Cause of the WITH gap: our bid_px = min(bid + tick, fair − edge·tick, ask − tick) and _vol_ladder's inside step reset the touch to one tick ahead of the others' best,
+  so the lean can never move a quote more than one tick in. Built 88ab2eab (backup QuoteAgent.pre-jump.py): live knobs mk_vol_jump (0–20 ticks; $300 only, needs the lean:
+  the favourable side steps up to N ticks toward fair, kept by _vol_ladder), mk_low_touch_min ($30's own touch minimum — mk_vol_touch_min no longer leaks onto $30), mk_skip_dec.
+  Defaults 0 = identical behaviour. test_pace ALL PASS (+6 checks). Installed as agents/QuoteAgent.py (prior agents/QuoteAgent.7d4dd4f5.py); restart_x1.sh md5 → 88ab2eab;
+  x1 restarted 10:10:25 AM CT (registered; same settings; 238 of 256 books paced; 0 errors). x2 keeps 7d4dd4f5 in memory (settled; needrestart blocked).
+- Tests on x1 (user: any change allowed): x1jump 10:31 AM–12:31 PM (A lean 1.0 + jump 3 vs B lean 1.0 + jump 0); x1low2 12:31–2:31 PM ($30 touch only when spread ≥ 2 ticks
+  vs always). Each with 15-s re-assert, grpcap (+252) and skill reads (UIDs 27 252 46 216). 4-dec off NOT tested: under the fees 4-dec making ≈ 0 and its skill class is
+  out of reach, so skipping it changes no pay now — but 4-dec credit is worth ≈ 10× per unit once fees fall; keep quoting it.
+
+## §1435 — 2026-11-13 ≈ 10:50 AM CT — Hidden-difference audit vs 252/216 (all validator gauges): PRESENCE and RESPONSE TIME; lean-only build dc5e46b0; x1 tests re-planned
+User: make sure nothing hidden separates us from 252 / long-lived miners. gdiff.py (every miner_gauge, current run, x1/x2 vs 252/216/46 + field median):
+- **Presence (biggest):** order_books x1 23 / x2 26 vs 252 192 / 216 256 (field 76); open bids/asks ≈ 41–49 vs 188–254; resting notional ≈ $80k vs $560–680k per side;
+  min_roundtrip_volume $0 vs $12.6–22.8k (we have one-sided books → 2·min = 0 making there); yet debeta_at_best_seconds 165k–278k vs 93–96k (we sit AT the touch far more).
+  Cause: pacer token bucket (pace_burst 900 s ≈ $4.7k per book): x1 trades ≈ $200k/book/day (44% of the refill) but PACE STATUS shows 228–238 of 256 books blocked →
+  when a book is live our at-the-touch quotes are hit at many times the fleet's rate, the bucket empties in minutes, the book goes dark. The fleet rests behind the touch on
+  ~all books and steps in with fundamental moves (44% WITH fills), at ≈ the same total $/book. Charging is correct (one spend per fill). Bigger pace_burst would NOT help
+  (attack suite: worst-24h identical for 900–14,400 s; only longer idle cycles) — the fix is quoting, not the bucket.
+- **Response time:** call_time x1 0.41 s / x2 0.41 vs 252 0.15 / 216 0.14 (field median 0.31; p5 0.33 vs 0.07). Delay curve (min 10 ms, max 1 s, timeout 3 s): ≈ 16 ms vs 12 ms
+  sim delay → within each round the fleet's orders reach the book first (queue priority / first to step in). Real but secondary; agent compute optimisation = next build.
+- Smaller: refused 65 vs 0, failures 4 vs 0 (x1 restarts); skill_net_alpha_mark_alt −1,970 vs +753 (median mark, published only). GenTRX 0 for all four. Counterparty factors,
+  presence share, coverage, s3 all equal.
+- Built dc5e46b0 (backup QuoteAgent.pre-leanonly.py): _vol_ladder no_touch accepts a SET of sides (ladder stays on both); live knob mk_vol_lean_only = on $300 books a touch
+  order only on the side the lean jump favours, ladder otherwise. test_pace ALL PASS (+5). x1 restarted 10:32:41 AM CT (lean off as base; 228/256 blocked; 0 errors).
+- x1jump (started 10:31) cancelled (x1 present on ~25 books → test crippled); x1rest 10:51 AM–12:51 PM: A = lean 1.0 + jump 3 + lean-only vs B = at-the-touch, no lean — judged
+  on presence first (order_books gauge, PACE blocked), then $300 skill net of refs, WITH share; x1low2 moved to 12:51–2:51 PM. Decisions ≈ 1:06 PM and ≈ 3:06 PM.
+
+## §1436 — 2026-11-13 ≈ 11:05 AM CT — Where our 0.41 s response time goes (vs the fleet's 0.15 s)
+- Network is NOT it: main validator 5EWwdZB7 (uid 0, Cherry Servers, Chicago) ↔ lab (DigitalOcean, North Bergen NJ) ping 19.4 ms avg.
+- py-spy (installed in /opt/mvtrx/venv; read-only sampling of x2 PID, 20 s @ 100 Hz, 110 busy samples inside forward()): decompress ≈ 20–24%; agent.update ≈ 27%
+  (QuoteAgent.py:346 builds _RawBook/_Ev objects for every event/order of all 256 books — __init__ lines 37/65 ≈ 20%); _quote ≈ 40% of which per-book
+  config_for / price_decimals / min_order_size lookups ≈ 12% and _predict (the alpha model, used only for cancel ordering while alpha_k = 0) ≈ 9%.
+- Next-build speedups (est. −30…40% of handle time): build _Ev lazily (only books we quote / events we read), cache per-book config lookups once per simulation config,
+  skip _predict when alpha_k = 0 and cancel_first is off. Not deployed (x1 is mid-test, x2 settled).
+
+## §1437 — 2026-11-13 ≈ 11:05 AM CT — Tests moved to x2 (user; x1 is the lowest unprotected = next prune); tape moved to x2; 1-h test blocks
+- User ≈ 11:00 AM: x1 will be pruned before the tests finish → move them to x2; away for a few hours; ANY changes/tests allowed.
+- x1 tests (x1rest/x1low2) stopped; tapeguard + tapeguard2 timers stopped/disabled; x1 → base settings (no lean/jump/lean-only), tape= removed from its unit (backup
+  mvtrx-x1.service.pre-notape), restarted 11:00:28 AM CT. x2: registered; tape= added (backup mvtrx-x2.service.pre-tape-1113); restarted 10:59:50 AM CT onto agent
+  dc5e46b0 with its FINAL settings (live_params_191 = FINAL); tape growing from x2; 235 of 256 books blocked at start (ledger carried).
+- **x2's protection ends ≈ 12:25 PM and its pay is $0** (score 0: start burst + fee collapse + 19-h window lag) → it will be the lowest unprotected UID right after and
+  likely pruned at the next registration. Tests therefore run as 1-h ABBA with 15-min blocks (abtest_sched_x2_15.sh): x2rest 11:16 AM–12:16 PM (A = FINAL + mk_vol_jump 3 +
+  mk_vol_lean_only 1 vs FINAL), reads 12:19 / 12:22 / 12:28 (before protection ends); x2low2 12:16–1:16 PM (mk_low_touch_min 2 vs 0). 15-s re-asserts, grpcap (+252),
+  skill reads. Decisions ≈ 12:31 PM and ≈ 1:31 PM.
+
+## §1438 — 2026-11-13 11:25 AM CT — x1 (UID 27) PRUNED; cleaned up; x2 alone (tape + tests)
+x1 was already unregistered when it restarted at 11:00:28 AM CT ("is not registered on netuid 79" at 11:00:37) → pruned between ≈ 10:50 (lowest unprotected, 1.00× the line)
+and 11:00. UID 27 now belongs to a new owner (age 0.5 h at 11:22). mvtrx-x1 stopped + disabled (was restart-looping in "activating"); 27 removed from our_uids.txt (backup
+our_uids.txt.pre-x1prune-1113) so the self-trade monitor no longer watches the new owner; selftrade 0. The tape had already moved to x2 (§1437) → no gap.
+Early presence read during x2rest arm A (rest behind the touch + lean step-in): x2 order_books 39 at 11:22 (24 before), 252 192.
+
+## §1439 — 2026-11-13 ≈ 12:40 PM CT — x2 (UID 191) PRUNED at ≈ 12:30 PM (minutes after protection ended, $0 pay); no miners left; x2rest verdict
+- UID 191 re-registered by hotkey 5C5mUdtFB7 at block 9,499,248 (≈ 12:30 PM CT); our x2 hotkey is in no slot. regcheck.py printed "REGISTERED" at 12:31:07 — it can lag a
+  prune by a minute (chain read vs metagraph). mvtrx-x2 stopped + disabled; all x2 timers stopped; x2low2 + its decision and the brief cron cancelled; our_uids.txt empty.
+  The tape stopped (x2 wrote it); last size 892 MB.
+- x2rest (11:16 AM–12:16 PM, 15-min ABBA, no flash): PRESENCE order_books A 28.1 (20–41) vs B 26.1 (21–35) → NO clear rise; $300 books filled per window A 40/35 vs B 40/51.
+  $300 skill x2 A −0.27 vs B +0.04 bp, refs Δ 252 −0.16 / 216 −0.15 → net −0.16 (no gain); $300 edge per $ A +1.24 vs +1.02 bp (fewer touch fills). → NOT a win.
+  Learning: removing the $300 touch orders did NOT restore presence → the pace stop-go has another driver (ladder / $30 / 4-dec fills, or the 900-s burst vs order size);
+  needs an offline replay of the pacer against the tape before the next miner.
+- Why both died: x1 — fee-driven making collapse (its pay was all making) → 0 live score → pay slid below the line within ≈ 14 h. x2 — the 256-book start burst lost money
+  (score 0 for its whole protection) and then the fee collapse → $0 pay at protection end → pruned within minutes. A new miner must carry a POSITIVE score well before its
+  24-h protection ends: smaller start budget, and skill (fees don't touch skill).
+
+## §1440 — 2026-11-13 ≈ 1:30 PM CT — Prerequisites 1–4 built (soft pacing, fee-aware, speed, start budget); gap list + test schedule; withdrawal commands
+User: do 1–4, deep-dive everything separating us from 252, a 2-h test schedule strictly around that (no repeats of proven items), then withdraw x1–x3 TAO and register.
+- Build 10dc929d (backups QuoteAgent.pre-softfee.py, test_pace.pre-softfee.py): soft pacing (unit pace_soft $ floor, pace_soft_min; live pace_soft_on), fee-aware widening
+  (live mk_fee_k; raw account "f"→"m" maker fee rate), per-book config cache, model skipped when unused. test_pace ALL PASS incl. soft attacks (worst $453–457k), hourly live
+  toggling ($467k; $50k sweeps $492k of $500k — so toggle no faster than 30-min blocks). Flow model (fills ∝ presence, 10–40× refill when present): presence hard 14/8/4% →
+  soft (5k, min 0.05) 100/99/77% at the same ≈ $458k/day. Staged as /opt/mvtrx/agents/QuoteAgent.next-10dc929d.py (not active; no miners run).
+- Gap list, starting settings and the 8-test schedule: deploy/sn79/NEXT_MINER_PLAN.md. Stake now: x3 27.48, x1 9.95, x2 2.91, x4 2.77 α on 79 (≈ 0.133 TAO), m3 0.021 α on 101.
+  Withdrawal = per hotkey `~/btcli/bin/btcli stake remove --wallet.name main --wallet.hotkey <hk> --all --no-mev-protection` (batch failed twice before, §1211 add. 19).
+
+## §1441 — 2026-11-13 1:50 PM CT — New miner UID 174 (hotkey x2) live on build 10dc929d; T1–T7 scheduled
+- User withdrew (per hotkey) and registered hotkey x2 → **UID 174** (block 9,499,598 ≈ 1:42 PM CT; protection 7,200 blocks → ends ≈ 1:42 PM CT 11-14).
+- Lab: agents/QuoteAgent.py = 10dc929d (prior saved as agents/QuoteAgent.dc5e46b0.py); unit mvtrx-x2 (backup mvtrx-x2.service.pre-uid174): pace_start 100000 → 20000,
+  + pace_soft=5000 pace_soft_min=0.05, tape on; live_params_174.json = x2's FINAL (§1432) + pace_soft_on 1, mk_fee_k 0, jump/lean-only/low-touch-min/skip-dec 0
+  (also saved as live_params_174.START.json = the test base). our_uids.txt = "174 maker x2 21458". Started 1:48:47 PM CT: UID 174 registered, live params applied,
+  ≈ 1,770 orders/min, 0 self-trades, tape growing. No old pace ledger for 174.
+- Scripts for UID 174: abtest_sched_n.sh (writes live_params_174.json), abgrp_n.sh (UIDS_EXTRA 174:x2,252:252), skillread_n.sh (174 252 46 216); reads at +3 / +14 / +20 min.
+- Schedule (CT, 2-h ABBA on the start base): T1 nsoft 3:01–5:01 PM, T2 nfee 5:01–7:01, T3 nrest 7:01–9:01, T4 nlow2 9:01–11:01 PM, T5 nskew 11:01 PM–1:01 AM,
+  T6 nlad 1:16–3:16 AM, T7 nin2 3:16–5:16 AM (T6/T7 shifted 15 min so no read overlaps the 3:07 AM tape rotation); decisions ≈ +23 min each; the T7 decision schedules
+  T8 confirmation 6:01–8:01 AM → settle ≈ 8:25 AM (≈ 5 h clean before protection ends); T5 decision = T+12 h survival check (stop testing if live making and skill ≤ 0).
+
+## §1442 — 2026-11-13 ≈ 2:15 PM CT — Adopt CLEAR winners live as reads come in (user); rebase_n.sh
+User: add a successful test to the live strategy when its read comes in (live switch, no restart). Risk = adopting a noisy single-read "win" contaminates later tests'
+base → adopt only CLEAR wins (presence clearly up, or skill net of refs ≥ ≈ +0.3 bp in the targeted class with more kept positive books, pay-weighted making not
+down > ≈ 10%); ties wait for T8. /opt/mvtrx/rebase_n.sh '<keys>' sets the keys live (live_params_174.json) and in the test base (live_params_174.START.json) and
+rewrites every PENDING n* switch (A/B/END/re-assert, same times) — except keys that test varies itself. Dry run on "mk_fee_k": 1.0 OK (7 tests, nfee's own key left
+alone). Original start base kept as /opt/mvtrx/live_params_174.ORIGINAL.json; T8 = everything adopted vs ORIGINAL. All 7 decision crons recreated with the rule.
+
+## §1443 — 2026-11-13 ≈ 4:05 PM CT — T1 interim: soft pacing is THE presence fix (recorded permanently, user)
+UID 174 T1 (nsoft, ABBA): arm A soft on (3:01–3:31 PM) ≈ 113 books with resting orders, ≈ 137 of 256 paced; arm B soft off (from 3:31 PM) **5 books, 248 of 256 paced**
+(validator order_books gauge + PACE STATUS) — the hard-pacing stop-go that left x1/x2 dark on ≈ 90% of books. The soft floor leaves buckets below zero, so switching it
+off empties the books almost completely. User: save it so we never forget, same rule for all current and future tests → new memory registry mvtrx-proven-results.md
+(PROVEN / DISPROVEN / NOISE with evidence), memory feedback-record-test-results.md, CLAUDE.md rule + "soft pacing mandatory", NEXT_MINER_PLAN.md updated.
+The formal T1 verdict (skill + making per arm) follows at ≈ 5:24 PM.
+
+## §1444 — 2026-11-13 6:10 PM CT — T1 (nsoft) FINAL: soft pacing = CLEAR WIN (presence + making), skill tie; stays on (already in the base)
+Laptop closed ≈ 5:00–6:09 PM (5:24 decision ran late; server ran T1's end + reads and T2 on time). UID 174 T1 (3:01–5:01 PM, ABBA, no flash), per 30-min window:
+A (soft on) $300 117–120 books, 1,874–3,322 fills, $172–529k, edge +1.00/+1.04 bp; $30 64 books $196–246k; 4-dec 64 books; all-group edge $ 96 / 147.
+B (soft off) $300 26 → 0 books, 58 → 0 fills; $30 9 → 6 books; edge $ ≈ 6 → 3. SKILL $300 A −0.05 vs B −0.19 bp (B tiny), refs Δ +0.08 / +0.05 → net +0.08 (tie);
+0 kept positive $300 books in either arm (the gap T3 targets). → CLEAR WIN on presence and making; adopt rule: already in the base (pace_soft_on 1), nothing to apply.
+Registry memory/mvtrx-proven-results.md updated. UID 174 at 6:09 PM: skill +0.015, combined 0.0028 (positive), making 0 (window lag), $0 pay; T2 nfee running (B block).
+
+## §1445 — 2026-11-13 7:25 PM CT — T2 (nfee) = CLEAR WIN → fee-aware quoting mk_fee_k 1.0 ADOPTED live
+UID 174 T2 (5:01–7:01 PM, ABBA, no flash). A (mk_fee_k 1.0) vs B (0): presence order_books mean 167.6 vs 120.7; $300 edge per $ +1.71 / +1.65 vs +0.95 / +0.84 bp,
+edge $ 47 vs 38 (on $282k vs $425k); $30 +2.69 / +2.54 vs +2.69 / +2.48 bp, edge $ 63 vs 56; 4-dec +1.55 / +1.40 vs +1.22 / +0.98 bp, edge $ 27 vs 23; pay-weighted ≈ 54.9 vs
+46.9 (+17%). SKILL $300 A −0.50 vs B −0.13, refs Δ 252 −0.10 / 216 −0.80 → net +0.08; $30 net +0.11 → tie. → CLEAR WIN (presence + making). `rebase_n.sh '"mk_fee_k": 1.0'`
+7:25 PM: live (LIVE PARAMS applied mk_fee_k 0.0→1.0) + base + pending tests nrest (4 switches left) / nlow2 / nskew / nlad / nin2; ORIGINAL keeps 0 for T8.
+Caveat: T3 (nrest) first A block 7:01–7:31 had fee_k on only from 7:25 → both T3 arms carry it from 7:31; judge T3 mainly on the later blocks.
+UID 174 at 7:24 PM: $1/month (first pay), skill +0.05, score 0.0001. Registry + plan updated.
+
+## §1446 — 2026-11-13 9:30 PM CT — T3 (nrest, jump 3) = not a win (timing works, price too aggressive); T7 replaced by jump 1
+UID 174 T3 (7:01–9:01 PM, ABBA, no flash; fee_k on in A1 only from 7:25). $300: A edge per $ +1.07 (A1) / +1.27 (A2) vs B +1.63 / +1.65 bp; edge $ 22 / 26 vs 26 / 30;
+SKILL A −0.30 vs B −0.48, refs Δ 252 +0.10 / 216 +0.18 → net +0.04 (tie), 0 kept books both; presence order_books A 158.7 vs B 177.2. fundmove256 ($300; B = sim 25562–26159,
+A2 = 26159–26460): fills after the fundamental moved WITH us 34% (A) vs 10% (B) — fleet 38–50% — but kept +0.27 vs +0.91 bp and move-after −0.26 vs −0.61 (fleet +0.19…+0.46).
+→ NOT adopted (rule: skill tie, presence and edge per $ down). Mechanism confirmed; the 3-tick jump steps in too far. T7 (nin2: inside 2 vs 3) REPLACED by nrest1
+(lean-only + jump 1 vs 0/0), 3:16–5:16 AM, re-assert + reads 11:30 / 11:36 UTC; T7 decision cron recreated (daf38bd6) incl. the T8 confirmation. UID 174 at 9:24 PM: $6/month.
+
+## §1447 — 2026-11-13 ≈ 10:40 PM CT — Why UID 174 has 0 making credit: the validator's miner-wide quality factor (exact 0.6.7 replica)
+User: should x2 be earning making credit? check only (no miner/test changes). making067.py runs the validator's own accumulate_book_capture (centred window 15, 20-s horizon,
+fee_weight 0.005, taker legs apart) + markout_quality offline on the tape (read-only, nice 15, compact tuples; 120 sim min = sim 19665–26865). Matches the live gauges
+(174 0 / live 0; 252 25.1 / live 36–41; 216 19.9 / live 22–30).
+UID 174: $300 C 57.8 R −117.4 (R/C −2.03); $30 C 258.4 R +118.9 (+0.46), two-sided 194.8; 4-dec C 240.7 R −16.7 → total R −15.2 → quality 0 → every class credit 0.
+252: $300 C 50.3 R −5.7; $30 C 109.9 R +68.5 (two-sided 64.1); no 4-dec → quality 0.392 → $30 credit 25.1. 216: quality 0.301 → $30 credit 19.9.
+markout_quality sums R and C over ALL books (one factor per miner) → our $300 losses wipe a $30 credit that would be ≈ 195 × 0.46 ≈ 90 (≈ 3.6× 252). Our $300 fills
+(≈ 22× 252's count, ≈ $190 avg, at/inside the touch) capture ≈ nothing vs the centred mid and lose at the horizon. Proposed tests (user to approve; nothing changed):
+mk_skip_vol 1 (no $300 making) and/or mk_skip_dec 1, judged with this replica's quality. Registry + pay-structure memory updated.
+
+## §1448 — 2026-11-13 ≈ 10:05 PM CT — User: never drop book groups; T5 replaced by a $300 rest-behind test judged on the validator's quality
+- User rejected stopping $300 / 4-dec making ("dropping a set of books is just overfitting with risks; if 252 uses them then we will too") → memory
+  feedback-no-dropping-books.md. Note: 252 had 0 4-dec fills on 11-13 but traded them on 11-12 → we keep them.
+- Fix the losing group instead: T5 (skew 3 vs 5, never run) REPLACED by ntm6 = mk_vol_touch_min 6 vs 0 ($300-only since 88ab2eab: no $300 touch order while the spread
+  < 6 ticks → only ladder 1:2:4:7 fills), 11:01 PM–1:01 AM CT, base = START (fee_k 1.0). Skew → extension list. Reads: main, grpcap 1:15, skill 1:21, and NEW
+  makingread_n.sh → making067_ab.py (validator-0.6.7 markout quality + per-class C / R per arm) at 1:40 AM (staggered: two 4.5-GB reads must not overlap on the 8-GB lab).
+  T5 decision cron moved to 1:48 AM (incl. the survival check). Caveat: a 2-h test spans ≈ 20 sim min → per-arm quality is noisy (T3 check: 252 itself reads ≈ 0) → weigh
+  per-class R vs 252/216 in the same windows.
+
+## §1449 — 2026-11-13 11:25 PM CT — T4 (nlow2, $30 picky) = LOSS → not adopted
+UID 174 T4 (9:01–11:01 PM, ABBA, no flash). $30: A (mk_low_touch_min 2) $49k + $52k, edge +3.36 / +3.35 bp, edge $ 16 + 18 = 34, 332 fills, 56–60 books; B $114k + $108k,
++2.72 / +2.73 bp, edge $ 31 + 29 = 60, 722 fills, 63–64 books → edge per $ +0.63 bp but edge $ −43% (credit pays on total two-sided capture). $30 SKILL A −0.29 vs B −0.05,
+refs Δ 252 −0.06 / 216 +0.19 → net −0.31. $300 / 4-dec unchanged. → LOSS; mk_low_touch_min stays 0. 252's higher $30 edge per fill is not from skipping tight spreads.
+T5' (ntm6, $300 rest-behind) started 11:01:50 PM. Registry updated.
+
+## §1450 — 2026-11-14 1:52 AM CT — T5' ($300 rest-behind) = TIE; T+12 h SURVIVAL CHECK FAILED → tests stopped, UID 174 settled
+- T5' ntm6 (11:01 PM–1:01 AM, ABBA, no flash): $300 edge per $ A +1.81 / +1.79 vs B +1.69 / +1.65 bp; edge $ 58 vs 69; volume $325k vs $410k; presence 118 vs 119 books.
+  Validator-0.6.7 replica per arm: $300 R A −5.4 vs B −7.7 (252 −5.6 / −2.4, 216 −5.6 / −5.3 in the same windows → negative for everyone over ≈ 10-sim-min arms), $30 R +0.3 / −1.4,
+  4-dec −1.2 / −3.3; QUALITY 0 for all three UIDs (arms too short). $300 skill A −0.42 vs B −0.44, refs Δ +0.06 / −0.11 → net +0.05. → TIE, not adopted.
+- SURVIVAL (rule set with the user): UID 174 live making 0 AND skill −0.11 at 1:48 AM; pay $5/month vs prune line $122; protection ends ≈ 1:42 PM CT. → remaining tests stopped
+  (T6 nlad mid-run — its B block had already restored the base ladder at 1:46 — and T7' nrest1; their decision crons cancelled; T8 skipped). FINAL = live_params_174.FINAL-1114.json
+  = START (original + fee-aware mk_fee_k 1.0, soft pacing on); applied 1:51 AM ("no change").
+- Assessment for the user: settling does not raise a 0 score; without making credit (miner-wide quality 0, §1447) or positive skill, UID 174 is likely pruned soon after ≈ 1:42 PM.
+
+## §1451 — 2026-11-14 ≈ 5:20 AM CT — Tests resumed on UID 174 until it is pruned (user)
+User ≈ 4:50 AM: "resume all the tests, we're just wasting money if we let it get pruned without testing on it." Scheduled (2-h ABBA, base live_params_174.START.json):
+R1 nj1 lean-only + jump 1 (5:01–7:01 AM), R2 nlad2 $300 ladder 2:5 (7:01–9:01), R3 nskw skew 3 (9:01–11:01), R4 nin2b inside 2 (11:01 AM–1:01 PM), R5 nfee2 fee_k 2.0
+(1:01–3:01 PM), each with re-assert, grpcap, skill and making-quality reads; decision crons 7:45 / 9:45 / 11:45 AM / 1:45 / 3:45 PM (adopt rule §1442; prune handling).
+Problem: the script ran after 11:01 UTC → nj1's first switch fired at schedule time and its re-assert got an EMPTY arm-A JSON (no 0r timer created); the live file stayed
+intact (32 keys) but A1 ran on base until fixed by hand: `liveswitch_nj1.sh A` 5:15:20 AM (applied mk_vol_jump 0→1, lean_only 0→1). Lesson recorded.

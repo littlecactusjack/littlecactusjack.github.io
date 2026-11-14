@@ -505,7 +505,7 @@ check("4-dec: 7 stale orders → at most 5 instructions in one reply", len(cn.in
 # §1334 $300 no-touch: gate expression + ladder-only behaviour on a $300 book
 VT = agent(new_path, pace_cap=450000, mk_vol_lad="2:5:10", mk_vol_touch_min=4)
 src = open(new_path).read()
-check("vol no-touch: main path gate present", "nt_v = bool(self.mk_vol_touch_min and ob_v" in src and "no_touch=nt_v" in src, "gate")
+check("vol no-touch: main path gate present", "nt_v = bool(tm_v and ob_v" in src and "no_touch=nt_v" in src, "gate")
 r = _RespE(); VT._vol_ladder(r, 7, [_OQ(30, Bd, 299.00, 5.0)], {Bd: 299.00, Sd: 299.03}, {}, 5.0, 10.0, 0.01, 2, no_touch=True)
 pl = sorted(i.price for i in r.instructions if i.kind == "place"); cn = sum(1 for i in r.instructions if i.kind == "cancel")
 check("vol no-touch: touch bid cancelled, only 2/5/10 ladder placed", cn == 1 and 299.0 not in pl and 299.03 not in pl and 298.98 in pl and 299.05 in pl, f"cancel {cn} place {pl}")
@@ -664,6 +664,100 @@ r = _Resp(); IN._vol_ladder(r, 7, [], {Bd: 299.00}, {}, 5.0, 10.0, tick, 2, insi
 check("inside: one side pulled → no inside move", all(i.price != 299.01 for i in r.instructions if i.kind == "place"), "bid stays 299.00")
 r = _Resp(); IN._vol_ladder(r, 7, [], {Bd: 299.00, Sd: 299.06}, {}, 5.0, 10.0, tick, 2)
 check("inside: off unless asked", all(i.price not in (299.01, 299.05) for i in r.instructions if i.kind == "place"), "default 0")
+
+# §1434 lean jump / $30 touch minimum / 4-dec off
+JP = agent(new_path, pace_cap=450000, mk_vol_lad="2:5:10", mk_vol_inside=3)
+check("jump: all three switches default off", JP.mk_vol_jump == 0 and JP.mk_low_touch_min == 0 and JP.mk_skip_dec == 0, f"{JP.mk_vol_jump} {JP.mk_low_touch_min} {JP.mk_skip_dec}")
+JP._jumped = {7: {Bd}}
+r = _Resp(); JP._vol_ladder(r, 7, [], {Bd: 299.03, Sd: 299.06}, {}, 5.0, 10.0, tick, 2, inside=3, obest=(299.00, 299.06))
+pl = sorted((i.side == Sd, i.price) for i in r.instructions if i.kind == "place")
+check("jump: a jumped bid keeps its price (not pulled back to one tick inside)", (False, 299.03) in pl and (True, 299.05) in pl, f"{pl}")
+JP._jumped = {7: set()}
+r = _Resp(); JP._vol_ladder(r, 7, [], {Bd: 299.00, Sd: 299.06}, {}, 5.0, 10.0, tick, 2, inside=3, obest=(299.00, 299.06))
+pl = sorted((i.side == Sd, i.price) for i in r.instructions if i.kind == "place")
+check("jump: without a jump the inside step is unchanged (one tick)", (False, 299.01) in pl and (True, 299.05) in pl, f"{pl}")
+JL = agent(new_path, pace_cap=450000, live_params=lpf, live_params_s=30)
+_tm.sleep(0.01); json.dump({"mk_vol_jump": 3, "mk_low_touch_min": 2, "mk_skip_dec": 1}, open(lpf, "w")); os.utime(lpf, None)
+JL._sec = 12000; JL._live_reload()
+check("jump: switches live-applied", JL.mk_vol_jump == 3 and JL.mk_low_touch_min == 2 and JL.mk_skip_dec == 1, f"{JL.mk_vol_jump} {JL.mk_low_touch_min} {JL.mk_skip_dec}")
+_tm.sleep(0.01); json.dump({"mk_vol_jump": 50, "mk_skip_dec": 5}, open(lpf, "w")); os.utime(lpf, None)
+JL._sec = 12100; JL._live_reload()
+check("jump: out-of-range values ignored", JL.mk_vol_jump == 3 and JL.mk_skip_dec == 1, f"{JL.mk_vol_jump} {JL.mk_skip_dec}")
+check("jump: 4-dec skip gate and $30 own touch minimum present in the source",
+      'if self.mk_skip_dec and self._g(book_id) == "dec"' in src and "tm_v = self.mk_low_touch_min if self._is_low(int(book_id)) else self.mk_vol_touch_min" in src
+      and "self._jumped[int(book_id)].add(OrderDirection.BUY)" in src, "gates")
+
+# §1435 per-side no-touch (lean-only touch on $300 books)
+LO2 = agent(new_path, pace_cap=450000, mk_vol_lad="2:5:10")
+check("lean-only: switch defaults off", LO2.mk_vol_lean_only == 0, f"{LO2.mk_vol_lean_only}")
+r = _Resp(); LO2._vol_ladder(r, 7, [], {Bd: 299.00, Sd: 299.06}, {}, 5.0, 10.0, tick, 2, no_touch={Sd})
+pl = sorted((i.side == Sd, i.price) for i in r.instructions if i.kind == "place")
+check("lean-only: no_touch={SELL} keeps the bid touch, drops only the ask touch, ladders on both sides",
+      (False, 299.0) in pl and (True, 299.06) not in pl and any(sd for sd, _ in pl) and (True, 299.08) in pl, f"{pl}")
+r = _Resp(); LO2._vol_ladder(r, 7, [_OQ(1, Sd, 299.06, 5.0)], {Bd: 299.00, Sd: 299.06}, {}, 5.0, 10.0, tick, 2, no_touch={Sd})
+check("lean-only: a resting ask AT the touch is cancelled when its side has no touch", any(i.kind == "cancel" for i in r.instructions), f"{[(i.kind, i.price) for i in r.instructions]}")
+r = _Resp(); LO2._vol_ladder(r, 7, [], {Bd: 299.00, Sd: 299.06}, {}, 5.0, 10.0, tick, 2, no_touch=set())
+pl = sorted((i.side == Sd, i.price) for i in r.instructions if i.kind == "place")
+check("lean-only: an empty set changes nothing", (False, 299.0) in pl and (True, 299.06) in pl, f"{pl}")
+check("lean-only: wired on $300 books only, off on $30", "else {OrderDirection.BUY, OrderDirection.SELL} - set(self._jumped.get(int(book_id), ()))" in src and "not self.mk_vol_lean_only or self._is_low(int(book_id))" in src, "wiring")
+
+# §1440 soft pacing (stay present, sizes shrink), fee-aware widening, config cache
+def soft_attack(a, days=3, seed=1, order=3000.0, sides=2, step=1):
+    """attack() with the order size scaled by the soft-pacing factor (as _quote does). Also returns the share of steps the gate was open."""
+    rng = random.Random(seed); b = 70; fills = collections.deque(); roll = worst = 0.0; n = 0; open_ = 0; steps = 0
+    for t in range(0, days * DAY, step):
+        a._sec = t; steps += 1
+        if a._paced_out(b):
+            continue
+        open_ += 1; f = a._pace_factor(b)
+        for _ in range(rng.randint(1, sides)):
+            v = order * f * rng.uniform(.3, 1.0); fill(a, b, t, v, True); fills.append((t, v)); roll += v; n += 1
+        while fills and fills[0][0] <= t - DAY:
+            roll -= fills.popleft()[1]
+        worst = max(worst, roll)
+    return worst, open_ / steps, n
+for name, kw in (("typical $3k orders", {}), ("large $10k orders", {"order": 10000.0}), ("two sides each step", {"sides": 2, "order": 3000.0}), ("one huge $50k sweep each time", {"order": 50000.0, "sides": 1})):
+    sa = agent(new_path, pace_cap=450000, pace_soft=5000, pace_soft_min=0.1); w, op, n = soft_attack(sa, **kw)
+    ha = agent(new_path, pace_cap=450000); wh, oph, nh = soft_attack(ha, **kw)
+    check(f"soft pacing, {name}", w < CAP, f"worst 24h ${w:,.0f} of ${CAP:,.0f} | gate open {op:.0%} of the time (hard pacing {oph:.0%}) | {n} fills")
+def toggle_attack(a, days=3, seed=2, order=10000.0, sides=2):
+    rng = random.Random(seed); b = 70; fills = collections.deque(); roll = worst = 0.0
+    for t in range(0, days * DAY):
+        a._sec = t; a.pace_soft_on = 1 if (t // 3600) % 2 == 0 else 0     # live switch flipped every sim hour
+        if a._paced_out(b): continue
+        f = a._pace_factor(b)
+        for _ in range(rng.randint(1, sides)):
+            v = order * f * rng.uniform(.3, 1.0); fill(a, b, t, v, True); fills.append((t, v)); roll += v
+        while fills and fills[0][0] <= t - DAY: roll -= fills.popleft()[1]
+        worst = max(worst, roll)
+    return worst
+TA = agent(new_path, pace_cap=450000, pace_soft=5000, pace_soft_min=0.05)
+w = toggle_attack(TA); check("soft pacing: live on/off flipped every hour, $10k orders", w < CAP, f"worst 24h ${w:,.0f} of ${CAP:,.0f}")
+TA2 = agent(new_path, pace_cap=450000, pace_soft=5000, pace_soft_min=0.05)
+w = toggle_attack(TA2, order=50000.0, sides=1); check("soft pacing: live on/off flipped every hour, $50k sweeps", w < CAP, f"worst 24h ${w:,.0f} of ${CAP:,.0f}")
+OFF = agent(new_path, pace_cap=450000, pace_soft=5000, pace_soft_min=0.05, pace_soft_on=0)
+check("soft pacing: pace_soft_on 0 → hard behaviour", OFF._pace_factor(73) == 1.0, f"{OFF._pace_factor(73)}")
+SP = agent(new_path, pace_cap=450000, pace_soft=5000, pace_soft_min=0.1); SP._sec = 100
+check("soft pacing: full bucket → full size", abs(SP._pace_factor(71) - 1.0) < 1e-9, f"{SP._pace_factor(71):.2f}")
+SP._tok_spend(71, 100, SP.pace_rate * SP.pace_burst + 5000 - 1.0)
+check("soft pacing: at the floor → minimum size, still open", abs(SP._pace_factor(71) - 0.1) < 1e-6 and not SP._paced_out(71), f"factor {SP._pace_factor(71):.2f} open {not SP._paced_out(71)}")
+SP._tok_spend(71, 100, 10.0)
+check("soft pacing: below the floor → dark", SP._paced_out(71), "paced out")
+HP = agent(new_path, pace_cap=450000)
+check("soft pacing: off by default (factor 1, hard gate at 0)", HP.pace_soft == 0 and HP._pace_factor(72) == 1.0, f"{HP.pace_soft}")
+class _AF:  # account with the raw fee rate
+    fee_m = 0.012
+FE = agent(new_path, pace_cap=450000, mk_fee_k=1.0)
+check("fee-aware: 120 bp maker fee on a $300 book → 2 ticks", FE._fee_ticks(_AF(), 300.0, 0.01) == 2, f"{FE._fee_ticks(_AF(), 300.0, 0.01)}")
+check("fee-aware: off by default", agent(new_path, pace_cap=450000)._fee_ticks(_AF(), 300.0, 0.01) == 0, "0")
+check("fee-aware + speed wiring present", "ft = self._fee_ticks(acct, mid, tick)" in src and "(self.alpha_k or self.pull or self.take or self.trend_z)" in src and "def config_for(self, book_id)" in src, "wiring")
+class _SC:
+    n = 0
+    def config_for_book(self, b): _SC.n += 1; return ("cfg", b)
+CC = agent(new_path, pace_cap=450000); CC.simulation_config = _SC(); CC._sec = 50
+CC.config_for(5); CC.config_for(5); CC.config_for(6)
+c1 = _SC.n; CC._sec = 50 + 700; CC.config_for(5)
+check("speed: config cached per book, refreshed after 600 sim s", c1 == 2 and _SC.n == 3, f"lookups {c1} then {_SC.n}")
 
 # §1308 trade-flow pull helper
 TF = agent(new_path, pace_cap=450000, mk_tflow_usd=1000, mk_tflow_win=10); TF._sec = 100
