@@ -22774,3 +22774,205 @@ R1 nj1 lean-only + jump 1 (5:01–7:01 AM), R2 nlad2 $300 ladder 2:5 (7:01–9:0
 (1:01–3:01 PM), each with re-assert, grpcap, skill and making-quality reads; decision crons 7:45 / 9:45 / 11:45 AM / 1:45 / 3:45 PM (adopt rule §1442; prune handling).
 Problem: the script ran after 11:01 UTC → nj1's first switch fired at schedule time and its re-assert got an EMPTY arm-A JSON (no 0r timer created); the live file stayed
 intact (32 keys) but A1 ran on base until fixed by hand: `liveswitch_nj1.sh A` 5:15:20 AM (applied mk_vol_jump 0→1, lean_only 0→1). Lesson recorded.
+
+## §1452 — 2026-11-14 7:55 AM CT — R1 (nj1: lean-only + jump 1) = TIE, not adopted; timing nearly matches the fleet
+UID 174 R1 (A1 5:15–5:31 only, B 5:31–6:31, A2 6:31–7:01; no flash). $300: A edge per $ +1.29 / +1.28 vs B +1.66 / +1.63 bp; edge $ 14 + 27 = 41 vs 28 + 30 = 58; presence 119–120
+books both. SKILL $300 A −0.37 vs B −0.44, refs Δ 252 +0.13 / 216 −0.11 → net +0.06 (tie), 0 kept books. Validator-0.6.7 making per arm: $300 R A −8.1 vs B −6.7; $30 R −0.6 / +0.2;
+4-dec −4.5 / −5.3; quality 0 both (252 0 / 0.195, 216 0 / 0.327). fundmove256 ($300, A2 vs B): WITH share 41% vs 10% (fleet 47–50%), kept on WITH fills +0.62 vs +0.72 bp
+(fleet +0.88–1.10; T3 jump 3 +0.27), move-after on all our fills −0.55 vs −0.86 (fleet +0.29–0.39). → not a clear win (skill tie, $300 edge per $ and realized slightly worse);
+best skill lead so far (timing ≈ fleet, price cost much smaller than jump 3). Registry updated. UID 174 registered at 7:45 AM; R2 (nlad2) running 7:01–9:01.
+
+## §1453 — 2026-11-14 9:00 AM CT — Why UID 174's skill fell to 0: last night's skill was 4-dec inventory luck, not $300 skill
+Per-class net alpha (agent_class_gauges, 2-h steps): $300 (class 0) −15 / −75 / −34 / −23 / +2 / +4 / +19 / −46 / −24 / −37 (3 PM → 9 AM) — never meaningfully positive;
+$30 0 throughout; 4-dec (class 2) −102 / −18 / +93 / +275 / +3 / −142 / −511 / −549 / −686 / −347. Overall debeta_skill peaked +0.16 at 9 PM (4-dec), went negative from ≈ 1 AM
+and is floored at 0.00 since 5 AM (net α −412). The fleet barely trades 4-dec (252 none today) → no exposure to these swings. User forbids dropping groups → proposal:
+smaller 4-dec orders (mk_dec_size 0.09 → 0.03, live) to cut 4-dec inventory risk; suggested in place of R5 (fee_k 2.0) at 1:01 PM if UID 174 is still registered.
+
+## §1454 — 2026-11-14 ≈ 9:10 AM CT — Rule: during testing, strategy discovery beats miner survival (user)
+User: "during testing phases miner survivability is not objective, finding a strategy that works is. you stopped testing last night because the survival check was
+negative and it wasted 4 hours of tests for no reason." The 1:48 AM survival stop (§1450) settled UID 174 with a 0 score; no reads 1:48–4:50 AM. Saved: memory
+feedback-testing-over-survival.md, CLAUDE.md rule, NEXT_MINER_PLAN.md (survival stop removed; test miners test until pruned). The pending R3–R5 decision crons already
+continue until prune (they only clean up after a prune).
+
+## §1455 — 2026-11-14 9:50 AM CT — R2 (nlad2, $300 ladder 2:5) = TIE, not adopted
+UID 174 R2 (7:01–9:01 AM, ABBA, no flash). $300 edge per $ A +1.70 / +1.61 vs B +1.65 / +1.66; edge $ 27 + 27 = 54 vs 31 + 33 = 64; books 117 vs 118–119. SKILL $300 A −0.48
+vs B −0.50, refs Δ 252 +0.10 / 216 +0.13 → net −0.10. Validator-0.6.7 making: $300 R A −6.1 vs B −9.1 (252 −1.2 / −6.3, 216 −4.9 / −8.1 → market moved the same way;
+net −1.2); quality 0 both. → TIE. UID 174 registered at 9:45; 252 pay $292/month (mostly skill; its making ≈ 3). R3 (skew) running 9:01–11:01.
+
+## §1456 — 2026-11-14 11:50 AM CT — R3 (nskw, skew 3 vs 5) = TIE / slight loss, not adopted
+UID 174 R3 (9:01–11:01 AM, ABBA, no flash). SKILL $300 A −0.43 vs B −0.50 bp (refs Δ 252 +0.34 / 216 +0.15 → net −0.17); $30 −0.13 vs −0.15 (refs Δ +0.43 / +0.08 → net −0.24);
+4-dec −0.12 vs −0.77 (noise). Validator making: $300 R −7.5 vs −8.4 (252 −6.9 / −9.5, 216 −5.9 / −6.2), $30 +0.8 / +0.3, quality 0. Edge $ per window ≈ equal (A 64 / 62 vs B 64 / 61).
+→ not adopted. UID 174 registered at 11:45; 252 $283/month. R4 (inside 2) running 11:01 AM–1:01 PM.
+
+## §1457 — 2026-11-14 1:50 PM CT — R4 (nin2b, $300 inside 2 vs 3) = TIE, not adopted; UID 174 still registered after protection ended
+UID 174 R4 (11:01 AM–1:01 PM, ABBA, no flash). $300 edge per $ A +1.48 / +1.80 vs B +1.65 / +1.78 bp; fills ≈ 1,650–1,690 per window both; SKILL $300 A −0.41 vs B −0.44, refs Δ 252
++0.13 / 216 +0.05 → net −0.06; validator making $300 R −7.2 vs −7.3 (252 −1.0 / −3.7, 216 −0.9 / −1.8 — references improved in A, we did not); quality 0 both. → TIE.
+Registration confirmed 1:45 PM (protection ended ≈ 1:42 PM). 252 $327/month (skill). R5 (fee_k 2.0) running 1:01–3:01 PM.
+
+## §1458 — 2026-11-14 2:17 PM CT — UID 174 (x2) PRUNED ≈ 2:09 PM; R5 (nfee2, fee_k 2.0 vs 1.0) NOT READ; lab cleaned
+Journal 20:09:37 UTC: "x2 is not registered on netuid 79"; chain: UID 174 now another hotkey (registered 0.14 h before the 2:17 check). Pruned ≈ 27 min after
+protection ended (≈ 1:42 PM) at $0 pay — as expected. R5 had only one A block (1:01–1:31) and one B block (1:31–2:01) + a partial → under the noise floor, NOT READ
+(fee_k 2.0 stays UNTESTED). Cleanup: mvtrx-x2 stopped + disabled; mvtrx-nfee2-{3,end,read} timers stopped; 174 removed from our_uids.txt (now empty; backup
+our_uids.txt.bak-1114-prune); session crons (R5 decision, 30-min brief) deleted. No miner runs now; the tape stopped with x2. 252 at last read $326/month (skill).
+User decision (11-14 ≈ 2 PM): build response speed BEFORE the next miner; then baseline read + speed-sensitive re-tests (NEXT_MINER_PLAN.md).
+
+## §1459 — 2026-11-14 2:15 PM CT — Speed build 9f0d07f3 (from 10dc929d): agent 200 → 67 ms median, output IDENTICAL; not deployed (no miner)
+Measured on 5 fresh validator requests captured off the wire (tcpdump on :8102 + reassembly → /opt/mvtrx/cap14/req_*.json, 256 books, ≈ 1.7 MB, ≈ 22–27k events,
+29k resting orders per state; bench /opt/mvtrx/speed/bench.py with the live x2 unit params + live_params_174.json). Live cycle before (journal): decompress ≈ 0.10 s,
+update 0.07–0.16, respond 0.22–0.27, instruction printing 0.01–0.03; gauge call_time_median 174 = 0.531 s vs 252 0.128 / 216 0.129.
+Fixes (all exact — no strategy change):
+1. _RawBook.events built lazily (raw dicts kept in raw_e) — the _Ev build of every event was the biggest cost.
+2. Pace fill scan reads the raw dicts; builds an _Ev only for our own fills.
+3. Tape (_record) written by ONE FIFO background thread, 0.25 s after the state and only once the handler is idle (tape_async=1, tape_delay=0.25).
+4. Per-book instruction count (_vol_ladder / _vol_lazy) counts from this book's start index — was a scan of the whole reply for every book (quadratic).
+5. Lock folder listed once per state (set) instead of ≈ 1,500 stat calls; our own ack writes/removes keep the set in sync.
+6. quiet_report=1: one "REPLIES" line per sim minute instead of printing ≈ 600 instructions per state before replying (also stops the journal bloat behind the scan hangs).
+Results: agent handle median 200 → 67 ms (p90 310 → 76) with the tape off the reply path; side by side vs 10dc929d on the same states (equiv.py, lock folder seeded from
+the live one): 15 replies, 0 instruction differences, tape identical (17,514 lines), pace ledger identical, lock folders identical. test_pace.py: ALL PASS (211 / 0).
+Left: framework decompress ≈ 90 ms (msgpack → Python objects, already C: 70 ms of it is decoding all books' events/orders) + ≈ 20 ms request parsing. Estimated server
+time ≈ 0.18 s vs ≈ 0.45 s. Cutting decompress needs a custom decoder in the miner (skip/lazy-decode events) — held. Reminder §1263 add. 2: under the validator's curve
+policy the sim-time delay gain is small (≈ 16 → 12 ms); the live read on the next miner decides whether speed moves $300 realized/skill.
+
+## §1460 — 2026-11-14 2:31 PM CT — New miner: hotkey x2 re-registered as UID 179; live on speed build 9f0d07f3 + START + pace_soft_min 0.20
+User registered x2 → UID 179 (regcheck REGISTERED 2:30 PM). Unit mvtrx-x2 reused (backup /opt/mvtrx/mvtrx-x2.service.pre-179): only change pace_soft_min 0.05 → 0.20
+(user yes 11-14); live_params_179.json = START (= 174's live, soft on, mk_fee_k 1.0); new ledger pace_179.ledger (clean cap); tape stays on x2. Started 20:31:04 UTC;
+first states: decompress 0.08–0.11 s, agent update ≈ 2 ms (was 70–160), 0 quote/tape errors, startup reply 1,141 instructions. our_uids.txt = "179 maker x2 36980".
+Plan: 2-h baseline 2:35–4:35 PM (read ≈ 4:41 PM; speed AND the size floor changed together — the read cannot separate them), then the speed-sensitive re-tests.
+
+## §1461 — 2026-11-14 4:40 PM CT — pace_soft_min 0.20 LOST presence → back to 0.05 (user rule: "if presence dropped, go back to 5%")
+Books with our resting orders per state (tape queue lines, speed/presence.py): UID 174 on 0.05 — sim 34000–35000 median 193 (p10 176), 35000–36000 191 (185),
+36000–36700 206 (198). UID 179 on 0.20 — first 310 sim s 233, next 300 174, sim 37600–38330 136 (p10 126) and still falling; paced-out books 91 → 109 → 121 of 256
+(3:26 → 3:56 → 4:26 PM). Bigger floor orders spend each book's pace budget faster → books block sooner. Caveat: 174's numbers are from a mature UID (≥ 20 h); a young
+UID with pace_start 20k presence was ≈ 113 on 11-13 T1, so part of the gap may be age — but the trend was down, not up, so the user's rule applies.
+Unit pace_soft_min 0.20 → 0.05 (backup mvtrx-x2.service.pre-min05), restart 22:40:24 UTC (regcheck REGISTERED; ledger reloaded 7,959 fills; 0 errors).
+The 2:35–4:35 baseline (speed + 0.20 together) is still read as planned; the next presence check confirms recovery on 0.05.
+
+## §1462 — 2026-11-14 4:50 PM CT — Speed baseline (UID 179, 2:35–4:35 PM, sim 37012–38278): SPEED DOES NOT FIX $300 — DISPROVEN as the cause
+Compared with UID 174 on the same START settings (R4 B sim 35152–35741, R5 B 36360–36690), refs 252/216 in each window (speed/profwin.py, skill_ab.py, making067_ab.py
+with synthetic switch log liveswitch_base179_log.txt; note: "174" rows in the 179 window are UID 174's NEW owner — ignore).
+- call_time median 0.531 s (174) → 0.299 / 0.287 / 0.256 / 0.246 s (179, 25 / 55 / 85 / 115 min); 252 0.12–0.14, 216 0.13–0.14.
+- $300 20-s markout: 179 −0.95 bp vs 174 −0.88 / −1.00; refs +0.31/+0.38 vs +0.22/+0.39 and +0.56/+0.02 → unchanged.
+- $300 skill: 179 −0.59 bp (1 kept) vs 174 −0.48 (0 kept); refs +0.31/+0.50 vs +0.27/+0.30 → unchanged / slightly worse. 4-dec −1.26 vs −1.05. $30 −0.18 vs −0.17.
+- making (validator 0.6.7): $300 R −49.4 on C 71.4 (174 −13.8 on 12.3), 4-dec −48.5 on 42.6, $30 +33.0 on 78.3 → quality 0 (refs ≈ 0 too this window).
+- Volume 4× (fill $763 vs $107–145, the 0.20 size floor) → presence fall (§1461).
+NEW GAP (depth split, speed/profdepth.py, $300 by ticks from the touch before the fill; kept = edge + 20-s markout):
+  179: d−1 0% | d0 5% (mo −0.28, kept +0.72) | d1 14% (−0.60, +0.63) | d2 37% (−0.79, +0.80) | d3+ 45% (−1.25, +1.01)
+  252: d−1 27% (mo +0.84, kept +1.59) | d0 44% (+0.44, +1.13) | d1 10% | d2 5% | d3+ 14% (−0.68, +1.42); 216 the same shape (d−1 23%, d0 45%).
+→ The fleet gets ~¼ of its $300 $ by stepping INSIDE the touch, and those fills move its way (+0.8 bp); at the touch it is also positive where we are negative.
+Our fills are every depth kept-positive but mid-markout-negative → the skill gap is WHERE/WHEN they step inside (side choice), not speed or depth alone.
+Next: re-test 1 = $300 lean-only + jump 1 (steps inside on the leaning side) — n179lj ABBA 5:01–7:01 PM CT; reads 7:15/7:21/7:39; decision ≈ 7:47 PM.
+
+## §1463 — 2026-11-14 6:25 PM CT — Inside-the-touch study: fee-aware quoting is what keeps our $300 quotes off the touch (EXACT); fee-off alone was a skill tie in T2
+MEASURED (tape, UID 179 B block of n179lj, sim 38868–39151, speed/insidestudy.py; book seen once per sim s):
+- $300 spreads: 1 tick 7%, 2 ticks 6%, 3 ticks 6%, ≥ 4 ticks 80% of book-seconds → there is room to step inside almost always (my 1-tick guess was wrong).
+- $300 maker $ by depth vs the touch 1 s before (20-s markout): 179 inside 1% (+0.57), touch 5% (+0.49), behind 94% (−0.99); 252 inside 44% (+0.43), touch 26% (+0.10),
+  behind 30% (−0.49); 216 inside 32% (+0.48), touch 30% (+0.38), behind 38% (−0.80). Fleet inside fills all at prior spreads ≥ 2 ticks.
+- 8,718 inward touch moves: our order reached the new best price within 6 s only 16% of the time (84% never).
+EXACT code attribution (speed/attrib.py: the real agent on the 5 cap14 states, one rule off at a time; where our $300 quotes rest vs the OTHER makers' best):
+  START: at/inside 1%, strictly inside 1%, median 2 ticks behind | mk_fee_k 0: 70% / 45% / 0 | skew 0, no-chase off, fund_mv 0, pace off: unchanged (1%).
+  → fee-aware (0.005 × ≈ 120 bp × mid ≈ 2 ticks per side) alone holds us 2 ticks behind. It was adopted on edge per $ + presence (T2 §1440), not on skill.
+T2 skill (ab_read_nfee.txt): $300 fee-aware A −0.50 vs off B −0.13 bp; refs Δ 252 −0.10, 216 −0.80 → net ≈ +0.08 = TIE. So fee-off ALONE did not give fleet skill.
+HYPOTHESIS (needs live A/B): the fleet's gain is stepping inside on the RIGHT side. The lean jump (mk_vol_jump) is EXEMPT from the fee push ("a jumped side keeps its
+price"), so re-test 1 (n179lj A = lean-only + jump 1) already tests "inside on the leaning side, fee-free" → keep it; read its depth split at the decision.
+Next candidates if it ties: (a) fee-aware only on the side AGAINST the lean; (b) measure the fleet's side choice for its inside fills (lean vs fundamental / flow / imbalance).
+
+## §1464 — 2026-11-14 7:50 PM CT — Re-test 1 n179lj ($300 lean-only + jump 1 vs START, UID 179, speed build): TIE on skill → ADOPTED by the copy-the-fleet rule
+ABBA 5:01–7:01 PM (A sim 38549–38868 + 39504–39820, B 38868–39504). $300 skill A −0.36 vs B −0.61 bp; refs Δ 252 +0.06, 216 +0.21 → net +0.11 (tie). $300 making R
+A −12.0 vs B −8.6 (refs Δ −0.6 / −2.8 → net ≈ −1.7, small C, noise); quality 0 everywhere (refs too). Edge per $ A +1.38/+1.40 vs B +1.87/+1.86. 4-dec/ $30 unaffected (noise).
+DEPTH SPLIT (insidestudy.py per window) — the key result: A puts 27–28% of our $300 $ INSIDE the previous touch (B 1%), matching the fleet's share (252 30–41%,
+216 32–37%), BUT our inside fills' 20-s markout is +0.01 / −0.05 bp vs the fleet's +1.03/+1.02 (A1) and +0.49/+0.45 (A2) in the SAME windows.
+→ MEASURED: stepping inside is not the edge; WHEN/which side is. Our fundamental-move lean picks neutral moments; the fleet's inside steps pick favourable ones.
+Adopted A as the new base (tie → copy the long-lived fleet's behaviour: their fill shape is ~⅓ inside): live_params_179.json + .START.json mk_vol_lean_only 1, mk_vol_jump 1
+(applied live 7:49 PM; backup bak-alerts-1114/live_params_179.START.pre-lj.json).
+Next: re-test 2 n179in2 (mk_vol_inside 2 vs 3 on the new base) 8:01–10:01 PM CT; reads 10:15/10:21/10:39 PM (NOTE lines, no Discord); decision ≈ 10:47 PM.
+Then the real lead: measure what the fleet's inside fills line up with (fundamental move, trade flow, book imbalance, microprice) vs ours → a side-choice signal test.
+
+## §1465 — 2026-11-14 10:50 PM CT — Re-test 2 n179in2 ($300 inside 2 vs 3 on the lean-only + jump 1 base): TIE / slight loss → keep 3; closed (2nd tie after R4)
+ABBA 8:01–10:01 PM. $300 skill A −0.42 vs B −0.37; refs Δ 252 +0.19, 216 +0.01 → net −0.15. $300 making R A −8.8 vs B −9.3 (252 −3.0 → +2.9 in A). Edge per $ equal
+(+1.33–1.39). Spreads are exactly 2 ticks only ≈ 6% of the time → small lever. Base unchanged (inside 3).
+
+## §1466 — 2026-11-14 11:00 PM CT — SIDE STUDY (MEASURED, tape sim 39504–41587, fleet also 37012–41587) → no visible side signal; STALENESS is the lead
+speed/sidestudy.py, takerstudy.py, sizestudy.py, agestudy.py/agestudy2.py (order age via per-book order-id → first-seen map from our queue lines; ids are PER BOOK).
+- $300 inside fills, 20-s markout: 179 n 2,596 +0.00 [−0.05, +0.04]; 252 n 474 +0.81 [+0.66, +0.94]; 216 n 442 +0.74 [+0.63, +0.84]. Split by EVERY visible feature
+  (fundamental − mid, its 5-s move, top-5 imbalance, microprice, 5-s return, 10-s trade flow): the fleet stays +0.44…+0.96 on both sides of each; ours −0.15…+0.14.
+  Fleet leans a bit more with fund/micro (66–70% / 56–60% vs our 58% / 41%) → selecting on them is worth ≈ 0.1–0.2 bp, not the 0.7 gap.
+- By taker: miner takers hit 16% of our inside $ (−0.11) vs 7–11% of the fleet's (+0.63/+0.86); background agent types similar mix. By taker trade size: fleet better in
+  EVERY bucket (inside +0.53…+1.30 vs ours −0.42…+0.14); $10k+ sweeps = 51% of our $300 $ (−1.08) vs 50% of the fleet's (+0.09/−0.04).
+- ORDER AGE at fill (all $300): fleet 67–68% of $ on orders < 1 s old (+0.40/+0.58), none > 30 s; ours 44% < 1 s (−0.35), the rest −0.8…−1.1. CALM books (63–101):
+  ours 51% of $ on orders > 10 s (26% > 30 s), all −0.9…−1.0; fleet 75–78% < 1 s (+0.5), none > 30 s. Our calm expiry is 500 s (copied 11-08 from an older fleet in the
+  128-book regime, §1311 — never A/B-tested). Caveat: only FILLED orders' ages are visible (unfilled fleet orders may live longer).
+→ NEXT TEST (user: side study → next test): n179cx mk_calm_expiry 30 vs 500 (live knob), ABBA 11:21 PM–1:21 AM CT, reads 1:35/1:41/1:59 AM, decision ≈ 2:07 AM.
+  If it helps: vol-book freshness next (needs a mk_vol_expiry live knob — code + equiv + test_pace + restart).
+
+## §1467 — 2026-11-15 12:30 AM CT — mk_vol_expiry live knob built (agent b3a6247c from 9f0d07f3); NOT deployed (waits for the n179cx decision ≈ 2:07 AM)
+$300 VOL books (0–62, 102–127; not calm, not $30/4-dec): touch + ladder orders expire after MK_VOL_EXPIRY sim s; 0 = unit expiry (60 s). Live knob (range 0–3600).
+First version also hit the $30 books (they share the vol path) — caught by an expiry census on a real state (speed/expcheck.py) → restricted with `not _is_low`.
+Checks: equiv.py vs 9f0d07f3 with the knob off — 10 replies, 0 instruction diffs, tape/ledger/locks identical; census with knob 10: vol 10 s, $30 60 s, 4-dec 60 s,
+calm 500 s ✔; test_pace ALL PASS (211/0). equiv timing: the SECOND agent in a run is ≈ 60 ms slower whichever it is (order effect, not the code).
+Lab copy: /opt/mvtrx/speed/QuoteAgent.volexp.py. Deploy = gated restart, only if calm expiry 30 wins or ties.
+
+## §1468 — 2026-11-15 2:10 AM CT — Calm expiry 30 vs 500 s (n179cx): TIE → ADOPTED (copy fleet); freshness is NOT our calm problem; restart onto b3a6247c; next = vol ladder size
+ABBA 11:21 PM–1:21 AM (A sim 42337–42620 + 43194–43480, B 42620–43194). $300 skill A −0.42 vs B −0.49; refs Δ 252 +0.18, 216 +0.01 → net −0.03 (tie). $300 making R
+−10.0 vs −9.6 (252 −5.3 vs −4.5) ≈ 0 net; edge per $ equal (+1.37…+1.48); $30 / 4-dec unchanged.
+Calm-book order age (agestudy2.py): fills on orders > 30 s 28% (B) → 5–6% (A) — the knob works — but markout stays −0.7…−1.3 at EVERY age (fresh < 1 s: A −1.31 / −0.83
+vs B −0.53). → MEASURED: our calm fills lose regardless of order age; the losses moved to 10–30 s orders. Freshness explains the fleet's profile, not our losses.
+Adopted A by the tie rule (fleet: no calm fills on orders > 30 s): live + START mk_calm_expiry 30 (backup bak-alerts-1114/live_params_179.START.pre-cx.json).
+Restart (gated, regcheck REGISTERED) onto b3a6247c (mk_vol_expiry knob, default 0 = identical) in the gap between tests, 08:07:52 UTC; ledger reloaded 57,962 fills.
+Next test chosen from this result: vol-book expiry would most likely tie the same way → test the measured loss bucket instead: $300 VOL ladder size half
+(mk_vol_lad_size 0.0135 vs 0.027; deep behind-touch fills = 62–65% of our $300 $ at −0.9…−1.1 vs fleet 30–38%). n179ls ABBA 2:31–4:31 AM, reads 4:45/4:51/5:09,
+decision ≈ 5:17 AM. vol expiry stays queued (knob live-ready).
+
+## §1469 — 2026-11-15 5:25 AM CT — Vol ladder size half (n179ls): TIE / leaning loss → keep 0.027; behind-fill SOURCE found (deep ladder levels); next = shallow ladder
+ABBA 2:31–4:31 AM (A sim 44149–44435 + 45013–45302, B 44435–45013). $300 skill A −0.42 vs B −0.44; refs Δ 252 +0.42, 216 +0.48 → net −0.43. $300 making R A −8.1 vs
+B −10.2 (252 −3.6 vs −7.5) → net ≈ −1.8. Edge per $ +1.45–1.55 both. Depth split: behind share A 65–67% vs B 65% (unchanged; fleet 23–34%) → size scales every level alike.
+Kept B (tie rule: A did not move our shape toward the fleet's).
+SOURCE of our $300 behind-touch fills (speed/srcstudy.py, B window sim 44435–45013; placement depth from each order's first queue appearance):
+  vol ladder 3+ ticks back 38% (−1.45) | calm ladder 3+ back 20% (−1.39) | calm ladder 1–2 back 16% (−0.75) | vol placed & filled < 1 s 9% (−1.09) |
+  vol ladder 1–2 back 7% (−0.87) | placed at/inside the touch then left behind 5% (−0.54) | calm < 1 s 3%.
+→ 58% of our behind $ are ladder levels ≥ 3 ticks back (vol levels 4/7, calm level 3), swept at ≈ −1.4 bp.
+Next test n179sh: shallow ladder — A = mk_vol_lad "1:2" + mk_calm_lad "1:2" vs B = "1:2:4:7" + "1:2:3" (live lists; every book still quoted). ABBA 5:31–7:31 AM CT,
+reads 7:45/7:51/8:09, decision ≈ 8:17 AM. (2:5 vs 1:2:4:7 tied on 11-14 R2 — a different shape; "1:2" untested.)
+
+## §1470 — 2026-11-15 7:20 AM CT — Taker miners in today's regime (user asked: switch to takers if makers don't progress?) — MEASURED
+Window sim ≈ 43746–46746 (≈ 50 sim min), all books; pay = metagraph emission × price (speed/toppay.py → pay_all.json); speed/takeshare.py, takerrank.py.
+- 252 and 216: 0% taker volume (pure makers) → their skill is all from resting orders.
+- Top 20 earners ($387–794/mo, UID 0 = owner excluded): 17 pure makers, 3 mixed — 191 (30% taker, $478), 146 (22%, $456), 60 (44%, $392); their taker trades'
+  20-s markout +0.05…+0.83 bp. No pure taker in the top 20.
+- 16 of 254 active UIDs are mostly takers (> 50% of $): best 232 ($336, rank 27), then $230/222/218/212…; the only pure taker (108, maker $0) earns $73.
+  Median pay: takers $158 (n 16) vs makers $204 (n 238).
+- History (11-04 → 11-08, 128-book regime): taker UIDs 169/114/22 — scaled taker −0.25 bp (§1245); copying the best takers' trades loses most alpha at a
+  0.5–1 s delay and all of it by 5 s (§1282); fitted models decayed and needed refits; the paper scorer was 2–3× optimistic (§1250); the 10× wealth per-book
+  volume cap stops a taker's re-entries (§1211, §1245); the best takers were young churn UIDs, long-lived takers weak (§1282).
+→ Pure taking pays LESS than making today; the only taker-heavy UIDs near the top are MIXED (maker + selective taking).
+
+## §1471 — 2026-11-15 7:45 AM CT — Shallow ladder (n179sh): TIE, shape unchanged → keep 1:2:4:7 / 1:2:3; the FEE PUSH is why our ladder sits deep; next = fee_k 0.5
+ABBA 5:31–7:31 AM (A sim 45882–46177 + 46750–47043, B 46177–46750). $300 skill A −0.31 vs B −0.41; refs Δ 252 0.00, 216 +0.23 → net −0.02 (tie). Making R A −9.2 vs B −8.1
+(252 −5.4 vs −7.5) → net ≈ −3 (small C). Edge per $ equal. Behind share A 61–67% vs B 64% (unchanged); presence A 202–212 vs B 204 (held).
+WHY no change: ladder levels are counted from the TARGET price, which fee-aware (mk_fee_k 1.0 ≈ 2 ticks at ≈ 120 bp fees) already holds behind the touch → even "1 tick
+back" ≈ 3 ticks behind the touch (srcstudy "3+ back" = 58%). → fee push again (cf. §1463 attribution).
+Next: n179f05 mk_fee_k 0.5 vs 1.0 (push ≈ 1 tick vs 2; 0.5 untested; 0 tied on skill in T2 on 11-13; 2.0 still queued). ABBA 7:46–9:46 AM, chained reads 9:48, decision 9:53.
+SIDE RESULTS (11-15 7:15–7:35 AM, MEASURED): (a) clone of UIDs 60/232's taker direction: 93.4% held-out accuracy (base 56%); rule = fade the last 1–5 min (dmid60 −4.1,
+dmid300 −4.1, dfund60 −0.8 z); as a TAKER on all book-seconds it moves +0.17…+0.42 bp ($300) / +0.11…+0.79 (4-dec) vs a half-spread cost 0.93 / 1.38 → loses; their own
+takes earn +0.8 (timing). (b) fade vs MAKER fills: ours inside agree +0.24/+0.33 vs disagree −0.21/−0.21 (20/120 s); all $300 −0.45 vs −0.93; fleet split similarly (+1.0 vs
++0.4) but does not select by it (≈ 49% agree). → candidate maker knob: step-in side from the fade signal (mk_fade_lean, code + restart).
+
+## §1472 — 2026-11-15 8:05 AM CT — mk_fade_lean live knob built (agent e43768f5 from b3a6247c); NOT deployed (deploy at the n179f05 boundary ≈ 9:53 AM)
+$300 VOL books: the lean JUMP side follows fade = −(Δmid 60 s + Δmid 300 s) in bp when |fade| ≥ MK_FADE_LEAN, instead of the fundamental move (fair shift unchanged).
+Mid history (per second, 305 s) is recorded every round even while off, so the knob can be switched on live. Range 0–50; 0 = off.
+Checks: speed/fadetest.py (seeded 10-bp fall → BUY jumps on 50 vol books; rise → SELL on 50; knob 0 → none) ✔; equiv.py vs b3a6247c with knob off — 10 replies,
+0 instruction diffs, tape/ledger/locks identical ✔; test_pace ALL PASS (211/0) ✔. Lab copy /opt/mvtrx/speed/QuoteAgent.fade.py.
+Planned test: mk_fade_lean 1.0 vs 0 (base lean-only 1 + jump 1), 2-h ABBA, right after n179f05.
+Also (8:00 AM, user Q "why are books kept so low?"): validator skill counts a book only when |alpha| ≥ 2.3 bp of OUR filled notional on it (hurdle_filter, debeta.py),
+then kappa over kept books, 0 below the minimum → our $300 books have 0 kept in every test (per-book −0.3…−0.5 bp, inside the band); the 27 gauge books are mostly
+losing 4-dec books. Not the presence fix (presence 200–210 is fine).
+
+## §1473 — 2026-11-15 8:25 AM CT — Checks #2 and #4 (MEASURED): NOT volume dilution; the fleet's skill comes from HOLDING BIGGER POSITIONS LONGER
+Window sim ≈ 45458–47228 ($300 books; validator alpha loop as skill_ab.py, inventory from 0 at window start): speed/dilution.py, speed/invstudy.py.
+#2 dilution: notional per book median $9k for 179, 252 and 216 alike. Per-book bp: 179 p10 −1.18 / p25 −0.71 / median −0.42 / p75 −0.12 / p90 +0.26, 18% positive,
+kept 0; 252 −2.34 / −1.02 / +0.33 / +1.98 / +3.01, 59% positive, kept +19 −10; 216 −2.30 / −0.94 / +0.50 / +1.72 / +3.51, 59%, kept +18 −10. Same alpha on 1/5 of the
+notional → ours kept +7 −56 → cutting volume only adds negative kept books. → dilution RULED OUT; the gap is sign and spread.
+#4 inventory: mean |inv| per book 179 $892 (p90 $2,064) vs 252 $4,029 (p90 $10,680) / 216 $3,894 (p90 $10,610); position hold median 179 91 s vs 252 742 s / 216 680 s;
+corr(inventory $, next-60-s mid move) 179 +0.057, 252 +0.042, 216 +0.057 → SAME timing edge. The fleet's per-book alpha is large because its positions are ≈ 4.5×
+bigger and ≈ 8× longer-held; with a small positive tilt that gives more positive kept books. Our skew 5 flattens positions in ≈ 1.5 min → |alpha| too small to count.
+NEXT (after n179f05 ≈ 9:53 AM + fade build restart): INVENTORY test skew 1 vs 5 (R3 skew 3 vs 5 tied on 11-14 — too small a step); then mk_fade_lean 1.0 vs 0.
+Remaining checks: #1 $30 skill vs 252, #3 reprice frequency.

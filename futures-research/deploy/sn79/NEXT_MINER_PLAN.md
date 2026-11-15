@@ -39,11 +39,11 @@ Live: x2's FINAL (§1432) = $300 mk_vol_size 0.044, mk_vol_inside 3, fund_mv 1.0
 | T3 T+5–7 h | lean-only + jump 3 vs touch | WITH share, $300 skill net of refs |
 | T4 T+7–9 h | $30 touch-min 2 vs 0 | $30 edge per $, edge $, $30 skill |
 | T5 T+9–11 h | skew 3 vs 5 | skill, inventory |
-| **check T+12 h** | live making and/or skill must be > 0; if not → stop testing, settle on the best-known | survival |
+| (no survival stop) | user 11-14: on a test miner keep testing until pruned — survival is not the objective | — |
 | T6 T+11–13 h | $300 ladder "2:5" vs "1:2:4:7" | $300 skill, avg fill, presence |
 | T7 T+13–15 h | inside 2 vs 3 | $300 skill, inside share |
 | T8 T+15–17 h | CONFIRMATION: all winners vs base | everything |
-| T+17–24 h | settled — no changes (protection ends T+24 h) | — |
+| T+17 h → pruned | keep testing (extensions) — settle only if the user wants the miner kept | — |
 Extensions only after T8. No taking. Each test winner decided by: presence → skill net of refs → pay-weighted making.
 
 ## Withdraw first (user runs these; one hotkey at a time, MEV protection off, no batch)
@@ -56,3 +56,38 @@ Stake on the coldkey now (11-13 ≈ 1 PM): x3 27.48, x1 9.95, x2 2.91, x4 2.77 a
 ~/btcli/bin/btcli stake remove --wallet.name main --wallet.hotkey m3 --all --no-mev-protection   # optional: subnet 101 dust
 ~/btcli/bin/btcli wallet balance --wallet.name main
 ```
+
+## Priority (user 11-14 ≈ 12 PM)
+Target $300 SKILL from our own post-only fills (price moving WITH our fills). It is also the making fix (miner-wide quality, §1447). Live-switch ideas tried 11-13/14 did not move it (jumps, ladder, skew, rest-behind); next build: response speed (0.41 → ≤ 0.2 s) and larger minimum soft-paced order size.
+
+## Speed build READY (11-14 2:15 PM, §1459) — UID 174 pruned ≈ 2:09 PM (§1458)
+Agent 9f0d07f3 (repo deploy/sn79/QuoteAgent.py; lab /opt/mvtrx/speed/QuoteAgent.speedfinal.py; running copy still 10dc929d in /opt/mvtrx/agents, backup
+QuoteAgent.10dc929d.py). Exact same output as 10dc929d; agent 200 → 67 ms. New params (defaults on): tape_async=1 tape_delay=0.25 quiet_report=1.
+Deploy for the next miner: cp speed/QuoteAgent.speedfinal.py agents/QuoteAgent.py; unit = mvtrx-x2 unit with the new hotkey + pace_soft_min 0.05 (0.20 tried 11-14 on UID 179: presence fell to 136 books, §1461) +
+live_params = START (soft on, mk_fee_k 1.0). Read call_time_median (gauge, wallet 5EWwdZB7) 30 min after start: target ≤ 0.25 s.
+Untested from R5: mk_fee_k 2.0 vs 1.0 (run after the re-tests).
+
+## Speed baseline verdict (§1462): speed is NOT the $300 cause; the gap is stepping INSIDE the touch on the right side
+Fleet: 23–27% of $300 $ filled inside the previous touch (+0.84 bp markout) + 44% at touch (+0.44); us: 0% inside, 5% at touch (−0.28). Order: re-test 1 lean-only + jump 1
+(n179lj, 11-14 5:01–7:01 PM) → re-test 2 inside 2 → touch_min 6 → fee_k 2.0; then design an inside-step test that copies the fleet's side choice (measure it from the tape first).
+
+## Re-test 1 verdict (§1464): lean-only + jump 1 ADOPTED (tie, copy-fleet); inside fills now 27% like the fleet but markout ≈ 0 vs fleet +0.5–1.0
+Base for the next miner: START + mk_vol_lean_only 1 + mk_vol_jump 1. Next lead after re-test 2: the fleet's SIDE-CHOICE signal for inside steps — user 11-14 8 PM: study right after the re-test 2 read (≈ 10:47 PM), and the side-choice test is the NEXT test (before touch_min 6 / fee_k 2.0).
+
+## Side study (§1466): no visible side signal; fleet $300 fills are FRESH (< 1 s, none > 30 s), ours stale → testing calm expiry 30 vs 500 (n179cx 11-14 11:21 PM)
+Inside 2 vs 3 closed (2 ties, §1465). If calm expiry 30 wins/ties: add a live mk_vol_expiry knob and test $300 vol-book freshness next.
+
+## Calm expiry 30 adopted (tie, §1468); agent b3a6247c (mk_vol_expiry knob). Base now: START + lean-only 1 + jump 1 + mk_calm_expiry 30.
+Freshness doesn't fix our losses (they persist at every order age); testing the deep-ladder share next (vol ladder size half, n179ls 11-15 2:31 AM).
+
+## Vol ladder size half: tie, kept 0.027 (§1469). Our behind-touch losses = deep ladder levels (≥ 3 ticks back, 58% of behind $) → shallow ladder test n179sh (11-15 5:31 AM).
+
+## Shallow ladder tie (§1471): the fee push sets our depth → testing fee_k 0.5 (n179f05, 11-15 7:46 AM); fade-lean maker knob being built (clone of 60/232: fade 1–5 min moves).
+
+## KEY GAP (§1473): fleet holds ≈ 4.5× bigger positions ≈ 8× longer with the SAME timing edge → test skew 1 vs 5 (11-15 ≈ 9:55 AM); then fade lean.
+
+## After the speed build (user Q 11-14 ≈ 2 PM: redo all tests?)
+No. Keep: soft pacing, fee-aware, $30 shape, $300 size + inside 3 + lean, 4-dec touch, $30 picky (lost on volume), skew (inventory, not speed).
+Step 1: short read of the faster build on current settings — does $300 realized / skill improve by itself?
+Step 2: re-test only the speed-sensitive (race) items, 2 h each: (1) lean-only + jump 1 (timing already 41% vs fleet ≈ 48%), (2) inside at ≥ 2 ticks,
+(3) $300 touch_min 6 (rest-behind). Re-test the 2:5 ladder only if those change.

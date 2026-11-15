@@ -56,14 +56,21 @@ _LEVELS = 5
 
 
 class _RawBook:
-    __slots__ = ("bids", "asks", "events", "fundamental", "raw_b", "raw_a")
+    __slots__ = ("bids", "asks", "raw_e", "_events", "fundamental", "raw_b", "raw_a")
 
     def __init__(self, d):
         self.raw_b, self.raw_a = d.get("b") or [], d.get("a") or []    # levels with their resting orders in queue order (qlog)
         self.bids = [_Lv(x) for x in self.raw_b[:_LEVELS]]             # §1263: only the top 5 levels are ever read; building all of them was ≈ 10% of the handler
         self.asks = [_Lv(x) for x in self.raw_a[:_LEVELS]]
-        self.events = [_Ev(x) for x in d.get("e") or []]
+        self.raw_e = d.get("e") or []                                   # speed build 11-14: ≈ 27k events per state on 256 books; building an _Ev for
+        self._events = None                                             # each was the biggest cost of the handler. Built only when read (lazy).
         self.fundamental = d.get("f")
+
+    @property
+    def events(self):
+        if self._events is None:
+            self._events = [_Ev(x) for x in self.raw_e]
+        return self._events
 
 
 class _RawAccount:
@@ -236,6 +243,11 @@ class QuoteAgent(FinanceAgent):
         self.mk_vol_inside = int(getattr(c, "mk_vol_inside", 0))   # §1304: >0: $300-book touch orders one tick inside the spread when it is ≥ this many ticks (fleet: 5)
         self.mk_calm_lad = [int(x) for x in str(getattr(c, "mk_calm_lad", "") or "").replace(":", ",").split(",") if x.strip()]   # §1303: calm-book ladder, ticks behind the touch (e.g. 1:2:4)
         self.mk_calm_lad_size = float(getattr(c, "mk_calm_lad_size", 0.036))   # §1303: calm ladder order size (fleet calm fills mostly $1-2k)
+        self.mk_fade_lean = float(getattr(c, "mk_fade_lean", 0.0))   # §1472: >0: the $300 lean JUMP side follows the FADE signal −(Δmid 60 s + Δmid 300 s) in bp when
+        self._mh = {}                                                 # |fade| ≥ MK_FADE_LEAN (clone of taker UIDs 60/232, 93% accurate; our inside fills +0.24 vs −0.21 bp
+                                                                      # by fade agreement, §1471) instead of the fundamental move; 0 = fundamental move (live knob)
+        self.mk_vol_expiry = int(float(getattr(c, "mk_vol_expiry", 0)) * 1_000_000_000)    # §1466: >0: $300 VOL-book (non-calm) touch + ladder orders expire after this many sim s
+                                                                                            # (fleet: its $300 fills are on orders < 1 s old, none > 30 s); 0 = EXPIRY (live knob)
         self.mk_calm_expiry = int(float(getattr(c, "mk_calm_expiry", 0)) * 1_000_000_000)   # §1311: >0: calm-book (63-101) ladder orders expire after this many sim s (fleet: max 500 s, §1311); 0 = EXPIRY
         self.mk_dec_size = float(getattr(c, "mk_dec_size", 0.0))      # §1313: >0: fleet-style quoting on the 4-dec books (102-127), order size (fraction of wealth; fleet ≈ $4.5k ≈ 0.09)
         self.mk_dec_inside = int(getattr(c, "mk_dec_inside", 1))      # §1313: ticks ahead of OTHER makers' best price (fleet: 1-2 ticks = 51% of its 4-dec $); our own orders never count
@@ -322,6 +334,14 @@ class QuoteAgent(FinanceAgent):
         self.sleeve_books = {int(x) for x in open(sb).read().split()} if sb else None   # 1: on skipped books, unwind the position with IOC takes (taker fills never enter the
                                                            # making pool, takers get a fee rebate) — one take per take_cool, ≤ take_size, ≤ top level   # books ranked on one half lift the other half 0.03 → 0.22)
         self.tape = open(str(c.tape), "a") if getattr(c, "tape", "") else None
+        self.quiet_report = int(getattr(c, "quiet_report", 1))  # speed build 11-14: one summary line instead of printing every instruction
+        self.tape_async = int(getattr(c, "tape_async", 1))       # speed build 11-14: write the tape on a background thread AFTER the reply is out
+        self.tape_delay = float(getattr(c, "tape_delay", 0.25))  # (it was ≈ 1/4 of the handler); one FIFO worker keeps the line order exact
+        self._tape_q = None
+        if self.tape is not None and self.tape_async:
+            import queue, threading
+            self._tape_q = queue.Queue()
+            threading.Thread(target=self._tape_worker, daemon=True, name="tape").start()
         self.lean = int(getattr(c, "lean", 0))             # 1: skip the base agent's state history, CSV event log and debug text (§1207, speed)
         self.cancel_first = int(getattr(c, "cancel_first", 0))   # 1: cancel the side the prediction says is exposed first (§1207)
         self.flow_pull = float(getattr(c, "flow_pull", 0.0))   # >0: drop our offer while near-touch new-order imbalance (5 s) > FLOW_PULL, our
@@ -356,6 +376,7 @@ class QuoteAgent(FinanceAgent):
         QuoteAgent uses none of it and the validator delays our orders by how long we take."""
         if not self.lean or isinstance(state, ExchangeStateUpdate):
             return super().update(state)
+        self._busy = True                                 # speed build: the tape worker waits while a state is being handled
         self.simulation_config = state.config
         raw_books = getattr(state.books, "_raw_books", None)
         if self.raw and raw_books is not None:            # lazy_load=1 left the wire dicts in place
@@ -379,6 +400,11 @@ class QuoteAgent(FinanceAgent):
         self._clock_check()
         if self.live_params:
             self._live_reload()
+        if self.lock_dir:                                  # speed build 11-14: list the lock folder once per state (was ≈ 1,500 stat calls)
+            try:
+                self._lockset = set(os.listdir(self.lock_dir))
+            except OSError:
+                self._lockset = set()
         if self.lock_dir and len(self.skip) < 128 and self._sec != getattr(self, "_hb_at", None):
             self._hb_at = self._sec                            # §1240 maker heartbeat: takers only handshake while a maker of ours is alive
             hb = f"{self.lock_dir}/maker_{self.uid}.hb"
@@ -395,10 +421,16 @@ class QuoteAgent(FinanceAgent):
             self._ioc_logged = self._sec            # §1223 add. 6: x2 runs without a tape, so log its IOC flow once per sim minute
             bt.logging.info(f"IOC FLOW: {self._ioc_n} IOCs, ${self._ioc_usd:,.0f} since start; rev targets open {sum(1 for t, _ in self._rev.values() if t)}; model entries {getattr(self, '_model_n', 0)}; copy slices {getattr(self, '_slice_n', 0)}")
         if self.tape is not None:
-            self._record(state)
+            if self._tape_q is not None and self._books is not None:
+                self._tape_q.put((time.monotonic() + self.tape_delay, state.timestamp, self._books, self.accounts))
+            else:
+                self._record(state.timestamp, self._books if self._books is not None else state.books or {}, self.accounts)
         if self.pace_cap:
+            uid = self.uid
             for book_id, book in (self._books if self._books is not None else state.books or {}).items():
-                for e in book.events or []:
+                raw_e = getattr(book, "raw_e", None)          # speed build: scan the raw dicts; build an _Ev only for our own fills
+                evs = (_Ev(x) for x in raw_e if x.get("y") == "t" and (x.get("Ma") == uid or x.get("Ta") == uid)) if raw_e is not None else (book.events or [])
+                for e in evs:
                     if getattr(e, "y", "") == "t" and (e.Ma == self.uid or e.Ta == self.uid):
                         key = (int(book_id), e.id, e.timestamp)
                         if key not in self._pace_seen:
@@ -448,6 +480,7 @@ class QuoteAgent(FinanceAgent):
                 self._ins_over.clear(); self._ins_ex = {}
         except Exception:
             pass
+        self._busy = False
         return response
 
     def _predict(self, book_id, book, sec, mid):
@@ -557,7 +590,7 @@ class QuoteAgent(FinanceAgent):
         tgt = dict(want)
         if B in tgt and S in tgt and self.mk_vol_penny and round((tgt[S] - tgt[B]) / tick) >= self.mk_vol_penny:
             tgt[B] = round(tgt[B] + tick, pd); tgt[S] = round(tgt[S] - tick, pd)
-        n = sum(1 for i in (response.instructions or []) if getattr(i, "bookId", None) == book_id)
+        n = sum(1 for i in (response.instructions or [])[getattr(self, "_ins_base", 0):] if getattr(i, "bookId", None) == book_id)
         urgent, stale, have, rest = [], [], set(), {B: [], S: []}
         for o in orders:
             px = tgt.get(o.side)
@@ -592,11 +625,11 @@ class QuoteAgent(FinanceAgent):
     LIVE_KNOBS = {"flow_pull": float, "flow_pull_vol_only": int, "flow_win": int, "flow_cool": int, "mk_vol_inside": int, "mk_vol_touch_min": int, "mk_vol_jump": int, "mk_low_touch_min": int, "mk_skip_dec": int, "mk_vol_lean_only": int, "mk_fee_k": float, "pace_soft_on": int,
                   "mk_nochase_bp": float, "mk_nochase_s": int, "mk_calm_touch_min": int, "mk_calm_hold": int, "mk_pace_hold": float,
                   "mk_vol_size": float, "mk_vol_lad_size": float, "mk_calm_lad_size": float, "mk_dec_size": float, "mk_dec_inside": int,
-                  "mk_dec_deep": float, "mk_dec_touch": int, "mk_dec_deep2": float, "book_map": str, "mk_low_size": float, "mk_low_lad_size": float, "mk_thin_ratio": float, "mk_thin_only_vol": int, "mk_thin_vol_off": int, "skew": float, "mk_calm_expiry": float,
+                  "mk_dec_deep": float, "mk_dec_touch": int, "mk_dec_deep2": float, "book_map": str, "mk_low_size": float, "mk_low_lad_size": float, "mk_thin_ratio": float, "mk_thin_only_vol": int, "mk_thin_vol_off": int, "skew": float, "mk_calm_expiry": float, "mk_vol_expiry": float, "mk_fade_lean": float,
                   "fund": float, "fund_cap": float, "fund_mv": float, "fund_mv_cap": float, "fund_scope": int, "micro": float, "mk_skip_vol": int}   # §1373: 1 = no making on the $300 books (miner-wide quality test)   # §1369: fundamental lean (the fleet fills after fundamental moves its way, §1368) and the micro-price weight
     LIVE_LISTS = {"mk_calm_lad": (1, 20, 4), "mk_vol_lad": (1, 20, 4), "mk_low_lad": (1, 20, 4)}   # §1346: ladder levels "a:b:c" — ticks 1..20, at most 4 levels (5-instruction budget)
     LIVE_LIMITS = {"mk_pace_hold": (0.0, 10000.0), "mk_vol_size": (0.0, 0.1), "mk_vol_lad_size": (0.0, 0.1), "mk_calm_lad_size": (0.0, 0.1),
-                   "mk_dec_size": (0.0, 0.12), "mk_vol_jump": (0, 20), "mk_low_touch_min": (0, 10), "mk_skip_dec": (0, 1), "mk_vol_lean_only": (0, 1), "mk_fee_k": (0.0, 5.0), "pace_soft_on": (0, 1), "mk_dec_touch": (0, 1), "mk_low_size": (0.0, 0.1), "mk_low_lad_size": (0.0, 0.1), "mk_dec_deep2": (0.0, 3.0), "skew": (0.0, 30.0), "mk_calm_expiry": (0.0, 3600.0), "fund": (0.0, 1.0), "fund_cap": (0.0, 5.0), "fund_mv": (0.0, 2.0), "fund_mv_cap": (0.0, 5.0), "fund_scope": (0, 2), "micro": (0.0, 1.0)}
+                   "mk_dec_size": (0.0, 0.12), "mk_vol_jump": (0, 20), "mk_low_touch_min": (0, 10), "mk_skip_dec": (0, 1), "mk_vol_lean_only": (0, 1), "mk_fee_k": (0.0, 5.0), "pace_soft_on": (0, 1), "mk_dec_touch": (0, 1), "mk_low_size": (0.0, 0.1), "mk_low_lad_size": (0.0, 0.1), "mk_dec_deep2": (0.0, 3.0), "skew": (0.0, 30.0), "mk_calm_expiry": (0.0, 3600.0), "mk_vol_expiry": (0.0, 3600.0), "mk_fade_lean": (0.0, 50.0), "fund": (0.0, 1.0), "fund_cap": (0.0, 5.0), "fund_mv": (0.0, 2.0), "fund_mv_cap": (0.0, 5.0), "fund_scope": (0, 2), "micro": (0.0, 1.0)}
 
     def _live_reload(self):
         """§1342: every LIVE_PARAMS_S sim s, if the JSON file changed, apply whitelisted quoting knobs (type-cast, range-checked) without a restart.
@@ -643,7 +676,7 @@ class QuoteAgent(FinanceAgent):
             lo, hi = self.LIVE_LIMITS.get(k, (None, None))
             if lo is not None and not (lo <= nv <= hi):
                 ignored.append(f"{k}(out of range)"); continue
-            if k == "mk_calm_expiry":
+            if k in ("mk_calm_expiry", "mk_vol_expiry"):
                 nv = int(nv * 1_000_000_000)                 # stored in ns
             if k == "book_map":
                 try:
@@ -813,7 +846,7 @@ class QuoteAgent(FinanceAgent):
             want = {sd: px for sd, px in want.items() if sd not in nts}
         elif no_touch:
             want = {}                                     # §1323: ladder only — touch orders are not placed (and a resting one is cancelled below)
-        n = sum(1 for i in (response.instructions or []) if getattr(i, "bookId", None) == book_id)
+        n = sum(1 for i in (response.instructions or [])[getattr(self, "_ins_base", 0):] if getattr(i, "bookId", None) == book_id)
         urgent, stale, keep = [], [], {B: [], S: []}
         for o in orders:
             px = tgt.get(o.side)
@@ -1054,6 +1087,7 @@ class QuoteAgent(FinanceAgent):
         lo = self._low_ov(book_id)
         if lo:
             ov = dict(ov or {}); ov.update(lo)
+        self._ins_base = len(getattr(response, "instructions", None) or [])  # speed build: count this book's instructions from here (was a scan of the whole reply per book)
         if not ov:
             return self._quote_inner(response, book_id, book, acct)
         saved = {k: getattr(self, k) for k in ov}
@@ -1122,8 +1156,22 @@ class QuoteAgent(FinanceAgent):
         bid_px = round(round(bid_px / tick) * tick, pd)
         ask_px = round(round(ask_px / tick) * tick, pd)
         self._jumped[int(book_id)] = set()
-        if self.mk_vol_jump and fmv and self._g(int(book_id)) == "vol" and not self._is_low(int(book_id)):   # §1434 lean jump
-            if fmv > 0:
+        lean = fmv
+        if self._g(int(book_id)) == "vol" and not self._is_low(int(book_id)):   # §1472: per-second mid history for the fade lean (kept even while off)
+            from collections import deque
+            mh = self._mh.get(int(book_id))
+            if mh is None:
+                mh = self._mh[int(book_id)] = deque()
+            if not mh or mh[-1][0] != self._sec:
+                mh.append((self._sec, mid))
+                while mh and mh[0][0] < self._sec - 305:
+                    mh.popleft()
+            if self.mk_fade_lean > 0:
+                m60 = next((m for t, m in mh if t >= self._sec - 60), None); m300 = mh[0][1] if mh and mh[0][0] <= self._sec - 295 else None
+                fade = -((mid - m60) + (mid - m300)) / mid * 1e4 if (m60 is not None and m300 is not None and mid > 0) else 0.0
+                lean = fade if abs(fade) >= self.mk_fade_lean else 0.0
+        if self.mk_vol_jump and lean and self._g(int(book_id)) == "vol" and not self._is_low(int(book_id)):   # §1434 lean jump (§1472: side from LEAN)
+            if lean > 0:
                 jb = round(math.floor(min(fair - self.edge * tick, ask - tick, bid + self.mk_vol_jump * tick) / tick + 1e-9) * tick, pd)
                 if jb > bid_px + 1e-12:
                     bid_px = jb; self._jumped[int(book_id)].add(OrderDirection.BUY)
@@ -1153,13 +1201,13 @@ class QuoteAgent(FinanceAgent):
             if self.lock_dir and len(self.skip) < 128:     # §1289 a MAKER on a book it does not quote (book split between our makers): still clear our
                 for side in (OrderDirection.BUY, OrderDirection.SELL):   # taker's locks, or x1 would wait on every book some maker skips
                     lk, ak = f"{self.lock_dir}/lock_{book_id}_{int(side)}", f"{self.lock_dir}/ack_{book_id}_{int(side)}_{self.uid}"
-                    if os.path.exists(lk):
+                    if os.path.basename(lk) in self._lockset:
                         if not any(o.side == side for o in acct.orders):   # ack only once nothing of ours rests on that side
                             with open(ak + ".tmp", "w") as fh:
                                 fh.write(str(self._sec))
-                            os.replace(ak + ".tmp", ak)
-                    elif os.path.exists(ak):
-                        os.remove(ak)
+                            os.replace(ak + ".tmp", ak); self._lockset.add(os.path.basename(ak))
+                    elif os.path.basename(ak) in self._lockset:
+                        os.remove(ak); self._lockset.discard(os.path.basename(ak))
                 return                                     # a maker never trades the books it skips
             if self.sleeve_books is not None and int(book_id) not in self.sleeve_books:
                 return                                     # sleeve_file set: trade only the sleeve books (another UID of ours quotes the rest)
@@ -1273,15 +1321,15 @@ class QuoteAgent(FinanceAgent):
         if self.lock_dir:                                  # maker side of the handshake, FIRST (paced-out / toxic books return early below)
             for side in (OrderDirection.BUY, OrderDirection.SELL):
                 lk, ak = f"{self.lock_dir}/lock_{book_id}_{int(side)}", f"{self.lock_dir}/ack_{book_id}_{int(side)}_{self.uid}"
-                if os.path.exists(lk):
+                if os.path.basename(lk) in self._lockset:
                     mine = [o for o in acct.orders if o.side == side]
                     self._cancel_all(response, book_id, mine)     # pull our quotes on the locked side now (§1293: one instruction)
                     if not mine:
                         with open(ak + ".tmp", "w") as fh:
                             fh.write(str(self._sec))
-                        os.replace(ak + ".tmp", ak)
-                elif os.path.exists(ak):
-                    os.remove(ak)
+                        os.replace(ak + ".tmp", ak); self._lockset.add(os.path.basename(ak))
+                elif os.path.basename(ak) in self._lockset:
+                    os.remove(ak); self._lockset.discard(os.path.basename(ak))
         if self.pace_cap and self._paced_out(int(book_id)):
             if self._pace_hold_ok(int(book_id)):           # §1317 soft gate (calm): deep orders stay resting, touch / inside orders go, nothing new
                 self._cancel_all(response, book_id, self._pace_hold_drop(book, acct.orders, tick))
@@ -1386,7 +1434,7 @@ class QuoteAgent(FinanceAgent):
             want.pop(OrderDirection.BUY if inv > 0 else OrderDirection.SELL, None)   # long into a fall / short into a rise: unwind only
         if self.lock_dir:
             for side in (OrderDirection.BUY, OrderDirection.SELL):
-                if os.path.exists(f"{self.lock_dir}/lock_{book_id}_{int(side)}"):
+                if f"lock_{book_id}_{int(side)}" in self._lockset:
                     want.pop(side, None)                   # a taker UID of ours is about to trade into this side: stay off it (ack handled above)
         # the validator adds 5-25 ms to every instruction after a book's first: cancel the side the prediction says is exposed first
         orders = sorted(acct.orders, key=lambda o: (o.side == OrderDirection.SELL) != (pred > 0)) if self.cancel_first else acct.orders
@@ -1422,7 +1470,7 @@ class QuoteAgent(FinanceAgent):
                 tm_v = self.mk_low_touch_min if self._is_low(int(book_id)) else self.mk_vol_touch_min   # §1434: $30 books have their own touch minimum
                 ob_v = self._others_best(book, acct.orders) if (self.mk_vol_inside or tm_v) else None
             nt_v = bool(tm_v and ob_v and ob_v[0] is not None and ob_v[1] is not None and round((ob_v[1] - ob_v[0]) / tick) < tm_v)
-            self._vol_ladder(response, book_id, orders, want, sq, qty, vq, tick, pd, inside=0 if nt_v else self.mk_vol_inside,
+            self._vol_ladder(response, book_id, orders, want, sq, qty, vq, tick, pd, expiry=(self.mk_vol_expiry or None) if not self._is_low(int(book_id)) else None, inside=0 if nt_v else self.mk_vol_inside,
                                  obest=ob_v if self.mk_vol_inside else None,
                                  no_touch=nt_v if (nt_v or not self.mk_vol_lean_only or self._is_low(int(book_id)))
                                  else {OrderDirection.BUY, OrderDirection.SELL} - set(self._jumped.get(int(book_id), ())))
@@ -1451,9 +1499,35 @@ class QuoteAgent(FinanceAgent):
                 response.limit_order(book_id=book_id, direction=side, quantity=lv[p], price=p, stp=STP.CANCEL_BOTH, postOnly=True,
                                      timeInForce=TimeInForce.GTT, expiryPeriod=self.expiry)
 
-    def _record(self, state):
-        ts = state.timestamp
-        for book_id, book in (self._books if self._books is not None else state.books or {}).items():
+    def report(self, state, response):
+        """quiet_report=1: the base report printed every instruction (≈ 600 lines per state) to the journal BEFORE the reply went out —
+        10-30 ms of the answer time and the journal bloat behind the scan hangs. One summary line per sim minute instead."""
+        if not self.quiet_report or isinstance(state, ExchangeStateUpdate):
+            return super().report(state, response)
+        ins = response.instructions or []
+        self._rep_n = getattr(self, "_rep_n", 0) + 1; self._rep_i = getattr(self, "_rep_i", 0) + len(ins)
+        if self._sec - getattr(self, "_rep_at", -10 ** 9) >= 60:
+            self._rep_at = self._sec
+            bt.logging.info(f"REPLIES: {self._rep_n} states, {self._rep_i / self._rep_n:.0f} instructions per reply (quiet_report)")
+            self._rep_n = self._rep_i = 0
+
+    def _tape_worker(self):
+        while True:
+            due, ts, books, accounts = self._tape_q.get()
+            try:
+                wait = due - time.monotonic()
+                if wait > 0:
+                    time.sleep(wait)
+                for _ in range(300):                      # ≤ 3 s: never compete with a handler for the GIL
+                    if not getattr(self, "_busy", False):
+                        break
+                    time.sleep(0.01)
+                self._record(ts, books, accounts)
+            except Exception as ex:
+                bt.logging.warning(f"TAPE worker error: {type(ex).__name__}: {ex}")
+
+    def _record(self, ts, books, accounts):
+        for book_id, book in books.items():
             for e in book.events or []:
                 if getattr(e, "y", "") == "t":
                     self.tape.write(json.dumps({"ts": e.timestamp, "book": book_id, "id": e.id, "p": e.price, "q": e.quantity, "s": e.side,
@@ -1475,7 +1549,7 @@ class QuoteAgent(FinanceAgent):
                 self.tape.write(json.dumps({"ts": ts, "book": book_id, "bid": book.bids[0].price, "ask": book.asks[0].price,
                                             "bids": [[l.price, l.quantity] for l in book.bids[:5]], "asks": [[l.price, l.quantity] for l in book.asks[:5]],
                                             "fund": getattr(book, "fundamental", None) or getattr(book, "f", None)}) + "\n")
-            acct = self.accounts.get(book_id) if self.qlog else None
+            acct = accounts.get(book_id) if self.qlog else None
             if acct is not None and getattr(book, "raw_b", None) is not None:   # qlog=1 (raw mode): where each of our orders sits in its queue
                 q = []
                 for o in acct.orders:
