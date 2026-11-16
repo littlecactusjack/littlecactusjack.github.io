@@ -22976,3 +22976,504 @@ corr(inventory $, next-60-s mid move) 179 +0.057, 252 +0.042, 216 +0.057 → SAM
 bigger and ≈ 8× longer-held; with a small positive tilt that gives more positive kept books. Our skew 5 flattens positions in ≈ 1.5 min → |alpha| too small to count.
 NEXT (after n179f05 ≈ 9:53 AM + fade build restart): INVENTORY test skew 1 vs 5 (R3 skew 3 vs 5 tied on 11-14 — too small a step); then mk_fade_lean 1.0 vs 0.
 Remaining checks: #1 $30 skill vs 252, #3 reprice frequency.
+
+## §1474 — 2026-11-15 8:40 AM CT — Checks #1 ($30) and #3 (reprice frequency), MEASURED; queue additions after the scheduled tests
+#1 $30 books (128–191), window sim ≈ 45560–47330 (speed/dilution2.py, invstudy2.py with BOOKS=128-191): per-book bp 179 p25 −0.13 / median +0.19 / p75 +0.48 / p90 +0.91,
+67% positive, kept +1 −0, notional/book $9k; 252 −0.81 / +0.96 / +2.02 / +4.10, 67% positive, kept +14 −7, $5k; 216 −0.22 / +0.74 / +2.42 / +4.67, 69%, +17 −6, $5k.
+Inventory: 179 $552 held 60 s; 252 $1,376 held 376 s; 216 $1,139 held 391 s. → on $30 we are as often RIGHT as the fleet but our |alpha| is too small (small,
+short positions on ≈ 2× the notional) → both holding longer and trading less help there.
+#3 validator gauges (wallet 5EWwdZB7, speed/gauges.sh): placements_sent 179 18,918 vs 252 1,297 / 216 7,005 / 60 308; cancels 15,743 vs 834 / 4,712 / 151; open orders
+≈ 1,450 vs 333 / 394 / 11; resting notional $225k vs $960k / $1.06M / $41k (avg order ≈ $155 vs $2,900 / $2,700 / $3,700); fills 1,039 vs 17 / 23 / 68;
+total_inventory_value −$189k vs −$502k / −$493k / −$135k. → WE reprice ≈ 15× more than 252 (the §1262 "fleet reprices 8× more" is stale — old regime).
+The fleet: few large resting orders, rarely changed, few large fills, large positions. Ours: many tiny orders churned constantly (soft pacing shrinks sizes while
+the bucket is low; 24-h notional median ≈ $76k vs cap $450k, fleet average daily maker volume ≈ $270k).
+QUEUE (user 11-15: keep the current schedule, add after): (1) skew 1 vs 5 [scheduled ≈ 10:05 AM], (2) mk_fade_lean 1.0 vs 0, (3) NEW "fewer, bigger orders": a pacing
+change letting order size use ≈ fleet-level daily volume (≈ $270k/book/day) while the cap stays safe — restart-only knobs → build offline + full test_pace incl.
+cap checks before deploying.
+§1474 add. (8:55 AM): per-book initial wealth $49–51k (config miner_wealth 50,000) → validator cap ≈ $500k/book/24 h; our pace_cap 450k is safe. WHY our orders are ≈ $150–215:
+179 has run only ≈ 10,300 sim s; its ≈ $76k/book = ≈ $7.4/s, above the bucket refill $5.2/s (450k/86,400) → buckets sit at the soft floor → size factor = pace_soft_min 0.05
+(4-dec order $215 ≈ 5% of $4.5k). The fleet trades ≈ the same $ as ≈ ONE order per side per book (≈ 333 open orders / ≈ 190 books) of ≈ $2.9k, rarely changed → few big
+fills; we spread the same budget over ≈ 8 ladder orders per book → many tiny fills → tiny positions. Design for queue item (3): one full-size order per side per book
+(ladder off/minimal) + a bucket sized so one fill doesn't drain it (pace_burst / pace_start are restart-only) — build offline + test_pace with cap checks first.
+§1474 CORRECTION (9:10 AM, user Q "edge or luck?"): the $30 "67% books positive" was ONE 30-min window. Eight consecutive 15-sim-min windows (sim 40198–47398, speed/dilwin.py):
+179 positive 42–57% (avg ≈ 49%), median −0.09…+0.05 bp, TOTAL −0.07…+0.19 bp → ≈ zero edge (luck). 252 positive 52–79% in every window, median +0.19…+1.68, TOTAL +0.73…+1.76
+in all 8 → real, steady $30 edge. → our $30 problem is NO EDGE, not only small positions; judge any lift (skew test) across several windows, not one.
+§1473 CHECK ACROSS WINDOWS (9:25 AM, 4 × 15-sim-min windows sim 40173–46473, $300 books; speed/invstudy2.py + dilwin.py): mean |inv| per book 179 $638–743 vs 252 $2,590–2,930
+/ 216 $2,552–3,062 (≈ 4×); hold median 179 70–90 s vs 252 338–450 s / 216 248–570 s (≈ 5×) → CONFIRMED. Timing corr 179 −0.011…+0.054 (avg ≈ +0.03) vs 252 +0.030…+0.086 / 216
++0.043…+0.087 (avg ≈ +0.06) → CORRECTION: the fleet's timing is ≈ 2× ours, not "the same" (one window misled). $300 TOTAL skill 179 −0.35…−0.47 in all 4 (21–31% books
+positive) vs 252 +0.19…+0.83 in all 4. → both levers matter: position size/hold (skew test) AND timing (fade lean).
+§1474 add. #4b (9:45 AM) — 252's $30 edge, 4 × 15-sim-min windows (speed/invstudy2.py BOOKS=128-191): mean |inv| 179 $370–473 vs 252 $764–1,113 / 216 $812–1,078; p90 179 $827–1,074
+vs 252 $1,804–1,815 / 216 $1,804–1,812 (≈ identical every window → the fleet looks hard-capped at ≈ $1.81k per $30 book ≈ 3.6% of wealth); hold median 179 32–60 s vs
+252 232–361 s / 216 242–338 s; timing corr 179 +0.016…+0.142 vs 252 −0.022…+0.053 / 216 −0.037…+0.101 → our short-term timing on $30 is as good or better; we exit in
+< 1 min, the fleet holds 4–6× longer → the skew test should be read on $30 separately (several windows); possible follow-up: lower skew + ≈ $1.8k inventory cap on $30.
+§1474 add. #5 (9:55 AM) — 4-dec books: 252 trades none of them (0 maker volume in every read); ours lose (fills −2.8…−3.2 bp at 20 s, skill −1.2…−2 bp, making R negative →
+drags the miner-wide making quality). User: copy 252 if it doesn't drop us under any minimum. Validator check (debeta.py coverage_weight, config): skill coverage scaling only
+below (1 − skill_max_inactive_books 0.375) × 256 = 160 books FILLED; without 4-dec ≤ 192 (252: 186, factor 1.0); per-class skill bar 20/10/10 only decides whether a class counts
+(our 4-dec skill is negative, 252 has none); presence gate = query failures. → QUEUED after the current tests: mk_skip_dec 1 vs 0 (live knob). Queue: skew 1 vs 5 → fade lean
+→ 4-dec skip → one order per side.
+
+## §1475 — 2026-11-15 10:00 AM CT — fee_k 0.5 vs 1.0 (n179f05): TIE, shape moved AWAY from the fleet → keep 1.0; restart onto e43768f5; skew 1 vs 5 scheduled
+ABBA 7:46–9:46 AM (A sim 47204–47530 + 48170–48474, B 47530–48170). $300 skill A −0.37 vs B −0.39; refs Δ 252 −0.02, 216 +0.13 → net −0.04. $30 skill A +0.09 vs B +0.05 (refs
+−0.20 / −0.50 → net +0.4, single test — noise until repeated). 4-dec −0.78 vs −1.00. Making R $300 −10.5 vs −9.4 (252 −6.9 vs −3.6), $30 +3.1 vs +0.9 (252 +3.2 vs +5.8) —
+small C, noise. Edge per $ equal; A ≈ 15% more $300 fills. Depth: behind A 66–70% vs B 63%, inside A 18–22% vs B 28% (AWAY from the fleet's 17–41% / 35–51%);
+presence A 198–202 vs B 208. → keep fee_k 1.0 (tie rule: A did not move our shape toward the fleet's).
+Restart (gated) onto e43768f5 (mk_fade_lean knob, off) 15:54:56 UTC; ledger reloaded 99,633 fills; 0 errors. Next: n179sk skew 1 vs 5, ABBA 10:01 AM–12:01 PM CT,
+reads 12:03, decision 12:08 PM. Queue: fade lean → 4-dec skip → one order per side.
+
+## §1476 — 2026-11-15 10:45 AM CT — mk_lad_off live knob built (agent 6944797a from e43768f5); deploy at the n179sk boundary (≈ 12:08 PM)
+Why no pacing change is needed: our bucket drains because ladder fills (behind-touch ≈ 65% of $300 $) spend faster than the $5.2/s refill (§1474 add.); without ladders
+we spend less, the bucket refills, orders return to full size (touch ≈ $2.2k ≈ the fleet's ≈ $2.9k).
+mk_lad_off 1: no ladder on $300 vol + calm books (span 0 → resting ladder orders are cancelled as stale, none placed); with lean-only on, touch orders stay on BOTH sides
+when the ladder is off (else books without a lean jump would have no orders — caught before testing). $30 (low) and 4-dec paths unchanged.
+Checks: equiv.py vs e43768f5 with knob off — 0 instruction diffs, tape/ledger/locks identical ✔; test_pace ALL PASS (211/0) ✔; census (speed/ladcheck.py; captured
+states replay the same resting orders so cancels never land offline): new orders touch-only, median $2,198 vs $1,350 ladder; both sides quoted on 115/128 $300 books
+(118 with ladders) ✔. Live, old ladder orders clear over a few states (5 instructions per book per reply).
+
+## §1477 — 2026-11-15 11:05 AM CT — Interaction check (new rule) on the queued FADE-LEAN test → found a blocking conflict; test arms redesigned
+Live settings the fade lean touches: lean-only (no lean → ladder only — same as today with fmv 0, OK), fee push (jumped side exempt, OK), pacing (unchanged, OK), and
+**fund_mv 1.0 (fair += fundamental move)**: the jump price is capped by fair (jb = min(fair − edge, ask − tick, bid + jump)), so a fundamental move AGAINST the fade blocks it.
+Census (speed/fadetest2.py, seeded 10-bp price move + seeded opposite fundamental move over 10 s, fund_mv 1.0): jumps 50 → 4–7 at 2 bp, 0 at 5 bp and 10 bp; with no
+fundamental move 50. The fleet's own taking fades the fundamental too (clone dfund60 −0.8), so the two disagree often → as planned the test would mostly measure nothing.
+REDESIGN: A = mk_fade_lean 1.0 + fund_mv 0 (lean source = fade) vs B = base (fund_mv 1.0, fade 0) — one idea, "lean on the fade instead of the fundamental move";
+census for A's config: 50/50 jumps in the fade direction ✔.
+Other queued tests: mk_skip_dec (cancels 4-dec orders, ≤ 5 per book per reply; coverage ≥ 160 filled books; 4-dec making/skill class → 0, ours negative today) — OK;
+mk_lad_off — checked in §1476 (lean-only keeps both touch orders when the ladder is off).
+
+## §1478 — 2026-11-15 11:05 AM CT — Interim: skew does NOT limit our positions → ladder-off moved up to 12:15 PM (user yes)
+n179sk A1 (skew 1, sim 48634–48950) vs B (skew 5, 48950–49200), speed/invstudy2.py: $300 mean |inv| $354 / hold 58 s vs $382 / 58 s; $30 $303 / 32 s vs $252 / 31 s → no change.
+Our inventory is small because our orders are tiny (≈ $150 at the pace floor, both sides filled), not because skew flattens it. MISS by the new interaction-check rule: I
+didn't check that skew actually constrains our inventory before scheduling (§1473 inferred it from the fleet comparison). User 11-15 11:05 AM: "move ladder-off up to 12:15".
+New order: skew decision 12:08 → restart onto 6944797a → n179 ladder-off (mk_lad_off 1 vs 0) ≈ 12:15 PM → fade lean (A fade 1.0 + fund_mv 0) → 4-dec skip.
+
+## §1479 — 2026-11-15 12:12 PM CT — Skew 1 vs 5 (n179sk): TIE → keep 5 (skew is not binding); restart onto 6944797a; ladder-off test scheduled
+ABBA 10:01 AM–12:01 PM (A sim 48634–48950 + 49600–49925, B 48950–49600). $300 skill A −0.42 vs B −0.48; refs Δ 252 +0.07, 216 +0.04 → net ≈ 0. $30 −0.02 both; refs Δ
++0.89 / +0.31 → net ≈ −0.6. 4-dec −1.20 vs −1.10. Making R $300 −11.1 vs −12.1 (252 −5.5 vs −8.4). Positions (invstudy2): $300 A $354–445 / 58–65 s vs B $605 / 90 s;
+$30 A $279–303 / 31–32 s vs B $437 / 31 s → skew 1 did NOT enlarge positions (confirms §1478). Keep skew 5.
+Restart (gated) onto 6944797a (mk_lad_off knob) 18:10:04 UTC; ledger reloaded 111,909 fills; replies OK. Next: n179lo mk_lad_off 1 vs 0, ABBA 12:16–2:16 PM CT,
+reads 2:18, decision 2:23 PM. UID 179's protection ends ≈ 2:30 PM (pay $0 → prune likely soon after). Queue: fade lean → 4-dec skip.
+
+## §1480 — 2026-11-15 12:30 PM CT — Ladder-off test REDESIGNED: A held ON 12:16–2:16 PM (bucket refill takes ≈ 2.5 wall h; ABBA can't show it)
+12:26 PM snapshot (10 min into A): open orders 1,450 → 604, presence 204 (held), but resting notional $144k → avg order ≈ $238, not the ≈ $2.2k full size. Cause: most books'
+pace buckets were at the soft floor (−pace_soft) when A started; refill $5.2/s per book (450k/86,400) → floor → full (−5k → +4.7k) ≈ 1,900 sim s ≈ 2.5 wall h; every B block
+(ladders back on) drains it again. → the 30-min ABBA could never reach the full-size regime. MISS by the interaction rule: "how long until the knob takes effect?".
+Change: cancelled the 12:46 B / 1:16 B / 1:46 A switches; A stays on until the planned end 2:16 PM; decision 2:23 PM compares A (and its last hour) vs the same-base B windows
+before 12:16 and vs 252/216 over the same windows (weaker before/after design — stated). Test order unchanged (user's approved order).
+
+## §1481 — 2026-11-15 1:00 PM CT — Ladder-off cut at 1 h (user); fade lean starts 1:21 PM; size test to be REDONE on the next fresh miner
+12:56 PM (40 min into A): open orders 649, resting $156k → avg ≈ $241 (unchanged since 12:26); presence 212. Ledger growth ≈ $1.6k per book per 30 wall min ≈ $4.6/s ≈ the $5.2/s
+refill → buckets stay near the floor: under soft pacing the steady-state size ≈ refill ÷ (fill rate × full size), so removing ladders cut ORDER COUNT but not the FILL RATE
+enough to grow size. The fleet trades fewer, bigger fills (gauge period 17 fills vs our 1,039; per-window fills on ≈ 46–60 of 128 $300 books vs our ≈ 120).
+User 11-15 ≈ 1:00 PM: "cut the test at an hour long and redo it with the new knowledge if theres no positive sign" → cut 1:16 PM (END → lad_off 0), reads 1:18, read/verdict 1:23;
+next n179fd fade lean (A = fade 1.0 + fund_mv 0 vs base) ABBA 1:21–3:21 PM, reads 3:23, decision 3:28. REDO of the size test: on the next miner from minute one (fresh bucket,
+pace_start 20k → full size at first), aimed at OUR FILL RATE, as a long single-arm run — design to be measured and written into NEXT_MINER_PLAN.md at 1:23 PM.
+
+## §1482 — 2026-11-15 1:40 PM CT — Ladder-off read (1 h, cut): small POSITIVE sign on $300 skill; fill-rate profile → REDO design for the next miner
+Ladder-off (A, sim 50089–50734) vs before (ladders, sim 49270–49925), speed/dilwin.py + invstudy2.py, 2 windows each (sign, not proof): $300 TOTAL 179 −0.54 / −0.46 → −0.34 / −0.24
+(252 +0.17 / +0.43 → +0.37 / +0.18, flat) → ≈ +0.2 bp better; positions SMALLER ($370–445 → $273–284) and shorter (65 → 33–46 s); $30 unchanged (≈ 0); presence 204–212.
+Keep mk_lad_off 1 in the redo (fleet-like one order per side; fewer deep swept fills).
+FILL-RATE PROFILE (speed/fillrate.py, $300; before / ladder-off): 179 fills 3,853 / 3,071, $410k / $383k, $/fill median $90 / $110, books filled 120, fills per filled book
+per sim min 2.94 / 2.38, on orders < 1 s old 44% / 55%; 252 150 / 157 fills, $362k / $342k, $/fill $3,251 / $2,000, books 69 / 64, 0.20 / 0.23 per book-min, < 1 s 54% / 61%;
+216 158 / 130, $341k / $307k, $2,260 / $3,184, 67 / 60 books, 0.22 / 0.20, 56% / 55%. $30: 179 $250 fills at 1.2/book-min vs fleet ≈ $1.8k at 0.15–0.21.
+→ SAME dollars, different shape: the fleet fills ONE big order (≈ $2–3k) every ≈ 5 sim min on the ≈ half of the books it is active on, mostly on orders placed < 1 s before
+(brief big step-ins); we fill tiny orders 2–3× a minute on every book. One $2.2k fill per ≈ 7 min per book = our bucket refill → the fleet's pattern FITS our pacing; ours
+forces soft pacing to shrink sizes to ≈ $100.
+REDO DESIGN (next miner, long single-arm run from minute one): (1) mk_lad_off 1; (2) step in (touch/inside) only when the book's bucket can afford a full-size fill — a brief
+big step-in, cancelled if not filled; (3) otherwise a full-size order rests a few ticks back (presence, rarely filled); (4) no size shrinking (pacing by gated step-ins, not size);
+(5) code + test_pace incl. cap + interaction check (presence, $30 vol path, lean-only, fee push, timing). Interaction risks to check: resting full-size orders swept in big moves
+(behind fills −1.4 bp today) → keep them ≥ 3 ticks back + short expiry; presence must stay ≳ 180.
+
+## §1483 — 2026-11-15 2:05 PM CT — mk_gate (budget-gated full-size step-ins) built: agent 7f434483 (from 6944797a); verified; not deployed
+Knob mk_gate (ticks, live, 0 = off), $300 vol + calm (not $30 / 4-dec): if the book's pace bucket ≥ one full-size fill ($ = size × wealth): quote touch/inside at FULL size, NOT
+fee-pushed (like a lean-jumped side; never crossing); else rest MK_GATE ticks behind the (fee-pushed) target at the soft size and clear the lean jump. Cap safety unchanged
+(paced_out + 24-h ledger untouched). After a $2.2k fill a book refills in ≈ 420 sim s ≈ the fleet's one fill per ≈ 5 min per book (§1482).
+INTERACTION CHECK: inside quoting (rest mode stays behind; step-in steps inside) OK; lean jump/lean-only (rest clears the jump; with lad_off both sides stay; with ladders +
+lean-only rest = ladder only → run the redo WITH mk_lad_off 1); fee push — FIRST census showed full-size orders still +2 ticks behind the others' best (push applied before the
+gate) → fixed: step-ins exempt from the push; pacing/cap unchanged; timing: acts each round from the current bucket (no refill wait to see both modes); $30/4-dec excluded.
+Checks (speed/gatecheck.py, half the $300 buckets seeded LOW −2k / half FULL 4k, mk_lad_off 1): gate 3 FULL → size median $2,195 at the others' best (+0 ticks), both sides on
+49 books; LOW → $681, +5 ticks back; gate 0 → $2,039 / $679 both +2 ticks. equiv.py vs 6944797a with gate 0: 10 replies, 0 instruction diffs, tape/ledger/locks identical ✔;
+test_pace ALL PASS (211/0) ✔. Lab copy /opt/mvtrx/speed/QuoteAgent.gate.py. REDO TEST = mk_gate 3 + mk_lad_off 1, long single-arm run.
+
+## §1484 — 2026-11-15 2:45 PM CT — The subnet's goal and the market's actual model (README, FAQ, simulate/trading/run/config/simulation_0.xml) → strategy implications
+GOAL (README/FAQ): realistic, valuable market DATA from "intelligent, risk-averse, budget-constrained" agents. Making pays two-sided liquidity that is not run over (20-s markout);
+skill pays "profit the market's drift does not explain" (inventory × mid change, drift removed; consistent across books, ≥ 20/10/10 books; qualifying miners share the half by
+net alpha); "pay follows performance, not volume"; "a strategy confined to a few books earns little"; fees + spread paid are in skill P&L (takers); weekly config changes;
+response time → order delay.
+MARKET MODEL ($300 books, simulation_0.xml; 8 × 16 books): fundamental = fBM Hurst 0.729 (persistent), σ 0.0069, jumps λ 2.06e-4 σJ 0.00622, updated every 30 s, published to us;
+1,000 StylizedTraderAgents (Chiarella 2007): sigmaF 1.2 (fundamentalist), sigmaC 1.1 (chartist), sigmaN 0.7 (noise), tau 600 s, tauHist 50 s; 20 HFT market makers (spread 15 bp,
+minSpreadTicks 10, undercutTicks 5, inventory horizon); 1,024 noise traders; 1 ALGO trader per book (large meta-orders, updateInterval 60 s, immediateBase 600); FeePolicy dynamic
+(targetMTR 0.4, maker 0 / taker 2.3 bp base, max 1.5%); minOrderSize 0.25; maxOpenOrders 100; MagneticField + FuturesSignal processes (FuturesTraderAgent count 0).
+MEASURED (speed/takerid.py, last ≈ 1,430 sim s, $300): taker id −1 = the big-sweep taker — median $5,802 per taker-second, 93% of its $ in $10k+ events, 60-s mid move its way
+−0.04 bp → UNINFORMED, impact reverts; miner takers +0.44 bp (informed); other bg ids ≈ $600 events, ±0.2 bp.
+IMPLICATIONS: (1) skill counts only inventory × mid move (maker fill price not credited) → fills that happen while a sweep pushes price through our orders are structurally bad
+for skill; fleet fills = small flow at/inside the touch; supports the redo (one order per side, gated step-ins). (2) The price model is known → build the lean from it
+(fundamental gap + fundamental trend (Hurst 0.73) + ≈ 50-s chartist momentum − sweep reversion), held-out tested vs fade / fund-move leans. (3) Sweeps revert in ≈ 60 s →
+consider holding sweep-acquired inventory ≈ 60 s instead of unwinding. (4) DIS fees reward scarce liquidity — fee-aware already reads per-book maker fees.
+NEXT: offline fit of the model-based predictor (MEASURED, held-out) during the fade test; if it beats the fade it becomes the redo's step-in side; sweep-hold queued.
+
+## §1485 — 2026-11-15 3:00 PM CT — MODEL-BASED LEAN (market-model features) beats every lean we have, held-out, stable over 4 windows
+speed/modelfit.py: $300 books, sampled every 5 s per book, sim ≈ 45,000–50,982 (149,248 samples), train first 70% / test last 30% by time; ridge λ 10 on z-scored features.
+Weights (z, H 120 s): dF300 +0.41, r300 −0.39, r50 −0.34, gap (fund − mid) +0.33, dF60 +0.21, r10 −0.12, dF30 +0.09, flow60 +0.06, sweep60 +0.04, r600 0.00 — exactly the
+config's model: persistent fundamental (Hurst 0.73) trend +, fundamentalist pull to the gap +, ≈ 50-s / 5-min price reversion −; flows ≈ 0.
+TEST (held-out): H 60 s MODEL corr +0.299, top-30% |signal| move in its direction +0.79 bp (fade +0.141 / +0.37; fund-move dF10 +0.070 / +0.14); H 120 s MODEL +0.307 / +1.04 bp
+(fade +0.095 / +0.29; dF10 +0.076 / +0.21). Four test windows (sim 49197–50982): 60 s corr +0.278 / +0.318 / +0.304 / +0.303, edge +0.77 / +0.87 / +0.79 / +0.77;
+120 s +0.298 / +0.330 / +0.316 / +0.297, +1.05 / +1.16 / +1.05 / +0.94 (fade 120 s +0.28 / +0.57 / +0.19 / +0.11). → robust, 2–4× the current leans; ≈ the fleet's inside-fill
+markout (+0.5…+1.0). MEASURED predictor of MID moves — live must show our fills capture it (adverse selection).
+NEXT: build mk_model_lean (per-second mid + fund history 600 s, 7 features, weights + mu/sd from a JSON file, lean when |pred| ≥ top-30% threshold) → redo = gated full-size
+step-ins on the model's side + position cap + stop rule; full checks first.
+
+## §1486 — 2026-11-15 2:00 PM CT — REDO build 1e4d2a83 (from 7f434483): market-model lean + lean-side-only gated step-ins + small rest side + live max_inv; verified
+Knobs (all live, 0/off = identical): mk_model_lean (× the file's top-30% threshold; weights /opt/mvtrx/agents/model_lean.json = 7-feature ridge fit §1485/§1486: gap, dF30, dF60, dF300,
+r10, r50, r300, H 120 s, thr 0.704 bp; overrides fade + fund move; needs ≥ 300 s of per-second mid + fundamental history — a fresh start leans after ≈ 5 sim min); mk_gate_side 1
+(vol books: full-size step-in only on the lean/jumped side; the other side rests MK_GATE ticks back at 10% size ≈ $220; calm books keep both-sided gating — no lean jump there);
+max_inv now live (0.01–0.5).
+INTERACTION CHECK: fund_mv's fair shift blocks lean jumps (§1477) → the redo runs fund_mv 0 (the model contains the fundamental); calm books never jump → gate_side applies to vol
+only; the rest side was full size when buckets are full (sweep risk) → capped at 10%; fee push: jumped side exempt; lean-only: lad_off 1 keeps both sides; pacing/cap untouched.
+CENSUS (speed/modelcheck.py; seeded mid + fundamental histories → BUY on even / SELL on odd vol books; full buckets): jumps 52, all on the predicted side, 0 wrong; vol predicted side
+$2,196 at −1 tick (inside the others' best); other side $220 at +5 ticks; calm both sides $1,799 at the others' best. Off → identical (equiv.py 0 diffs; tape/ledger/locks) ✔;
+test_pace ALL PASS ✔.
+REDO TEST (after the n179fd decision ≈ 3:28 PM): deploy 1e4d2a83 (gated restart) → LONG single-arm run: mk_lad_off 1, mk_gate 3, mk_gate_side 1, mk_model_lean 1.0, fund_mv 0,
+mk_fade_lean 0, max_inv 0.14 (≈ $7k, the fleet's $300 p90). STOP RULE: if $300 per-15-min skill (dilwin.py) is worse than the same-base before-windows, net of 252/216, for 2
+consecutive windows → revert to base. Reads every 30 min (order size, positions/hold, skill, presence, pace).
+
+## §1487 — 2026-11-15 2:30 PM CT — More from the subnet's docs/config/dials (user: "as much information as we can get before we register the new miner")
+PER-CLASS MARKETS (simulation_1/2.xml vs _0): $30 (128–191): stylized sigmaF 1.7 / sigmaC 1.3, tau 62 s (vs 600 s), tauF 3.7; HFT minSpreadTicks 3, undercut 0. 4-dec (192–255): fundamental
+σ 0.0125 (≈ 2×), σJump 0.0113; stylized sigmaF 2.9 / sigmaC 1.5, tau 182 s, tauF 20, r_aversion 40,900; HFT minSpread 2526 (≈ $0.25), undercut 1. → the model lean must be FIT PER CLASS
+(different horizons and pull strengths); the 4-dec books' strong fundamental pull + high volatility may suit a model lean even though 252 skips them.
+AGENT GUIDE: (a) every instruction takes `delay` (0–1 s within the sim interval) — orders/cancels can be scheduled between state updates; MEASURED (speed/subsec.py, $300 fills, last
+≈ 1,770 sim s): fills by 0.1-s bucket — all 18/9/9…%, us 17/10/9…, 252 21/8/9/6/9/12…, 216 22/10/8/6… → no strong clustering, so `delay` is not the fleet's edge (still a tool);
+(b) a LOCAL simulator (agents/proxy, the real C++ engine + same background agents) can pre-test strategies with real market reaction — far better than tape replays (false positives).
+VALIDATOR DIALS (taos/im/config/__init__.py, speed dials.py): w_make 0.50; making_horizon 20 s; making_fee_weight 0.005; making basis "realized"; skill hurdle 2.3 bp; skill_min_books_share
+20/128; skill_max_inactive 0.375; skill_variant "drift" (window's whole drift — a closed position keeps being re-marked); mark_mode mid, fill_charge taker; p11/s3 counterparty discounts;
+conjunction (resting two-sided volume within N × spread of the mid, size ≥ 25% of the book's median fill size) published as debeta_conjunction; skill rank among positives.
+GAUGES (wallet 5EWwdZB7): debeta_skill_net_alpha 179 +427 vs 252 +1,661 / 216 +1,803; num_scored_books 179 11 vs 97 / 115; conjunction 13.2M vs 42.2M / 44.1M; p11/s3/presence 1.0 all.
+→ in the validator's own 3-h window our net alpha is POSITIVE (≈ ¼ of the fleet's) — we earn 0 because only 11 books clear the 2.3-bp hurdle → bigger, well-timed positions (the redo) is
+the right lever. Upstream: origin/test = origin/main = 0.6.7 final (11-10); next weekly release ≈ Wed 11-18 17:00 UTC (may change configs).
+
+## §1488 — 2026-11-15 3:00 PM CT — Per-class model fits; $30 lean added (move the FAR side back — $30 spreads leave no room to step in); build 887a18c6; local-simulator answer
+PER-CLASS FITS (speed/modelfitc.py, same 7 features, held-out 30%, 4 windows): $30 (128–191) H 60 s corr +0.319, top-30% +1.77 bp (windows +1.80 / +2.02 / +1.64 / +1.60); H 120 s
++0.342, +2.42 bp (+2.40 / +2.72 / +2.37 / +2.14); weights gap +0.82 (dominant: fundamentalist 1.7, 62-s horizon), dF60 +0.44, dF300 +0.39, r50 −0.37, r300 −0.26; FADE on $30 is
+WRONG-WAY (−0.53 bp at 120 s). 4-dec (192–255): weak — corr +0.10–0.14, +0.37 / +0.71 bp, ≈ the fade → not used (252 skips 4-dec).
+$30 SPREADS (tape): 1 tick 68%, 2 ticks 32%, 3+ 1% → the lean JUMP can't act there (census: 0 jumps even at a tiny threshold). New knob mk_lean30_back (default 2): with
+mk_model_lean_30 > 0 and |pred| ≥ thr on a $30 book, keep the predicted side at the touch and move the OTHER side MK_LEAN30_BACK ticks back (fade/fund move never used on $30).
+Census (speed/modelcheck30.py, seeded histories): other side +3 ticks back (90 re-placed), predicted side at the touch ($1,653). Off → identical (equiv.py 0 diffs) ✔; test_pace ALL
+PASS ✔. Agent 887a18c6 = /opt/mvtrx/speed/QuoteAgent.model.py; agents/model_lean.json + model_lean_30.json in place.
+REDO now = $300 (model lean + gated lean-side step-ins + lad_off + max_inv 0.14) AND $30 (model lean, far side 2 back) in the same long run, read SEPARATELY per class.
+LOCAL SIMULATOR (user Q): we used it 10-31 → 11-06 ("lab runs", repo/simulate/trading/build/src/cpp/taosim on mvtrx-lab): it MISLED — the lab market mean-reverted where live
+trended; a lab-fitted model had live IC −0.22 (§1206); the lab published no fundamental then (§1247); no other miners there. Full 256-book layout needs validator-class hardware
+(16 cores, 32–48 GB). Recommendation: no box now — live tests on fresh miners are the measurement; the sim helps mainly with mechanics (our census tools cover that).
+
+## §1489 — 2026-11-15 3:10 PM CT — UID 179 (x2) PRUNED 2:57:55 PM CT (≈ 24.9 h after registration); final reads; next miner prepared
+Journal 20:57:55 UTC "x2 is not registered"; regcheck NOT REGISTERED. Cleanup: mvtrx-x2 stopped + disabled; n179fd end/read timers stopped; our_uids.txt emptied (backup
+our_uids.txt.bak-1115-prune); session crons (3:28 decision, UID-179 briefs) deleted. Fade-lean test n179fd closed at the prune (sim 51819; last A block only ≈ 84 sim s).
+n179fd FINAL (A = mk_fade_lean 1.0 + fund_mv 0 vs B = base): $300 skill A −0.06 vs B −0.50; refs Δ 252 +0.10, 216 +0.40 → net +0.19; $300 making R A −5.8 vs B −10.0 (252 −3.7 vs
+−6.4) → net +1.5; $30 skill −0.03 vs +0.10 (fade not used on $30); 4-dec −0.84 vs −0.98. → LEANING POSITIVE (single test, not proven); superseded by the model lean (§1485/§1488).
+NEXT MINER (user will re-register x2): agents/QuoteAgent.py = 887a18c6 (backup agents/QuoteAgent.6944797a.py); model files in agents/; `sh /opt/mvtrx/newminer.sh <uid>` then
+`sh /opt/mvtrx/redo_179.sh <uid>` (REDO settings on top of START, logged switch liveswitch_redo<uid>_log.txt) → long single-arm run from minute one; the leans start after
+≈ 300 sim s of history; read per class every 30 min with the per-class stop rule (HANDOFF_2026-11-15.md).
+
+## §1490 — 2026-11-15 3:15 PM CT — New miner: x2 re-registered as UID 255; live on 887a18c6 with the REDO from minute one
+newminer.sh 255: regcheck REGISTERED; START (= UID 179's base) → live_params_255.json / .START.json; UID copies of the A/B + read scripts; clean ledger; restart 21:12:50 UTC;
+our_uids.txt = "255 maker x2 51981". redo_179.sh 255 at sim 51983 (log liveswitch_redo255_log.txt): LIVE PARAMS applied fund_mv 1.0→0, mk_lad_off 0→1, mk_gate 0→3, mk_gate_side
+0→1, mk_model_lean 0→1.0, mk_model_lean_30 0→1.0, max_inv 0.3→0.14 (mk_lean30_back 2 = default); first GATE line: step-ins active (fresh buckets, pace_start 20k). Leans start
+after ≈ 300 sim s of history (≈ sim 52290). 30-min brief + per-class redo read + stop rule (cron, :13/:43).
+§1490 add. (3:20 PM): user — no automatic switch-off on the REDO; per-class report every brief, flag sustained underperformance, changes only with the user (memory feedback-no-auto-switchoff).
+§1490 add. 2 (3:25 PM): user — once a WINNING strategy runs, tweak tests on it get an automatic revert-to-winner (trigger defined before each test); until then no auto switch-off.
+
+## §1491 — 2026-11-15 3:55 PM CT — INCIDENT: UID 255 blocked on ALL books ≈ 3:20–3:52 PM by a phantom $500k/book volume (stale validator series) — FIXED
+Symptom (3:47 PM brief): PACE STATUS 256/256 books blocked, 24-h notional median $500,399; 0 instructions per reply; no open orders. Our real volume: ledger fill rows $855,963 total
+= the live validator's total_daily_volume for 255 ($855,963) ≈ $3.3k per book. Cause: pace_sync.py queried agent_gauges daily_volume with NO validator filter and took the MAX per book;
+the stale old-sim validator 5E7RbxVy (lesson 11-07) still publishes UID 255's PREVIOUS owner / old-sim volume ≈ $500k per book; the agent's _pace_sync charged the gap → 256 sync
+rows ($103M) in pace_255.ledger → every book paced out. (pace_sync also printed "near the hard cap" ALERT lines → likely false Discord alerts.)
+Fix: pace_sync.py queries filtered to wallet 5EWwdZB7 (backup pace_sync.py.bak-1115; first patch broke its import line — restored and re-applied); sync rows removed from
+pace_255.ledger (654 fill rows kept; backup pace_255.ledger.bak-phantom); pace_sync_255.json deleted then regenerated (median $1,642, max $21,092); gated restart 21:52:26 UTC →
+"0 of 158 traded books blocked, median $3,304", 643 instructions, GATE step-ins active. The REDO lost ≈ 30 wall min of trading; its read window restarts after ≈ sim 52,700.
+
+## §1492 — 2026-11-15 4:35 PM CT — 252's lifespan and how often it changes (user: "how often a winning strategy needs to be tweaked to survive")
+CHAIN (speed/fleetage.py, block 9,514,813): UID 252 age 32.66 d, coldkey 5F1F2JMu; the coldkey runs 24 UIDs aged 0.11–35.35 d (216 35.4, 252 32.7, 40 32.2, 52 31.1; 134/147/210 19.5–24.5;
+166/110/132/183 ≈ 12.4–12.5; 225 7.3; 13 UIDs 0.1–5.4 d). Axon version 10005000 = the bittensor library (same on all) → no strategy info. Fleet size over time (past §§):
+32 (11-07) → 38 → 41 (11-10, $9.7k/mo) → 40 (11-11) → 35 (11-12) → 24 (11-15) — shrinking.
+BEHAVIOUR (speed/uidhist.py over 8 tapes 11-05 → 11-15; Nov 8–13 rotated out; speed/uidhist_252.txt): per sim hour median maker fill $1,786–1,806 (= 3.6% of $50k) on 11-05/06/07
+and $1,795–1,803 on 11-14/15; taker trades 0 every hour; maker buy share 46–56%; books filled 91–128 of 128 (old layout) → 150–169 of 256 (new layout, skips the 64 4-dec books);
+fills/hour 300–1,840, moving with the market. → NO visible strategy change in 10 days (likely the whole 32 d); it adapted only to the 128 → 256 layout. Its pay still fell ≈ $330 → $209
+in a day with the behaviour constant (fees / competition / rule updates).
+→ A winning strategy is mostly left alone; re-check after each weekly release (Wed ≈ 17:00 UTC) — refit the market model then. Static survival depends on staying above the
+prune line (the fleet loses UIDs).
+
+## §1493 — 2026-11-15 4:50 PM CT — REDO read #1 (leans on, sim 52691–52990, ≈ 5 sim min — ONE window, a sign not a finding)
+$300 (speed/dilwin.py BOOKS=0-127): 255 TOTAL +0.72 bp, 69% of 105 books positive, median +0.61 (before-level UID 179 same base −0.35…−0.54; 252 same window +0.12, 48% positive).
+invstudy2: 255 mean |inv| $1,807 (p90 $5,077), hold 48 s, timing corr +0.144 (179 ≈ +0.03); 252 $1,546, corr +0.181.
+$30 (BOOKS=128-191): 255 TOTAL +0.18, 59% positive, median +0.20 (before −0.13…+0.07); 252 +1.56, 95% positive; 255 |inv| $950 hold 31 s corr +0.102; 252 $793 / 71 s / +0.176.
+Health 4:47 PM: 0 errors; presence median 244; 6/250 paced; GATE 5,282 step-in / 2,218 rest; resting $562k on 648 orders (avg ≈ $867, falling as start buckets drain); call 0.328 s.
+Pay: UID 255 $97/mo ($3.24/day) — FIRST non-zero pay on a test miner in days (score 0.0014 vs 252 0.0041; skill/making gauges still 0 → source unclear, new-UID head start
+possible); 252 $211. Validator gauges for 255 (net alpha −2.5, 50 books) still mix the previous owner's 3-h window.
+Running tally: $300 1 window +1.1…+1.3 bp vs before (net of 252 ≈ +1); $30 1 window ≈ +0.2. Needs ≥ 4 windows.
+
+## §1494 — 2026-11-15 5:45 PM CT — REDO reads #1–#3 (leans on): $300 skill POSITIVE and ahead of 252 in 3/3 windows; sizes shrinking as start buckets drain
+Windows (300 sim s each; speed/dilwin.py + invstudy2.py), $300 TOTAL 255 vs 252: 52691–52990 +0.72 vs +0.12 (69% books +); 52990–53290 +0.62 vs +0.34 (56%); 53290–53570 +0.68 vs +0.44
+(61%) — before-level (UID 179, same base) −0.35…−0.54 (21–31% +). $30 TOTAL 255 vs 252: +0.18 vs +1.56; +0.04 vs +0.85; +0.17 vs +0.68 (before −0.13…+0.07).
+Positions (255): $300 mean |inv| $1,807 → $1,394 → $1,154, hold 48–64 s, timing corr +0.144 / +0.088 / +0.051; $30 $950 → $865 → $513, hold 31–71 s.
+Health 5:41 PM: 0 errors; presence median 236; 10/255 paced; GATE 4,518 step-in / 2,886 rest; resting $319k on 671 orders (avg ≈ $475, from ≈ $1,530 at 4:17); call 0.342 s.
+Pay: 255 $2/mo (the 4:47 PM $97 was a new-UID head start, not skill); 252 $219. Validator gauges for 255 (net alpha +126, 53 books) still mix the previous owner until ≈ 6:10 PM.
+Tally: $300 3/3 windows ≈ +1.1 bp vs before, ahead of 252 each time (4-window rule: one more needed); $30 ≈ +0.1. Watch: does $300 skill hold as sizes shrink with draining buckets?
+
+## §1495 — 2026-11-15 6:00 PM CT — $30 volume cut (user): mk_lean30_only 1 — no lean → both $30 sides rest 2 ticks back; build 7b78f008 live
+Why (6:00 PM measurement, speed/dilution2.py since the leans): $30 books clearing 2.3 bp: 255 1 (since start 0) vs 252 22 (31); our notional per $30 book $15k (since start $27k) vs 252
+$2k ($4k) — 4–7× — at median ≈ +0.06 bp → the hurdle (relative to our notional) is out of reach. Smaller size wouldn't help (alpha and notional scale together). User: "lets cut the
+30 volume now". $300 at the same read: books clearing 255 11 (10+ / 1−) since leans, 14 (12+ / 2−) since start vs 252 21 (13+ / 8−) / 20 (12+ / 8−); need 20.
+Knob mk_lean30_only (live, 0 = identical): with mk_model_lean_30 on and NO lean on a $30 book, both sides rest MK_LEAN30_BACK (2) ticks back; with a lean, the predicted side stays
+at the touch (§1488). Interaction check: $30 ladder (level 1) → 3 back, presence kept; after a restart no lean for ≈ 300 sim s → no $30 touch orders then (fine); no-chase / fee
+push on the moved target; pacing untouched. Census (speed/l30only.py): no-lean books both sides +3 ticks (was +0); lean books ask +3, bid near the touch. equiv vs 887a18c6 with
+knob off: 0 diffs, tape/ledger/locks identical; test_pace ALL PASS. Gated restart 23:59:03 UTC (ledger reloaded 5,902 fills; 7/256 paced; 704 instructions); switch logged at sim
+53765 (A30). The restart resets price history → both leans resume ≈ sim 54,070; the 4th $300 window is cut short (user accepted).
+
+## §1496 — 2026-11-15 6:45 PM CT — REDO $300: 4th positive window (4/4, ahead of 252 each) → meets the 4-window rule; $30 volume cut works (≈ 14× less, ≈ 252's pattern)
+Window 4 (sim 54070–54230, after the 5:59 PM restart; speed/dilwin.py): $300 255 TOTAL +0.61 bp (54% of 74 books +) vs 252 +0.54 → $300 series +0.72 / +0.62 / +0.68 / +0.61, 252
++0.12 / +0.34 / +0.44 / +0.54, before-level (UID 179 same base) −0.35…−0.54. $300 fill rate 0.97 per filled book per sim min (start 3–5; 252 0.46), $/fill median $552 (252 $3,552).
+$30 after mk_lean30_only (speed/fillrate.py, 160 sim s each): before the cut 191 fills / $86k on 60 books, 1.19 per book-min; after 9 fills / $6k on 8 books, 0.42 (252 4 / $7k on 4
+books, 0.38) → ≈ 14× less volume, ≈ 252's pattern; $30 TOTAL +0.22 on 8 books (too few to judge). Health 6:43 PM: 0 errors; presence 232; 13/256 paced; GATE 3,712 / 3,668; resting
+$380k on 625 orders (avg ≈ $606); call 0.349 s. Pay 255 $2/mo (validator net alpha +137 on 37 books — its 3-h window still includes the pre-lean hours); 252 $216.
+→ $300 REDO = first strategy that is consistently positive and ahead of the reference (4/4 windows). Next: does the validator's hurdle count reach 20 $300 books as the window fills
+with lean-on trading; $30 needs time (books clearing at the new volume).
+
+## §1497 — 2026-11-15 8:40 PM CT — REDO catch-up (sim 54230–55400): $30 QUALIFIES (21 books clear 2.3 bp, > 252's 12); $300 edge FADED as start buckets drained
+Windows (300 sim s; speed/dilwin.py) 255 vs 252: $300 +0.43 / −0.04 / −0.15 / +0.04 vs −0.02 / −0.08 / +0.57 / −0.01 (net ≈ −0.05 over the four; earlier 4: ahead each time);
+$30 +1.22 / +0.05 / +0.30 / +1.13 vs +1.65 / +2.05 / +0.66 / +1.37.
+HURDLE (speed/dilution2.py, sim 54070–55400, ≈ 22 sim min): $30 255 54 books, notional/book $2k (was $15–27k; 252 $2k), median +0.74 bp, 67% +, KEPT +18 −3 = 21 (bar 10) vs 252 +10 −2;
+$300 255 122 books, $8k/book, median +0.15, 52% +, kept +8 −5 = 13 (bar 20) vs 252 +10 −6 = 16, median +0.75.
+Positions (speed/invstudy2.py sim 55130–55340): $300 255 $673 (from $1,807 at the start), hold 69 s, timing corr +0.024 (from +0.144) vs 252 $1,408 / +0.141; $30 255 $709, corr +0.332.
+GATE 2,188 step-in / 5,072 rest (75% → 30% step-ins) → buckets drained → most $300 books in rest mode at the soft size → positions shrank → edge faded. $300 fill rate 0.97 per book-min
+(252 0.46) is still too high for full size under our pace.
+Pay 255 $11/mo (validator net alpha +260, rising); 252 $199. Health 0 errors, presence 236, 6/256 paced, call 0.353.
+→ $30: the lean + volume cut copies 252's volume and beats its hurdle count — keep. $300: needs the same lever as $30 (fewer, full-size fills — e.g. a higher $300 lean threshold so
+step-ins are rarer and buckets refill). Proposed to the user; nothing changed (no automatic changes).
+
+## §1498 — 2026-11-15 8:46 PM CT — $300 lean threshold 1.0 → 2.0 (user yes): fewer, full-size $300 step-ins so the pace buckets refill
+live_params_255.json mk_model_lean 2.0 (|pred| ≥ 2 × 0.704 ≈ 1.4 bp ≈ the strongest 10–15% of signals) at sim 55552 (logged A300 in liveswitch_redo255_log.txt); LIVE PARAMS applied
+1.0→2.0. Interaction check: books without a jump rest both sides at the 10% size under gate_side (presence kept via lad_off); fewer step-ins → buckets refill → step-ins at full size;
+live switch, no restart (histories kept). Watch: GATE step-in share recovering from ≈ 28%, $300 |inv| toward 252's ≈ $1.4k, $300 fill rate toward 252's ≈ 0.46 per book-min, $300 skill
+and books clearing (bar 20). Briefs now lead with the 255 vs 252 alpha comparison (user).
+
+## §1499 — 2026-11-15 9:00 PM CT — Why 252's skill fell all day (user) — MEASURED, validator history (speed/skillhist.py, query_range, wallet 5EWwdZB7, 30 h hourly)
+252 skill (kappa-type consistency score) 4.09 (11-14 3 PM) → peak 4.44 (11-15 4 AM) → 1.04 (8 AM) → 2.51 (4 PM) → 0.92 (9 PM); 216 moves in step (2.37 → 3.60 → 1.02 → 1.75 → 0.87); field top-10
+mean skill 3.46 → 4.21 → 1.59 → 2.83 → 2.37 → MARKET-wide predictability swings, not a 252 change (its behaviour is constant, §1492). Net alpha (what the skill half pays on): 252 1,871 →
+1,940 (6 AM) → 1,459 (−25%); 216 ≈ flat (1,880 → 1,722); field sum of positive net alpha 312k → 344k → 282–288k. Miners with skill > 0: 172–189 overnight → 213–219 afternoon → more
+qualifiers split the half. TAO $185 → $192, alpha 0.00309 → 0.00303 → prices flat. → 252's pay ≈ $330 → $199 = share dilution (more qualifiers) + its own net-alpha dip (share
+0.58% → 0.51%). UID 255 started 3:12 PM; 252's decline began ≈ 4–5 AM; since 3 PM 252 net alpha −15% while 216 held → small overlap effect on the $30 books possible, not proven.
+→ judge pay by net-alpha share; the skill pool is crowding.
+
+## §1500 — 2026-11-15 9:10 PM CT — What killed our makers (≈ $190/mo on 11-09) and whether it can recur with the new edge (user Q)
+Killers (§1289, §1364, §1429, §1438–§1447): (1) our income was the MAKING half; the engine's DYNAMIC maker fee (per book, rises when miner making share > 0.4) went from 20–40 bp to
+100–140 bp; the validator nets 0.005 × fee from making credit → making ≈ 0 field-wide by 11-13 (even 252); making quality is one miner-wide factor → one bad class zeroed all;
+(2) 0.6.7 (11-10): 256 books / 3 classes — our tuning was for 128; (3) ours: three identical makers on the same books (11-08) split flow and skill (x3 $158 → $56 overnight), tests /
+restarts on settled miners, start bursts burning the pace budget before protection ended.
+Recurrence risk for the REDO: it earns SKILL (inventory × mid move, drift removed; fees not in it) — the fee mechanism that killed making doesn't apply. Real risks: (a) weekly releases
+can change market configs / skill rules → after every release re-read the configs and REFIT the model before trusting it; (b) crowding (skill qualifiers 172–189 → 213–219 on 11-15)
+dilutes share; (c) scaling identical miners on the same books collides (as 11-08) → split books / vary thresholds and run the collision checks before adding miners; (d) unproven over
+hours / the validator window / protection end (≈ 3:10 PM 11-16). Plan adds: post-release refit + compare; collision plan before scaling; auto-revert for tweaks once a winner (user).
+
+## §1501 — 2026-11-15 9:30 PM CT — Read after the $300 threshold 2.0 (one window); 255 skill score first > 0; $30 28 books clear (> 252's 23)
+Validator: 255 net alpha +278 (+137 → +242 → +278), 40 books, debeta_skill 0.0121 (FIRST non-zero), combined 0.0024; 252 +1,271, 73 books, skill 0.86. Pay 255 $13/mo, 252 $198.
+Window sim 55552–55852 (dilwin): $300 255 −0.45 (40% +) vs 252 −0.09; $30 255 +0.55 (65% +) vs 252 −1.05. Hurdle (dilution2): $300 since the change 255 kept +4 −7 = 11, $2k/book,
+median −0.49 vs 252 +5 −3; $30 since 54070 255 +20 −8 = 28, $3k/book, median +0.72 vs 252 +17 −6 = 23.
+$300 fillrate since the change: 255 0.44 per book-min (from 0.97), $/fill median $713; 252 0.28, $3,499. Positions: 255 $609 / hold 44 s / corr +0.031 vs 252 $2,144 / +0.156.
+GATE 2,134 step-in / 5,126 rest (29%). Buckets refill ≈ 2.5 wall h after a drain → full-size recovery expected gradually. Flag if $300 stays negative ≈ 1 h+ (no action without the user).
+
+## §1502 — 2026-11-15 10:15 PM CT — $300 rest orders deeper + calm books join the model lean (user yes): build ab404873, mk_gate_rest 6
+Why (user Q "will the budget run out again?"): refill ≈ $312 per book per sim min; a full $2.2k fill per ≈ 7 sim min (≈ 0.14 fills/book-min) is sustainable; we filled 0.44 → the gate
+parks most books at the small soft size (what we see). Fills on unsignalled books' resting orders (sweeps) drain the bucket and lose → make $300 fills come (almost) only from
+signalled step-ins, as on $30.
+Knob mk_gate_rest (ticks; 0 = MK_GATE; live): $300 resting orders (no-lean books, the non-lean side, low-bucket rest) sit MK_GATE_REST ticks behind the target. INTERACTION CHECK
+found: the 39 CALM $300 books (63–101) never lean (lean code was vol-only) → under the gate they stepped in at FULL size on BOTH sides at the touch (census $1.8k at +0) — a large
+part of the $300 drain/sweep losses → with mk_gate_rest > 0 the calm books get the same model lean, jump and lean-side-only gating as vol (the model was fit on all $300 books).
+Census (speed/gaterest.py; even books seeded BUY, odd no lean; full buckets): vol + calm LEAN bid full size ($2,195 / $1,799) at −1 tick; their ask and all no-lean sides $180–220 at
++8 / +9 ticks (fee push 2 + rest 6). equiv vs 7b78f008 with knob 0: 0 diffs, tape/ledger/locks identical; test_pace ALL PASS.
+Gated restart 04:13:55 UTC (ledger 11,019 fills; 7/256 paced; 621 instructions); LIVE PARAMS mk_gate_rest 0→6; logged sim 56427 (A300r). Leans resume ≈ sim 56,730.
+Watch: $300 fill rate → ≈ 0.1–0.15 per book-min, GATE step-in share up, positions toward ≈ $1.4–2k, $300 skill vs 252, coverage (books filled ≥ 160 — debeta_coverage_books).
+
+## §1503 — 2026-11-15 11:00 PM CT — First read after mk_gate_rest 6 + calm leans: $300 fill rate ≈ 252's, buckets refilling, first window +0.68
+Validator: 255 skill 0.0596 (0.012 → 0.040 → 0.060), combined 0.014, net alpha +237, 45 scored books, coverage 256 (≥ 160 ✔); 252 skill 0.95, net alpha +1,222, coverage 185.
+GATE 4,631 step-in / 2,569 rest (64%, from 29%). $300 fillrate sim 56430–56865: 255 99 fills / $56k on 49 books, 0.28 per book-min (from 0.44), $/fill median $425; 252 86 / $184k,
+0.27, $2,018. Window sim 56730–56865 (135 s, short): $300 255 +0.68 (23 books) vs 252 +0.66; $30 +0.42 (4 books). Presence 239; 2/256 paced; 0 errors. Pay 255 $17/mo, 252 $191.
+
+## §1504 — 2026-11-15 11:05 PM CT — Full skill + pay readout (user: briefs had thinned); briefs now lead with pay, validator skill, books clearing
+Pay 255: $0 (3–5 PM), $2 (5:41), $11 (8:34), $13 (9:25), $17 (10:56); 252 $219 → $191. Validator history (speed/skill255.py, 30-min steps): 255 skill −0.19…−0.22 (4–5 PM) → 0.00 (8 PM)
+→ +0.03…+0.06 now; net alpha −24 (4 PM) → +183 (8 PM) → +240…+280 (flat since 8:30 PM); scored books 36–53; 252 skill 2.7 → 0.99, net alpha 1,815 → 1,278.
+Books clearing 2.3 bp since sim 54070 (speed/dilution2.py): $30 255 33 (22+/11−, $3k/book) vs 252 22 (17+/5−) → $30 QUALIFIES; $300 255 13 (9+/4−, $13k/book, median −0.17 — includes
+the faded 8–10:15 PM stretch) vs 252 26 (16+/10−) → $300 not yet (bar 20). Post-fix window sim 56730–56940: $300 255 +1.02 (55% +) vs 252 +0.33; $30 +1.08 vs +0.58.
+Why pay is small: $300 = half the skill pool and we don't qualify there yet; $30 (a quarter) qualifies but our net alpha there is small → ≈ $17/mo. Key milestone: $300 books clearing → 20.
+
+## §1505 — 2026-11-15 11:10 PM CT — Brief (on request): skill score 0.064, pay $17; post-fix $300 +0.82 vs 252 +0.37; $30 35 books clear
+Pay 255 $17/mo ($0.58/day), 252 $192. Validator: 255 skill 0.0637, combined 0.0138, net alpha +249, 46 scored books, coverage 256; 252 skill 1.003, net alpha +1,266, 77 books, coverage 185.
+Books clearing 2.3 bp: since 54070 — $300 255 13 (9+/4−) vs 252 27 (16+/11−); $30 255 35 (22+/13−) vs 252 23 (18+/5−). Post-fix (since 56730, ≈ 250 sim s) — $300 255 7 (5+/2−) vs 252 0.
+Window sim 56730–56980: $300 255 +0.82 (52% +, 31 books) vs 252 +0.37; $30 +0.28 (7 books) vs +1.55 (1 book). $300 fillrate post-fix: 255 0.47 per filled book-min, 61 fills / $45k on
+31 books, $/fill median $601; 252 0.37, $94k, $2,676. GATE 4,807 / 2,393 (67% step-in). Presence 241; 5/256 paced; 0 errors; call 0.361.
+
+## §1506 — 2026-11-16 5:20 AM CT — Overnight: $300 AND $30 QUALIFY (27 / 18 books clear); every window positive; 4-dec books drag net alpha negative
+Pay 255 $27/mo ($0.91/day; $17 at 11 PM); 252 $146 (from $192). Validator: 255 skill 0.0, combined 0.0, score 0.0008, net alpha −212 (was +249), 54 books, coverage 256; 252 skill 1.10,
+net alpha +1,190, 96 books. GATE 6,257 / 943 (87% step-ins — buckets refilled). 0 errors; 8/256 paced; presence 238; call 0.39.
+Windows (900 sim s, tape .prev + current; speed/dilwin.py) 255 vs 252: $300 +0.64/+0.49/+0.31/+1.33 vs +0.36/+0.53/+0.23/+0.41 (ahead 3/4); $30 +0.79/+0.70/+0.44/+0.69 vs
++4.20/+4.22/+2.39/+1.60 (252 trades few $30 books per window). 4-dec 255 −1.76 / −1.48 (5–15% books +) vs 216 −3.15 / −0.80.
+Books clearing 2.3 bp, sim 57880–60580 (45 min; speed/dilution2.py): $300 255 27 (19+/8−, $4k/book, median +0.87, 62% +) vs 252 32 (18+/14−) → $300 QUALIFIES (bar 20);
+$30 255 18 (12+/6−, $5k/book) vs 252 19 → QUALIFIES (bar 10); 4-dec 255 32 kept ALL NEGATIVE (0+/32−), $14k/book, median −2.30 bp, 3% + → the validator net alpha turns
+negative from the 4-dec books (we still quote them with the old base; 252 trades none).
+Recommendation to the user: mk_skip_dec 1 now (queued + approved test; coverage stays 192 ≥ 160).
+
+## §1507 — 2026-11-16 6:15 AM CT — Brief: net alpha −212 → −25; $300 still ahead of 252; 4-dec still all-negative (0+/22−); skip_dec awaiting the user
+regcheck x2 255 REGISTERED. Pay 255 $27/mo ($0.90/day, flat vs 5 AM); 252 $151 (from $146). Validator: 255 skill 0.0, books kept 48, combined 0.0, score 0.0008, net alpha −24.6
+(5 AM −212); 252 skill 1.54, kept 88, net alpha +1,114, coverage 189. 255 coverage 256.
+Windows (300 sim s, dilwin) 255 vs 252: $300 60580 +0.97 vs +0.30, 60880 +0.80 vs +0.66; $30 −0.05 vs +0.25, +0.81 vs +1.28; 4-dec 255 −1.19 / −0.77 (17–24% +) vs 216 −1.54 / −1.31.
+Hurdle (dilution2) since 56730 (post-fix): $300 255 35 (22+/13−, $7k/book, median +0.58) vs 252 31 (17+/14−); $30 24 (17+/7−) vs 28 (18+/10−); 4-dec 22 kept ALL negative.
+Since 59680 (≈ 28 sim min): $300 34 (23+/11−) vs 30; $30 24 (16+/8−) vs 19; 4-dec 0+/17−.
+Mechanics: 0 errors; PACE 10/256 blocked; GATE 6,238 / 962 (87%); presence median 233; call 0.41 s; resting $481k on 583 orders. $300 fillrate sim 61080–61380: 255 97 fills / $73k
+on 39 books, 0.50 per filled book-min, $/fill median $574 vs 252 84 / $180k on 52 books, 0.32, $2,370 → our fills are still ≈ 4× smaller than 252's.
+
+## §1508 — 2026-11-16 6:30 AM CT — Brief: flat; net alpha −27; $300 window behind 252 for the first time in 6; 4-dec 0+/25−
+regcheck 255 REGISTERED. Pay 255 $27/mo ($0.89/day); 252 $150. Validator: 255 skill 0.0, kept 46, net alpha −27.4 (6:07 −24.6); 252 skill 1.44, kept 94, net alpha +1,154, coverage 189; 255 coverage 256.
+Window 61180–61540 (dilwin) 255 vs 252: $300 +0.18 (44% +) vs +0.46; $30 +0.69 vs +1.10; 4-dec −1.02 vs 216 −2.66.
+Hurdle since 56730: $300 255 34 (20+/14−, $8k/book, median +0.55) vs 252 41 (23+/18−); $30 28 (22+/6−) vs 34 (24+/10−); 4-dec 25 kept ALL negative.
+Mechanics: 0 errors; PACE 5/256; GATE 6,181 / 1,019 (86%); presence median 234; call 0.39 s; $300 fillrate 61240–61540 255 83 / $61k, $513 median, 0.40 vs 252 89 / $212k, $3,529, 0.35.
+
+## §1509 — 2026-11-16 6:38 AM CT — mk_skip_dec 1 LIVE on UID 255 (user: "yes, go ahead with the 4-dec skip")
+Live knob, no restart: 06:38:14 CT sim 61715; agent logged "LIVE PARAMS applied: mk_skip_dec 0→1" 12:38:23 UTC. Backup live_params_255.pre-skipdec.json; switch log line SKIPDEC.
+Interaction check: the skip runs AFTER want/gate/lean/no-chase and cancels every order on books 192–255 with one instruction per book (_cancel_all) — nothing else reads it;
+$300/$30 paths, soft pacing (per-book buckets, no transfer), gate, leans unchanged. Open 4-dec positions stay (no taking): mean |inv| $788/book (p90 $1,812) on 59 books
+(invstudy2, sim 61240–61600) → small leftover exposure scored as inventory × mid move until it ages out. Coverage target ≈ 192 ≥ 160. Making credit ≈ 0 field-wide → nothing lost there.
+After the switch: presence median 179 (p10 177; 234 before), 0 errors, PACE 6/256, GATE 6,121 / 1,079.
+Why: since 56730 the 4-dec books cleared 25 books ALL negative (median −2.03 bp, 5% +) with the biggest notional per book ($25k vs $8k on $300/$30); 252 trades none.
+Expectation (rough, by notional × median bp since 56730): 4-dec ≈ 64 × $25k × −2.0 bp outweighs $300 (117 × $8k × +0.55) + $30 (63 × $8k × +1.37) → without them net alpha
+should turn positive once the 4-dec trades roll out of the validator window; skill score back to the 11 PM level (0.06 at net alpha +249, pay ≈ $17–30/mo) — the bigger step
+needs bigger $300 fills (ours $513 vs 252 $3,529).
+
+## §1510 — 2026-11-16 6:45 AM CT — Brief: skip-dec 6 min in (≈ 60 sim s) — 4-dec fills 0; validator not yet moved
+regcheck 255 REGISTERED. Pay 255 $27 ($0.89/day); 252 $150. Validator: 255 skill 0.0, kept 49, net alpha −30.8, coverage 256 (unchanged yet); 252 skill 1.36, kept 92, +1,171, cov 190.
+Window 61540–61774 (dilwin): $300 255 +0.99 (54% +) vs 252 +0.29; $30 +0.46 (8 books) vs +0.95. 4-dec fills since 61725: 0. Hurdle not re-run (only ≈ 60 sim s since the switch).
+Mechanics: 0 errors; PACE 3/256; GATE 6,221 / 979 (86%); call 0.38 s; presence after the switch ≈ 179. $300 fillrate 61540–61774: 255 72 / $53k, median $323, 0.50 vs 252 71 / $185k, $3,535, 0.40.
+
+## §1511 — 2026-11-16 6:54 AM CT — $300 SIZE-UP live on 255 (user: "start working on the 300 books sizing ... without the pacer bringing us back down and without hitting the cap")
+Measured (speed/kindsplit.py, sim 61000–61850, $300 books) 255 vs 252: INSIDE fills n63 $70k (39%) median $1,113, p90/max $2.2k, mo20 +1.22 / mo60 +1.34 vs 252 n106 $234k, $2,793,
+max $3.7k, +0.80 / +1.29; TOUCH 255 $766 +0.43 / +0.07 vs 252 $1,959 +0.79 / +1.30; BEHIND 255 n146 $76k (43% of our $300 $) median $221, depth 8, −1.19 / −1.04 vs 252 n72 $200k,
+$3,572, depth 2, −0.11 / +0.35. Totals: 255 $178k vs 252 $553k in the same 850 sim s → we use ≈ 40% of the pace refill, 252 ≈ 100%. Our max fill = our order size ($2.2k): the
+size knob, not the pacer, caps our fills; 43% of our budget goes to swept deep rest orders at −1 bp. (sizestudy.py: 252 earns 85% of $ from ≥ $3k taker trades.)
+Census 1 (sizecensus.py, mk_vol_size 0.072 alone): with the bucket at $3,000 (< full $3.6k) the vol books REST at soft size ≈ $2,970 on BOTH sides 5–9 ticks back → big deep orders
+for sweeps. → code: agent 95ead2cb = ab404873 + mk_rest_frac (every gated $300 rest order, low bucket too, capped at frac × full size) + mk_calm_size (calm books' full size; SIZE
+was not live). equiv.py 0 instruction diffs (10 replies, tape + ledger identical), test_pace ALL PASS.
+Census 2 (sizecensus2.py on 95ead2cb, buckets $4,700 / $3,000 / $800): A now = step-in $2.2k vol / $1.8k calm at −1 tick, rest $220 / $180, low-bucket rest $1.3k / $1.1k;
+B (mk_vol_size 0.072, mk_calm_size 0.072, mk_rest_frac 0.1) = step-in $3.6k both at −1 tick, rest $360, low-bucket rest $360; same jumps; books without orders 2 in both.
+Interaction check: step-in needs bucket ≥ full $3.6k (burst ≈ $4.7k) → fewer, bigger step-ins (binding: yes, order size = max fill; acts on the next step-in); lean / gate_side / fee-push
+exemption / lad_off / no-chase unchanged; $30 books untouched (excluded from the gate path, own mk_low_size); 4-dec skipped; max_inv 0.14 ≈ $7k ≈ 2 same-side step-ins;
+cap safety unchanged (paced_out + ledger; worst book $75k of $450k). RISK: fewer $300 books filled → coverage (≈ 180 now, must stay ≥ 160) — watch every brief.
+Restart 12:54:36 UTC (before 04:13:55), agent 95ead2cb (backup agents/QuoteAgent.ab404873.py, params live_params_255.pre-size.json); LIVE PARAMS applied incl. mk_vol_size
+0.034→0.072, mk_calm_size 0.072, mk_rest_frac 0.1, mk_skip_dec 1; 0 errors; presence 179. No automatic switch-off (user 11-15): read each brief, 1-hour verdict ≈ 7:55 AM CT.
+Also (user question): 252 trades NO 4-dec books; 216 trades 31 at $2k/book (median −1.03, 42% +, kept 7+/11−, coverage 245) — near break-even and small; ours were $11k/book, 8% +.
+
+## §1512 — 2026-11-16 7:15 AM CT — Validator-exact alpha per class, last 90 sim min (sim 56767–62167; speed/skill_cls2.py = skill_cls.py without the old ts < 40000 s filter)
+$300: 255 +87.8 (+0.79 bp on $1.11M, kept 38 = 25+/13−, kappa +0.72, ELIGIBLE) vs 252 +228.0 (+0.73 bp on $3.14M, kept 53, kappa +0.61) vs 216 +105 (+0.40 on $2.63M).
+$30: 255 +78.3 (+1.50 bp on $0.52M, kept 26, kappa +1.19) vs 252 +68.9 (+2.64 on $0.26M) vs 216 +47.6. 4-dec: 255 −392.7 (−2.39 bp on $1.64M, 0+/23−) vs 252 none vs 216 −78.8.
+Totals: 255 −227 → +166 without 4-dec (56% of 252's +297); same $300 edge per $ as 252 — the $300 gap is VOLUME (2.8×). If the size-up brings $300 volume to ≈ $3.1M at
++0.79 bp → $300 ≈ +248, total ≈ +326 per 90 sim min ≈ 252's level (gauge ≈ +1,100 ≈ 3.7× the 90-min sum → validator window ≈ 5–6 sim h). Use skill_cls2.py as the size-up yardstick.
+
+## §1513 — 2026-11-16 7:25 AM CT — Brief: NET ALPHA +124 (from −31; skip-dec washing out); size-up window so far = restart WARM-UP (no leans for 300 sim s)
+regcheck 255 REGISTERED. Pay 255 $26/mo ($0.88/day); 252 $153. Validator: 255 skill 0.0, kept 44, net alpha +124.3 (6:43 −30.8), coverage 256; 252 skill 1.44, kept 91, +1,142, cov 191.
+Sim 61900–62170 (first 270 sim s after the 6:54 restart): 255 $300 fills = ONLY behind rest fills (n50 $18k, $360, depth 8, mo20 −1.73 / mo60 −1.56), 0 inside/touch; 30 books filled;
+dilwin $300 −1.28 (27% +) vs 252 +0.60; $30 no 255 fills. CAUSE: the model leans need ≥ 295 sim s of mid + fundamental history (_at(mh/fh, 300)) → no lean → no jump → gate_side
+steps in on no side, and $30 lean30_only puts both sides back → after a restart the REDO quotes only deep rest for ≈ 300 sim s (≈ 28 wall min). Real test window starts sim 62195
+(≈ 7:22 AM); verdict moved to 8:27 AM (one-shot 60c4e2ab). Mechanics: 0 errors; PACE 0/256, worst $75k of $450k; GATE 5,848 / 1,352; presence 176; call 0.32 s.
+
+## §1514 — 2026-11-16 7:45 AM CT — Why 252's pay keeps falling (user question): its weight −35% (0.0048 → 0.0031) = pay −30%; its net alpha −33% since 11-15 evening; making pool grew
+speed/payhist.py / payhist2.py / payhist3.py (validator 5EWwdZB7 gauges every 3 h over 30 h; Prometheus via urllib needs a curl User-Agent — python's default gets Cloudflare 1010):
+252 score 0.0047/0.0048/0.0049/0.0046/0.0040/0.0042/0.0038/0.0032/0.0030/0.0029/0.0031 (11-15 1:30 AM → 11-16 7:30 AM); net alpha 1,628–1,800 until 4:30 PM, 1,443 at 7:30 PM, 1,166 from
+10:30 PM on (flat since); skill score noisy 0.8–3.7; combined-score share flat ≈ 0.55–0.6% (except 0.38% at 10:30 PM). Price ≈ flat (pay/score ratio unchanged).
+FIELD: making credit > 0 on 122–139 miners; Σ making 8,343 → 12,972 (+55% in 30 h); Σscore of making>0 miners 0.61 / 0.56 / 0.60, skill-only 0.35 / 0.42 / 0.37 (252 skill-only, making 0).
+→ CORRECTION of "making ≈ 0 field-wide" (§1429 era): making credit pays ≈ 60% of weight today. 255 making = 0 — the miner-wide markout quality clamp (§1447) was likely zeroed by
+the 4-dec books + swept deep rest; both are gone now (§1509/§1511) → track 255 debeta_making every brief; if it stays 0, making quality is the next lever after the size-up.
+252's pay ≈ $146–153 since 5 AM — levelling with its net alpha.
+
+## §1515 — 2026-11-16 7:55 AM CT — Making credit will NOT rise on its own; making pays the top (young) UIDs $400–970/mo now
+Validator 0.6.7 making replica (speed/making067b.py = making067.py without the old ts < 40000 s filter), last 90 sim min (56928–62328):
+255 C 20.2 / R −56.2 → quality 0; $300 C 8.4 R −20.0, $30 C 13.6 R +14.0, 4-dec C −1.9 R −50.2; TWO-SIDED 0 in every class → credit 0 even at quality 1 (lean-only / one-side step-ins by design).
+252 C −1.5 / R −40.9 → 0 (skill-only, same as us). 216 → 0. 169 quality 0.456, credit $300 58.8 + $30 324.9 (C 1,114, two-sided 713); 133 quality 0.507, credit 50 + 261 + 29.
+Credit = Σ_book 2·min(buy, sell captured) × miner-wide R/C → needs BALANCED two-sided spread capture with positive 20-s realized markout; the $30 books carry most of it.
+Field now (speed/makerages.py): top 25 earners are 0.6–4.8 d old except 222 (21 d); makers 30 $967 (3.2 d), 59 $849, 133 $830 (1.4 d), 113 $587, 169 $442 (0.6 d, net alpha −1,659);
+skill-only young 99 $491 (net alpha +3,190, 2.2 d), 76 $419 (+2,490, 0.8 d). By age: 0–2 d 99 uids (61 makers, median $159 vs skill-only $181); 2–7 d 120 (63, $200 vs $190);
+7–14 d 20 (12, $175 vs $213); ≥ 14 d 17 uids, only 3 makers (median $283), skill-only $153. → making pays most but makers churn (our own makers died at ≈ $200/mo, §1428).
+Recommendation to the user: keep 255 on the skill path (size-up verdict 8:27); study the top makers (30/59/133/113) on the $30 books and the young skill UIDs 99/76 (net alpha 2–3× 252);
+a maker strategy belongs on a SEPARATE UID (rule: makers making-only, skill on separate UIDs, §1235/§1289).
+
+## §1516 — 2026-11-16 7:55 AM CT — Brief: net alpha +128; size-up first real 265 sim s (62195–62460) — too short, mixed
+regcheck 255 REGISTERED. Pay 255 $26 ($0.88/day); 252 $154. Validator: 255 skill 0.0 (net alpha +128 but skill still 0 — kept 42), coverage 256; 252 skill 1.66, net alpha +1,243, kept 93, cov 191.
+kindsplit 62195–62460: 255 inside n8 $9k $839 med (max $3,040) mo20 −1.16 / mo60 −1.80; touch n8 $10k −0.58 / +1.06; BEHIND n50 $25k (58%) $360 med (p90 $1,166, max $3,001)
+−1.90 / −1.89 vs 252 inside n19 $44k $3,477 +0.43 / +1.39, touch n29 $59k +0.55 / +1.03, behind n15 $44k −0.35 / −0.24. Totals 255 $46k on 28 books vs 252 $152k on 41 (30%).
+dilwin $300 255 +0.41 (43% +) vs 252 +0.43; $30 +0.99 (10 books) vs +0.42. Behind fills still ≥ half our $300 $ (rest orders + stale step-ins left deep after the price moves).
+Mechanics: 0 errors; PACE 0/256 (worst $75k of $450k); GATE 5,899 / 1,301; presence 177; call 0.36 s.
+
+## §1517 — 2026-11-16 8:10 AM CT — Skill-leader study (user: focus on skill): UID 99 is a TAKER with 2.3× 252's $300 alpha per $; 76 a touch maker
+Validator-exact per class, last 40 sim min (speed/skill_cls2.py): $300 99 +335 (+2.89 bp on $1.16M, kept 70 = 68+/2−, kappa +4.26) vs 252 +212 (+1.25 bp on $1.69M, 30+/13−) vs 255 +41
+(+0.88 bp on $0.47M, 27+/20−) vs 76 +59 (+0.61, not eligible); $30 76 +199 (+2.60 on $0.77M) vs 99 +66 vs 252 +39 vs 255 +34 (+1.88, kappa 2.05); 4-dec 99 +295 (+5.61 bp), 76 +81 (+4.24),
+255 −88 (dropped).
+99 = pure taker (no maker fills; speed/takerprof.py 61400–62400): $300 373 trades $524k ($2,058 median, 105 books ≈ cap rate $5.2/s per book), price vs mid −0.13 bp (takes
+when the spread is tight), mid after +20 / +60 / +120 s: +0.33 / +0.82 / +1.16 bp; 4-dec 168 trades +0.73 / +0.97 / −0.10, price −1.64. Taker fee REBATE ≈ 114 bp per $ (dynamic
+fees; sim money, not in skill). 57% buys. Positions (invstudy2, $300): 99 $1,151/book, hold 272 s, corr(inv, next 60 s) +0.172; 252 $3,471, 469 s, +0.114; 255 $795, 109 s, +0.069.
+76 = touch maker (89% of $ at the touch, $677 fills ≤ $1,500, markout ≈ 0) whose alpha comes from holding, mostly on $30 and 4-dec.
+Implications for 255 skill: (1) our $300 positions are 4× smaller and held 4× shorter than 252's with the weakest timing corr; (2) behind/rest fills still eat ≥ half of our $300 $
+at −1.9 bp (§1516) → removing $300 rest orders is the most direct next test; (3) a 99-style taker leg on our model (+1.0 bp at 120 s on $300 ≈ 99's +1.16) would match the best
+skill UID — needs the user's call (rule: no taking on makers; taking only after a solid maker base / clone study).
+
+## §1518 — 2026-11-16 8:25 AM CT — Next test READY: mk_gate_rest 6 → 30 ($300 rest orders out of reach), switch right after the 8:27 size verdict (user: "we can do this so long as we dont need the resting orders"; hold longer "sounds good"; taker leg → only on a later separate miner once a maker miner is steady)
+Do we need rest orders? Validator 0.6.7 debeta.coverage_weight: skill × min(1, books FILLED / required), required = (1 − max_inactive) × field max (≈ 160); "a single small fill counts";
+no quoting/presence requirement in the skill leg. speed/stepbooks.py, sim 56730–61890 (86 sim min, pre-restart): books with inside/touch fills $300 104 + $30 63 = 167 ≥ 160 (all fills
+117 + 63); post-size-up 62195–62700: step-in books only 15 of 45 $300 (few step-ins yet; validator window 5–6 h adds margin) → coverage = the risk to watch.
+$300 behind fills by depth (56730–61890): 1–4 ticks n224 $191k mo60 +0.78 bp (stale step-ins / shallow — GOOD, like 252's 2-tick fills); 5–9 n668 $299k −1.73; 10–19 n101 $47k −2.33;
+20+ n3 −7.26 → the losers are the gate_rest-6 rest orders (6 + fee push ≈ 8 ticks).
+Census (speed/restcensus.py, live 255 params, buckets $4,700 / $3,000 / $800): B (gate_rest 30) rest orders at +29…+33 ticks (A +5…+9), sizes unchanged ($360 rest, $3.6k step-ins at −1);
+same jumps; books without orders 2 in both. Interaction: gate_rest only moves $300 RESTING orders (no-lean books, non-lean side, low-bucket rest); calm leans stay on (gate_rest > 0);
+$30 untouched; step-ins / fee-push exemption / lean unchanged; rest fills stop draining the bucket → more step-ins; positions stop being unwound by deep rest fills → longer holds
+(user's item 2 partly comes with it — measure hold time). Live knob, no restart / warm-up.
+
+## §1519 — 2026-11-16 8:30 AM CT — SIZE-UP VERDICT: NOT PROVEN for volume (NOISE on edge); rest-30 switched on 8:24:38 (sim 62823)
+regcheck 255 REGISTERED. Pay 255 $19/mo ($0.63/day; $26 at 7:50) vs 252 $161. Validator: 255 skill 0.0 (net alpha +220, kept 35, coverage 255); 252 skill 1.37, net alpha +1,184, kept 99.
+Why skill 0 with net alpha > 0: the validator's kept books still include the 4-dec losers (23 all-negative at 7:15) → kappa ≤ 0; clears as they age out (≈ midday).
+Size-up window 62195–62770 (575 sim s after warm-up; kindsplit / fillrate / skill_cls2 10 min / invstudy2): 255 $300 $99k on 53 books (baseline ≈ $120k per 575 s → volume DOWN ≈ 17%) vs 252
+$385k on 77; inside n24 $34k median $1,068 (max $3,622) +0.21 / +0.48 (baseline +1.22 / +1.34), touch n10 $11k, BEHIND n97 $50k 52% $360 −1.62 / −1.24 vs 252 inside $168k +0.69/+1.06,
+touch $96k, behind $102k depth 3 −0.42/−0.09. Validator-exact last 10 sim min: $300 255 +12.3 (+1.29 bp on $96k) vs 252 +9.3 (+0.24 on $389k); $30 255 +3.1 (+0.61 on $50k) vs 252 +12.7.
+Hold 43 s (n8), corr −0.044 vs 252 150 s, +0.124.
+VERDICT: step-ins at $3.6k need the bucket ≥ $3.6k of ≈ $4.7k, and the deep rest fills (still half our $300 $) keep draining it → fewer step-ins, volume down, not up. Edge per $ not
+damaged on the validator measure (+1.29 bp). NOT PROVEN / NOISE — keep (it is the size 252 uses) and remove the drain: mk_gate_rest 6 → 30 (§1518, user-approved) applied 8:24:38 CT,
+"LIVE PARAMS applied: mk_gate_rest 6→30" 14:25:04 UTC; backup live_params_255.pre-rest30.json. 0 errors; PACE 0/256; GATE 5,691 / 1,509; presence 178; call 0.37 s.
+Rest-30 verdict ≈ 9:35 AM (brief cron 7b074b4b).
+
+## §1520 — 2026-11-16 8:55 AM CT — Rest-30 first read (220 sim s, 62830–63050): deep losers gone, positions 2× bigger, timing corr turned positive; volume flat so far
+regcheck 255 REGISTERED. Pay 255 $19 vs 252 $163. Validator: 255 skill 0.0, net alpha +211, kept 39, coverage 255; 252 skill 1.59, +1,254, kept 92.
+kindsplit: 255 inside n10 $13k −0.48/+0.32, touch n14 $11k +0.05/+0.41, behind n12 $17k depth median 1 (5+ tick fills gone) −0.37/+0.78 vs 252 inside $59k +0.95/+2.21, touch $35k,
+behind $36k −0.79/−0.54. $300 255 $40k on 16 books (≈ $105k per 575 s — flat vs size-up-only $99k) vs 252 $137k on 38. Validator-exact 4 sim min: $300 255 +5.2 (+1.38 bp, 6+/0−) vs
+252 +13.6 (+0.92 bp). invstudy2: 255 mean |inv| $1,656/book (size-up only $838), corr +0.105 (was −0.044) vs 252 $1,880, +0.067; hold n/a (window too short).
+Presence tool shows 64 books (only $30) — ARTIFACT: the queue tape only logs orders inside the published depth and $300 rest orders now sit ≈ 30 ticks out; validator gauges show
+231 bids / 185 asks, $397k resting (unchanged). Coverage proxy: 220 sim s → $300 16 books filled (9 by step-ins) + $30 9 — too short to judge; watch over the hour.
+Mechanics: 0 errors; PACE 0/256; GATE 5,672 / 1,528; call 0.37 s.
+
+## §1521 — 2026-11-16 9:30 AM CT — REST-30 VERDICT: PROVEN on quality (validator $300 +2.37 bp, 16+/1−; skill score off 0); volume still flat → mk_model_lean 2.0 → 1.5 live 9:25:55 (sim 63407)
+regcheck 255 REGISTERED. Pay 255 $20 ($0.67/day) vs 252 $164. Validator: 255 SKILL 0.12 (first > 0 today), combined 0.080, net alpha +346 (8:20 +220), kept 43, coverage 253, open 213/169;
+252 skill 1.40, +1,102, kept 90.
+Rest-30 window 62830–63340 (510 sim s) vs size-up-only 62195–62770: 255 inside n30 $43k median $1,329 +0.35 / +1.21 (was +0.21 / +0.48), touch n18 $15k +0.22 / +0.60, behind n21
+$29k depth 1 −0.38 / +0.47 (was 52% at depth 8, −1.62 / −1.24); 252 inside $168k +0.94 / +1.81, touch $64k, behind $101k −0.65 / −0.23. $300 255 $92k on 41 books (≈ $104k / 575 s —
+FLAT) vs 252 $352k on 76. Validator-exact 8.5 sim min: $300 255 +20.2 (+2.37 bp on $85k, kept 17 = 16+/1−, kappa +5.0) vs 252 +41.7 (+1.15 bp on $361k, 22+/6−); $30 255 +5.3
+(+1.27) vs 252 +8.5 (+1.22). Positions 255 $1,176/book corr +0.114 vs 252 $2,195, +0.111. Books filled 41 $300 (29 by step-ins) + 24 $30 in 510 s.
+VERDICT rest-30: PROVEN (alpha per $ doubled, deep losers gone, timing ≥ 252) — keep. Volume not raised: the binding limit is how often the $300 model leans, not the budget (we use ≈ 30%).
+Lean frequency census (speed/leanfreq.py, live model_lean.json on the tape, 3 windows 57000–59000 / 59000–61000 / 61000–63200): active share / mid move +120 s in the predicted direction:
+k 1.0 28.9/28.1/28.3% +1.27/+1.25/+1.17 bp; 1.25 19.0/18.2/18.8% +1.46/+1.44/+1.28; 1.5 12.1/11.4/11.7% +1.66/+1.65/+1.40; 1.75 7.5/7.0/7.1% +1.82/+1.86/+1.50; 2.0 4.5/4.1/4.3% +2.06/+2.07/+1.66.
+→ 1.5 = 2.7× the step-in chances for −16% edge (≈ 2.3× alpha opportunity). Interaction: mk_model_lean only scales the $300 (vol + calm) lean threshold → jumps / gate_side step-ins;
+$30 own knob (mk_model_lean_30 1.0) untouched; rest 30, size 0.072, rest_frac 0.1, bucket gate, cap safety unchanged; more step-ins → budget may become binding (watch PACE).
+Applied 15:26:19 UTC "mk_model_lean 2.0→1.5"; backup live_params_255.pre-lean15.json; 0 errors. Verdict ≈ 10:30 AM.
+
+## §1522 — 2026-11-16 9:55 AM CT — FLEET STUDY for scaling (user request): 5F1F2JMu runs 24 near-identical UIDs on the SAME books at the SAME prices and each earns ≈ $115–215
+speed/fleetids.py (metagraph + validator gauges): coldkeys with ≥ 4 UIDs: 5CAXJT4t 31 UIDs $7,529/mo, 5F1F2JMu 24 $4,366 (median $171), 5GCSdbyd 20 $3,782, 5G9URk3b 16 $3,443, 5FNTAiDo 10 $2,514,
+5ECLVeLz 9 $3,570 … (big fleets are normal). 5F1F2JMu: TWO configs — makers 66/95/251/190 ($297–403, making credit 200–231, coverage 256, $300 fills $887, 4-dec $900, net alpha ≈ 100) and
+≈ 19 skill UIDs (net alpha 850–1,720, skill 0.3–3.6, $115–236, mostly coverage ≈ 191 = no 4-dec). Ages 0.2–36 d (40/216/252/52 ≥ 31 d; 147/134/210 20–25 d; many 1–5 d = replacements;
+fleet 41 → 24 UIDs). Twins 10/141 (identical gauges).
+speed/fleettape.py, sim 62000–63400 (23 sim min): every skill UID trades $300 $633k–1,021k (≈ the cap rate $5.2/s/book on ≈ 90–122 books) + $30 $110–446k, fixed sizes ($300 $2.4–3.5k,
+$30 $1,795 or $3,590), ≈ 50% buys. NO book split: $300 book sets ≈ 110 each, pairwise Jaccard median 0.72. Same timing: 59% of fleet maker fills are followed within 5 s by ANOTHER
+fleet UID on the same book and side (41% at the same price), opposite side 3.7%. $300 book-minutes with fleet fills: 1 uid 480, 2 361, 3 322, 4 219, 5–9 418, 10–18 123.
+→ Identical copies stack at the same price and a big sweep fills several of them; skill = inventory × mid move, so sharing the fill flow does not split the alpha per $. The fleet scales
+by COPIES at full cap volume, paid ≈ $170 each; churned UIDs are replaced. Our gap per UID is VOLUME (255 ≈ 30% of the cap rate vs ≈ 100%), not uniqueness.
+Implications: (1) scaling our skill miner by copies is viable IF each runs near the cap rate with ≥ +1 bp per $; pay per UID ≈ share of the skill pool (fleet ≈ $170); (2) keep a
+collision check (no self-trades; our copies never cross each other — same side stacks are harmless); (3) pool dilution: the fleet's 19 skill UIDs ≈ $3.3k/mo — adding ours dilutes
+everyone incl. ours; add one at a time and measure total pay; (4) a maker config is the fleet's top earner per UID ($300–400) — later, per the user's order.

@@ -1,3 +1,5 @@
+# READ deploy/sn79/HANDOFF_2026-11-15.md FIRST (11-15): next miner = agent 887a18c6 + the REDO settings; newminer.sh <uid>.
+
 # Next miner — gap list vs UID 252, build, test schedule, withdrawal (11-13 PM, §1440)
 
 ## Prerequisites 1–4 (done)
@@ -25,6 +27,7 @@ Build: /opt/mvtrx/agents/QuoteAgent.next-10dc929d.py (NOT active). test_pace ALL
 **PROVEN 11-13 (T1 interim, UID 174): soft pacing = the presence fix** — on ≈ 113 books with resting orders vs off 5 books (248/256 paced). Registry: memory mvtrx-proven-results.md.
 **PROVEN 11-13 (T2, UID 174): fee-aware quoting mk_fee_k 1.0** — presence +39%, $300 edge per $ ≈ 2×, pay-weighted edge +17%, skill tie; adopted live.
 Already PROVEN (not re-tested): $300 size 0.044 + inside 3 + lean 1.0 (skill +0.36/+0.20/+0.42), $30 shape (+23–25% edge $), 4-dec touch kept, 4-dec size/deep ties.
+**11-16 (§1506–§1519, UID 255):** 4-dec skip = net alpha −31 → +220 in 1.5 h (4-dec cost −393 per 90 sim min; validator-exact). $300 size-up to $3.6k step-ins NOT PROVEN for volume (bucket drained by deep rest fills, −17% $); edge per $ intact. Deep rest fills 5+ ticks lose −1.7…−2.3 bp, 1–4 ticks +0.78 → rest 30 test live 8:24 AM. Skill leader UID 99 = taker (separate future miner only).
 
 ## Starting settings (proven base)
 Unit: agent 10dc929d, pace_cap 450000, pace_steady 450000, **pace_start 20000, pace_soft 5000, pace_soft_min 0.05**, tape on, live_params_s 5.
@@ -85,6 +88,16 @@ Freshness doesn't fix our losses (they persist at every order age); testing the 
 ## Shallow ladder tie (§1471): the fee push sets our depth → testing fee_k 0.5 (n179f05, 11-15 7:46 AM); fade-lean maker knob being built (clone of 60/232: fade 1–5 min moves).
 
 ## KEY GAP (§1473): fleet holds ≈ 4.5× bigger positions ≈ 8× longer with the SAME timing edge → test skew 1 vs 5 (11-15 ≈ 9:55 AM); then fade lean.
+
+## NEXT MINER IN MINUTES (11-15): after the user re-registers x2 → `sh /opt/mvtrx/newminer.sh <uid>` (regcheck, START → live_params_<uid>, UID copies of the
+A/B + read scripts, clean ledger, gated restart, our_uids.txt) → schedule the next queued test with abtest_sched_<uid>.sh + readchain_<uid>.sh. If UID 179 is pruned first:
+stop mvtrx-x2, empty our_uids.txt, record (newminer.sh re-enables the unit).
+
+## REDO SIZE TEST for the next miner (§1482, user 11-15: "redo it with the new knowledge")
+Fleet: same $ as us, as ONE big fill (≈ $2–3k) per ≈ 5 sim min per active book, ≈ half the books active, fills mostly on orders < 1 s old (brief big step-ins).
+Ours: tiny ($100) fills 2–3×/min on every book → soft pacing shrinks size. Design: mk_lad_off 1 + budget-gated full-size step-ins (only when the bucket affords a
+full fill; cancel if unfilled) + a full-size rest order ≥ 3 ticks back for presence + no size shrinking. Needs code + test_pace + cap checks + interaction check;
+run as a LONG single-arm read from the miner's first minute (fresh bucket pace_start 20k). Compare vs 252/216 over the same windows.
 
 ## After the speed build (user Q 11-14 ≈ 2 PM: redo all tests?)
 No. Keep: soft pacing, fee-aware, $30 shape, $300 size + inside 3 + lean, 4-dec touch, $30 picky (lost on volume), skew (inventory, not speed).

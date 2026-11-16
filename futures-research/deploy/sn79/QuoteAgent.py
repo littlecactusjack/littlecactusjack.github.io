@@ -243,6 +243,36 @@ class QuoteAgent(FinanceAgent):
         self.mk_vol_inside = int(getattr(c, "mk_vol_inside", 0))   # §1304: >0: $300-book touch orders one tick inside the spread when it is ≥ this many ticks (fleet: 5)
         self.mk_calm_lad = [int(x) for x in str(getattr(c, "mk_calm_lad", "") or "").replace(":", ",").split(",") if x.strip()]   # §1303: calm-book ladder, ticks behind the touch (e.g. 1:2:4)
         self.mk_calm_lad_size = float(getattr(c, "mk_calm_lad_size", 0.036))   # §1303: calm ladder order size (fleet calm fills mostly $1-2k)
+        self.mk_model_lean = float(getattr(c, "mk_model_lean", 0.0))   # §1486: >0: the $300 lean JUMP side follows the MARKET-MODEL prediction (fundamental gap + trend,
+        self._ml = None                                                  # 50-s / 5-min price reversion; weights in MODEL_LEAN_FILE) when |pred| ≥ MK_MODEL_LEAN × the file's threshold
+        self.model_lean_file = str(getattr(c, "model_lean_file", "/opt/mvtrx/agents/model_lean.json"))   # (top-30% |pred|); overrides fade + fund move; 0 = off (live)
+        try:
+            self._ml = json.load(open(self.model_lean_file))
+        except Exception:
+            self._ml = None
+        self._fh2 = {}                                                   # per-second fundamental history (305 s) for the model lean
+        self.mk_model_lean_30 = float(getattr(c, "mk_model_lean_30", 0.0))   # §1488: the same lean on the $30 books with their OWN fit (MODEL_LEAN_30_FILE; fade is wrong there)
+        self.model_lean_30_file = str(getattr(c, "model_lean_30_file", "/opt/mvtrx/agents/model_lean_30.json"))
+        self.mk_lean30_back = int(getattr(c, "mk_lean30_back", 2))       # §1488: $30 spreads are 1–2 ticks (no room to step inside) → the $30 lean keeps the predicted
+        self._lean_now = {}                                              # side at the touch and moves the OTHER side MK_LEAN30_BACK ticks back (live)
+        self.mk_lean30_only = int(getattr(c, "mk_lean30_only", 0))       # §1495: 1 = with no $30 lean, BOTH sides rest MK_LEAN30_BACK ticks back (touch only on the predicted
+                                                                          # side when the model leans) — cuts our $30 volume (we trade 4–7× 252's notional per book at ≈ 0 bp)
+        try:
+            self._ml30 = json.load(open(self.model_lean_30_file))
+        except Exception:
+            self._ml30 = None
+        self.mk_gate_side = int(getattr(c, "mk_gate_side", 0))           # §1486: 1 = gated full-size step-ins only on the LEAN (jumped) side; the other side rests (live)
+        self.mk_rest_frac = float(getattr(c, "mk_rest_frac", 0.0))   # §1511: >0: EVERY gated $300 rest order (low bucket too, not only the non-lean side) is capped at
+                                                                  # MK_REST_FRAC × the full size — a big deep rest order is what sweeps hit (−1 bp); 0 = off (non-lean side 10%, low-bucket rest at soft size) (live)
+        self.mk_calm_size = float(getattr(c, "mk_calm_size", 0.0))   # §1511: >0: full order size on the calm $300 books (63-101) instead of SIZE (live)
+        self.mk_gate_rest = int(getattr(c, "mk_gate_rest", 0))   # §1502: ticks back for $300 RESTING orders (no-lean books, the non-lean side, low-bucket rest); 0 = MK_GATE.
+                                                                  # Deeper rest → sweeps rarely reach them → fewer, signal-only fills → the bucket sustains full-size step-ins (live)
+        self.mk_gate = int(getattr(c, "mk_gate", 0))             # §1483 budget-gated step-ins ($300 vol + calm): if the book's pace bucket can afford a FULL-size fill,
+                                                                  # quote touch/inside at full size (no soft shrink); else rest MK_GATE ticks behind the target at the
+                                                                  # soft size (presence, rarely filled) until the bucket refills — the fleet's one big fill per ≈ 5 min
+                                                                  # per book (§1482). 0 = off (live). Cap safety unchanged (paced_out + 24-h ledger).
+        self.mk_lad_off = int(getattr(c, "mk_lad_off", 0))       # §1476: 1 = no ladder on $300 vol + calm books (one touch/inside order per side, like the fleet's
+                                                                  # ≈ 1 order per side per book, §1474); resting ladder orders are cancelled; 0 = ladders as configured (live)
         self.mk_fade_lean = float(getattr(c, "mk_fade_lean", 0.0))   # §1472: >0: the $300 lean JUMP side follows the FADE signal −(Δmid 60 s + Δmid 300 s) in bp when
         self._mh = {}                                                 # |fade| ≥ MK_FADE_LEAN (clone of taker UIDs 60/232, 93% accurate; our inside fills +0.24 vs −0.21 bp
                                                                       # by fade agreement, §1471) instead of the fundamental move; 0 = fundamental move (live knob)
@@ -625,11 +655,11 @@ class QuoteAgent(FinanceAgent):
     LIVE_KNOBS = {"flow_pull": float, "flow_pull_vol_only": int, "flow_win": int, "flow_cool": int, "mk_vol_inside": int, "mk_vol_touch_min": int, "mk_vol_jump": int, "mk_low_touch_min": int, "mk_skip_dec": int, "mk_vol_lean_only": int, "mk_fee_k": float, "pace_soft_on": int,
                   "mk_nochase_bp": float, "mk_nochase_s": int, "mk_calm_touch_min": int, "mk_calm_hold": int, "mk_pace_hold": float,
                   "mk_vol_size": float, "mk_vol_lad_size": float, "mk_calm_lad_size": float, "mk_dec_size": float, "mk_dec_inside": int,
-                  "mk_dec_deep": float, "mk_dec_touch": int, "mk_dec_deep2": float, "book_map": str, "mk_low_size": float, "mk_low_lad_size": float, "mk_thin_ratio": float, "mk_thin_only_vol": int, "mk_thin_vol_off": int, "skew": float, "mk_calm_expiry": float, "mk_vol_expiry": float, "mk_fade_lean": float,
+                  "mk_dec_deep": float, "mk_dec_touch": int, "mk_dec_deep2": float, "book_map": str, "mk_low_size": float, "mk_low_lad_size": float, "mk_thin_ratio": float, "mk_thin_only_vol": int, "mk_thin_vol_off": int, "skew": float, "mk_calm_expiry": float, "mk_vol_expiry": float, "mk_fade_lean": float, "mk_lad_off": int, "mk_gate": int, "mk_model_lean": float, "mk_gate_side": int, "max_inv": float, "mk_model_lean_30": float, "mk_lean30_back": int, "mk_lean30_only": int, "mk_gate_rest": int, "mk_rest_frac": float, "mk_calm_size": float,
                   "fund": float, "fund_cap": float, "fund_mv": float, "fund_mv_cap": float, "fund_scope": int, "micro": float, "mk_skip_vol": int}   # §1373: 1 = no making on the $300 books (miner-wide quality test)   # §1369: fundamental lean (the fleet fills after fundamental moves its way, §1368) and the micro-price weight
     LIVE_LISTS = {"mk_calm_lad": (1, 20, 4), "mk_vol_lad": (1, 20, 4), "mk_low_lad": (1, 20, 4)}   # §1346: ladder levels "a:b:c" — ticks 1..20, at most 4 levels (5-instruction budget)
     LIVE_LIMITS = {"mk_pace_hold": (0.0, 10000.0), "mk_vol_size": (0.0, 0.1), "mk_vol_lad_size": (0.0, 0.1), "mk_calm_lad_size": (0.0, 0.1),
-                   "mk_dec_size": (0.0, 0.12), "mk_vol_jump": (0, 20), "mk_low_touch_min": (0, 10), "mk_skip_dec": (0, 1), "mk_vol_lean_only": (0, 1), "mk_fee_k": (0.0, 5.0), "pace_soft_on": (0, 1), "mk_dec_touch": (0, 1), "mk_low_size": (0.0, 0.1), "mk_low_lad_size": (0.0, 0.1), "mk_dec_deep2": (0.0, 3.0), "skew": (0.0, 30.0), "mk_calm_expiry": (0.0, 3600.0), "mk_vol_expiry": (0.0, 3600.0), "mk_fade_lean": (0.0, 50.0), "fund": (0.0, 1.0), "fund_cap": (0.0, 5.0), "fund_mv": (0.0, 2.0), "fund_mv_cap": (0.0, 5.0), "fund_scope": (0, 2), "micro": (0.0, 1.0)}
+                   "mk_dec_size": (0.0, 0.12), "mk_vol_jump": (0, 20), "mk_low_touch_min": (0, 10), "mk_skip_dec": (0, 1), "mk_vol_lean_only": (0, 1), "mk_fee_k": (0.0, 5.0), "pace_soft_on": (0, 1), "mk_dec_touch": (0, 1), "mk_low_size": (0.0, 0.1), "mk_low_lad_size": (0.0, 0.1), "mk_dec_deep2": (0.0, 3.0), "skew": (0.0, 30.0), "mk_calm_expiry": (0.0, 3600.0), "mk_vol_expiry": (0.0, 3600.0), "mk_fade_lean": (0.0, 50.0), "mk_lad_off": (0, 1), "mk_gate": (0, 20), "mk_model_lean": (0.0, 10.0), "mk_gate_side": (0, 1), "max_inv": (0.01, 0.5), "mk_model_lean_30": (0.0, 10.0), "mk_lean30_back": (0, 20), "mk_lean30_only": (0, 1), "mk_gate_rest": (0, 30), "mk_rest_frac": (0.0, 1.0), "mk_calm_size": (0.0, 0.12), "fund": (0.0, 1.0), "fund_cap": (0.0, 5.0), "fund_mv": (0.0, 2.0), "fund_mv_cap": (0.0, 5.0), "fund_scope": (0, 2), "micro": (0.0, 1.0)}
 
     def _live_reload(self):
         """§1342: every LIVE_PARAMS_S sim s, if the JSON file changed, apply whitelisted quoting knobs (type-cast, range-checked) without a restart.
@@ -824,7 +854,7 @@ class QuoteAgent(FinanceAgent):
             lv.append(k2)
         return lv
 
-    def _vol_ladder(self, response, book_id, orders, want, sq, qty, vq, tick, pd, levels=None, inside=0, expiry=None, tol=None, obest=None, hold=0, no_touch=False):
+    def _vol_ladder(self, response, book_id, orders, want, sq, qty, vq, tick, pd, levels=None, inside=0, expiry=None, tol=None, obest=None, hold=0, no_touch=False, no_ladder=False):
         """§1279: $300-book quoting. Touch orders at WANT; ladder orders REST anywhere 1..max(MK_VOL_LAD)+2 ticks behind the touch target (no re-pricing
         when the touch moves, so they keep their queue place). The validator accepts only MK_MAX_INS instructions per book per reply (default 5;
         the rest are DROPPED), so instructions go in priority order: (1) cancel orders ahead of the target or on a pulled side, (2) touch orders,
@@ -841,6 +871,8 @@ class QuoteAgent(FinanceAgent):
         elif inside and B in want and S in want and round((want[S] - want[B]) / tick) >= inside:   # §1304 fleet: one tick INSIDE the spread when it is ≥ INSIDE ticks wide
             want[B] = round(want[B] + tick, pd); want[S] = round(want[S] - tick, pd)
         tgt = dict(want); span = max(levels) + (2 if tol is None else max(2, tol))   # §1313: a wide tolerance widens the keep window too
+        if no_ladder:
+            span = 0                                      # §1476: no ladder — every resting order behind the target is stale (cancelled), none placed
         nts = no_touch if isinstance(no_touch, (set, frozenset)) else None   # §1435: a SET = no touch order on those sides only (ladder stays on both)
         if nts is not None:
             want = {sd: px for sd, px in want.items() if sd not in nts}
@@ -877,6 +909,8 @@ class QuoteAgent(FinanceAgent):
         for o in stale:
             if n >= self.mk_max_ins: break
             response.cancel_order(book_id, o.id); n += 1
+        if no_ladder:
+            return
         lv = sorted(levels)
         if tol is None: tol = min((y - x for x, y in zip(lv, lv[1:])), default=2) // 2   # §1303: 1:2:4 → 0 (adjacent levels), 2:5:10 → 1
         for k in lv:
@@ -1157,7 +1191,10 @@ class QuoteAgent(FinanceAgent):
         ask_px = round(round(ask_px / tick) * tick, pd)
         self._jumped[int(book_id)] = set()
         lean = fmv
-        if self._g(int(book_id)) == "vol" and not self._is_low(int(book_id)):   # §1472: per-second mid history for the fade lean (kept even while off)
+        _low = self._is_low(int(book_id))
+        if _low:
+            lean = 0.0                                     # §1488: $30 books lean only on their own model (never on fade / fund move)
+        if self._g(int(book_id)) == "vol" or (self._g(int(book_id)) == "calm" and self.mk_gate_rest):   # §1472/§1488/§1502: mid history ($300 vol + $30; calm when mk_gate_rest) for the leans
             from collections import deque
             mh = self._mh.get(int(book_id))
             if mh is None:
@@ -1166,11 +1203,36 @@ class QuoteAgent(FinanceAgent):
                 mh.append((self._sec, mid))
                 while mh and mh[0][0] < self._sec - 305:
                     mh.popleft()
-            if self.mk_fade_lean > 0:
+            fv = getattr(book, "fundamental", None)
+            if fv:
+                fh = self._fh2.get(int(book_id))
+                if fh is None:
+                    fh = self._fh2[int(book_id)] = deque()
+                if not fh or fh[-1][0] != self._sec:
+                    fh.append((self._sec, fv))
+                    while fh and fh[0][0] < self._sec - 305:
+                        fh.popleft()
+            if self.mk_fade_lean > 0 and not _low:
                 m60 = next((m for t, m in mh if t >= self._sec - 60), None); m300 = mh[0][1] if mh and mh[0][0] <= self._sec - 295 else None
                 fade = -((mid - m60) + (mid - m300)) / mid * 1e4 if (m60 is not None and m300 is not None and mid > 0) else 0.0
                 lean = fade if abs(fade) >= self.mk_fade_lean else 0.0
-        if self.mk_vol_jump and lean and self._g(int(book_id)) == "vol" and not self._is_low(int(book_id)):   # §1434 lean jump (§1472: side from LEAN)
+            _ml, _k = (self._ml30, self.mk_model_lean_30) if _low else (self._ml, self.mk_model_lean)
+            if _k > 0 and _ml and mid > 0:                 # §1486 market-model lean (overrides fade / fund move); §1488 per-class fit
+                fh = self._fh2.get(int(book_id)); fv = getattr(book, "fundamental", None)
+                def _at(dq, k):                                    # value at the first sample ≥ now − k, only when the history reaches back ≥ k − 5 s
+                    if not dq or dq[0][0] > self._sec - k + 5: return None
+                    return next((v for t, v in dq if t >= self._sec - k), None)
+                m10, m50, m300 = _at(mh, 10), _at(mh, 50), _at(mh, 300)
+                f30, f60, f300 = _at(fh, 30), _at(fh, 60), _at(fh, 300)
+                lean = 0.0
+                if fv and None not in (m10, m50, m300, f30, f60, f300):
+                    x = {"gap": (fv - mid) / mid * 1e4, "dF30": (fv - f30) / mid * 1e4, "dF60": (fv - f60) / mid * 1e4, "dF300": (fv - f300) / mid * 1e4,
+                         "r10": (mid - m10) / mid * 1e4, "r50": (mid - m50) / mid * 1e4, "r300": (mid - m300) / mid * 1e4}
+                    ml = _ml
+                    pred = sum(w * (x[nm] - mu) / sd for nm, w, mu, sd in zip(ml["names"], ml["w"], ml["mu"], ml["sd"]) if sd > 0)
+                    lean = pred if abs(pred) >= _k * ml["thr"] else 0.0
+        self._lean_now[int(book_id)] = lean if _low else 0.0
+        if self.mk_vol_jump and lean and (self._g(int(book_id)) == "vol" or (self._g(int(book_id)) == "calm" and self.mk_gate_rest)) and (not _low or self.mk_model_lean_30 > 0):   # §1434 lean jump (§1472 side from LEAN; §1488 $30 too)
             if lean > 0:
                 jb = round(math.floor(min(fair - self.edge * tick, ask - tick, bid + self.mk_vol_jump * tick) / tick + 1e-9) * tick, pd)
                 if jb > bid_px + 1e-12:
@@ -1192,6 +1254,7 @@ class QuoteAgent(FinanceAgent):
             bid_px = max((l.price for l in book.bids if l.price <= bid_px + tick / 2 and held(0, l)), default=None)
             ask_px = min((l.price for l in book.asks if l.price >= ask_px - tick / 2 and held(1, l)), default=None)
         sz = self.mk_vol_size if (self.mk_vol_size > 0 and self._g(book_id) == "vol") else self.size   # §1275: own size on the $300 books (long-lived fleet quotes ≈ $3k there)
+        if self.mk_calm_size > 0 and self._g(book_id) == "calm": sz = self.mk_calm_size   # §1511
         if self.mk_dec_size > 0 and self._g(book_id) == "dec": sz = self.mk_dec_size   # §1313: fleet 4-dec order size
         self._pf = self._pace_factor(int(book_id))               # §1440 soft pacing
         qty = round(max(sz * wealth0 / mid * self._pf, self.min_order_size(book_id)), vd)
@@ -1448,6 +1511,59 @@ class QuoteAgent(FinanceAgent):
                         p = round(math.floor(n + 1e-9) * tick if side == OrderDirection.BUY else math.ceil(n - 1e-9) * tick, pd)
                         if p != want[side] and p > 0: lv[p] = sq.get(side, qty)
                 extra[side] = lv
+        if self.mk_model_lean_30 > 0 and self.mk_lean30_back > 0 and want and self._is_low(int(book_id)) and self._lean_now.get(int(book_id)):   # §1488 $30 lean
+            far = OrderDirection.SELL if self._lean_now[int(book_id)] > 0 else OrderDirection.BUY   # model says UP → keep the bid at the touch, move the ask back
+            if far in want:
+                want[far] = round(want[far] + self.mk_lean30_back * tick, pd) if far == OrderDirection.SELL else round(want[far] - self.mk_lean30_back * tick, pd)
+                if want[far] <= 0: want.pop(far); sq.pop(far, None)
+            self._l30_n = getattr(self, "_l30_n", 0) + 1
+        elif self.mk_model_lean_30 > 0 and self.mk_lean30_only and self.mk_lean30_back > 0 and want and self._is_low(int(book_id)):   # §1495 no lean → both sides back
+            for sd in list(want):
+                want[sd] = round(want[sd] - self.mk_lean30_back * tick, pd) if sd == OrderDirection.BUY else round(want[sd] + self.mk_lean30_back * tick, pd)
+                if want[sd] <= 0: want.pop(sd); sq.pop(sd, None)
+        if self.mk_gate > 0 and want and self.pace_cap and self._g(book_id) in ("vol", "calm") and not self._is_low(int(book_id)):   # §1483 gated step-ins
+            qfull = round(max(sz * wealth0 / mid, self.min_order_size(book_id)), vd)
+            tok = self._tok_accrue(int(book_id), self._sec)[0]
+            self._gate_n = getattr(self, "_gate_n", [0, 0])
+            jd0 = self._jumped.get(int(book_id), set()); gs = bool(self.mk_gate_side) and (self._g(book_id) == "vol" or (self._g(book_id) == "calm" and self.mk_gate_rest))   # §1502: calm leans too when mk_gate_rest
+            if tok >= qfull * mid:                         # the bucket affords a full fill: full-size step-in
+                self._gate_n[0] += 1
+                if gs:                                     # §1486: only the lean (jumped) side steps in; the other side rests MK_GATE ticks back at the soft size
+                    qrest = round(max(qfull * (self.mk_rest_frac or 0.1), self.min_order_size(book_id)), vd)   # a small rest order (presence) — a full-size deep order is what sweeps hit
+                    for sd in list(want):
+                        if sd in jd0: continue
+                        want[sd] = round(want[sd] - (self.mk_gate_rest or self.mk_gate) * tick, pd) if sd == OrderDirection.BUY else round(want[sd] + (self.mk_gate_rest or self.mk_gate) * tick, pd)
+                        if want[sd] <= 0: want.pop(sd); sq.pop(sd, None); continue
+                        sq[sd] = min(sq.get(sd, qrest), qrest)
+                for sd in list(want):
+                    if gs and sd not in jd0: continue
+                    room = ((acct.quote_balance.free + self._reserved(acct, OrderDirection.BUY)) / want[sd]) if sd == OrderDirection.BUY else (acct.base_balance.free + self._reserved(acct, OrderDirection.SELL))
+                    q = qfull if room >= qfull else (round(room * 0.98, vd) if self.fit_qty else 0.0)
+                    if q >= self.min_order_size(book_id) and q > 0:
+                        sq[sd] = q
+                qty = qfull
+                jd = self._jumped.get(int(book_id), set())
+                if ft and not gs:                          # §1483: a step-in is NOT fee-pushed (with mk_gate_side only the jumped side steps in — already exempt) (like a lean-jumped side) — the fleet steps in at/inside the touch
+                    for sd in list(want):
+                        if sd in jd: continue
+                        want[sd] = round(want[sd] + ft * tick, pd) if sd == OrderDirection.BUY else round(want[sd] - ft * tick, pd)
+                    if OrderDirection.BUY in want and OrderDirection.SELL in want and want[OrderDirection.BUY] >= want[OrderDirection.SELL] - 1e-12:
+                        want[OrderDirection.BUY] = round(want[OrderDirection.BUY] - ft * tick, pd); want[OrderDirection.SELL] = round(want[OrderDirection.SELL] + ft * tick, pd)   # never cross
+            else:                                          # rest MK_GATE ticks behind the target at the soft size until the bucket refills
+                self._gate_n[1] += 1
+                for sd in list(want):
+                    want[sd] = round(want[sd] - (self.mk_gate_rest or self.mk_gate) * tick, pd) if sd == OrderDirection.BUY else round(want[sd] + (self.mk_gate_rest or self.mk_gate) * tick, pd)
+                    if want[sd] <= 0: want.pop(sd); sq.pop(sd, None)
+                if self.mk_rest_frac > 0:                  # §1511: the low-bucket rest is small too (never a big deep order for sweeps)
+                    qrest = round(max(qfull * self.mk_rest_frac, self.min_order_size(book_id)), vd)
+                    for sd in list(want):
+                        sq[sd] = min(sq.get(sd, qrest), qrest)
+                    qty = min(qty, qrest)
+                self._jumped[int(book_id)] = set()         # a resting side is not a lean jump (keeps the fee/inside logic consistent)
+            if self._sec - getattr(self, "_gate_logged", -10 ** 9) >= 60 and sum(self._gate_n):
+                self._gate_logged = self._sec
+                bt.logging.info(f"GATE: {self._gate_n[0]} step-in / {self._gate_n[1]} rest book-rounds in the last sim minute ($300 vol+calm)")
+                self._gate_n = [0, 0]
         if self.mk_nochase_bp > 0 and want:                # §1323 no-chase (all quoted books)
             self._nc_n = getattr(self, "_nc_n", 0) + self._nochase(int(book_id), want, bid, ask, mid, pd)
         if self.mk_skip_dec and self._g(book_id) == "dec":  # §1434: no making on the 4-dec books — pull everything with one instruction
@@ -1470,16 +1586,16 @@ class QuoteAgent(FinanceAgent):
                 tm_v = self.mk_low_touch_min if self._is_low(int(book_id)) else self.mk_vol_touch_min   # §1434: $30 books have their own touch minimum
                 ob_v = self._others_best(book, acct.orders) if (self.mk_vol_inside or tm_v) else None
             nt_v = bool(tm_v and ob_v and ob_v[0] is not None and ob_v[1] is not None and round((ob_v[1] - ob_v[0]) / tick) < tm_v)
-            self._vol_ladder(response, book_id, orders, want, sq, qty, vq, tick, pd, expiry=(self.mk_vol_expiry or None) if not self._is_low(int(book_id)) else None, inside=0 if nt_v else self.mk_vol_inside,
+            self._vol_ladder(response, book_id, orders, want, sq, qty, vq, tick, pd, expiry=(self.mk_vol_expiry or None) if not self._is_low(int(book_id)) else None, no_ladder=bool(self.mk_lad_off) and not self._is_low(int(book_id)), inside=0 if nt_v else self.mk_vol_inside,
                                  obest=ob_v if self.mk_vol_inside else None,
-                                 no_touch=nt_v if (nt_v or not self.mk_vol_lean_only or self._is_low(int(book_id)))
+                                 no_touch=nt_v if (nt_v or not self.mk_vol_lean_only or self._is_low(int(book_id)) or self.mk_lad_off)
                                  else {OrderDirection.BUY, OrderDirection.SELL} - set(self._jumped.get(int(book_id), ())))
             return
         if self.mk_calm_lad and self._g(book_id) == "calm":  # §1303 calm-book ladder: the fleet's calm volume is 60% from orders resting 1+ ticks behind the touch
             vq = round(max(self.mk_calm_lad_size * wealth0 / mid * self._pf, self.min_order_size(book_id)), vd)
             ob_ = self._others_best(book, acct.orders) if (self.mk_calm_hold or self.mk_calm_touch_min) else None
             nt = bool(self.mk_calm_touch_min and ob_ and ob_[0] is not None and ob_[1] is not None and round((ob_[1] - ob_[0]) / tick) < self.mk_calm_touch_min)
-            self._vol_ladder(response, book_id, orders, want, sq, qty, vq, tick, pd, levels=self.mk_calm_lad, expiry=self.mk_calm_expiry or None,
+            self._vol_ladder(response, book_id, orders, want, sq, qty, vq, tick, pd, levels=self.mk_calm_lad, expiry=self.mk_calm_expiry or None, no_ladder=bool(self.mk_lad_off),
                              hold=self.mk_calm_hold, obest=ob_ if self.mk_calm_hold else None, no_touch=nt)
             return
         for o in orders:

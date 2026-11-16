@@ -76,11 +76,15 @@ Re-read this file before every action.
 - **During testing phases, finding a strategy that works is the goal — NOT the test miner's survival** (user 11-14: "the miner was never going to
   survive anyways so we should've kept testing"). Test miners run tests back-to-back until pruned or the user says stop. Never stop or settle a test
   day because of a survival check (that cost ≈ 4 h of reads on UID 174, 11-14 1:48–4:50 AM). Settling is only for a miner the user wants kept.
+- **Interaction check before EVERY test** (user 11-15: "we need to keep that same discipline when planning all tests"): list every live setting the change touches
+  (lean-only/no_touch, lean jump, fee-aware push, ladders + their fee-pushed target, soft pacing/bucket, inside, touch_min, expiry, skips, book groups — the $30 books share
+  the vol path) and what each does once it is on; then an offline census on captured states for BOTH arms (orders per side per book, sizes, books/sides left with no orders).
+  Write the list into the test's decisions §. Misses it would have caught: mk_vol_expiry hitting $30 (§1467), shallow ladder vs fee push (§1471), lad_off + lean-only (§1476).
 - **Soft pacing is PROVEN and mandatory** (11-13 T1 on UID 174: soft on ≈ 113 books with resting orders; off → 5 books, 248/256 paced — the stop-go that
   killed x1/x2). Every miner runs `pace_soft=5000 pace_soft_min=0.05` (agent ≥ 10dc929d); never go back to hard pacing.
 
 ## Current state / where to look
-- Full handoff (live state, infrastructure, status checks, subnet mechanics, next steps): `HANDOFF_BITTENSOR_2026-11-08.md` (this folder).
+- **Latest handoff: `HANDOFF_2026-11-15.md` (this folder) — read first.** Older: `HANDOFF_2026-11-14.md`, `HANDOFF_BITTENSOR_2026-11-08.md`.
   When it and `~/futures-research/reports/decisions.md` disagree, the newer decisions.md § wins.
 - Memory: `~/.claude/projects/-home-coltontr419/memory/MEMORY.md` → `bittensor-mining-lead.md`, `mvtrx-lessons.md`
   (append every problem/fix), `mvtrx-one-miner-plan.md`, and every `feedback-*.md`.
