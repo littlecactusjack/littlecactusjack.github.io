@@ -23477,3 +23477,403 @@ by COPIES at full cap volume, paid ≈ $170 each; churned UIDs are replaced. Our
 Implications: (1) scaling our skill miner by copies is viable IF each runs near the cap rate with ≥ +1 bp per $; pay per UID ≈ share of the skill pool (fleet ≈ $170); (2) keep a
 collision check (no self-trades; our copies never cross each other — same side stacks are harmless); (3) pool dilution: the fleet's 19 skill UIDs ≈ $3.3k/mo — adding ours dilutes
 everyone incl. ours; add one at a time and measure total pay; (4) a maker config is the fleet's top earner per UID ($300–400) — later, per the user's order.
+
+## §1523 — 2026-11-16 9:55 AM CT — Lean-1.5 first read (240 sim s, 63410–63650): $300 volume ≈ 2.7×, alpha per $ +1.89 bp (12+/0−), total $300 alpha/min ABOVE 252's
+regcheck 255 REGISTERED. Pay 255 $20 vs 252 $166. Validator: 255 skill 0.13, combined 0.108, net alpha +367 (9:20 +346), kept 46, coverage 253, open 226/176; 252 skill 1.66, +1,262.
+kindsplit: 255 inside n41 $67k (61%) median $1,087 +0.27 / +0.97, touch n7 $8k +1.70 / +1.52, behind n21 $34k depth 2 −0.64 / +0.62 vs 252 inside $77k +0.88 / +1.11, touch $47k, behind $51k.
+fillrate: 255 $117k on 43 books (≈ $280k per 575 s vs rest-30 $104k → ≈ 2.7×) vs 252 $200k on 51 (we ≈ 58% of 252). Validator-exact last 4 sim min: $300 255 +16.3 (+1.89 bp on $86k,
+12+/0−; 4.1 per sim min vs rest-30 2.4 → +70%) vs 252 +9.5 (+0.56 bp on $171k; 2.4/min); $30 255 +1.6 vs 252 +0.8. Positions 255 $1,481/book corr +0.156 vs 252 $2,032, +0.177.
+Books filled 43 $300 (35 by step-ins) + 10 $30 in 240 s. Budget starting to bind: GATE 4,746 step-in / 2,454 rest (34% rest, was ≈ 20%); PACE 0/256 blocked; worst $75k of $450k.
+0 errors; call 0.36 s. Verdict ≈ 10:30 AM.
+
+## §1524 — 2026-11-16 10:05 AM CT — Upstream release cadence (user question) + release watcher installed
+GitHub taos-im/sn-79 main (commit history; no tags / GitHub releases; the test branch = main, no advance preview): 27 versioned releases since 06-01: Wed 11, Tue 6, Fri 6, Mon 2, Thu 2;
+NEVER weekends. Times 09:52–15:52 UTC = ≈ 4 AM–11 AM CT (most 13:00–15:50 UTC = 7–10 AM CT). Gaps (days): 7.1, 14, 6, 3, 5, 7, 13, 29, 13.9, 5.9, 1.2, 1.8, 3.2, 2, 1.9, 3, 0.9, 7.1, 1.8,
+6.2, 1.8, 5.2, 1.9, 6, 8, 4.1 → since 0.6.x (09-09) a PAIR pattern: a version (Tue/Wed) then a "final" 1–4 days later (0.6.3 10-06 → 10-08, 0.6.4 10-14 → 10-16, 0.6.5 10-21 → 10-23,
+0.6.7 11-06 → 11-10); new version ≈ every 6–8 days. Last: 0.6.7 final 11-10 08:54 AM CT → 6 days quiet → next likely Tue–Fri this week, 4–11 AM CT. "Wednesday 17:00 UTC" was wrong.
+What changed before (titles): making pool, skill floor, pool pay vector, multi-asset sim, fee-aware market making (dynamic fees) — scoring + sim config, the things our edge rests on.
+Watcher: /opt/mvtrx/release_watch.py + systemd mvtrx-releasewatch.timer (every 10 min): polls GitHub main; on a new commit logs to release_watch.log with the changed sim-config/scoring files
+and writes an ALERT line to alerts.txt. Baseline 20e97853 (0.6.7 final). Response plan (§1500): re-read config xml + scoring dials, refit model_lean*.json (speed/modelfitc.py) and compare
+held-out edge, read validator alpha vs 252 hourly for the first 6 h; changes to the frozen miner only with the user.
+
+## §1525 — 2026-11-16 10:30 AM CT — LEAN-1.5 VERDICT: PROVEN ($300 volume 2.1×, alpha per $ held, Σα/min = 252's) → next: mk_model_lean 1.5 → 1.25 live 10:28:05 (sim 64042)
+Release watch: no new release (baseline 0.6.7 final). regcheck 255 REGISTERED. Pay 255 $20 vs 252 $167. Validator: 255 skill 0.20 (9:51 0.13), combined 0.134, net alpha +298 (rolling-window dip
+from +367), kept 58, coverage 252, open 223/177; 252 skill 1.40, +1,155, kept 88.
+Lean-1.5 window 63410–63980 (570 sim s) vs rest-30 (62830–63340): kindsplit 255 inside n88 $132k median $1,168 +0.19 / +1.08, touch n20 $25k +0.84 / +1.58, behind n34 $55k depth 2 −0.49 / +0.17
+vs 252 inside $216k +0.99 / +1.51, touch $92k, behind $148k +0.04 / +0.84. fillrate: 255 $218k on 70 books (rest-30 ≈ $104k per 575 s → 2.1×) vs 252 $460k on 88 (we 47%).
+Validator-exact 9.5 sim min: $300 255 +35.5 (+1.85 bp on $191k, kept 29 = 28+/1−, kappa +2.90, ELIGIBLE) = 3.7 Σα/min (rest-30 2.4 → +56%) vs 252 +34.1 (+0.82 bp on $419k) = 3.6/min;
+$30 255 +4.4 (+0.65 on $69k) vs 252 +11.0 (+1.46 on $76k) — $30 lags. Positions 255 $1,685/book, hold 50 s (n4), corr +0.094 vs 252 $2,369, 301 s, +0.138. Books filled $300 70 (56 by step-ins)
++ $30 25 in 570 s. PACE 0/256 blocked, worst $77k; GATE 4,811 / 2,389 (33% rest). 0 errors; call 0.38 s.
+VERDICT lean 1.5: PROVEN — keep. Next (same knob, census = speed/leanfreq.py §1521: 1.25 = 18–19% active vs 11–12%, edge +1.28–1.46 vs +1.40–1.66 bp at 120 s): our $ edge is 2.3× 252's,
+so trade edge for volume once more. Interaction: as §1521; budget binding rises (watch GATE rest share / PACE blocked). Applied 16:28:28 UTC "mk_model_lean 1.5→1.25"; backup
+live_params_255.pre-lean125.json. Verdict ≈ 11:30 AM. Queued after: hold-longer (user item 2), $30 class (lags 252 per $).
+
+## §1526 — 2026-11-16 10:55 AM CT — Lean-1.25 first read (205 sim s, 64045–64250): volume ≈ 1.5× lean-1.5, +1.48 bp (10+/0−), Σα/min ≈ 4.5 (lean 1.5: 3.7); pay dipped to $10
+Release watch: none. regcheck 255 REGISTERED. Pay 255 $10/mo ($0.35/day; 10:23 $20) vs 252 $172 — on-chain pay lags and mixes all validators; our validator's skill keeps rising.
+Validator 5EWwdZB7: 255 skill 0.30 (10:23 0.20), combined 0.163, net alpha +341, kept 62, coverage 252, open 226/176; 252 skill 1.28, +1,167, kept 91.
+kindsplit: 255 inside n45 $69k median $977 +0.43 / +1.26, touch n10 $12k, behind n17 $33k −0.99 / −0.01 vs 252 inside $82k +0.99 / +1.49, touch $22k, behind $43k. fillrate: 255 $121k on 42 books
+(≈ $336k per 570 s vs lean-1.5 $218k → ≈ 1.5×) vs 252 $147k on 39. Validator-exact 3.7 sim min: $300 255 +16.7 (+1.48 bp on $113k, 10+/0−) ≈ 4.5/min vs 252 +4.5 (+0.26) — quiet window
+for 252; $30 255 −0.7 vs 252 +2.9. Budget binding more: GATE 4,204 / 2,996 (42% rest, was 33%); PACE 0/256 blocked, worst $79k. 0 errors; call 0.37 s. Verdict ≈ 11:30 AM.
+
+## §1527 — 2026-11-16 11:25 AM CT — LEAN-1.25 VERDICT: NOISE / tie vs 1.5 — the pace budget now binds; recommend back to 1.5 (user's call)
+Release watch: none. regcheck 255 REGISTERED. Pay 255 $11 vs 252 $173. Validator: 255 skill 0.24, combined 0.155, net alpha +311, kept 74, coverage 251, open 236/179; 252 skill 0.87, +1,112, kept 87.
+Lean-1.25 window 64045–64560 (515 sim s): 255 inside n97 $134k median $819 +0.54 / +1.35, touch n14 $19k, behind n37 $58k −0.65 / +0.50 vs 252 inside $150k +0.84 / +1.08, touch $76k, behind $108k.
+fillrate 255 $218k on 77 books (423/s vs lean 1.5 382/s → +11% only; first 205 s looked 1.5×) vs 252 $345k on 78. Validator-exact 8.5 sim min: $300 255 +29.4 (+1.65 bp on $178k,
+kept 22 = 21+/1−) = 3.5 Σα/min (lean 1.5: 3.7) vs 252 +17.1 (+0.52) = 2.0/min; $30 255 +4.5 (+1.22) vs 252 +9.1. Positions 255 $1,621/book, HOLD 171 s (n3), corr +0.117 vs 252 $2,161, 227 s,
++0.107. Books filled $300 77 (60 by step-ins) + $30 19. GATE 3,757 step-in / 3,443 rest (48% rest; 1.5: 33%); PACE 0/256 blocked, worst $79k. 0 errors; call 0.36 s.
+VERDICT: NOISE (tie on Σα/min, lower bp/$, fewer kept books per min). Cause: the bucket gate binds — a full $3.6k step-in needs tok ≥ $3.6k, our step-ins fill PARTIALLY (median $819),
+each partial fill drops tok below $3.6k and the book rests until refill (≈ 150–700 s) → more leans can't add volume. Recommendation: back to 1.5 (higher bp per $ → more books clear the
+2.3-bp hurdle); next lever = budget efficiency: step in with min(full size, bucket) once the bucket ≥ ≈ 50% of full (code + restart), or the $30 class. Hold-longer (user item 2) largely
+done by rest-30 + leans: 50 → 171 s vs 252 227 s (small n) — keep measuring.
+
+## §1528 — 2026-11-16 11:40 AM CT — User: back to lean 1.5 + budget fix next. mk_model_lean 1.25 → 1.5 (11:27, applied "1.25→1.5"); RESTART onto 2ef16f9b with mk_gate_part 0.5 (17:38:40 UTC, sim ≈ 64760)
+Code 2ef16f9b = 95ead2cb + mk_gate_part (live): a $300 step-in also goes out when full × part ≤ bucket < full, sized floor(bucket / mid) (never above the bucket); 0 = full size only.
+First census found round() could put the part size a hair ABOVE the bucket → the book rested; fixed with floor. equiv.py 0 instruction diffs (10 replies, tape / ledger / locks identical),
+test_pace ALL PASS. Census (speed/partcensus.py, live 255 params) B = part 0.5: bucket $4,700 → step-in $3.6k at −1; $3,000 → $3,000 at −1; $2,000 → $2,000 at −1 (27 vol + 12–13 calm jumps
+as at full); $1,200 (< 50%) → rest $360 at +29 (= A). A (part 0): $3,000 / $2,000 / $1,200 → rest only. Interaction: only the gated $300 step-in size + the threshold change; rest size =
+rest_frac × that size (smaller); lean / gate_side / rest 30 / fee exemption / $30 / 4-dec skip unchanged; spend never exceeds the bucket (cap safety unchanged).
+Backups agents/QuoteAgent.95ead2cb.py, live_params_255.pre-part.json. Startup: LIVE PARAMS applied incl. mk_gate_part 0.5, mk_model_lean 1.5, mk_gate_rest 30, sizes 0.072, rest_frac 0.1,
+skip_dec 1; 0 errors. WARM-UP (no leans) until ≈ sim 65065 (≈ 12:06 PM CT); real test window from there; verdict ≈ 1:05 PM CT, then freeze the next-miner settings (≈ 2:30 PM).
+
+## §1529 — 2026-11-16 11:50 AM CT — $30 class (user: "when are we going to work on getting the 30 books better?"): we are NOT behind 252 per $; the gap to the leader (76) is volume → mk_model_lean_30 1.0 → 0.75 live 11:47:01 (sim 64845), concurrent with the $300 part test
+Validator-exact $30 (speed/skill_cls2.py, tape .prev + current): last 120 sim min 255 +120.5 (+1.74 bp on $693k, kept 29+/7−) vs 252 +74.2 (+1.17 on $632k) vs 76 +802 (+3.18 on $2.52M, $43.5k/book
+≈ cap); last 45: 255 +45.3 (+1.90 on $239k, 26+/7−) vs 252 +51.5 (+1.34 on $385k) vs 76 +255 (+3.08 on $827k). The short-window "lags" in §1525–§1527 were noise.
+$30 fills (speed/kindsplit2.py BOOKS=128-191, sim 57000–64700): 255 touch 93% $684k median $1,643 mo60 +1.28, inside +1.90 vs 252 touch 73% $464k +0.22, behind 26% −0.30; 76 touch 100% $2.65M
+$1,500 +0.26. Positions (invstudy2 62000–64700): 255 $922/book hold 937 s corr +0.062; 252 $1,370, 420 s, −0.029; 76 $6,119, 226 s, −0.014.
+$30 model lean census (speed/leanfreq2.py MODEL=model_lean_30.json BOOKS=128-191; 3 windows 58000–60500 / 60500–63000 / 63000–64700): k 1.0 (live) 23.4/22.4/23.1% active, +2.19/+2.28/+2.14 bp at
+120 s; 0.75 36.5/35.3/35.8%, +1.84/+1.89/+1.84; 0.5 54.8/53.4/53.7%, +1.54/+1.54/+1.54; 1.25 14%, +2.5–2.7. → 0.75 = 1.56× lean time for −16% edge (same trade as the $300 lean-1.5 win).
+Interaction: mk_model_lean_30 only scales the $30 (low-group) lean threshold → which side stays at the touch (lean30_only: no lean → both sides back 2); $300 path, gate, rest 30, part step-ins,
+4-dec skip untouched; per-book budgets (no cross-class effect) → safe to run with the $300 part test (per-class reads). Applied 17:47:22 UTC "mk_model_lean_30 1.0→0.75"; 0 errors;
+backup live_params_255.pre-l30075.json. $30 leans also warm up after the 11:38 restart (until ≈ sim 65065). Verdict with the part test ≈ 1:05 PM (per class).
+
+## §1530 — 2026-11-16 12:00 PM CT — UID 76 lifecycle (user: "maybe they're a churn and burn miner"): YES — 5CAXJT4t fleet, 31 UIDs, oldest 6.1 d
+76 is 1.0 d old on coldkey 5CAXJT4t (31 UIDs, ≈ $7.5k/mo, the largest fleet); ages 0.2, 1.0, 1.0, 1.5 ×3, 2.1 ×3, 2.2, 3.1, 3.2, 3.9, 4.0, 4.1, 5.1 ×4, 5.4, 5.5 ×3, 5.6 ×2, 5.7 ×2, 5.9 ×2,
+6.0, 6.1 → no UID survives ≈ 6 days; they register ≈ 5/day = churn-and-burn. UID 99 (taker, §1517) is a lone UID, 2.4 d — lifecycle unknown.
+Rule (copy-successful-miners): trading behaviour may be copied from any good earner if our cap-safe pacing keeps it intact; pacing / lifecycle only from long-lived UIDs → 76's $30 volume is a
+direction (more volume at good edge, which the $30 lean-0.75 test does within our pacing), NOT a benchmark for survival. The long-lived benchmark stays 252 (33 d; fleet 5F1F2JMu has UIDs 20–36 d).
+
+## §1531 — 2026-11-16 12:20 PM CT — Brief (user away until 1 PM): only 90 sim s past the restart warm-up — no verdict material yet; skill 0.30, net alpha +387, pay $21
+Release watch: none. regcheck 255 REGISTERED. Pay 255 $21 ($0.70/day; 11:20 $11) vs 252 $189. Validator: 255 skill 0.30, combined 0.162, net alpha +387 (11:20 +311), kept 83 (11:20 74), coverage 251,
+open 231/169; 252 skill 1.29, +1,156, kept 92. Sim 65159 (warm-up ended ≈ 65065). First 90 sim s (fillrate): $300 255 59 fills $72k on 29 books (median $656) vs 252 21 / $72k on 20;
+$30 255 13 / $21k on 13 vs 252 5 / $9k. GATE 6,701 step-in / 499 rest (7% — buckets full after the restart: start balance 20k). PACE 0/256, worst $81k. 0 errors; call 0.33 s.
+No changes (user away; only safety rollbacks allowed).
+
+## §1532 — 2026-11-16 12:50 PM CT — Brief: $300 part step-ins strong (Σα/min 5.1 vs 3.7, +1.79 bp, 16+/0−, volume 83% of 252); $30 lean 0.75: volume ≈ 2.5× but +0.64 bp (total ≈ flat) — early
+Release watch: none. regcheck 255 REGISTERED. Pay 255 $21 vs 252 $190. Validator: 255 skill 0.35, combined 0.177, net alpha +414 (best today), kept 85, coverage 249, open 223/183; 252 skill 1.82, +1,201, kept 95.
+Window 65065–65470 (405 sim s, post warm-up). $300 kindsplit: 255 inside n97 $122k median $810 +0.90 / +1.05, touch n17 $26k, behind n47 $61k depth 3 −0.55 / −0.48 vs 252 inside $87k, touch $66k,
+behind $96k. fillrate $300: 255 $220k on 64 books (≈ $310k per 570 s vs lean-1.5 $218k → 1.42×) vs 252 $266k on 70 (we 83%). Validator-exact 6.7 sim min: $300 255 +34.1 (+1.79 bp on $190k,
+16+/0−) = 5.1 Σα/min (lean 1.5: 3.7 → +38%) vs 252 +12.2 (+0.49) = 1.8/min vs 76 +0.6. GATE 5,605 / 1,595 (22% rest; lean 1.5 33%, 1.25 48%).
+$30: fillrate 255 $91k on 40 books (baseline ≈ $36k per 405 s → ≈ 2.5×) vs 252 $47k on 20; kindsplit2 255 touch 100% $85k +0.03 / +0.42 vs 252 touch $32k −0.81 / −0.23, behind $11k.
+Validator-exact $30 6.7 min: 255 +5.6 (+0.64 bp on $87k, 5+/0−) = 0.84/min (baseline ≈ 1.0/min, +1.90 bp) vs 252 +6.0 (+1.33) vs 76 +7.0 (+0.59) — edge per $ fell more than the offline census
+(−16%) predicted; small sample. PACE 0/256, worst $83k. 0 errors; call 0.37 s. Verdicts ≈ 1:15 PM.
+
+## §1533 — 2026-11-16 1:25 PM CT — VERDICTS: $300 part step-ins PROVEN (+22% Σα/min); $30 lean 0.75 PROVEN on total (+35% Σα/min, bp below target); FROZEN into live_params_NEXT.json; newminer.sh uses it
+Release watch: none. regcheck 255 REGISTERED. PAY 255 $49/mo ($1.63/day; 12:46 $21) vs 252 $200. Validator: 255 skill 0.38, combined 0.168, net alpha +442 (best today), kept 79, coverage 249,
+open 233/185; 252 skill 2.12, +1,362, kept 91.
+Window 65065–65800 (735 sim s, after warm-up). $300: fillrate 255 $314k on 78 books (≈ $243k per 570 s vs lean-1.5 $218k → +12%; the 405-s read overstated it) vs 252 $483k on 93; kindsplit 255
+inside n151 $196k +0.76 / +0.91, touch n30 $40k, behind n56 $77k depth 3 −0.42 / −0.27. Validator-exact 12.2 sim min: $300 255 +55.1 (+1.86 bp on $296k, kept 26 = 25+/1−, kappa +3.32) = 4.5 Σα/min
+(lean 1.5: 3.7 → +22%) vs 252 +34.2 (+0.73) = 2.8/min. Positions $1,977/book (252 $2,247), hold 110 s, corr +0.073 (252 +0.082). GATE 6,247 / 953 (13% rest). → mk_gate_part 0.5 PROVEN, keep.
+$30: fillrate 255 $150k on 52 books (≈ 2.3× the pre-test rate) vs 252 $87k on 34; validator-exact $30 255 +16.5 (+1.13 bp on $146k, 12+/0−, kappa +6.95, ELIGIBLE) = 1.35/min (baseline ≈ 1.0 → +35%)
+vs 252 +12.5 (+1.53) = 1.0/min. bp below the +1.5 target but total up and every kept book positive → mk_model_lean_30 0.75 PROVEN on total, keep; do NOT go to 0.5 (edge fell faster than the census said).
+Coverage proxy 735 s: $300 78 books (71 by step-ins) + $30 52 = 130. PACE 0/256, worst $84k of $450k. 0 errors; call 0.34 s.
+FREEZE (target ≈ 2:30 PM, done early): /opt/mvtrx/live_params_NEXT.json = live_params_255.json now (agent 2ef16f9b): mk_skip_dec 1, mk_vol_size 0.072, mk_calm_size 0.072, mk_rest_frac 0.1,
+mk_gate_rest 30, mk_gate_part 0.5, mk_model_lean 1.5, mk_model_lean_30 0.75, mk_lean30_back 2, mk_lean30_only 1, mk_gate 3, mk_gate_side 1, mk_lad_off 1, max_inv 0.14, fund_mv 0 (+ REDO base).
+newminer.sh (backup newminer.sh.bak-1116): refuses unless agents/QuoteAgent.py md5 = 2ef16f9b; copies live_params_NEXT.json → live_params_<uid>.json / .START.json; old uid default 255 for
+the read-script copies. Repo copies deploy/sn79/speed/live_params_NEXT.json + newminer.sh. 255 keeps running these settings unchanged.
+
+## §1534 — 2026-11-16 1:50 PM CT — Brief (post-freeze, no tests): pay $49 vs prune line $109 → 255 likely pruned after ≈ 3:10 PM; alpha/min still ≈ 2× 252's on $300
+Release watch: none. regcheck 255 REGISTERED. Pay 255 $49 ($1.63/day) vs 252 $200, field median $188, PRUNE LINE $109 (255 at 0.45× it). Validator: 255 skill 0.37, net alpha +408, kept 93 (more than
+252's 84), coverage 249; 252 skill 2.40, +1,474. Validator-exact last 15 sim min: $300 255 +47.9 (+1.46 bp on $328k, 23+/1−) vs 252 +16.8 (+0.32 on $521k); $30 255 +22.2 (+1.26 on $175k, 12+/1−)
+vs 252 +10.3 (+1.15). GATE 5,192 / 2,008 (28% rest); PACE 0/256, worst $87k. 0 errors.
+Pay lags the validator by hours and 255's early-day history (4-dec drag, restarts) still weighs on it → unlikely to clear $109 by ≈ 3:10 PM. Prune plan unchanged: user re-registers x2 →
+newminer.sh <uid> (frozen live_params_NEXT.json + agent 2ef16f9b).
+
+## §1535 — 2026-11-16 2:25 PM CT — Prune watch: still registered; pay $66 (prune line $107, 0.62×) and rising; skill 0.58, net alpha +489
+Release watch: none. regcheck 255 REGISTERED. Pay 255 $66/mo ($2.19/day; 1:46 $49) vs 252 $206; prune line $107. Validator: 255 skill 0.58, combined 0.20, net alpha +489, kept 87, coverage 249; 252 skill 2.64,
++1,624, kept 93, coverage 192. Validator-exact last 15 sim min: $300 255 +60.8 (+1.67 bp on $364k, 32+/0−) vs 252 +35.2 (+0.62 on $571k); $30 255 +14.1 (+0.87 on $161k) vs 252 +7.4 (+0.92).
+GATE 5,286 / 1,914 (27% rest); PACE 0/256, worst $89k. 0 errors. No changes (frozen; user not yet answered the optional gate_part 0.3 question).
+
+## §1536 — 2026-11-16 2:35 PM CT — User: "run the budget-fix if 255 is still alive" → mk_gate_part 0.5 → 0.3 live 14:33:24 CT (sim 66625) WITH an automatic revert guard
+255 REGISTERED at the switch. Census (speed/part3census.py, live 255 params, buckets $2,000 / $1,500 / $1,200 / $800): A (0.5) steps in at $2,000, rests $360 at +29 below $1,800; B (0.3) steps in at $2,000 /
+$1,500 / $1,200 (at −1, same jumps 27 vol + 12–13 calm), rests below $1,080 ($800 → rest, = A). Interaction: only the step-in threshold (smaller step-ins ≥ $1,080 after partial fills); rest size,
+lean, rest 30, $30, 4-dec skip, cap safety unchanged. Applied 20:33:41 UTC "mk_gate_part 0.5→0.3"; backup live_params_255.pre-part03.json.
+GUARD (user 11-15: once a strategy wins, tweak tests carry an automatic revert): /opt/mvtrx/guard_part03.sh (pid 1455335; log guard_part03.log) every 10 min for 100 min: after ≥ 360 sim s, validator-exact
+$300 Σα per sim min (speed/skill_cls2.py) < 3.0 (proven 4.5) or $300 bp/$ < +0.8 → sets mk_gate_part back to 0.5, logs + ALERT. Stops itself if 255 is deregistered or the value changes.
+The frozen live_params_NEXT.json keeps 0.5 unless this clearly wins (Σα/min above 4.5 with bp ≥ +1.2).
+
+## §1537 — 2026-11-16 2:55 PM CT — Prune watch + part-0.3 first read (3.5 sim min): $300 +12.4 = 3.5 Σα/min, +1.51 bp (9+/0−) — too early; pay $66, prune line $119
+Release watch: none. regcheck 255 REGISTERED. Pay 255 $66 vs 252 $206; prune line $119 (0.55×). Validator: 255 skill 0.50, net alpha +476, kept 99 (252 85), coverage 248; 252 skill 2.32, +1,596.
+Part 0.3 since sim 66625 (3.5 sim min; guard log: "sim +110 s - waiting" at 20:43 UTC): validator-exact $300 255 +12.4 (+1.51 bp on $82k, 9+/0−) ≈ 3.5/min (proven 4.5) vs 252 +5.7 (+0.38); $30 255 +1.7
+(+0.43 on $40k). fillrate $300 255 $82k on 39 books (median $978) vs 252 $150k on 44. GATE 6,219 / 981 (14% rest; was 27%). PACE 0/256, worst $91k. 0 errors. Verdict ≈ 3:40 PM.
+
+## §1538 — 2026-11-16 3:05 PM CT — Plan (user): after the prune register TWO UIDs — x2 right away, a second this evening (registration burn rises when registrations come quickly)
+Prep done (no miner touched): /etc/systemd/system/mvtrx-x1.service rebuilt from the x2 unit (backup /opt/mvtrx/mvtrx-x1.service.bak-1116): hotkey x1, port 8101, soft pacing (pace_soft 5000 /
+min 0.05, pace_start 20000 — the old x1 unit had hard pacing, pace_start 100000), NO tape (x2 keeps the only tape writer); disabled + inactive until used. newminer.sh generalised (backup
+newminer.sh.bak-1116b): HK=x1 sh newminer.sh <uid> → regcheck x1, restart mvtrx-x1, APPENDS "<uid> maker x1 <sim>" to our_uids.txt (x2 still overwrites). Lab: 4 cores, 7 GB, load 0.2 → two miners fit.
+Collision: both post-only on the same books → they cannot trade each other (a crossing post-only order is rejected); they stack like the 5F1F2JMu fleet (§1522), which pays ≈ $170 per UID.
+Measure the cost: miner 1's validator-exact alpha per sim min for ≈ 1 h before vs after miner 2 starts (speed/skill_cls2.py) + self-trade check (0 fills between our UIDs).
+Both start on the frozen settings (live_params_NEXT.json + agent 2ef16f9b); no tests on miner 1 once settled (rules); miner 2 is the candidate test bench after the collision read.
+
+## §1539 — 2026-11-16 3:25 PM CT — Protection over: 255 IS the prune line ($64 = lowest unprotected paid) → next registration on the subnet prunes it; part 0.3 at 8.7 sim min ≈ tie
+Release watch: none. regcheck 255 REGISTERED. Pay 255 $64 ($2.14/day) vs 252 $211; PRUNE LINE $64 = 255 (ratio 1.00 — the lowest-paid unprotected UID). Validator: 255 skill 0.54, net alpha +527 (best),
+kept 106 (252 89), coverage 248; 252 skill 2.39, +1,635.
+Part 0.3 (sim 66625–67144, 8.7 sim min): guard log 21:14 UTC +428 s: 3.79/min, +1.64 bp (no revert). Validator-exact $300 255 +36.7 (+1.84 bp on $200k, 28+/0−) = 4.2/min (proven 0.5: 4.5) vs 252 +30.2
+(+0.81) = 3.5/min; $30 255 +6.0 (+0.61). fillrate $300 255 $200k on 68 books ≈ $23k/sim min (part 0.5 ≈ $25.6k) — no volume gain yet. GATE 6,373 / 827 (11% rest). PACE 0/256, worst $92k. 0 errors.
+
+## §1540 — 2026-11-16 3:35 PM CT — Can the market change without a release? YES — sim-day resets (≈ every 5 wall days; layout changed at the 11-12 reset), crowding, fees, validator dials. Sim-reset + layout watcher added.
+What can change WITHOUT an upstream release: (1) SIM-DAY RESET — the sim clock runs to 86,400 s then restarts at 0 (≈ 5 wall days; last 11-11 ≈ 7:55 PM → 11-12 midnight); the 11-12 reset brought
+a NEW BOOK LAYOUT (256 books, groups moved — §1403; our book_map was wrong on ≈ 90 books). New paths/fundamentals each day; config-driven parameters should carry, but our book_map
+(calm:63-101; low:128-191; dec:192-255) and the fitted models must be re-checked. Next: sim 67,208 at 3:30 PM, ≈ 10.4 sim s per wall min → 86,400 ≈ 31 h → ≈ 11-17 10 PM CT (rough).
+(2) Crowding — other miners copy the signal (252's net alpha −33% in a day, §1514); slow, measured by alpha per $ vs 252 every brief. (3) Dynamic maker fees move with the field's maker share.
+(4) Validator dials are command-line flags (e.g. making_fee_weight "may be raised") — the owner can change them without a GitHub release; visible only in gauges.
+Watcher: /opt/mvtrx/simreset_watch.py now runs in mvtrx-releasewatch.service (every 10 min): tape clock jumps back > 1 h → logs "SIM RESET" + layout check (price level / decimals per book vs
+the $300 0–127 / $30 128–191 / 4-dec 192–255 map) to release_watch.log + ALERT. Response: verify book_map, run speed/leanfreq.py / leanfreq2.py on the new day's first hour (model edge per
+class), reset our_uids.txt start sims (lessons 11-11), refit if the edge dropped.
+
+## §1541 — 2026-11-16 3:45 PM CT — Watchers (user: "any other events that could hurt us?"): gaps added to the standing watchdog
+Already covered by /opt/mvtrx/overnight.sh (mvtrx-overnight.timer, every 10 min, laptop open or closed; ALERT lines forwarded, HEARTBEAT so a dead watchdog shows): service DOWN, QUOTE ERROR /
+Traceback since start, every our_uids UID still registered (prune → log), validator-volume sync vs the $450k cap (pace_sync.py, books over $400k), memory/load, self-trade guard (stops mvtrx-x1 on
+any fill between our UIDs — fits the planned 2nd miner x1). Plus mvtrx-releasewatch (upstream release §1524 + sim-day reset / book layout §1540) and mvtrx-taperotate (disk 51%, 77 GB free).
+ADDED (/opt/mvtrx/watch_extra.sh, called from overnight.sh; backup overnight.sh.bak-1116): per our UID — HUNG (no validator state in 6 min), SLOW replies (call time > 1.0 s), COVERAGE < 170
+(skill is cut below 160), NET ALPHA < 0 two checks in a row, scoring validator 5EWwdZB7 shows NO gauges for us. Fixed overnight.sh simmin (read the inactive x4 journal → x2).
+First run: x2 UID 255 states(6 min) 64 | call 0.375 s | coverage 248 | net alpha +540 → no alerts.
+Not watched (not actionable / covered elsewhere): TAO/alpha price, registration cost, other validators' weights (pay lag), coldkey (laptop only).
+
+## §1542 — 2026-11-16 3:55 PM CT — PART-0.3 VERDICT: NOISE / slightly worse → frozen NEXT keeps mk_gate_part 0.5; 255 still the prune line ($65)
+Release watch: none. regcheck 255 REGISTERED. Pay 255 $65 = PRUNE LINE $65 (ratio 1.00) vs 252 $213. Validator: 255 skill 0.76 (best), combined 0.246, net alpha +593 (best), kept 105 (252 89), coverage 248;
+252 skill 2.41, +1,719.
+Part 0.3, sim 66625–67465 (14.0 sim min): guard log 4.06 → 4.01 → 3.89 /min, +1.74–1.84 bp (no revert). Validator-exact $300 255 +52.2 (+1.74 bp on $300k, 34+/1−) = 3.7/min vs proven 0.5
+4.5/min; vs 252 +35.3 (+0.63) = 2.5/min. $300 volume $301k = $21.5k/sim min (0.5: $25.6k) — no gain; GATE rest 11% (0.5: 22–28%) — the extra smaller step-ins don't add fills.
+$30 255 +12.9 (+0.77 on $169k) vs 252 +10.2. PACE 0/256, worst $92k. 0 errors.
+VERDICT: NOISE (slightly below 0.5) → live_params_NEXT.json unchanged (0.5). Recommendation: 255 back to 0.5 (user's call; the guard has not tripped).
+
+## §1543 — 2026-11-16 4:00 PM CT — User: "go ahead" → 255 mk_gate_part 0.3 → 0.5 (applied "0.3→0.5"); 255 settings now identical to live_params_NEXT.json; guard exits on its next check
+
+## §1544 — 2026-11-16 4:30 PM CT — Brief + NEAR-MISS: the live validator briefly reported $500k on 187 of our books → pace_sync plausibility guard added
+Release watch: none. regcheck 255 REGISTERED. Pay 255 $65 = prune line $65 vs 252 $213. Validator: 255 skill 0.73, combined 0.25, net alpha +603 (best), kept 105, coverage 248; 252 skill 2.74, +1,782, kept 88.
+Validator-exact last 15 sim min: $300 255 +55.5 (+1.99 bp on $279k, 35+/2−) vs 252 +28.6 (+0.47 on $611k); $30 255 +12.1 (+0.70) vs 252 +12.8 (+1.34). 0 errors; PACE 0/256, worst $95k. Guard exited 21:58 UTC.
+NEAR-MISS: overnight_log 21:49 UTC — pace_sync.py (already filtered to 5EWwdZB7, §1491) read "validator max book $501,986, books over $400k 187" (same tick x1_gauge showed skill 0.168 vs 0.76 a
+minute later → a glitch in the live validator's gauges); 21:59 back to $95k. The agent's _pace_sync charges any validator-minus-ledger gap > $1k into the bucket + ledger → it would have
+blocked ≈ 187 books for 24 h. It did NOT fire (0 "PACE SYNC" lines 21:40–22:15, PACE 0 blocked) — luck of timing.
+FIX (lab script only, agent md5 unchanged): pace_sync.py (backup pace_sync.py.bak-1116) keeps the previous pace_sync_<uid>.json and prints an ALERT when > 5 books jump > $60k in one 10-min tick
+(max real gain ≈ $5.2/sim s); offline test with the phantom values → IGNORED; live run normal ($95,926). Applies to every miner (newminer.sh uses the same pace_sync).
+
+## §1545 — 2026-11-16 5:00 PM CT — UID 255 PRUNED (between ≈ 4:30 and 4:56 PM CT); mvtrx-x2 stopped + disabled; our_uids.txt emptied (backup our_uids.txt.bak-pruned255)
+regcheck x2=255 NOT REGISTERED twice (4:56 and 5:00 PM). Gauges for 255 now the new owner's (skill 0, coverage 18). Last state of our 255 (4:30 PM): pay $65 (= prune line), skill 0.73,
+net alpha +603 (best of the day), kept 105 (> 252's 88), $300 alpha/min ≈ 2× 252's. Pay lag + this morning's 4-dec drag and two restarts kept on-chain pay below the line.
+Next (§1538): user re-registers x2 now (VS Code closed) → `sh /opt/mvtrx/newminer.sh <uid>` (checks agent md5 2ef16f9b, copies the frozen live_params_NEXT.json, restarts mvtrx-x2 = tape
+writer); x1 this evening → `HK=x1 sh /opt/mvtrx/newminer.sh <uid>`. The overnight "within 10% of the hard cap" alerts in the log are the 21:49 UTC validator glitch (§1544), not new.
+
+## §1546 — 2026-11-16 6:00 PM CT — NEW MINER UID 85 (x2) live on the frozen strategy: newminer.sh 85 → restart 00:00:25 UTC (sim 68860)
+User registered x2 as UID 85 (≈ 5:55 PM CT); next miner (x1) at 8 PM. newminer.sh: regcheck x2=85 REGISTERED; agent md5 2ef16f9b; settings live_params_NEXT.json → live_params_85.json/.START.json;
+read-script copies for 85; our_uids "85 maker x2 68860"; mvtrx-x2 re-enabled + active. LIVE PARAMS applied: mk_vol_size 0.072, mk_calm_size 0.072, mk_rest_frac 0.1, mk_gate_rest 30,
+mk_gate_part 0.5, mk_model_lean 1.5, mk_model_lean_30 0.75, mk_skip_dec 1 (+ REDO base). 0 errors; PACE 0 books, fresh ledger. Model leans warm up 300 sim s (until ≈ sim 69160).
+Rules for 85: no tests / restarts (it is miner 1, the one to keep; tests go on x1 after the collision read). Protection ≈ until 6 PM CT 11-17. Sim-day reset expected ≈ 11-17 9–10 PM CT
+(sim 68860 now, ≈ 10.4 sim s per wall min) — watchers armed (§1540).
+
+## §1547 — 2026-11-16 6:20 PM CT — Brief: UID 85 in warm-up (142 sim s in), no fills yet as expected; validator has no gauges for 85 yet
+Release watch: none. regcheck x2=85 REGISTERED. Pay 85 $0 (new) vs 252 $194; prune line $106. Validator: 85 no gauges yet (not yet scored); 252 skill 2.67, +1,735. Sim 69002 (start 68860).
+0 errors; PACE "0 of 0 traded books" — no fills yet: during the 300-sim-s warm-up there are no leans → no step-ins; $300 rest orders sit 30 ticks out and $30 quotes are 2 ticks back (lean30_only)
+→ almost nothing fills until ≈ sim 69160. GATE 7,680 / 0 (buckets full). Call 0.16 s.
+Watchdog: watch_extra.sh raised "scoring validator shows no gauges for us" for 85 — expected for a brand-new UID; patched (backup watch_extra.sh.bak-1116): in a UID's first sim hour (start sim from
+our_uids.txt) the no-gauge and coverage checks only log. The "UID 255 no fills for 63 min" alert is from 255's last hour (pruned).
+
+## §1548 — 2026-11-16 6:50 PM CT — Brief: UID 85 trading since warm-up ended — first 2.5 sim min $300 +27.4 (+1.83 bp, 11+/0−); validator now scoring it
+Release watch: none (alerts in the log are the old 255 one + 85's pre-patch no-gauge line). regcheck x2=85 REGISTERED. Pay 85 $0 (new) vs 252 $194; prune line $111.
+Validator: 85 skill 0.0 (too few books yet), net alpha +29.4, kept 18, coverage 56 (rising); 252 skill 3.67, +1,726, kept 85.
+Validator-exact last 2.5 sim min: $300 85 +27.4 (+1.83 bp on $150k, 11+/0−) vs 252 −1.3; $30 85 +2.1 (+0.67 on $31k). fillrate $300 sim 69160–69310: 85 138 fills $200k on 50 books (start burst:
+fresh buckets start at pace_start $20k) vs 252 39 / $97k. PACE 0 of 59 traded books blocked, worst $16.7k; GATE 7,680 / 0. 0 errors; call 0.34 s.
+
+## §1549 — 2026-11-16 7:20 PM CT — Brief: UID 85 SKILL 1.04 after ≈ 1 h (255 never passed 0.76); net alpha +96, coverage 124 and rising
+Release watch: none (log alerts are old). regcheck x2=85 REGISTERED. Pay 85 $0 (chain lag) vs 252 $196; prune line $112. Validator: 85 skill 1.04, combined 0.313, net alpha +95.6, kept 60,
+coverage 124; 252 skill 3.55, +1,810, kept 81. Validator-exact last 7 sim min: $300 85 +72.6 (+1.77 bp on $410k, 24+/2−, ELIGIBLE; ≈ 10/min while the start buckets last) vs 252 +8.8 (+0.38);
+$30 85 +5.7 (+0.70 on $81k, ELIGIBLE) vs 252 +8.9. PACE 0 of 126 traded books blocked, worst $20.0k; GATE 7,559 / 121. 0 errors; call 0.36 s.
+
+## §1550 — 2026-11-16 7:50 PM CT — Brief: UID 85 skill 0.43 (1.04 at 7:16 — kappa wobbles as books are added), net alpha +117, coverage 156
+Release watch: none. regcheck x2=85 REGISTERED. Pay 85 $0 (chain lag) vs 252 $197; prune line $33. Validator: 85 skill 0.43, combined 0.168, net alpha +116.6, kept 66, coverage 156 (→ 160+);
+252 skill 3.58, +1,780, kept 85. Validator-exact last 15 sim min: $300 85 +101.1 (+1.28 bp on $790k — start-bucket burst volume, 33+/7−, kappa +0.87) vs 252 +8.5 (+0.14 on $623k);
+$30 85 +8.6 (+0.62 on $138k, 15+/9−) vs 252 +21.9 (+1.86). PACE 0 of 156 traded books blocked, worst $21.6k; GATE 7,459 / 161. 0 errors; call 0.36 s.
+
+## §1551 — 2026-11-16 8:00 PM CT — Collision BASELINE for UID 85 before x1 joins (sim 69160–70049, 14.8 sim min after warm-up)
+Validator-exact (speed/skill_cls2.py 14.8): $300 85 +114.2 (+1.37 bp on $833k, kept 36 = 34+/2−, kappa +1.36) = 7.7 Σα/sim min (start-bucket volume still elevated) vs 252 +19.0 (+0.31) = 1.3/min;
+$30 85 +11.1 (+0.76 bp on $146k, 14+/2−) = 0.75/min vs 252 +29.5 (+2.57). fillrate last 600 sim s (69449–70049): $300 85 362 fills $510k on 92 books, median $1,112, 0.39 per filled book-min
+vs 252 181 / $421k on 91; $30 85 48 / $79k on 36 books vs 252 44 / $79k on 30. NOTE: 85's start buckets ($20k each) are still being spent → its volume falls over the next ≈ hour regardless of
+x1; the collision read compares bp per $ and fills/book-min and keeps 252 as the control (252's alpha per $ moves with the market, not with x1).
+
+## §1552 — 2026-11-16 8:10 PM CT — SECOND MINER UID 47 (x1) live on the frozen strategy (HK=x1 newminer.sh 47 → restart 02:04:15 UTC, sim 70140)
+User registered x1 as UID 47. newminer.sh: regcheck x1=47 REGISTERED, agent 2ef16f9b, live_params_NEXT.json → live_params_47.json; our_uids.txt now "85 maker x2 68860" + "47 maker x1 70140";
+mvtrx-x1 enabled + active (port 8101, soft pacing, no tape). LIVE PARAMS applied (same frozen set as 85); 0 errors on x1 and x2. Self-trade check (selftrade.sh, any two of our UIDs): 0 of 1,608
+recent fills. Watchdog self-trade guard is armed (stops mvtrx-x1 on any fill between our UIDs). x1 warm-up until ≈ sim 70440 (≈ 8:35 PM). Collision read ≈ 9:35 PM: 85's validator-exact bp per $
+and fills/book-min vs the §1551 baseline, 252 as control; x1 alone vs 85; self-trades 0. Rules: no tests on 85; x1 = candidate test bench after the collision read.
+(Cosmetic: the read-script copies for 47 carry the label UIDS_EXTRA=47:x2 — x1 in reality.)
+
+## §1553 — 2026-11-16 8:20 PM CT — Brief (two miners): 85 coverage 167 (≥ 160 ✓), net alpha +176, skill 0.55; 47 in warm-up (no fills of ours yet); self-trades 0
+Release watch: none (log alerts old). regcheck x2=85 + x1=47 REGISTERED. Pay 85 $1 (first emission), 47 $0, 252 $205; prune line $98. Validator: 85 skill 0.55, combined 0.194, net alpha +175.9, kept 83,
+COVERAGE 167 (passed 160); 47 no gauges yet; 252 skill 4.47, +1,822. Validator-exact last 15 sim min: $300 85 +104.2 (+1.49 bp on $701k, 31+/3−) vs 252 +24.0 (+0.38); $30 85 +10.1 (+0.75) vs 252 +27.1.
+UID 47 rows in that window (−26.1 on $335k $300, +24.5 $30) are the PREVIOUS OWNER's fills (sim < 70140; 47 itself shows "0 of 0 traded books" — warm-up) — ignore; collision read uses sim ≥ 70440 only.
+selftrade.sh: 0 of 1,596. 0 errors on both units; 85 PACE 0 of 167 blocked, worst $23k.
+
+## §1554 — 2026-11-16 8:50 PM CT — Brief (two miners): 85 skill 0.75, net alpha +245, coverage 173; 47 trading after warm-up (net alpha +17, coverage 55); self-trades 0
+Release watch: none. regcheck 85 + 47 REGISTERED. Pay 85 $1 (lag); 47 / 252 pay reads timed out at 80 s (chain slow; 252 ≈ $205 at 8:17). Validator: 85 skill 0.75, combined 0.273, net alpha +244.9, kept 90,
+coverage 173; 47 skill 0.0, net alpha +17.5, kept 15, coverage 55 (rising); 252 skill 3.27, +1,714. Sim 70588 (47 warm-up ended ≈ 70440). 0 errors on both; PACE 85 0/173 (worst $25k), 47 0/61 (worst $15k).
+selftrade.sh: 0 of 1,571. Collision read ≈ 9:43 PM (needs ≈ 1 h after sim 70440).
+
+## §1555 — 2026-11-16 9:20 PM CT — Brief (two miners): 47 skill 0.62 within 45 min, 85 skill 0.66 / net alpha +256; self-trades 0; 47's "$93" pay is the previous owner's lagging weight
+Release watch: none. regcheck 85 + 47 REGISTERED. Pay 85 $6 ($0.21/day), 47 $93 (= the slot's previous owner's emission still decaying — not ours yet), 252 $210; prune line $52–94.
+Validator: 85 skill 0.66, combined 0.249, net alpha +255.6, kept 82, coverage 177; 47 skill 0.62, combined 0.226, net alpha +64.4, kept 50, coverage 121 (rising); 252 skill 3.63, +1,697.
+0 errors on both; PACE 85 0/180 (worst $25k), 47 0/119 (worst $20k). selftrade.sh 0 of 1,425. Sim 70902. Collision verdict ≈ 9:43 PM.
+
+## §1556 — 2026-11-16 9:55 PM CT — COLLISION READ (85 alone vs 85 + 47): edge per $ NO cost; 85's volume down (mostly its start buckets running out) — volume verdict needs both past their start burst
+Release watch: none. regcheck 85 + 47 REGISTERED. Pay 85 $6, 47 $94 (previous owner's fading weight), 252 $211. Validator: 85 skill 0.98, combined 0.386, net alpha +349, kept 92, coverage 186;
+47 skill 1.25, combined 0.422, net alpha +173, kept 84, coverage 163 (≥ 160 in 1.7 h); 252 skill 3.77, +1,772. selftrade.sh 0 of 1,422. 0 errors; PACE 85 0/186 (worst $28k), 47 0/164 (worst $22k).
+Validator-exact, AFTER = sim 70440–71232 (13.2 min, both trading) vs BEFORE §1551 (69160–70049, 14.8 min, 85 alone):
+$300 85 +83.7 on $437k = +1.91 bp, 6.3 Σα/min, 32+/3− (BEFORE +114.2 on $833k = +1.37 bp, 7.7/min, 34+/2−); 252 control +0.80 bp (BEFORE +0.31) → the market's edge rose ≈ +0.5 bp for
+everyone, 85's rose +0.54 → NO edge-per-$ collision cost. 47 +140.1 on $797k = +1.76 bp, 34+/1−. Our combined $300 = +223.8 = 17.0/min (85 alone was 7.7/min).
+$30: 85 +14.0 (+1.20 bp on $116k) vs BEFORE +11.1 (+0.76); 47 +13.9 (+1.00); 252 +14.4 (+1.72).
+Fills ($300): 85 264 fills $446k on 80 books, 0.25 per filled book-min, median $1,577 (BEFORE 362 / $510k on 92, 0.39 / 600 s) — 85's volume −45% per minute, but 85's $20k start buckets were being spent in
+the BEFORE window and 47 is in its own start burst now ($868k, 0.43) → the volume split can't be separated yet.
+VERDICT: edge collision cost NONE; volume collision cost UNDETERMINED (start-burst confound). Re-read volume tomorrow ≈ 8–10 AM when both miners are past their start buckets (85 vs 252 $ per book-min,
+both of ours vs one). Recommendation: no third miner until that read; 47 stays on frozen settings until then (test bench after).
+
+## §1557 — 2026-11-16 10:05 PM CT — "Anything else to check, or let them run?" → let them run; the open items, and one more automation
+Let them run: 85 = keeper (no tests/restarts), 47 frozen until the volume re-read (11-17 after 8 AM). Standing watchers (lab, laptop-independent): overnight.sh (+ watch_extra.sh) every 10 min, release + sim-reset
+watcher every 10 min, pace_sync plausibility guard, tape rotation.
+Added: simreset_watch.py now also runs simreset_uids.sh on a detected reset (our_uids start sims → 0 for the new sim day, §1399; otherwise selftrade.py / the watchdog ignore every new fill).
+Backup simreset_watch.py.bak-1116.
+Open items, in time order: (1) 11-17 Tue morning — possible upstream release (Tue–Fri 4–11 AM CT) → watcher; (2) 11-17 after 8 AM — volume collision re-read + 85 vs 47 like-for-like; (3) 11-17 ≈ 6 PM / 8 PM —
+protection ends for 85 / 47: pay must clear the prune line (≈ $95 tonight; 85 $6 now, rising; 255 went $0 → $66 in ≈ 24 h despite its bad morning); (4) 11-17 ≈ 9–10 PM — sim-day reset: watcher alerts,
+checks the layout, fixes our_uids; then I check the model edge (leanfreq per class) on the first hour of the new day.
+
+## §1558 — 2026-11-16 10:25 PM CT — Brief (two miners): skills converging (85 0.97, 47 0.94), net alpha +380 / +225, coverage 188 / 177; self-trades 0
+Release watch: none (log alerts old). regcheck 85 + 47 REGISTERED. Pay 85 $6, 47 $95 (previous owner's weight), 252 $212; prune line $101. Validator: 85 skill 0.97, combined 0.381, net alpha +379.8, kept 98,
+coverage 188; 47 skill 0.94, combined 0.363, net alpha +224.8, kept 96, coverage 177; 252 skill 4.02, +1,724. Validator-exact last 15 sim min: $300 85 +83.7 (+1.99 bp on $421k, 33+/2−), 47 +135.7
+(+1.87 on $725k, 35+/1−) vs 252 +37.8 (+0.63); $30 85 +10.1 (+0.65), 47 +11.9 (+0.77) vs 252 +8.7 (+0.87). 0 errors both; PACE 85 0/188 (worst $28k), 47 0/177 (worst $23k); selftrade 0 of 1,375.
+
+## §1559 — 2026-11-16 10:40 PM CT — Skill score vs net alpha (user question), from the 0.6.7 code: skill (kappa) is a magnitude-blind CONSISTENCY GATE; skill pay = share of NET ALPHA
+debeta.kappa_of_alpha: MAD-normalised, downside-adjusted mean of per-book alphas (books with |alpha| ≥ the floor, ≥ min books) — "magnitude-blind". reward.skill_pool_share: eligible if skill_raw > 0 on ≥ min_books
+qualifying books; share = max(0, skill_net_alpha) × p11 counterparty factor ÷ total ("consistency decides who is in, P&L decides how much"; cloning-invariant). → 252's kappa 3–4 = very even per-book results
+(big steady fleet); its pay ($212) comes from net alpha ≈ 1,700. Ours: gate passed (0.97 / 0.94); what to grow is net alpha. Net alpha is a rolling-window total (window = several sim h ≈ a wall day at
+today's sim speed) → still filling for 85/47; last 15 sim min 85 +93.8, 47 +147.6 vs 252 +46.5 → at full window each could pass 252's ≈ 1,700 if the per-minute edge holds (crowding / sim reset / release risks).
+
+## §1560 — 2026-11-16 11:50 PM CT — Brief (two miners; the 10:43 and 11:13 briefs did not run — session idle): 85 pay $30, net alpha +458; 47 pay $13 (previous owner's weight gone, ours starting), +349
+Release watch: none. regcheck 85 + 47 REGISTERED. Pay 85 $30 ($1.00/day; 10:21 $6), 47 $13 ($0.43/day; the $95 was the old owner's), 252 $213; prune line $103. Validator: 85 skill 1.11, combined 0.369,
+net alpha +458.5, kept 102, coverage 190; 47 skill 1.15, combined 0.384, net alpha +348.9, kept 103, coverage 189; 252 skill 4.97, +1,770, kept 76. Validator-exact last 15 sim min: $300 85 +61.2 (+1.69 bp,
+27+/1−), 47 +82.9 (+1.84, 27+/1−) vs 252 +46.1 (+0.68); $30 85 +20.3 (+1.26), 47 +22.2 (+1.23) vs 252 +20.4 (+1.44). 0 errors; PACE 85 0/190 (worst $34k), 47 0/189 (worst $28k); selftrade 0 of 1,045.
+
+## §1561 — 2026-11-17 12:05 AM CT — Scaling plan (user: "if both miners are still doing well tomorrow afternoon how many more should we register in the evening?")
+Capacity: each miner ≈ 8–10% of one core, ≈ 220 MB; lab 4 cores, load 0.15–0.4, 6.7 GB free → ≈ 8+ miners fit. Pool dilution is small: field Σ positive net alpha ≈ 200k (§1514) vs ≈ 1.7k per mature
+miner → 5 more of ours ≈ 4–5% of the skill pool (we dilute ourselves only marginally). The binding unknowns: (1) the VOLUME collision re-read (11-17 AM; edge per $ already shows no cost, §1556),
+(2) correlated risk — every copy runs the same strategy, so a release / sim reset hits all at once; (3) registration cost rises with fast registrations.
+Recommendation: if the AM read shows volume cost NONE/SMALL and both still beat 252 per minute in the afternoon → register 2 tomorrow evening (x3, x4), spaced ≈ 2–3 h; measure the collision again with
+4 miners; then ≈ 2 per day while each addition still raises our TOTAL alpha per minute; stop when a new miner adds less than it takes from the others. If the AM read shows LARGE volume cost → 1 at most,
+and work on a second signal first. Prep done: mvtrx-x3 / mvtrx-x4 units rebuilt from the x2 template (ports 8103 / 8104, soft pacing, NO tape — the old units wrote the same tape file; backups
+mvtrx-x3/x4.service.bak-1116), disabled until used; start with `HK=x3 sh /opt/mvtrx/newminer.sh <uid>` / `HK=x4 …`. Hotkeys x3/x4 exist on the lab; more than 4 miners need new hotkeys (user: btcli wallet new_hotkey).
+
+## §1562 — 2026-11-17 — Non-MVTRX subnet re-dive (read-only): SN107 Minos is the top new lead; Synth forward passes its bar
+- Minos: ≈ $479k/mo miner pot, winner 0.8 + ranks 2-20 share 0.2 (decay 0.9), 5-of-20 eligibility; 37 revealed rounds: ≈ 55 submitters, all GATK,
+  #1-#20 gap ≈ 0.001, winner rotates; 28 UIDs average ≥ $1.7k/mo. Past rounds release BAM + truth → offline backtest possible. Burn 0.99 TAO, CPU box.
+- Synth forward 11-04→11-16: crypto-24h rank 2/257 (modelled $2.5-4.4k, conflicts with chain top UID $1.1k — verify), crypto-1h ≈ 2× median.
+- Full ranked list + history: deploy/HANDOFF_SUBNETS_2026-11-17.md. tag101-m3 verified inactive/disabled (§1309). No miners or services changed.
+
+## §1562 — 2026-11-17 12:20 AM CT — Read deploy/HANDOFF_SUBNETS_2026-11-17.md (other-subnet research, for when MVTRX income allows); port conflict fixed
+Port conflict: the staged Synth miner synth-s1 (disabled) uses axon port 8103 on the lab box, the same port §1561 gave the rebuilt mvtrx-x3 → mvtrx-x3 moved to 8105 (x4 stays 8104). Lab ports: 8101 x1,
+8102 x2, 8103 synth-s1 (when enabled), 8104 x4, 8105 x3.
+Cross-check with today's MVTRX code read (§1557-era): the handoff's lesson "on MVTRX a slot can keep its inherited standing (§1241)" — the 0.6.7 validator's handle_deregistration docstring says an
+older TypeError made a deregistered slot keep its standing; 0.6.7 fixed it and apply_resets → reset_agent_histories zeroes the slot (confirmed live: UID 47 started from no gauges, §1555). Still check
+1 h after any registration. Lab box capacity is shared: MVTRX miners ≈ 8–10% of a core each; a Minos GATK backtest needs its own box (as the handoff says).
+
+## §1563 — 2026-11-17 12:25 AM CT — Brief (two miners): net alpha 85 +502, 47 +421 (climbing); pay $30 / $13 (lag); $300 +1.7–1.9 bp vs 252 +0.67; self-trades 0
+Release watch: none. regcheck 85 + 47 REGISTERED. Pay 85 $30, 47 $13, 252 $212; prune line $106. Validator: 85 skill 1.06, combined 0.379, net alpha +502.2, kept 96, coverage 191; 47 skill 1.23, combined
+0.409, net alpha +420.9, kept 98, coverage 190; 252 skill 4.92, +1,739, kept 73. Validator-exact last 15 sim min: $300 85 +69.2 (+1.71 bp, 30+/3−), 47 +98.8 (+1.90, 39+/1−) vs 252 +47.2 (+0.67); $30 85 +15.3
+(+0.94), 47 +15.0 (+0.88) vs 252 +14.1 (+1.22). 0 errors; PACE 85 0/191 (worst $37k), 47 0/190 (worst $29k); selftrade 0 of 1,146.
+
+## §1564 — 2026-11-17 12:55 AM CT — Brief (two miners): net alpha 85 +522, 47 +457; pay $30 / $26; $300 +1.51 / +1.59 bp vs 252 +0.59; self-trades 0
+Release watch: none. regcheck 85 + 47 REGISTERED. Pay 85 $30, 47 $26 (12:21 $13), 252 $201; prune line $83–90. Validator: 85 skill 0.99, combined 0.328, net alpha +522.5, kept 93, coverage 191; 47 skill 1.08,
+combined 0.367, net alpha +457.3, kept 102, coverage 191; 252 skill 4.94, +1,842. Validator-exact last 15 sim min: $300 85 +58.0 (+1.51 bp, 32+/1−), 47 +79.0 (+1.59, 29+/1−) vs 252 +34.0 (+0.59); $30 85 +19.9
+(+1.13, 10+/0−), 47 +20.5 (+1.18) vs 252 +21.4 (+1.80). 0 errors; PACE 85 0/191 (worst $37k), 47 0/191 (worst $30k); selftrade 0 of 1,127.
+
+## §1565 — 2026-11-17 1:45 AM CT — SYNTH (SN50) $-model check (user: "lets run the synth test"): the forward test's $4.4–5.8k/UID is NOT credible; realistic ≈ $150–600/UID, slow ramp
+Chain (deploy/sn50/sn50pay.py, TAO $193): miner $ ≈ $60.6k/mo of $121k; UID 248 (639 d, ck 5DxyiWpG) $13.3k = 22% of miner $ (owner-like; 0% in the 24h API view); best real miners: 215 $1,106 (51 d),
+then ≈ 14 UIDs at $539–870 (fleet 5Cu4VX5C at a flat $539); paid median $115, p90 $539. Synth API v2/leaderboard/latest (fractions of total): default/1h view top 163 1.025%, then ≈ 1.0% flat;
+prompt_name=high (24h) top 216 0.656%, 66 0.319%, 251 0.318% — i.e. the real 24h competition is FLAT-ish, not winner-take-most.
+Validator code (synth-subnet 10-28): 3 competitions (com/equ 24h, crypto 24h, crypto 1h; + VHFT) ≈ ¼ each; softmax β 0.15 (24h) / 0.3 (1h) over a MOVING AVERAGE (window 10 d for 24h, 5 d for 1h) of
+per-asset-weighted scores (ASSET_COEFFICIENTS: BTC 1.0, ETH 0.71, SOL 0.63, XRP 0.57, HYPE 0.48, …); miners that joined inside the window get the WORST score backfilled for the missing times.
+Sanity check of our backtest's share method (deploy/sn50/synthcheck.py, 10 forward days, 1,232 prompt-asset rows): the same method predicts the field's best 24h UID (163) takes 39–89% of the competition —
+REAL: 163 gets 0.0% there (it is 5.0 d old: a re-used slot, so the historical API's per-UID scores include the PREVIOUS owner, and the validator backfills the new owner's missing days with the worst score).
+The real 24h leaders 216 / 66 / 251 are 10.2–11.2 d old (just past the 10-day window). → The backtest (field scores keyed by UID, no backfill, no asset coefficients) does not reproduce the validator; its
+"rank 1, 32% share, ≈ $5.7k/mo" is an artefact. With coefficients our model's average is still slightly better than the field's best in our reconstruction (49.8 vs 54.7) but that comparison is not trusted.
+Realistic: crypto-1h ≈ 2× median (≈ $150/mo, §1222) + whatever 24h share survives; pay ≈ 0 for the first ≈ 5 d (1h) / 10 d (24h) because of the worst-score backfill; SN50 immunity 65,535 blocks ≈ 9.1 d.
+Verdict: Synth is a small, slow stream (≈ $150–600/UID after ≈ 10 days), well below MVTRX per UID; keep staged, do NOT register on the backtest's $; a credible estimate needs the validator's own
+moving-average path (prepare_df_for_moving_average + coefficients) re-run on the history with per-hotkey (not per-UID) keys.
+
+## §1566 — 2026-11-17 2:30 AM CT — MINOS (SN107) offline desk study (user: "can we look into minos offline as well?") — public API only, no compute, nothing registered
+api.theminos.ai (v2.0.0 active): network-config winner_weight 0.8, dust_top_n 20, dust_decay 0.9, burn 0, participation_window 20 / min 5 rounds, config_commitment_required, reward_normalization; chromosome
+weights chr10 .356, chr11 .244, chr12 .111, chr13 .089, chr14–22 .022 each. Rounds every 72 min (submission window 72 min), ≈ 53–54 submissions; regions ≈ 8–14 Mbp; input.bam ≈ 263 MB (+ truth/mutation VCFs).
+57 revealed rounds (≈ 11-14 → 11-17): 16 distinct winners (uid 6/18/71 8 each, 73/26 6, 93 4); gap #1–#2 median 7.1e-6 (max 3.9e-4); gap #1–#20 median 0.0011; EXACT top ties (|Δ| < 1e-6) in 19/57
+rounds and the EARLIEST submitter won 16/19; top-20 tools 100% GATK; avg weight per round: uid6 .145, 18 .122, 71 .119, 26 .103, 73 .079, 93 .063.
+Submission time from round start: winners median 29.8 min (8.7–70), top-20 median 54.2, all 36.9.
+Zero-weight mystery SOLVED (deploy/sn107/zerock.py, 15 rounds): top-20 eligible rows paid 250 / zero 47 — 45 of the 47 zeros belong to a COLDKEY that already had a higher-ranked paid UID that round
+→ ONE PAID UID PER COLDKEY PER ROUND (extra UIDs on one coldkey add nothing except a second shot at the top slot). Config hashes are unique per miner (54/54), so copying is not visible.
+Reading: the field has converged on one GATK config (scores tied to ≈ 1e-6); winning = matching that config exactly AND submitting early (speed breaks ties); ranks 2–20 pay 0.2 × decayed shares (rank 2 ≈ 2.3%
+of the pot, rank 20 ≈ 0.35%; pot ≈ $479k/mo per the subnet handoff). Even a steady mid-top-20 rank ≈ $2–5k/mo; rank 1 rotates by noise/speed among ≈ 15 coldkeys.
+Next (needs the user's yes — a box): rent a CPU box (≈ 8–16 vCPU, 32 GB, ≈ $20–50 for a few days; NOT the MVTRX lab box — GATK would slow the miners' replies), download ≈ 20 revealed rounds
+(≈ 5 GB), run GATK HaplotypeCaller with the tuning-guide configs, score with the repo's hap.py demo mode, and check (1) do we reproduce the top score to 1e-6, (2) wall time per round on the box
+(must beat ≈ 30 min to win ties), (3) which knobs move the score. Then 1 UID (0.99 TAO ≈ $190) on its own coldkey/box.
+
+## §1567 — 2026-11-17 1:25 AM CT — Brief (two miners): net alpha 85 +547, 47 +490; pay $39 / $26; $300 +1.82 / +1.67 bp (29+/0−, 33+/0−) vs 252 +0.97; self-trades 0
+(Time note: §1565 / §1566 headers said 1:45 / 2:30 AM; the real CT times were ≈ 12:55 / 1:15 AM.)
+Release watch: none. regcheck 85 + 47 REGISTERED. Pay 85 $39 ($1.32/day), 47 $26, 252 $203; prune line $105. Validator: 85 skill 0.83, net alpha +547.4, kept 96, coverage 191; 47 skill 0.95, net alpha +489.9,
+kept 106, coverage 191; 252 skill 3.69, +1,749. Validator-exact last 15 sim min: $300 85 +57.5 (+1.82 bp, 29+/0−), 47 +65.6 (+1.67, 33+/0−) vs 252 +54.0 (+0.97); $30 85 +21.9 (+1.25), 47 +21.0 (+1.20)
+vs 252 +24.5 (+1.79). 0 errors; PACE 85 0/191 (worst $38k), 47 0/191 (worst $31k); selftrade 0 of 1,114.
+
+## §1568 — 2026-11-17 8:25 AM CT — Morning brief + VOLUME COLLISION RE-READ: cost SMALL (≈ −15–20% $ and alpha per miner), two miners = ≈ 1.7× one → go ahead with x3/x4
+Overnight: no release (baseline 0.6.7 final), no sim reset yet (sim 78062), no new real alerts (log tail = 255's old lines + 85's pre-patch no-gauge line); both REGISTERED; selftrade 0 of 920; 0 errors;
+PACE 0/192 each (worst $58k / $53k of $450k).
+PAY 85 $79/mo ($2.62/day; 1:22 AM $39), 47 $78 ($2.60/day; $26), 252 $182; prune line $105. Validator: 85 skill 2.04, combined 0.438, net alpha +906.5, kept 89, coverage 192; 47 skill 2.03, combined 0.435,
+net alpha +915.1, kept 91, coverage 192; 252 skill 3.76, +1,557, kept 67.
+Collision re-read, last 30 sim min (77–78k; both long past their start buckets), validator-exact: $300 85 +110.4 (+1.81 bp on $609k, 40+/4−) = 3.7 Σα/sim min, $20.3k/sim min; 47 +117.5 (+1.79 on $656k,
+38+/4−) = 3.9/min, $21.9k/min; 252 +39.1 (+0.32 on $1.21M). Single-miner reference = 255 on the same settings, mature (§1533): +1.86 bp, 4.5/min, $25.6k/sim min (252 then ≈ $39k/min vs $40k/min now →
+comparable market). → edge per $ unchanged (1.8 vs 1.86); volume and alpha per miner ≈ −15–20%; COMBINED $300 7.6 Σα/min ≈ 1.7× one miner. Fills per filled book-min 0.15 / 0.17 (252 0.15).
+$30: 85 +13.2 (+0.47 bp on $281k), 47 +12.8 (+0.45) vs 252 +25.1 (+1.58) — our $30 bp per $ is down from ≈ +1.2 (one window; watch, not a collision effect — both miners equal).
+VERDICT: volume collision cost SMALL. Recommendation (§1561): register x3 this evening, x4 ≈ 2–3 h later (or after reading x3's collision), then re-measure per-miner alpha/min with 3–4; stop adding when a
+new miner raises the total by less than it costs the others. Sim-day reset expected ≈ 9–10 PM CT tonight — watchers armed.
+
+## §1569 — 2026-11-17 9:30 AM CT — 4-dec books as a third pay pool (user: "go ahead"): offline signal search → NOT a quick win; the strong signal is mostly drift the validator removes
+Model fit (speed/modelfitc.py BOOKS=192-255 TICK=0.0001): later tape (74701–78000) model top-30% at 120 s −0.47 bp (corr +0.17), earlier (.prev 68000–74600) +0.74 bp — unstable sign; the 'fade' signal
+is wrong-way in all 8 test slices (−1.46 / −3.12 bp at 120 s) → the 4-dec books trend.
+Momentum lean census (speed/momfreq.py: signal = Δmid 60 s + Δmid 300 s): raw edge in the lean direction k 1.0 (30% active) +0.69 / +1.16 / +2.51 bp at 60 / 120 / 300 s (early) and +2.04 / +4.03 / +10.19
+(late, ≈ 2× volatility). BUT the validator scores alpha = Σ inventory × Δmid − mean inventory × book drift over its window: with each book's whole-window drift removed (speed/momfreq3.py) the edge falls to
++0.21 / +0.21 / +0.13 bp (early) and +0.37 / +0.68 / +1.83 (late) — most of the 'momentum' is drift. (A 600-s block de-drift showed negative values but leaks hindsight — discarded.)
+Verdict: 4-dec edge after de-drift ≈ +0.2–0.7 bp at 1–2 min, unstable between windows, and our past 4-dec maker fills lost −2.4 bp; with the 2.3-bp-of-own-notional hurdle almost no 4-dec book would
+clear → no skill pay there. Parked (re-check after a sim reset / config change). Scaling levers left: (1) shallow rest (2–3 ticks; 1–4-tick fills earned +0.78 bp, §1518) on x3, (2) signal diversity on x4.
+
+## §1570 — 2026-11-17 10:00 AM CT — Offline check of the shallow-rest idea (user: test on x1/x2 instead of new miners? offline first?): resting fills pay ONLY on the lean side
+speed/depthflow.py, $300 books, every maker's fills except ours, sim 76100–78300 (37 sim min), split by depth behind the pre-trade touch and by whether OUR live model (lean 1.5) leaned the resting side's way;
+markout of the mid in the maker's favour, raw and with each book's whole-window drift removed (+60 / +120 s):
+depth 0 lean agrees $472k/sim min, de-drift +1.28 / +1.71 bp | no lean $5.4M/min −0.05 / +0.02 | against −1.37 / −1.64.
+depth 1 lean agrees $180k/min +1.04 / +1.73 | no lean $2.0M/min −0.22 / −0.07 | against −1.72 / −1.83.
+depth 2 lean agrees $119k/min +1.01 / +1.41 | no lean $1.6M/min −0.46 / −0.32 | against −1.81 / −2.12.
+depth 3 lean agrees $95k/min +0.61 / +0.83 | no lean $1.2M/min −0.65 / −0.42 | against −1.99 / −2.08.
+depth 4 lean agrees $64k/min +0.46 / +0.86 | no lean −0.90 / −0.80 | against −2.24 / −2.58.
+→ A resting order 1–3 ticks back earns ≈ +0.8 to +1.7 bp after de-drift ONLY on the side our model leans; everywhere else resting loses. The lean-side flow at depth 1–3 (≈ $390k per sim min across all
+makers) is ≈ 20× one miner's current $300 volume (≈ $20k/min) — even a small share is a real volume gain at full edge. Test design: keep the inside step-in, ADD lean-side resting orders at 1–3 ticks
+(non-lean side stays at 30). Offline can't tell our fill share (queue position) → needs a live A/B.
+Recommendation: run it LIVE on UID 47 (x1) with an auto-revert guard while still protected (until ≈ 8 PM), 85 = frozen same-window control (the cleanest A/B so far); new miners are not needed for it.
+
+## §1571 — 2026-11-17 ≈ 8:50 AM CT — LEAN-SIDE SHALLOW REST live on UID 47 (x1) with an auto-revert guard; UID 85 = frozen same-window control (user: "add that test to 47 with the automatic revert guard")
+Code: agent 683f430c = 2ef16f9b + mk_lean_lad (live, 0 = identical): with mk_lad_off, resting orders 1..N ticks behind the step-in target, ONLY on the side the lean jumped, only while a step-in is live
+($300 vol + calm; $30 books excluded); sized by the ladder size (mk_vol_lad_size 0.027 ≈ $1.35k; calm 0.02 ≈ $1.0k); a side whose lean ends → its rest orders are cancelled. equiv.py 0 instruction diffs (10 replies,
+tape / ledger / locks identical), test_pace ALL PASS. Census (speed/leanladcensus.py, live_params_47, buckets $4,700 / $1,200): B (mk_lean_lad 3) adds on lean books 0 / 1 / 2 ticks behind the others' best
+(vol 5+5+5, calm 3+3+3 orders, $1,352 / $999) next to the −1 step-in; non-lean side unchanged at +31…+34; low bucket → no lean, identical to A.
+Interaction: §1570 says lean-side rest at depth 0–3 earns +0.6…+1.7 bp de-drifted; adds lean-side exposure (step-in $3.6k + 3 × $1.35k); max_inv 0.14 still caps inventory; the instruction limit
+(5/book) orders cancels → step-in → ladder nearest first; budget gate unchanged (rest orders spend only when filled).
+Deploy (47 only): backups agents/QuoteAgent.2ef16f9b.py, live_params_47.pre-leanlad.json, mvtrx-x1.service.bak-leanlad; x1 unit pace_start 20000 → 4700 (no start burst → a clean A/B vs 85); live_params_47
+mk_lean_lad 3; agents/QuoteAgent.py = 683f430c; restart x1 only 14:45:10 UTC (x2 untouched since 00:00:25 UTC; it keeps running 2ef16f9b in memory); LIVE PARAMS applied incl. mk_lean_lad 0→3; 0 errors.
+Warm-up to ≈ sim 78645. newminer.sh now expects agent md5 683f430c (identical to 2ef16f9b with mk_lean_lad 0, which live_params_NEXT.json keeps).
+GUARD /opt/mvtrx/guard_leanlad.sh (pid 1543291, log guard_leanlad.log): every 10 min for 150 min, ≥ 600 sim s after warm-up: validator-exact $300 Σα of 47 vs 85 over the same window → mk_lean_lad back
+to 0 (+ ALERT) if 47 < 0.75 × 85 or 47's bp/$ < +0.8. Verdict ≈ 1 h after warm-up, well before 47's protection ends (≈ 8 PM).
+
+## §1572 — 2026-11-17 9:25 AM CT — Brief: pay 85 $85 / 47 $86; net alpha +1,036 / +958; lean-ladder test only ≈ 100 sim s past warm-up (no read yet)
+Release watch: none; no new alerts. regcheck 85 + 47 REGISTERED; selftrade 0 of 927. Pay 85 $85 ($2.84/day), 47 $86, 252 $182; prune line ≈ $96–107. Validator: 85 skill 2.89, net alpha +1,036, kept 80,
+coverage 192; 47 skill 2.92, +958, kept 88, coverage 192; 252 skill 3.23, +1,558. Sim 78746 (warm-up ended 78645). Guard log: waiting (needs +600 sim s). 0 errors; PACE 85 0/192 (worst $61k), 47 3/192
+blocked (worst $57k; bucket started at 4,700 instead of 20,000 — watch). Verdict ≈ 10:15–10:30 AM.
