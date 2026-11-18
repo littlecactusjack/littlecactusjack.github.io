@@ -23877,3 +23877,1071 @@ to 0 (+ ALERT) if 47 < 0.75 × 85 or 47's bp/$ < +0.8. Verdict ≈ 1 h after war
 Release watch: none; no new alerts. regcheck 85 + 47 REGISTERED; selftrade 0 of 927. Pay 85 $85 ($2.84/day), 47 $86, 252 $182; prune line ≈ $96–107. Validator: 85 skill 2.89, net alpha +1,036, kept 80,
 coverage 192; 47 skill 2.92, +958, kept 88, coverage 192; 252 skill 3.23, +1,558. Sim 78746 (warm-up ended 78645). Guard log: waiting (needs +600 sim s). 0 errors; PACE 85 0/192 (worst $61k), 47 3/192
 blocked (worst $57k; bucket started at 4,700 instead of 20,000 — watch). Verdict ≈ 10:15–10:30 AM.
+
+## §1573 — 2026-11-17 9:55 AM CT — Brief: lean-ladder interim (7 sim min) BEHIND the control — 47 $300 +17.0 (+1.46 bp, $116k) vs 85 +30.3 (+1.86, $163k); guard likely to revert at its next check
+Release watch: none; no new alerts. regcheck 85 + 47 REGISTERED; selftrade 0 of 960. Pay 85 $83, 47 $83, 252 $178 (prune-line read $0 this tick — script artefact). Validator: 85 skill 2.51, net alpha
++1,068, kept 78; 47 skill 3.36, +974, kept 86; 252 +1,584; coverage 192 each. 0 errors; PACE 85 0/192, 47 2/192.
+Interim A/B, sim 78645–79070 (skill_cls2 7.1 min / kindsplit): $300 47 +17.0 (+1.46 bp on $116k, 12+/2−) vs 85 +30.3 (+1.86 on $163k, 24+/1−) vs 252 +11.1 (+0.39). Fills: 47 inside n53 $67k mo60 +1.52,
+touch n11 $8k +0.34, behind n33 $36k depth 2 −0.31 / −0.69 (the new lean-side rest: so far NEGATIVE, offline said +1.0…+1.4); 85 inside n93 $101k +1.93, touch n19 $21k −0.30, behind n25 $31k depth 2
++0.17 / +0.53. 47 has FEWER step-in fills (53 vs 93) — the rest fills spend the budget that step-ins need. Guard (0.75 × 85) would revert at 17.0 < 22.7 on its next tick if this holds.
+
+## §1574 — 2026-11-17 10:25 AM CT — Lean-ladder first full read (12.4 sim min ≈ 1 wall h): NOISE — 47 slightly ahead on alpha, behind on volume; the new rest fills ≈ 0 bp; keep running (guard on) for a second window
+Release watch: none; no alerts. regcheck 85 + 47 REGISTERED; selftrade 0 of 949. Pay 85 $85, 47 $85, 252 $182; prune line $117–118. Validator: 85 skill 2.51, net alpha +1,076, kept 77; 47 skill 2.51, +1,018,
+kept 87; 252 +1,610; coverage 192 each. 0 errors; PACE 85 0/192, 47 1/192.
+A/B sim 78645–79390 (validator-exact 12.4 min): $300 47 +63.9 (+2.48 bp on $258k, 31+/0−) vs 85 +58.6 (+2.05 on $285k, 32+/1−) vs 252 +23.8; $30 47 +15.5 vs 85 +14.8 (equal, as expected).
+Guard log 16:17 UTC (11.5 min): 47 +46.6 (+2.05 bp) vs 85 +53.5 — no revert. Fills (kindsplit): 47 inside n123 $137k +1.65 bp (mo60), touch n28 $28k −0.77, behind n77 $85k depth 2 −0.14; 85 inside n144 $161k
++1.89, touch n35 $43k −1.07, behind n56 $73k depth 1 +0.57. fillrate: 47 $251k on 62 books vs 85 $280k on 77.
+Reading: total $300 alpha +9% for 47 but −10% volume and fewer books filled; the added lean-side rest fills earn ≈ 0 bp (offline promised +1.0 to +1.4) — the 7-min interim had 47 −44%; within noise.
+VERDICT so far: NOISE. Keep 47 on mk_lean_lad 3 with the guard for a second ≈ 1 h window (fine-tuning size effect, test-duration rule allows longer); NEXT keeps mk_lean_lad 0 until it is clearly ahead.
+
+## §1575 — 2026-11-17 10:55 AM CT — Brief: lean-ladder converging on a TIE (47 +75.8 vs 85 +80.9 over 17.3 sim min); pay 85 $87 / 47 $93
+Release watch: none; no alerts. regcheck 85 + 47 REGISTERED; selftrade 0 of 1,042. Pay 85 $87, 47 $93, 252 $200; prune line ≈ $102. Validator: 85 skill 2.79, net alpha +1,147, kept 81; 47 skill 3.13, +1,087,
+kept 88; 252 +1,694; coverage 192 each. 0 errors; PACE 85 0/192, 47 2/192. Guard log ($300 since warm-up): 13.4 min 47 +65.9 (+2.29) vs 85 +66.2; 15.3 min +70.8 (+2.27) vs +74.1; 17.3 min +75.8 (+2.05)
+vs +80.9 → 47 at 0.94× 85, edge per $ equal or higher, volume lower. Verdict ≈ 11:30 AM.
+
+## §1576 — 2026-11-17 11:25 AM CT — LEAN-LADDER VERDICT: NOISE / slightly worse → 47 back to the frozen settings (mk_lean_lad 0, applied "3→0"); scaling levers to rethink
+Release watch: none; no alerts. regcheck 85 + 47 REGISTERED; selftrade 0 of 1,078. Pay 85 $89, 47 $94, 252 $203; prune line $114. Validator: 85 skill 3.27, net alpha +1,169, kept 86; 47 skill 3.11, +1,155,
+kept 93; 252 +1,625; coverage 192 each. 0 errors.
+Guard log (validator-exact $300 since warm-up, 47 vs 85): 11.5 min +46.6 / +53.5; 13.4 +65.9 / +66.2; 15.3 +70.8 / +74.1; 17.3 +75.8 / +80.9; 21.1 +99.6 / +104.0; 22.9 +102.5 (+2.07 bp) / +114.1 → 47 = 0.90× 85.
+Guard finished (no revert: never below 0.75×). The 12.4-min fill read: the lean-side rest fills ≈ −0.1 bp (offline other-maker fills at the same depth +1.0…+1.4) and 47's volume −10%, books filled 62 vs 77.
+VERDICT: NOISE, slightly worse — DISPROVEN as a scaling lever in this form. Lesson: other makers' fills at a depth do not predict OUR resting fills there (queue position / which sweeps reach us).
+47 now = live_params_NEXT.json (only diff: mk_lean_lad 0 explicitly). Frozen setup for x3/x4 unchanged (agent 683f430c, mk_lean_lad 0 = 2ef16f9b behaviour). 47's x1 unit keeps pace_start 4700.
+
+## §1577 — 2026-11-17 12:00 PM CT — Brief: pay 85 $94 / 47 $99 (prune line ≈ $114; this tick's "$1" read is a script artefact); $30 edge per $ stays low (+0.5–0.6 bp, 2nd window) — FLAG
+Release watch: none; no alerts. our_uids 85 (x2) + 47 (x1), both REGISTERED; selftrade 0 of 1,071. Pay 85 $94 ($3.12/day), 47 $99 ($3.30/day), 252 $212. Validator: 85 skill 2.94, net alpha +1,216, kept 89;
+47 skill 2.56, +1,204, kept 96; 252 +1,754; coverage 192 each. 0 errors; PACE 0/192 both (worst $70k / $57k).
+Validator-exact last 15 sim min: $300 85 +62.7 (+1.71 bp, 34+/3−), 47 +54.3 (+1.64) vs 252 +25.4 (+0.39); $30 85 +8.7 (+0.51 bp), 47 +10.1 (+0.61) vs 252 +20.6 (+2.28).
+FLAG: our $30 bp per $ was ≈ +1.1–1.3 through 11-16 evening; since this morning +0.45 / +0.47 (8:25 AM) and +0.51 / +0.61 now while 252 earns +1.6–2.3 on $30 — same on both miners, so a market/model
+issue on the $30 books, not a collision. Next: re-check the $30 model edge on today's tape (speed/leanfreq2.py MODEL=model_lean_30.json BOOKS=128-191) vs 11-16 — refit if it decayed (no change without the user).
+
+## §1578 — 2026-11-17 12:20 PM CT — $30 edge flag checked: the $30 MODEL is intact (de-drifted +1.9–2.2 bp at 120 s, unchanged) and our $30 fill markouts barely moved → likely window noise; no change
+speed/leanfreq3.py (live model_lean_30.json, books 128–191, each book's whole-window drift removed): sim 68500–72500 (11-16 evening) k 0.75 +1.56 / +1.86, k 1.0 +1.84 / +2.18 bp at 60 / 120 s; sim 77000–80300 (now)
+k 0.75 +1.47 / +1.91, k 1.0 +1.68 / +2.18 (mean |drift| 0.59 bp per 120 s both). $300 reference (k 1.0) +0.77 / +1.02 then, +1.09 / +1.41 now.
+Our $30 fills (speed/kindsplit2.py BOOKS=128-191): 11-16 evening 85 touch n129 $212k mo60 +1.02, 47 n143 $232k +1.18; now 85 n166 $248k +0.90, 47 n161 $238k +0.88 (99% at the touch; 252 now touch
+−0.15, behind −0.44 yet validator +2.28 → fill markouts don't map 1:1 to validator alpha, which is inventory × mid over the holding time). A 15-min validator window of ≈ $170k $30 notional moves
+≈ ±1 bp on noise. Verdict: NOISE so far; keep watching the $30 bp per $ each brief; act only if it stays < +0.8 for several more windows.
+
+## §1579 — 2026-11-17 12:30 PM CT — Brief: pay 85 $91 / 47 $99; prune-line reads unstable ($1 / $26 / $114 within 1 h — the lowest unprotected paid UID changes as others register/prune); $30 +0.7 bp
+Release watch: none; no alerts. regcheck 85 + 47 REGISTERED; selftrade 0 of 1,009. Pay 85 $91 ($3.04/day), 47 $99 ($3.28/day), 252 $211; prune line read $26–27 this tick. Validator: 85 skill 2.42, net alpha
++1,100 (window roll, 12:00 +1,216), kept 85, coverage 190; 47 skill 2.40, +1,186, kept 88, coverage 192; 252 +1,731. Validator-exact last 15 sim min: $300 85 +62.3 (+2.00 bp, 34+/1−), 47 +49.6 (+1.54) vs 252
++7.4 (+0.12); $30 85 +10.4 (+0.71), 47 +10.4 (+0.73) vs 252 +17.1 (+1.72). 0 errors; PACE 0/192 both.
+
+## §1580 — 2026-11-17 12:50 PM CT — Signal diversity offline (user: run it now): the only usable non-overlapping signal is the model's 1.0–1.5× band (≈ 65% of the live edge); the half-models are weak
+speed/sigoverlap.py ($300 books, per book-second, each book's whole-window drift removed; overlap = the live signal A (|pred| ≥ 1.5 thr) leans the same side on the same book within ±5 s):
+now (sim 78000–80600): A active 12.9%, edge +1.30 / +1.67 bp (60 / 120 s); B1 band 1.0–1.5 thr active 18.1%, overlap 41.6%, B-only edge +0.84 / +1.06; B2 fundamental half (top 12%) overlap 39.2%, B-only
++0.29 / +0.38; B3 reversion half overlap 48.9%, B-only +0.28 / +0.24.
+11-16 evening (.prev 69000–72500): A 10.6%, +0.95 / +1.25; B1 17.1%, overlap 39.7%, B-only +0.64 / +0.85; B2 B-only +0.11 / +0.16; B3 B-only +0.31 / +0.40.
+Reading: B1 (lean only when 1.0 ≤ |pred|/thr < 1.5) finds ≈ 60% new moments at ≈ 0.65× A's edge in both windows; its 40% 'overlap' is timing adjacency (the prediction passes through the band on its
+way above 1.5×) — with an UPPER bound the B1 miner withdraws exactly when A miners step in. Risks: ≈ +0.8–1.1 bp means fewer books clear the 2.3-bp-of-own-notional hurdle → the $300 skill bar (20 books)
+is not assured; needs a code knob (mk_model_lean_max). Half-models (B2/B3) are not worth a miner.
+Plan: x3 tonight = identical copy (proven, collision small §1568); x4 = B1 band test (new knob, census before) — a new miner, so testing it costs nothing that is earning.
+
+## §1581 — 2026-11-17 1:20 PM CT — Band (diversified) miner staged for x4: agent f13a7947 + mk_model_lean_max; live_params_NEXT_B1.json; newminer.sh PARAMS=
+Code f13a7947 = 683f430c + mk_model_lean_max (live, 0 = no upper bound = identical): the $300 lean fires only while mk_model_lean ≤ |pred|/thr < MK_MODEL_LEAN_MAX ($30 untouched). equiv.py 0 instruction
+diffs (10 replies, tape / ledger / locks identical); test_pace ALL PASS; census (speed/bandcensus.py, live_params_47, seeded strong predictions): B (lean 1.0, max 1.5) makes NO jumps when |pred| ≥ 1.5×
+→ all $300 lean books rest at +31…+34 (stands back exactly where 85/47 step in); A unchanged.
+Staged (no running miner touched; 85 = 2ef16f9b and 47 = 683f430c in memory): agents/QuoteAgent.py = f13a7947 (backups .2ef16f9b / .683f430c); newminer.sh expects f13a7947 and takes PARAMS=<file>
+(default live_params_NEXT.json; backup newminer.sh.bak-1117); /opt/mvtrx/live_params_NEXT_B1.json = NEXT + mk_model_lean 1.0, mk_model_lean_max 1.5.
+Tonight: x3 `HK=x3 sh /opt/mvtrx/newminer.sh <uid>` (identical copy); x4 `HK=x4 PARAMS=live_params_NEXT_B1.json sh /opt/mvtrx/newminer.sh <uid>` (band test). Judge x4 by its own validator-exact
+$300 alpha + books clearing the 2.3-bp hurdle (needs ≥ 20 for the $300 class) and by whether 85/47/x3 keep their alpha/min.
+
+## §1582 — 2026-11-17 1:00 PM CT — Brief: pay 85 $98 / 47 $108 vs prune line $113 — both climbing to it; $30 edge back near +0.9 (time note: §1581's "1:20 PM" was ≈ 12:55)
+Release watch: none; no alerts. regcheck 85 + 47 REGISTERED; selftrade 0 of 913. Pay 85 $98 ($3.28/day), 47 $108 ($3.60/day), 252 $209. Validator: 85 skill 2.30, net alpha +1,155, kept 89, coverage 190;
+47 skill 3.02, +1,234, kept 83, coverage 192; 252 +1,766. Validator-exact last 15 sim min: $300 85 +51.9 (+1.59 bp), 47 +62.9 (+1.85, 36+/3−) vs 252 +19.8 (+0.31); $30 85 +14.0 (+0.95), 47 +12.3 (+0.83)
+vs 252 +15.5 (+1.39) — the $30 dip (§1577) recovering. 0 errors; PACE 0/192 both.
+
+## §1583 — 2026-11-17 1:15 PM CT — THIRD MINER UID 54 (x3) live on the BAND test (user: register x3 now, put the test on it before x4)
+User registered x3 as UID 54. mvtrx-x3 unit pace_start 20000 → 4700 first (no start burst — §1571 lesson; backup mvtrx-x3.service.bak-1117), port 8105. `HK=x3 PARAMS=live_params_NEXT_B1.json sh newminer.sh 54`:
+agent f13a7947, restart 19:12:23 UTC (sim 81201), our_uids now 85 (x2) + 47 (x1) + 54 (x3); LIVE PARAMS applied incl. mk_model_lean 1.0, mk_model_lean_max 1.5 (band), $30 lean 0.75, rest 30, part 0.5,
+skip_dec 1; 0 errors; all three units enabled/active (ports 8101 / 8102 / 8105); selftrade 0 of 1,308. Warm-up to ≈ sim 81500.
+BEFORE baseline (validator-exact, last 20 sim min to 81204): $300 85 +68.5 (+1.67 bp) = 3.4/min, 47 +81.6 (+1.97) = 4.1/min, 252 +17.3; $30 85 +13.6 (+0.72), 47 +13.3 (+0.70), 252 +22.1.
+Reads from sim 81500: 54's own $300 alpha + bp per $ + books clearing the 2.3-bp hurdle (≥ 20 for the $300 class) + 85/47 alpha/min vs this baseline (identical-copy collision cost was ≈ −15–20%, §1568).
+Verdict ≈ 1–2 h after warm-up decides x4's settings (band or identical).
+
+## §1584 — 2026-11-17 1:45 PM CT — MAKING-POOL STUDY (offline, user: "yes … do what you need to"): long-lived makers earn making credit on the $30 books with balanced small touch quotes, and SKILL on the $300 books — a HYBRID
+Field (speed/makers2.py, validator 5EWwdZB7 gauges + chain): 108 UIDs with making > 0, Σ making 5,740, their pay ≈ $29.2k/mo; making-only UIDs median ≈ $5.0 per unit of making credit. Long-lived (≥ 7 d) makers 17:
+181 (9.2 d, making 120, $296, skill 0.23, net alpha +678), 234 (10.3 d, 118, $304, +460), 51 (7.9 d, 117, $377), 251 (7.2 d, 108, $549), 240 (7.6 d, 91, $268), 3 (21.4 d, 89, $223), 188, 46 (14.6 d), 155, 17, 207 (13.7 d), 140.
+181 / 234 / 51 share coldkey 5DPmdLHb and behave identically.
+Making credit replica (speed/making067b.py, last 60 sim min): credit comes from the $30 books — 181 $30 two-sided 55.3 → credit 30.5 (quality R/C 0.55), 234 23.9, 51 19.0, 3 18.4 (+ 4-dec 8.7), 46 7.1 (+ $300 6.8);
+$300 contributes ≈ 0 (R/C ≈ 0 or negative). Our 85: C −25.9 / R −37.9 → quality 0, two-sided 0 (one-sided lean quoting by design).
+$30 quoting style (speed/makerstyle.py, sim 79800–81300): 181 / 234 / 51 ≈ 26 fills per sim min, $600 per fill, 40–43 books, 51–52% buys, per-book two-sidedness (min/max $) 0.70–0.75, 94% at the touch, spread 1 tick,
+fill price vs mid +1.8 bp at 2 s and 20 s; 46: 38.7 fills/min, 62 books, +2.3 / +2.5 bp; 3: $2,394 fills, 9.4/min. Ours 85: 6.3 fills/min, $1,603, two-sidedness 0.49.
+Their SKILL by class (validator-exact 30 sim min): $300 181 +34.3 (+2.19 bp on $157k, ELIGIBLE), 234 +36.4 (+2.26), 51 +14.4; $30 181 −19.3 (−0.41 bp on $469k), 234 −9.7, 51 −11.6 (making books give no skill);
+4-dec 181 +40.4, 234 −84.9, 51 −76.5. Ours: $300 85 +122.9 / 47 +122.8 (≈ 3.5× their $300 alpha); $30 85 +38.6 / 47 +40.0 (+1.2 bp).
+Reading: the making pool (≈ 60% of weight, a pool our skill miners don't touch) is earned by BALANCED $600 touch quotes on the $30 books; long-lived makers combine it with a modest $300 skill leg. A HYBRID
+for a new lane = our $300 skill strategy (proven, ≈ 3.5× theirs) + $30 balanced making (their style) instead of our $30 lean. Trade-off: our $30 skill (≈ +40 alpha per 30 sim min) would be replaced
+by making credit (long-lived makers 90–120 credit, $220–550 total pay). Making credit is a share among ≈ 108 makers, so it does not collide with our skill lanes (it would collide between our own hybrids).
+Open: the old rule "makers stay making-only, no skill legs" (11-11/11-13) predates this — the user decides. Next if approved: build a $30 'balanced maker' mode (both sides at the touch, $600, inventory skew,
+fast requote), census, and run it on a NEW miner (x4 or later), not on 85/47.
+
+## §1585 — 2026-11-17 1:55 PM CT — Brief (three miners): 54 only ≈ 130 sim s past warm-up — no band read yet; 85 $98 / 47 $108 / 54 $0; self-trades 0
+Release watch: none; no alerts. regcheck 85 / 47 / 54 REGISTERED; selftrade 0 of 1,345 (three makers). Pay 85 $98, 47 $108, 54 $0 (new), 252 $209; prune-line read $30 (jumpy; steady ≈ $110).
+Validator: 85 skill 3.00, net alpha +1,168, coverage 190; 47 skill 2.86, +1,259, coverage 191; 54 skill 0, net alpha −1.9, kept 13, coverage 70 (building); 252 +1,771. 0 errors on all three;
+PACE 85 0/192, 47 0/192, 54 0/82 (worst $6.9k). Sim 81630 (54 warm-up ended ≈ 81500). Band verdict needs ≈ 1–2 h → ≈ 3:00–3:30 PM.
+
+## §1586 — 2026-11-17 2:30 PM CT — How the long-lived makers really earn (pre-hybrid deep dive, user: "make sure … you have as good of an understanding as you can") + why 85/47's alpha plateaued
+ALPHA PLATEAU: validator-exact 200-sim-min sums match the net-alpha gauges (85 $300 +881 + $30 +359 = 1,240 vs gauge 1,168; 47 +928 + 351 = 1,279 vs 1,259; 252 +1,669 + 17 = 1,686 vs 1,771) → the skill window
+is ≈ 200 sim min (not 5.5 h) and is FULL: 85/47 sit at ≈ 1,200–1,280 net alpha. Pay ≈ net-alpha share: 252 $209 at 1,771 ≈ $0.118 per unit → ours ≈ $140–150 each once pay catches up (now $98 / $108).
+$200 per skill-only miner needs ≈ 1,700 (252 trades 1.6× our $300 notional at a similar bp over 200 min). A second income source per miner is the realistic route.
+MAKING MECHANICS (validator 0.6.7 debeta.accumulate_book_capture): capture C of a fill = (centered mid − price) × q for a maker buy (price − mid for a sell), where the centered mid = unweighted mean of the
+fill's own print and the W = 15 nearest PRINTS on each side (trade prices, dust-floored, reach 8W) — NOT the book mid; realized R = the same against the print mark 20 s of sim time later; both net of
+fee_weight 0.005 × the maker fee (dynamic MTR fee ≈ 138–143 bp now → ≈ 0.7 bp per fill); self-trades earn nothing. Per book two-sided = 2·min(buy C, sell C); quality = clamp(ΣR/ΣC over ALL of the miner's
+books, 0, 1) (taker legs booked apart); credit per class = Σ two-sided × quality; making pool split by class 50 / 25 / 25 ($300 / $30 / 4-dec), share of class credit.
+→ stepping INSIDE the spread to buy pays above the surrounding prints → negative C (why 85's C is −25.9 / R −37.9); exactly-at-the-touch balanced fills capture the half-spread (+1.8 bp) − 0.7 fee.
+FIELD credit by class, last 60 sim min (speed/making_field.py): $300 421 (94 UIDs; top 91 51.8, 231 20.2, 177 18.6, 30, 59 — young 5FLbhrTC fleet, $750–940/mo), $30 960 (108 UIDs; 226, 115, 100,
+157, 181 28.3 …), 4-dec 685 (96). Pool per credit ∝ class share / total → $300 credit ≈ 4.5× and 4-dec ≈ 1.4× a $30 credit; ≈ $6/mo per hourly $30 credit point → 181 ≈ $180/mo from making.
+ROLES (tape, last ≈ 400 MB): 181 $300 TAKER n423 $185k, $30 maker n1,030 $592k, 4-dec taker $123k; 234 $300 taker $186k, $30 maker $585k, 4-dec maker $151k; 51 $300 taker $95k, $30 maker $566k,
+4-dec maker $149k; our 85 $300 maker $895k, $30 maker $421k. → the long-lived 'makers' (5DPmdLHb, 8–10 d) = balanced $30 makers + a $300 TAKER skill leg; their $300 maker C/R stays at 0, so quality
+(R/C) stays ≈ 0.5.
+HYBRID consequence: quality is miner-wide — combining our $300 MAKER skill leg (85, 60 min: C −14.0, R −29.1) with a 181-style $30 maker (C 77.9, R 42.9) → quality 13.8 / 63.9 = 0.22 (vs 0.55)
+→ $30 making credit ≈ 39% of the pure maker's (≈ $70/mo instead of ≈ $180). Options for x4: H1 our $300 maker skill + $30 balanced making (≈ $100 skill + ≈ $70 making); H2 181's template — $300
+TAKER skill + $30 balanced making (≈ $250–300 total like 181/234; needs the user's OK on taking); H3 $30 balanced making only (≈ $180, no skill). Mechanics to build for any of them: both sides
+EXACTLY at the touch (never inside), $600 orders (≈ 0.012 × $50k), all 64 $30 books, fast requote, inventory skew to stay ≈ 50/50, soft pacing (they trade ≈ the $5.2/s per-book cap on $30).
+
+## §1587 — 2026-11-17 2:35 PM CT — Brief + BAND first read (9.2 sim min): 54 adds +55 $300 alpha (+1.10 bp, 25 books kept ≥ 20) and 85/47 are NOT hurt (3.8 / 3.9 per min vs 3.4 / 4.1 before)
+Release watch: none; no alerts. regcheck 85 / 47 / 54 REGISTERED; selftrade 0 of 1,627. Pay 85 $94, 47 $104, 54 $0, 252 $208; prune line $110. Validator: 85 skill 3.47, net alpha +1,108, coverage 190; 47 skill 3.08,
++1,186, coverage 190; 54 skill 0.55, combined 0.20, net alpha +75, kept 76, coverage 164 (≥ 160 already); 252 +1,726. 0 errors; PACE 0 blocked on all three.
+Band read, sim 81500–82050 (validator-exact 9.2 min): $300 54 +55.3 (+1.10 bp on $504k, kept 25 = 22+/3−, ELIGIBLE) = 6.0 per sim min; 85 +34.9 (+1.65) = 3.8/min; 47 +35.6 (+1.69) = 3.9/min (§1583 baseline
+3.4 / 4.1); 252 +36.2 (+1.07). $30 54 +7.9 (+0.71), 85 +9.3, 47 +9.8. fillrate $300: 54 506 fills $551k on 119 books (0.46 per filled book-min, $730 median) vs 85 180 / $235k on 70, 47 160 / $219k on 70.
+Reading: the band miner trades ≈ 2.4× the volume of each lean miner (it leans ≈ 18% of the time vs ≈ 13%) at ≈ 0.65× the edge — as the offline study said — and the identical-copy collision (−15–20%)
+does not appear. Our total $300 alpha per sim min 13.7 vs 7.5 before (+83%). Too short to call — verdict ≈ 3:15 PM after ≈ 20 sim min.
+
+## §1588 — 2026-11-17 2:55 PM CT — H2 chosen (user: "lets try for H2 but taking has failed in the past … be sure we're doing everything correct compared to the taker miners") — taker study
+Past failures (lessons): taker copies collapsed under our pace (§1282), 10-min exit lost (§1289), x1 had no edge (§1283), fade clone as taker moved +0.2–0.8 < half-spread 0.9–1.4 (§1471) — in skill a
+TAKER pays its fill price (fill_charge = taker), so move − cost must be positive.
+speed/takerstudy.py, $300 books, sim 78500–82000 (≈ 58 sim min), de-drifted moves, our live model at entry (|pred|/thr ≥ 1 = agree):
+181: 440 trades (7.5/sim min) $250k, $600 each; spread at entry 1 tick 135 / 2 39 / 3 45 / ≥4 221; cost +0.47 bp; model agree 320 / weak 119 / against 1; 92% of trades RAISE |inventory|; position hold
+median 1,530 s; move +1.65 / +2.08 / +3.67 bp at 60 / 120 / 300 s; move − cost @120 s +1.60 (agree +1.82, weak +0.97); taker fee −83.8 bp (rebate, not in skill).
+234: 431 trades, $600, cost +0.50, agree 312 / weak 118, 92% entries, hold 736 s, +2.10 @120, net +1.60 (agree +1.82). 51: 224 trades, cost +0.52, agree 160 / weak 64, 96% entries, hold 14 s, net +1.40.
+99: 1,202 trades (20.6/sim min) $1.79M, $2,007 each; cost −0.22 (enters at/inside mid — waits for tight spreads); agree 642 / weak 531 / against 29; 54% entries; hold 205 s; +1.22 @120; net +1.44
+(agree +1.85, weak +1.11, against −0.32).
+→ The successful takers trade OUR signal (≈ 72% at |pred| ≥ thr), small ($600) so the crossing cost is ≈ 0.5 bp vs a ≈ +2 bp de-drifted move, and they HOLD (mostly add, hold minutes) — skill = inventory
+× mid move. The 5DPmdLHb trio runs identical copies with near-identical stats (scales across ≥ 3 copies). Taker skill uses the same skill pool as our makers (adds by capturing new alpha);
+$30 making credit is a separate pool (≈ $6/mo per hourly credit point).
+BUILD PLAN for x4 (H2, 181/234 template): $300 = TAKER ONLY (no $300 maker quotes, so making quality stays clean): take $600 in the lean direction when |pred| ≥ 1.0 × thr, per-book spacing ≈ 1 per
+≈ 17 sim min (7.5/min over 128 books), position cap, hold until the lean flips (study their inventory caps + exits first); $30 = balanced maker, both sides at the touch, $600, inventory skew; 4-dec skipped;
+self-trade guard (our taker must never hit our makers — their opposite side sits 30 ticks out; add an explicit lock); census + test_pace before deploy; new miner x4 only.
+
+## §1589 — 2026-11-17 3:40 PM CT — H2 hybrid BUILT + staged for x4 (agent 2e5726e3); taker position study; watchdog self-trade guard was BROKEN — fixed
+Position study (speed/takerinv.py, $300, sim 76000–82100): 181 965 taker trades on 88 books, max |position| per book median $3,501 (p90 $8,144, max $25k), |position| after a take median $3,000; exits:
+128 by its own takes, 49 by maker fills; gap between takes on a book median 46 s; 96% same side as the previous take on that book. 234: 1,128 on 86 books, max median $4,182 (p90 $10,788), gap 7 s,
+96% same side. 51: 648 on 58 books, $2,982, gap 22 s. 99: 2,727 on 124 books, $4,270, gap 59 s, 56% same side → takers BUILD $600 at a time on one side while the signal lasts, hold ≈ $3–4k.
+Code 2e5726e3 = f13a7947 + (live, all 0 = identical): mk_take300 — $300 vol + calm books TAKER-only: cancel any resting $300 orders; if the model leans (threshold mk_model_lean): an opposite lean sets
+the target flat, a same-side lean adds MK_TAKE_USD (600) every ≥ MK_TAKE_GAP (15) sim s up to MK_TAKE_CAP_USD (4,000); no lean = hold; IOC at the touch for min(gap, $600, touch size), retry ≥ 5 s;
+new exposure blocked when paced out (exits always go); the lock handshake (_lock_ok) makes our makers clear the side first; mk_low_inside (0 = never step inside on $30). equiv.py 0 instruction diffs,
+test_pace ALL PASS. Census (speed/h2census2.py, inherited inventory held as the target): $300 lean books → $600 IOC BUY only (vol 35, calm 18), no-lean books → nothing, no resting $300 orders;
+$30 books → $600 post-only at the touch on both sides (0 ticks behind others' best). (Without holding, the census state's inherited inventory is flattened first — a new miner starts flat.)
+Staged (no running miner touched): agents/QuoteAgent.py = 2e5726e3 (backup .f13a7947); /opt/mvtrx/live_params_NEXT_H2.json = NEXT + mk_take300 1, mk_model_lean 1.0, mk_take_usd 600, cap 4,000,
+gap 15, retry 5, mk_model_lean_30 0, mk_lean30_only 0, mk_low_size 0.012, mk_low_lad_size 0.012, mk_low_inside 0, skip_dec 1; newminer.sh expects 2e5726e3 (backup .bak-1117b); mvtrx-x4 unit
+pace_start 4700, port 8104, lock_dir set (backup mvtrx-x4.service.bak-1117).
+WATCHDOG FIX: overnight.sh's self-trade guard grepped "taking them): N" but selftrade.sh now prints "self-trades (any two of our UIDs, takers […]): N" → the guard could never fire. Pattern fixed (reads
+ST=0 now) and it now stops mvtrx-x4 (the taker) instead of x1 (backup overnight.sh.bak-1117).
+x4 start: `HK=x4 PARAMS=live_params_NEXT_H2.json sh /opt/mvtrx/newminer.sh <uid>`. Judge by: $300 taker alpha (validator-exact) vs 181/234 (+1.4–1.6 bp, ≈ $34–36 per 30 sim min at their size),
+$30 making credit (making067b: quality ≈ 0.5, two-sided ≈ 45–55 per sim h), self-trades 0, coverage ≥ 160.
+
+## §1590 — 2026-11-17 2:50 PM CT — BAND VERDICT (x3 / UID 54): PROVEN on the first hour — total $300 alpha +69%, 85+47 only −9% (identical copy cost −15–20%); (time note: §1588 / §1589 headers ≈ 50 min fast)
+Sim 81500–82218 (12.0 sim min ≈ 1 wall h after warm-up), validator-exact $300: 54 +70.6 (+1.06 bp on $663k, kept 24 = 22+/2− ≥ 20, ELIGIBLE) = 5.9 per sim min; 85 +42.2 (+1.38) = 3.5/min; 47 +39.1 (+1.37)
+= 3.3/min (§1583 before x3: 3.4 / 4.1 → 85+47 7.5 → 6.8, −9%); 252 +33.3. Our total $300 alpha per sim min 12.7 vs 7.5 → +69%. 54 coverage 181, net alpha +87 (building), pay $0 (new); 85 $94 / 47 $104;
+selftrade 0 of 1,711 (three makers).
+VERDICT: PROVEN (single-hour window, keep watching): the 1.0–1.5× band lane adds ≈ 1.6× a lean miner's $300 alpha and costs the two lean miners less than an identical copy would. x3 stays on the band;
+x4 = the H2 hybrid (staged §1589); a later miner could be a second band miner (live_params_NEXT_B1.json).
+
+## §1591 — 2026-11-17 ≈ 3:10 PM CT — FOURTH MINER UID 228 (x4) live on the H2 HYBRID ($300 taker on our lean + $30 balanced maker)
+User registered x4 as UID 228. `HK=x4 PARAMS=live_params_NEXT_H2.json sh newminer.sh 228`: agent 2e5726e3, restart 21:08:52 UTC (sim 82441), port 8104, pace_start 4700; our_uids 85 / 47 / 54 / 228.
+LIVE PARAMS applied (non-defaults shown): mk_take300 0→1, mk_model_lean 1.0, mk_low_size 0.012, mk_low_inside −1→0, skip_dec 1 (take $600 / cap $4,000 / gap 15 / retry 5, $30 lean 0, lean30_only 0 = defaults
+in the file); 0 errors; all four units active (8101 / 8102 / 8104 / 8105); selftrade 0 of 2,263 (four UIDs). Warm-up (no leans → no takes) until ≈ sim 82741.
+First read ≈ 1 h after warm-up: IOC count + $300 taker alpha (skill_cls2) vs 181/234; $30 making (making067b, quality target ≈ 0.5); self-trades 0; coverage ≥ 160; 85/47/54 alpha/min unchanged.
+
+## §1592 — 2026-11-17 ≈ 3:40 PM CT — FLEET DIVE (user: how do the top fleets run 20+ miners?): two recipes — balanced small two-sided $300 makers (5E2fVqiW), and 4-dec TAKERS (5GCSdbyd / 5CAXJT4t / 5H9PQncR)
+speed/fleets2.py (chain + validator gauges, coldkeys ≥ 8 UIDs; fleets hold 62% of the ≈ $55k/mo miner pay): 5F1F2JMu 27 UIDs $6,005 (median $200; mixed skill + makers); 5CAXJT4t 35 $5,490 ($161, ages ≤ 7.2 d,
+31 skill, median net alpha 1,679); 5EA8Kgeh 9 $3,969 ($426, 0.4 d, net alpha 9,249); 5ECLVeLz 11 $3,791 (makers, $379); 5GCSdbyd 17 $3,457 ($204, ages 1.3–13.5 d, all skill, net alpha 4,157); 5E2fVqiW 20 $3,301
+($165, 0.5–2.1 d, all skill, 2,013); 5GVu1hrR 10 $2,949 (makers $295); 5FNTAiDo 10 $2,428 (makers, up to 21.5 d); 5H9PQncR 9 $1,452 (skill, 3,487); 5G9URk3b 12 $1,168.
+Validator-exact per class, 30 sim min (skill_cls2): 5E2fVqiW 1 / 29: $300 +186.9 / +190.5 (+1.83 / +1.74 bp on ≈ $1.05M — ≈ 2× our 85's +97.2), $30 +93.7 / +76.3, no 4-dec. 5GCSdbyd 26 / 33: $300 +44 / +7,
+$30 +36 / +55, 4-dec +251.9 (+17.2 bp) / +39.7. 5CAXJT4t 6 / 12: $300 +49 / +55, $30 +56 / +72, 4-dec +217.3 (+9.5) / +66.7. 5H9PQncR 15 / 24: $300 ≈ 0 / +28, $30 +51 / +19, 4-dec +241.4 (+8.5) / +234.8 (+10.2).
+Roles (speed/fleetrole.py, sim 81000–82700): 5E2fVqiW 1 / 29 / 62 — $300 MAKER both sides (46–48% buys), $470–490 fills, depth inside 43% / touch 42%, ≈ 770 fills per 28 sim min (≈ 1.7× our 85's 447), fleet
+overlap (another member same book + side within 2 s) ≈ 50%; $30 maker at the touch, $810–880, balanced, overlap 85–96%. 5GCSdbyd 26 / 33 / 37 — $300 maker at the touch / 1 behind, $1–1.7k, 64–70% buys;
+$30 maker touch $2k; 4-dec TAKER $900, 32–38% buys. 5CAXJT4t 6 / 12 / 19 — $300 maker touch $1.2–1.5k; $30 maker touch $1.5k; 4-dec TAKER $750–900, fleet overlap 0% (members split the 4-dec moments).
+Ours 85 / 47: $300 maker ONE-SIDED lean step-ins (inside 53%), $30 touch.
+4-dec takers (speed/takerstudy_dec.py, whole-window de-drift, sim 79500–82700): trades WITH the 60 + 300 s momentum net +5.0 / +6.6 / +11.8 / +5.0 / +5.8 bp at 120 s (6 / 12 / 26 / 33 / 15), AGAINST
+−3.9 / −4.5 / −4.6 / −2.3 / −5.3; costs +1.0–2.1 bp (4-tick spreads); 82–95% of trades add to the position; holds 600–2,025 s; $2.3–6.4k trades (6 / 12 / 15), $3.6–4.3k (26 / 33).
+Reading: (1) 20 copies coexist when each quotes BOTH sides with small orders inside + at the touch — more fills per UID at the same bp, overlap tolerated; (2) the 4-dec class (25% of the skill pool) pays the
+big fleets via TAKING that follows momentum selectively (our §1569 raw-momentum lean, de-drifted, was only +0.2–0.7 bp — their entries are far more selective: +6–14 bp at 120 s on their with-momentum
+trades) — a lane we have not built. Next (offline): reverse-engineer the 4-dec taker entry rule (momentum size, fundamental gap, spread, timing) and 5E2fVqiW's two-sided $300 quoting vs our model lean.
+
+## §1593 — 2026-11-17 3:25 PM CT — Brief (four miners): 228 still in warm-up (no takes yet); 54 coverage 187; pay 85 $93 / 47 $103 / 54 $1; self-trades 0
+Release watch: none; no alerts. regcheck 85 / 47 / 54 / 228 REGISTERED; selftrade 0 of 2,430. Pay 85 $93, 47 $103, 54 $1 (first emission), 228 $0, 252 $202. Validator: 85 skill 2.87, net alpha +1,079, coverage 190;
+47 skill 3.79, +1,157, coverage 189; 54 skill 0.48, +141, kept 95, coverage 187; 228 +4, coverage 55 (warm-up, $30 making only so far); making credit 0 on all (228's $30 making needs time to register).
+0 errors on all four; PACE 0 blocked. Sim 82605 (228 warm-up to ≈ 82741) — no IOC takes yet, as expected. First H2 read ≈ 4:40 PM.
+
+## §1594 — 2026-11-17 3:45 PM CT — PRUNE RISK for 85 / 47 (user: pay down $1, not rising): net alpha has plateaued BELOW what clears the prune line; pay is no longer lagging
+speed/prunecheck.py (chain): immunity 7,200 blocks = 24.0 h; 199 non-immune UIDs; lowest non-immune pay $105 (69), then $108, $109, $112 …; NONE below 85 ($93) or 47 ($103). 85's immunity ends in ≈ 2.4 h
+(≈ 5:50 PM), 47's in ≈ 4.5 h (≈ 7:50 PM), 54 ≈ 21.6 h, 228 ≈ 23.6 h. 56 UIDs registered in the last 24 h (≈ one prune per 26 min). Leaving immunity in the next 6 h: 255 ($274 — not ours any more), 34 ($19, in 1.6 h),
+180 ($148), 2 ($180), 163, 58 ($45, in 3.6 h), 226, 245, 20 → only 34 and 58 sit below us and they leave immunity on either side of 85.
+Pay factors (validator 5EWwdZB7 gauges): skill p11 factor 1.0 / 0.998, coverage factor 1.0, pool factor 1.0, presence 1.0, debeta_score 85 0.410 / 47 0.425 vs 252 0.381 / 5E2fVqiW's 29 0.414 — but the
+pay-setting `score` 85 0.0015, 47 0.0017 vs 252 0.0034, 29 0.0029, tracking net alpha (85 1,111 / 47 1,197 vs 252 1,756 / 29 2,032). The other validator 5E7RbxVy is the stale old-sim one (0 for ours).
+→ Pay ≈ $0.085 per unit of net alpha → $105–110 needs ≈ 1,300 net alpha; 85/47 plateaued at ≈ 1,100–1,200 (the 200-sim-min window ≈ 19 wall h at today's sim speed, so nothing done now moves it before
+5:50 PM). Expected: 85 pruned ≈ 6–6:30 PM, 47 ≈ 8–8:30 PM unless lower-paid UIDs leave immunity first. Structural: two lean copies each sit just under the line; the 5E2fVqiW recipe (two-sided small
+$300 quotes) reaches ≈ 2,000 net alpha per UID within 0.5–2 days.
+
+## §1595 — 2026-11-17 ≈ 3:45 PM CT — 5E2fVqiW RECIPE live on UID 85 (user: "Test fleet recipe on 85"; replacements decided after) — two-sided small $300 quotes when there is no lean
+Study (speed/twosided.py, $300 maker fills, sim 80500–82800, de-drifted, our live model at the fill): 5E2fVqiW 1 / 29 — lean-agree 56–62% of $ (inside 26%, $560–625, +1.86…+2.17 / +2.42…+2.74 bp at
+60 / 120 s; touch 25–29%, +1.55 / +1.78…+2.02), NO-LEAN 38–44% of $ (inside 12–16% +1.29…+1.39 / +0.97…+1.30; touch 18–20% +1.28…+1.43 / +1.41…+1.82), AGAINST 0%. Our 85: agree 86% of $
+(inside 46% at $935, +1.10 / +1.46; behind 26%), no-lean 14%, against 0%.
+→ Recipe: pull the side against the lean (we already do), quote BOTH sides small at the touch / inside when there is no lean (+1.0…+1.8 bp for them), small ($500–600) lean-side orders too.
+Code 16708680 = 2e5726e3 + mk_nolean_q (live, 0 = identical): with gate + gate_side, a book with no lean keeps both sides at the touch / inside (fee push exempt, never crossing) at mk_nolean_q × full size.
+First census showed the no-lean quotes 2 ticks behind (fee push) → exempted; re-census (speed/nlcensus.py, live_params_85, bucket $4,700): no-lean vol books ASK −1 ×28 / 0 ×3, BID −1 ×27 / 0 ×6, calm
+0 ×11–12, all ≈ $600; lean books BID −1 step-ins $600, against side pulled to +32…+34. equiv.py 0 instruction diffs; test_pace ALL PASS (earlier build).
+Deploy (85 only; 47 = untouched control with the same lean strategy): agents/QuoteAgent.py = 16708680 (backup .2e5726e3); newminer.sh now expects 16708680; live_params_85: mk_nolean_q 1.0, mk_vol_size
+0.012, mk_calm_size 0.012 (≈ $600), mk_model_lean 1.0 (backup live_params_85.pre-fleet.json); x2 unit pace_start 4700 (backup mvtrx-x2.service.bak-fleet); restart 21:41:51 UTC (sim ≈ 82786); LIVE PARAMS
+applied incl. mk_nolean_q 0→1.0; 0 errors. Warm-up to ≈ sim 83086 (≈ 4:15 PM). Read at ≈ 5:15 PM (85 vs 47 $300 alpha/min, fills, bp per $) — before 85's immunity ends (≈ 5:50 PM). The 4-dec
+taker study and the remaining offline steps are paused for this (user).
+
+## §1596 — 2026-11-17 3:50 PM CT — Why 85/47 stopped at ≈ 1,100–1,200 net alpha (user question) — correction of my 11-16 projection
+Net alpha is a ROLLING sum over the validator's ≈ 200-sim-min window (checked §1586: our 200-min sums match the gauges), so it levels off at ≈ alpha per sim min × 200 once a miner is older than the window.
+85/47 earn ≈ 5–5.5 per sim min ($300 ≈ 3.5–4 + $30 ≈ 1–1.5) → ≈ 1,100–1,200. My 11-16 estimate of a ≈ 5.5-sim-h window (from a rough 252 comparison) made me project continued growth through 11-17 — wrong:
+the windows were full by the morning. Lesson: verify the window length directly before projecting.
+Per-minute gap to 5E2fVqiW (≈ 9 per sim min → ≈ 2,000): we don't quote when there is no lean (14% of our $ vs their 38–44% at +1.0…+1.8 bp), our $1–3.6k step-ins fill partially and wait for the
+budget (447 vs 770 fills), their small lean-side fills earn more per $ (+2.4…+2.7 vs +1.5), and two of our copies cost each other 15–20%. Targets: ≈ 6.5+ per sim min to clear ≈ $105–110; ≈ 9–10 for $150–200.
+
+## §1597 — 2026-11-17 3:55 PM CT — Outlook (user: will the 2 new miners have the same problem? total miners and $/mo)
+Validator-exact since 54's warm-up (sim 81500–82840, 22.3 sim min): 54 $300 +105.8 (+1.07 bp on $991k, 37 kept) + $30 +36.4 = 6.4 per sim min → ≈ 1,275 net alpha ≈ $105–110 (≈ $0.085/unit) — borderline at the
+prune line; immunity ends ≈ 1:10 PM 11-18. 47 same window $300 +97.1 + $30 +36.7 = 6.0/min. 228: 322 IOCs / $165k since start (taking works), but its rows still include the slot's previous owner
+(sim < 82441; e.g. 4-dec −75.2 which we skip) and it left warm-up at ≈ 82741 → no clean read yet; it also earns making credit (separate pool).
+Scenarios (rough): fleet recipe works (≈ 9/min, 5E2fVqiW ≈ $165 per UID × 20) → ≈ 8–15 skill miners ≈ $1.5–2.5k/mo; H2 works (≈ $250–300 per hybrid like 181/234) → +3–4 ≈ +$1k; both ≈ $2–3.5k;
+neither → lean / band sit at ≈ $95–110, 1–2 survive ≈ $100–300/mo. Decision reads: 85 vs 47 ≈ 5:15 PM; 228 first clean read ≈ 5:30–6 PM; if the recipe wins, move 54 and every replacement to it tonight.
+
+## §1598 — 2026-11-17 4:05 PM CT — Post-mortem + SURVIVAL GATE (user: "whats stopping this from happening again?")
+Failures: (1) the lean strategy was called proven on bp per $ / vs 252, never on projected pay vs the prune line; (2) pay was projected from an unverified ≈ 5.5-h window (it is ≈ 200 sim min, §1596);
+(3) the prune line was read from mypay's jumpy "lowest paid > $20" field ($1–$114) instead of the sorted non-immune list (≈ $105 all day); (4) we added miners before one had shown it clears the line.
+GATE (memory feedback-survival-gate, CLAUDE-level rule): before any registration or copy, a LIVE miner on the strategy must show validator-exact α per sim min over ≥ 30 sim min (after warm-up and any
+start burst) → projected steady pay = α/min × 200 × $ per net-alpha unit (field-measured, ≈ $0.085 today) ≥ 1.3 × the real prune line (speed/prunecheck.py; ≈ $140 today). One miner per untested
+strategy; checked by hour ≈ 6 of immunity. Today: 47 ≈ $100 FAIL; 54 band ≈ $105–110 FAIL (borderline; needs the winning recipe before ≈ 1 PM 11-18); 85 (fleet recipe) and 228 (H2) pending reads.
+Briefs now show each miner's projected pay vs the line.
+
+## §1599 — 2026-11-17 4:15 PM CT — Why 252 is paid ≈ 2× us although we match/beat it per minute lately (user question)
+Validator-exact last 60 sim min, all 255 UIDs (skill_cls2): $300 85 +196.4, 47 +199.4, 252 +171.5, 29 (5E2fVqiW) +350.5; $30 85 +110.5, 47 +119.4, 252 +61.4, 29 +170.5 → in the last hour 85 / 47 beat 252.
+But pay follows the ≈ 200-min window: 252 net alpha 1,756 (≈ 8.8 per sim min average; only 3.9 in the last hour) vs ours ≈ 1,110–1,190 (a steady ≈ 5–6) — 252's alpha comes in bursts from BIG positions
+held longer (≈ $2–3.5k for 5–8 min vs our ≈ $0.8–2k for 1–3 min; skill = inventory × move), so the same edge per $ captures more of the large moves over a full window (more variance, higher average).
+Field class totals, last 60 sim min, eligible positive α: $300 39,869 (142 UIDs), $30 22,992 (155), 4-dec 88,128 (90) → with the 50 / 25 / 25 skill split a unit of $300 or $30 α is worth ≈ $0.09–0.10/mo
+(per 200-min unit), a unit of 4-dec α only ≈ $0.02 — the 4-dec fleets' big alpha numbers are worth ≈ ¼ per unit (revises §1592's 4-dec enthusiasm).
+→ The lever to reach 252's level is position × time at our edge (user 11-15: "4× size, 5× holding time"), alongside more fills (fleet recipe test on 85).
+
+## §1600 — 2026-11-17 4:05 PM CT — HOLD-LONGER test live on UID 47 (user: "add the new test to 47. compare the 85 read against its old self instead of against 47")
+Why we exit fast (speed/exitwhy.py, $300, sim 80000–82900): 47's position reductions — 86% by LEAN-AGREE fills (the model flipped and we stepped in on the other side: inside 52%, behind 1–4 22%, touch 12%);
+max |position| per book median $3,821. 252: only ≈ 43% by lean-agree fills, ≈ 57% by no-lean passive fills; max |position| median $7,299 (≈ 2× ours).
+Code e2ce0136 = 16708680 + mk_exit_k (live, 0 = identical): on $300 books a lean that would REDUCE an open position (|pos| ≥ 25% of a full order) only counts when |pred| ≥ MK_EXIT_K × the entry
+threshold; weaker opposite leans → no lean (hold). equiv.py 0 instruction diffs; test_pace ALL PASS. Census (speed/exitcensus.py, live_params_47; 38 BUY-lean books hold a short): exit_k 2.0 → no change
+(the census's seeded signals exceed 2×); exit_k 10 → jumps 40 → 23, the short books rest at +32 instead of stepping in → the hold logic works.
+Deploy (47 only): agents/QuoteAgent.py = e2ce0136 (backup .16708680); newminer.sh expects e2ce0136; live_params_47 mk_exit_k 2.0, max_inv 0.3 (= the unit's start value; was 0.14 live) (backup
+live_params_47.pre-exit.json); restart x1 22:04:11 UTC (sim ≈ 83029), pace_start 4700; LIVE PARAMS applied mk_exit_k 0→2.0; 0 errors. Warm-up to ≈ sim 83330 (≈ 4:35 PM).
+Baselines (own, validator-exact last 60 sim min before the changes, §1599): 47 $300 +199.4 + $30 +119.4 = 5.3 per sim min, max position ≈ $3.8k; 85 $300 +196.4 + $30 +110.5 = 5.1 per sim min.
+Reads: 47 vs its own baseline (α/min, max position, % reductions by lean flips) ≈ 5:35 PM; 85 (fleet recipe) vs its own 5.1/min ≈ 5:15 PM.
+
+## §1601 — 2026-11-17 4:10 PM CT — SAFETY: H2 taking switched off on UID 228 (x4); 32 stale lock files cleared
+
+Health check (user: "anything else you need to check to make sure we arent doing anything wrong?") found:
+- **228 over-trading:** 1,791 taker fills / $797k on all 128 $300 books in 5.6 sim min (sim 82741–83079); IOC FLOW 1,512 → 1,738 IOCs ($876k).
+  The template (181/234/51) does ≈ 7.5 taker trades per sim min (181: $250k in 58 sim min), so 228 ran at ≈ 40× template churn.
+- **Lock handshake side effect:** 32 lock files in /opt/mvtrx/locks, aged up to 756 s. While a lock exists, 85/47/54 pull quotes on that book side,
+  so the H2 taker was silently cutting our makers' presence. This contaminates the 85 fleet-recipe and 47 hold-longer reads from about 22:00 UTC onward.
+- Action: `mk_take300 1→0` on 228 (live knob, no restart, backup live_params_228.pre-stoptake.json). The $30 maker keeps running.
+  Locks were moved to /opt/mvtrx/locks_removed_1117/. Locks stayed at 0 after 60 s.
+- Not yet diagnosed: why H2 churns (suspects: target resets on every lean flip followed by rebuilds; the 15-s add gap filling the $4k cap fast on 128 books; retries; locks kept while the gap persists).
+  Measure this offline before any H2 restart. Do not re-enable as-is.
+- 85/47 reads: mark lock overlap; prefer windows after 22:10 UTC (sim ≈ 83140+) or judge with locked sides excluded.
+
+## §1602 — 2026-11-17 4:25 PM CT — brief (sim ≈ 83283)
+
+- Prune line (prunecheck): lowest non-immune $109. 58 registrations in 24 h ≈ one prune every 25 min.
+  Five immune UIDs paid below $93 leave immunity in the next 6 h (34 $19 at about 5:15 PM; 58, 112, 43, 196 later) and get pruned before us.
+- Pay (mypay): 85 $87 (was $93), 47 $98 (was $103), 54 $5 (ramping), 228 $0.
+- Validator-exact α per sim min, last 30 sim min (81483–83283; mixes old settings, restarts and the lock period on 85/47):
+  - 54: $300 +156.7 (+1.19 bp), $30 +62.4. 7.3/min → $124 projected, 1.14× the line (gate 1.3×: FAIL).
+  - 85: 121.7 in 30 sim min (4.1/min, $69).
+  - 47: 157.4 in 30 sim min (5.2/min, $89).
+- 85 test: only ≈ 2 clean sim min after warm-up and lock clearing (83086–83283: $300 −1.5, $30 0). No read yet.
+- 47 test: still in warm-up until sim ≈ 83330.
+- 228 H2 interim, while taking was on (82755–83271): $300 +93.3 α on $905k (+1.03 bp, kappa 1.81, 16 books kept 15+/1−). That is ≈ 13 α per sim min of taking, ≈ 2.5× our makers.
+  It came at ≈ 40× the template's churn, and the stale locks pulled 85/47/54. INTERIM: the edge per $ looks real; the trade rate and lock handling are broken.
+  Next step: a trade-rate cap plus lock max-age, then re-test.
+- Self-trades 0; locks 0 since 4:10 PM; errors 0 on all units. PACE blocked books: x1 0, x2 1, x3 0, x4 11 (taker volume).
+- Release watcher: no new release; sim reset expected about 9–10 PM CT.
+
+## §1603 — 2026-11-17 4:43 PM CT — H3 taker test live on UID 228 (user: "start the test on 228")
+
+**Why H2 churned (§1601), from the code:**
+- No limit on open books: each of the 128 $300 books built its own $4k position, $600 at a time.
+- No miner-wide trade-rate limit: 15-s add gap and 5-s retries meant about 2 IOCs per book per sim min.
+- A lock was released only when a book's position reached its target. Paced and unfunded paths left locks behind, which kept 85/47/54 quotes pulled.
+
+**Agent 570517c8 (from e2ce0136)** adds new knobs, all off by default:
+- `mk_take_books`: max open-target books.
+- `mk_take_rate`: miner-wide entry IOCs per sim min (token bucket).
+- `mk_take_k`: entries only when |pred| ≥ k × thr.
+- `mk_take_hold`: close after that many seconds with no add.
+
+Locks now span one IOC: they are released after each IOC and on every paced, unfunded or empty-bucket return. If the rest of an order can't be funded, the miner keeps the units it has.
+
+Verification:
+- equiv.py: 0 instruction diffs; tape, ledger and locks identical.
+- test_pace ALL PASS.
+- newminer.sh now expects 570517c8 (backup newminer.sh.bak-h3).
+
+**Census (speed/h3census.py)**: starts flat, BUY lean held on 64 even books, 24 passes × 5 s, every IOC assumed filled, a fake maker of ours acks each lock.
+
+| Arm | IOCs per sim min | Max open books | Locks |
+|---|---|---|---|
+| H2 as run | 232 | 64 | up to 64 |
+| H3 (books 4, rate 8, k 1.5, hold 300) | 6 | 4 | ≤ 4, cleared the next pass |
+
+The 181/234 template makes ≈ 7.5 trades per sim min.
+
+**Interaction check:**
+- $30 maker on 228 unchanged (the knobs apply only to $300 vol/calm).
+- Pacing: entries still pace-checked; exits always go.
+- Locks for 85/47/54: ≤ 4 at a time, each one IOC long.
+- 4-dec skipped.
+- At restart `_t3` is empty, so every inherited $300 position is closed (a one-time flush, exits unthrottled).
+
+**Live:**
+- Restart 22:43:03 UTC, pace_start 4,700. Params: mk_take300 1, usd 600, cap 4000, gap 15, retry 5, books 4, rate 8, k 1.5, hold 300.
+- Flush: 581 IOCs / $298k by 22:49, 695 / $351k by 22:54. Locks 117 → cycling 6–94 → 1 at 22:54.
+- Bug seen: `mk_take_hold` 300 re-zeroed the target that an unfunded close had held at the current units, re-requesting a lock each cycle. Set `mk_take_hold` 0 live at 22:45.
+  Proper fix for the next restart: the unfunded path should also set last_add = now.
+- Read: rows from after the flush (sim ≈ 83570+). Compare trades per sim min (target ≈ 8), $300 taker α per sim min, lock count, and 85/47/54 α against their own pre-test baselines.
+
+## §1604 — 2026-11-17 5:10 PM CT — brief; 85 fleet-recipe test DISPROVEN and reverted; 47 interim
+
+- Prune line (prunecheck): $117. Pay: 85 $88, 47 $99, 54 $5 (ramping), 228 $0.
+  UID 34 ($12) leaves immunity at ≈ 5:20 PM and goes first. After that, 85 (immunity ends ≈ 5:50 PM) is the lowest non-immune, so expect its prune ≈ 6:15–6:40 PM.
+- **85 (x2) fleet recipe (mk_nolean_q 1, $600, lean 1.0)**, sim 83100–83715 (10.25 sim min; includes ≈ 1.7 sim min of lock contamination):
+  - $300 +0.7 α on $411k (+0.02 bp, 0 books kept); $30 +12.1. Total 1.25 α per sim min vs its own baseline of 5.1.
+  - twosided: 69% of $300 fills had no lean, at ≈ −0.1 bp (the fleet earns +1.0–1.8 bp there). 14% filled against the lean, at −0.5 to −2.5 bp (the fleet never does).
+  - Our copy does not reproduce the fleet's no-lean edge. **DISPROVEN.**
+  - Reverted 23:09 UTC to live_params_85.pre-fleet.json + mk_nolean_q 0 (test params saved as live_params_85.fleet-test.json).
+- **47 (x1) hold-longer (mk_exit_k 2, max_inv 0.3)**, sim 83357–83729 (6.2 sim min, includes the 228 flush):
+  - $300 +24.9 on $130k (+1.92 bp, kappa 2.92) on only 46 books; $30 +3.6. Total 4.6/min vs baseline 5.3.
+  - exitwhy: max position per book median $3.2k (baseline max ≈ $3.8k); too few reductions to classify.
+  - Interim: NOISE. Read at ≈ 5:35 PM.
+- **54 (x3)**, last 30 sim min: $300 +158.2 (+1.43 bp), $30 +61.5. 7.3 per sim min → $125, 1.07× the line (gate 1.3×: FAIL).
+- **228 (x4) H3**: model warm-up until sim ≈ 83720; 697 IOCs total (flush). Read ≈ 6:10 PM.
+- Self-trades 0; locks 0; errors 0. Pace blocks: x4 has 7 books blocked (the flush used its bucket), the others 0. No release.
+
+## §1605 — 2026-11-17 5:40 PM CT — why the tests fail (alpha study) + REST-NONE test live on 54 (user: "run the offline test and the live one on 54"; tests pre-approved)
+
+**Alpha study** (speed/alphadecomp(2).py, twosided3.py, nahist.py; window 81300–83080 before the tests):
+- **Pay = net alpha** (de-drifted inventory MTM over every filled book) × p11, for eligible miners. Spread capture doesn't count. Making credit is 0 for 47, 54, 85 and 252 (validator gauges), so the making half pays us nothing.
+- **Validator net alpha:** 85 ≈ 1,050–1,200, 47 ≈ 1,130–1,270, 252 ≈ 1,600–1,770.
+- **Every miner is pace-bound** at ≈ $38k per sim min of $300 volume (the 24-h sim-time cap). Share of book-rounds resting on the GATE: 85 99% (after the fleet test burned its bucket), 54 51%, 47 11%.
+- So the lever is alpha per dollar of budget. Fill move after 120 s:
+
+  | Miner | 120-s move | Volume | Where the volume goes |
+  |---|---|---|---|
+  | 252 | +1.63 bp | $1.13M | big fills ($2–3.5k); even its weak-signal fills earn +1.3 bp |
+  | 47 | +1.54 bp | $0.64M | 89% on lean |
+  | 85 | +0.88 bp | — | 36% in small ~$300 no-lean / against fills at the touch (the gate's rest orders), −0.4 to −1.9 bp |
+  | 54 | +0.88 bp | — | 42% of $ at P < 1 thr: 36% at P 0.5–1 (+0.19 bp), many 30 ticks back |
+
+- **Why the tests fail:** 85's fleet copy added no-lean quoting, which earns ≈ 0 for us, and burned its budget. 47's hold-longer is the most budget-efficient miner, but its read fell in a slow market.
+- 54's inventory is flat (< $1k) 33% of the time, 85's and 47's ≈ 50%, 252's 33%.
+
+**Test: `mk_rest_none 1` on 54** (agent e29ace21 = 570517c8 + the knob):
+- No gated $300 rest orders at all: non-lean sides, no-lean books and low-bucket rests are all removed. The budget goes only to lean step-ins.
+- The same agent also fixes the H3 unfunded path, which now restarts the hold clock.
+- Verification: equiv 0 diffs; tape, ledger and locks identical; test_pace ALL PASS. Census (speed/rncensus.py): arm A rests $360 orders 32 ticks back on vol/calm; arm B places none.
+- **Interaction check:**
+  - Unchanged: lean jump/step-in, part step-in, $30 books (not gated), fee push, no-chase, lock acks.
+  - Coverage of $300 books will drop. Coverage only scales skill_raw, while pay needs skill_raw > 0 and skill_books ≥ the bar. The watch_extra coverage alert for 54 was lowered to 120 (backup .bak-rn).
+  - Inventory now shrinks only through opposite-lean step-ins (longer holds); max_inv still caps it.
+- Restart 23:40:09 UTC (sim ≈ 84070). Warm-up until ≈ 84370. Backup live_params_54.pre-restnone.json. newminer.sh now expects e29ace21.
+- **Baseline** (last 45 sim min, 81361–84061):
+
+  | Miner | $300 | $30 | Total |
+  |---|---|---|---|
+  | 54 | +203.8 (+1.14 bp, $1.79M) | +101.4 | 6.8 α per sim min |
+  | 47 | +163.1 | +85.6 | 5.5 |
+  | 252 | +99.5 | +44.9 | — |
+
+  54's $300 ratio to 47 is 1.25×.
+- **Read** ≈ 1 wall hour after warm-up (≈ 7:10 PM CT):
+  - 54 α per sim min against its own 6.8 and against the 1.25× ratio to 47.
+  - $300 volume, bp, and the GATE rest share.
+  - twosided3 P-bin mix (target: ≥ 80% of $ at P ≥ 1).
+
+## §1606 — 2026-11-17 6:10 PM CT — brief + why rest orders existed (user: "wont only filling with the lean hurt us? why did we need the resting orders in the first place?")
+
+- **History of the rest orders:**
+  - 11-13: soft pacing was the "presence" fix for making credit, when hard pacing had left our books dark.
+  - §1502: deep, small rest orders were kept so books stayed quoted without sweeps draining the budget. Already then, swept rest fills lost ≈ −1 bp (§1511: 43% of $300 $).
+  - Concern at the time: coverage, with skill cut below ≈ 160 filled books.
+- **Now:**
+  - Making credit is 0 for every one of our UIDs, so presence earns nothing.
+  - Skill pay is proportional to net alpha × p11 when skill_raw > 0 and skill_books ≥ the bar (reward.py ≈ 1229). Coverage only scales skill_raw, so it doesn't change pay.
+  - Real remaining risk: $300 KEPT books (hurdle 2.3 bp of notional) must stay ≥ 20. Dropping zero-edge notional should raise per-book bp and so the kept count. Watched every brief.
+- **Brief:**
+  - Prune line $111. Pay: 85 $84, 47 $97, 54 $11 (ramping), 228 $0.
+  - 85 is non-immune and the lowest → prune expected.
+  - 54 is in warm-up (sim 84186 < 84370).
+  - 228 H3: $300 taker $38k on 15 books, +1.14 bp; 781 IOCs, ≈ 8 per sim min after the flush; 1 lock.
+  - 0 errors, self-trades 0, no release.
+- The brief cron was re-created (16f73f15) with the current tests.
+
+## §1607 — 2026-11-17 6:13 PM CT — UID 85 (x2) PRUNED; tape writer moved to x4
+
+- User: "x2 was pushed". regcheck run twice: x2=85 NOT REGISTERED; 47, 54 and 228 REGISTERED. The x2 journal also shows "not registered on netuid 79".
+- mvtrx-x2 stopped and disabled. our_uids.txt is now 47 / 54 / 228 (backup our_uids.txt.bak-85prune).
+- **x2 was the tape writer**, so the tape would have stopped and every read with it.
+  - Added `tape=/opt/mvtrx/live_tape_x3.jsonl` to mvtrx-x4.service (backup mvtrx-x4.service.bak-tape); regcheck x4=228, then daemon-reload and restart at 00:13:17 UTC.
+  - Tape resumed (sim 84441); 0 errors.
+  - overnight.sh simmin() now reads mvtrx-x4 (backup .bak-85prune).
+- Side effect: 228's H3 state was reset by the restart. It closes its ≤ 4 small positions and warms up again (≈ 300 sim s).
+- Outcome of 85: lived ≈ 24.5 h. Pay peaked ≈ $103 and ended $84 under a $105–117 prune line. Strategy NEXT (lean 1.5, rest orders), then a final hour on the DISPROVEN fleet recipe.
+- With 85 gone, 54's band ceiling (mk_model_lean_max 1.5) only avoids 47 now; it is the candidate for the next 54 test.
+
+## §1608 — 2026-11-17 6:47 PM CT — brief: the sim has slowed to ≈ 5 sim s per wall min; reads pushed back
+
+- regcheck: 47, 54 and 228 REGISTERED. Prune line (prunecheck) $113; gate 1.3× = $147.
+- Pay: 47 $98, 54 $11 (ramping), 228 $0.
+- Survival gate, using the last full window (§1605, 45 sim min to 84061):
+
+  | Miner | α per sim min | Projected pay | vs $113 line |
+  |---|---|---|---|
+  | 54 | 6.8 | $116 | 1.03× (FAIL) |
+  | 47 | 5.5 | $94 | FAIL |
+  | 228 | — | — | H3 warm-up |
+
+- **Sim speed:** 84309 at 6:13 PM → 84463 at 6:45 PM, about 5 sim s per wall min (it was ≈ 11). A 1-hour read now holds only ≈ 5 sim min, while the noise floor needs ≈ 11 sim min. Reads take until ≈ 11 sim min after warm-up.
+- **54 rest-none:** 1.5 sim min after warm-up. $300 $39k on 17 books, +0.96 bp. Too short to read. ≈ 11 sim min arrives ≈ 8:40 PM CT, unless the sim reset (≈ 9–10 PM) comes first.
+- **228:** restarted 00:13 UTC as the new tape writer. H3 warm-up until sim ≈ 84740 (≈ 7:40 PM CT). 3 IOCs since start; 4 paced books.
+- The coverage ALERT for x2/85 was raised at 00:08 UTC, before our_uids.txt was updated. watch_extra reads our_uids.txt, so it won't repeat.
+- 0 errors, self-trades 0, locks 0, no release.
+
+## §1609 — 2026-11-17 7:00 PM CT — next 54 test prepared: bigger pacing bucket (pace_burst 900 → 3600)
+
+- **Why:** with rest_none, 54 spends only on lean step-ins. A lean is active ≈ 15–30% of book-time.
+  - The bucket holds at most pace_burst × rate = 900 s × $5.2 ≈ $4.7k. A book that goes quiet longer than ≈ 15 sim min stops saving, so its budget is lost.
+  - pace_burst 3600 (≈ $18.8k) lets quiet books save for their next lean episode.
+- **Cap safety** (test_pace with pace_burst overridden):
+
+  | pace_burst | Every attack PASSES (worst 24-h) | Max |
+  |---|---|---|
+  | 900 | $3k / $10k / two-sided / $50k sweeps | $493k of $500k |
+  | 3600 | worst unchanged; the 24-h backstop binds | $493k |
+  | 7200 | same | $493k |
+
+- Only "no stop-go: idle stays short" FAILS (longest idle 4,388 s at 3600). That check guards making presence, which pays us 0; lean-only books idle without a lean by design. Accepted for the test.
+- pace_burst is a launch flag, so this needs a restart.
+- **Plan:** start right after the rest_none read (≈ 11 sim min after warm-up; ≈ 8:40 PM CT at today's ≈ 5 sim s per wall min).
+  - Arm: rest_none 1 + pace_burst 3600.
+  - Read: $300 volume used (target toward the ≈ $40k per sim min refill) at the same bp; α per sim min against the rest_none-only read.
+- **Then:** lean order size (mk_vol_size / mk_calm_size 0.072 → 0.108) and removing the band ceiling (mk_model_lean_max 0) now that 85 is gone.
+
+## §1610 — 2026-11-17 7:05 PM CT — bigger lean orders STACKED on the rest_none test on 54 (user: "why not run bigger lean orders already?")
+
+- User's reasoning: if rest_none fails both are dropped anyway; if it works, stacking saves hours.
+- **Constraint:** a full step-in needs bucket ≥ full order. The bucket max is ≈ $4.7k (pace_burst 900), so any larger order is cut to the bucket. Largest useful size without a restart: 0.094 ≈ $4.7k.
+- **Live (no restart):** mk_vol_size and mk_calm_size 0.072 → 0.094; max_inv 0.14 → 0.3, so ≈ 2 step-ins aren't blocked by the inventory cap (47 runs 0.3). Backup live_params_54.pre-size094.json. Applied at sim 84595.
+- **Census (speed/szcensus.py; band ceiling off in both arms so step-ins fire):**
+  - Bucket $4.7k: lean step-ins $3.6k → $4.7k, 1 tick inside, in both arms.
+  - Bucket $3.0k: $3.0k in both arms (part step-in).
+  - Same jumps, same books without orders, nothing else changed.
+- **Read** ≈ 11 sim min after 84595, against the §1605 baseline (6.8 α per sim min; $300 1.25× 47). Because the two changes are stacked, a FAIL can't say which part failed.
+  If the combined read is clearly worse, the next step is rest_none alone (size back to 0.072), not dropping both.
+- The pace_burst 3600 test (§1609) follows, with the size raised again to ≈ 0.12–0.14 once the bucket can pay for it.
+
+## §1611 — 2026-11-17 7:18 PM CT — brief: early 54 read positive (rest_none + bigger lean orders)
+
+- regcheck: 47, 54 and 228 REGISTERED. Prune line $117 (gate $152). Pay: 47 $98, 54 $11 (ramping), 228 $0.
+- **54, early read** (6 sim min, 84438–84798; size-up from 84595):
+
+  | | 54 | 47 | 252 |
+  |---|---|---|---|
+  | $300 α | +23.9 | +11.8 | +19.7 |
+  | $300 bp | +1.08 | +1.34 | +0.77 |
+  | $300 notional | $221k on 78 books | $88k | $257k |
+  | $300 books kept | 17 (16+/1−) | — | — |
+  | $30 α | +4.4 (+0.72 bp) | +3.5 | +1.7 |
+
+  - $300 α per sim min: 54 4.0 vs 47 2.0, a ratio of 2.0× (baseline 1.25×). Total 54 4.7 vs 47 2.6 in a slow market.
+  - 54 still spends ≈ $37k per sim min on $300 (≈ the full refill) with no rest orders. GATE: 2,809 step-in / 4,871 rest rounds; rest rounds now place nothing.
+  - Too short for a verdict. The interim lean is positive.
+- 228: 15 IOCs since the 6:13 PM restart; warm-up done ≈ sim 84740. 3 books paced, 0 locks.
+- 0 errors, self-trades 0, no release.
+- Brief cron re-created (d14c6f1c) with the current state.
+
+## §1612 — 2026-11-17 7:33 PM CT — 54 rest_none + size 0.094 = PASS (strong interim, 10 sim min); next: pace_burst 3600 + bigger orders live
+
+- **Read** sim 84637–85237 (10 sim min; the sim sped up again):
+
+  | | 54 | 47 | 252 | 228 |
+  |---|---|---|---|---|
+  | $300 α | +39.5 (+1.21 bp, $326k on 108 books) | +18.8 (+1.84 bp) | +14.8 (+0.40 bp) | +5.9 taker (+2.31 bp, $26k / 8 books, early) |
+  | $300 kept books | 35 (30+/5−), ELIGIBLE | — | — | — |
+  | $30 α | +12.4 (+1.04 bp, 15 kept) | +10.1 | +5.9 | — |
+  | Total α per sim min | 5.2 | 2.9 | 2.1 | — |
+
+  - $300 ratio to 47: 1.25× → 2.1×. Ratio to 252: 2.0× → 2.7×.
+  - Absolute α is below the 6.8 baseline because the whole market was slow (47 fell 5.5 → 2.9, i.e. 53%). Normalised, 54 ≈ 9.8 α per sim min.
+  - **Verdict: PASS** (strong interim). Pay 54 $20 (ramping), 47 $97, 228 $1. Prune line $113.
+- **Next test** (pre-approved, started at once): restart 01:32:11 UTC (sim ≈ 85301) with `pace_burst=3600` in mvtrx-x3.service (backup mvtrx-x3.service.bak-burst; cap-safe per §1609). Params backup live_params_54.pre-burst.json.
+  - mk_calm_size 0.12 (≈ $6k).
+  - mk_vol_size: 0.12 was REJECTED (bound 0.1), leaving vol at the unit default 0.034 for ≈ 1 min. Set 0.1 (≈ $5k) live at 01:33.
+  - Kept: max_inv 0.3, rest_none 1, band 1.0–1.5.
+- **Census (bcensus.py, bucket $18.8k):** calm step-ins $4.7k → $6.0k. Vol buys were cut to $1.7k by cash fit on the census account's long books; that is natural max_inv-like behaviour, and flat books get the full order.
+- Restart start burst: every book starts with a full $18.8k bucket. Cap-safe via the 24-h backstop, but the first sim minutes after warm-up are front-loaded.
+- **Read:** ≥ 11 sim min after warm-up (≈ sim 85600). Compare $300 volume used and α per sim min against the ratio to 47/252 (54 now 2.1× 47 and 2.7× 252 on $300).
+
+## §1613 — 2026-11-17 7:45 PM CT — path to $200 per miner; $30 size-up stacked on 54 (user: "165 is better but still not at 200, how can we get it higher?")
+
+- **Target:** $200 per month ≈ 11.8 α per sim min (200 sim min × $0.085). 54 runs ≈ 9.8 market-normalised (§1612).
+- **Levers, ranked:**
+  1. $30 size: $30 books used ≈ $157 of the $312 per-book refill per sim min (≈ 50%), at +1–2 bp, and give ≈ 2.3 of 6.8 α.
+  2. $300 bucket + size (running, §1612).
+  3. Band ceiling off (the P ≥ 1.5 fills are the best, +1.77 bp; free once 47 is gone).
+  4. mk_exit_k hold-longer on 54.
+  5. Model retrain on recent data.
+- **Live now:** mk_low_size and mk_low_lad_size 0.033 → 0.066 on 54 at sim ≈ 85436. Backup live_params_54.pre-low066.json; bounds 0.1.
+- **Census (speed/lowcensus.py):** $30 orders $1.65k → $3.3k, same ticks (lean side 1–3 back, no-lean 3 back), same books without orders.
+- **Interaction:** the $30 books are outside the $300 gate and rest_none, and use their own soft pacing bucket. lean30_only and lean30_back are unchanged. max_inv 0.3 caps inventory.
+- **Read:** the $30 class line in skill_cls2 ($30 α per sim min and bp vs before; $30 ratio to 47 was ≈ 1.2×) is separable from the $300 bucket test, which is read on the $300 class.
+
+## §1614 — 2026-11-17 7:50 PM CT — band ceiling stays (user)
+
+- User: keep mk_model_lean_max 1.5 on 54. Scaling needs signal lanes, so tests are read with the ceiling ON and survival-gate numbers are lane-limited. Lever #3 of §1613 is dropped unless scaling turns out not to need lanes.
+- **Scaling note:** the ≥ 1.5× lane (the best fills, +1.77 bp) is the natural recipe for the NEXT miner, with the same rest_none + size recipe. 54 (1.0–1.5) and a ≥ 1.5 miner don't share signals, so the collision cost should be small. Verify with a before/after on 54 when that miner starts.
+
+## §1615 — 2026-11-17 8:00 PM CT — plan (user): if 228's H3 reads negative, move x4 to the 54 recipe in the ≥ 1.5× lane
+
+- User: "after x4s test, if its negative lets put it on this new strategy but with a different ceiling".
+  This is the user's explicit call; the survival gate (§1598) is about registering and copying, and here an existing miner switches strategy.
+- **Prepared** /opt/mvtrx/live_params_NEXT_L2.json = live_params_54.json with mk_model_lean 1.5, mk_model_lean_max 0 (no ceiling) and mk_take300 0.
+  Kept from 54: rest_none 1, vol 0.1, calm 0.12, $30 0.066, max_inv 0.3, skip_dec 1.
+- **Census (speed/l2census.py)** on a strong seeded lean (≥ 1.5×): x4 lane places full $4.7k lean step-ins 1 tick inside on all 27 vol + 13 calm leaning books; 54 places none (band). The lanes don't overlap.
+- **Switch steps:** regcheck x4=228; agent e29ace21 (has mk_rest_none); copy NEXT_L2 → live_params_228.json; add pace_burst=3600 to the unit only if 54's burst read keeps it; restart (tape= stays on x4).
+  Then measure 54's α before/after for the collision cost. 47 also leans at ≥ 1.5 until it is pruned, so expect some overlap with 47 until then.
+- **Decision time:** the H3 read ≈ 8:45 PM CT (228 warm-up ended ≈ sim 84740). Negative = $300 taker α ≤ 0, or clearly below 54's $300 α per $.
+
+## §1616 — 2026-11-17 8:20 PM CT — brief: 54 in its restart burst; H3 positive but far too small; 47 is now the lowest non-immune
+
+- regcheck: 47, 54 and 228 REGISTERED. Prune order: **47 ($92) is first**. Pay: 47 $93, 54 $25 (ramping), 228 $0.
+- **54** (3 sim min after warm-up, 85663–85843; front-loaded by the restart's full $18.8k buckets):
+  - $300 +57.9 on $534k (+1.08 bp, 15+/0 kept); $30 +2.0 (+0.41 bp).
+  - GATE 6,979 step-in / 701 rest rounds (buckets full).
+  - No read yet. The burst inflates volume, so the read starts ≈ 85900+.
+- **228 H3** (18 sim min, 84780–85860):
+  - $300 taker +4.8 on $54k (+0.88 bp, 3 kept); $30 maker +10.5 on $372k (+0.28 bp). Total 0.85 α per sim min → ≈ $14/mo projected.
+  - 119 IOCs total (≈ 6–7 per sim min after the flush); locks 0.
+  - Same window, 54: $300 +125.3 (+1.07 bp, 24 kept, ELIGIBLE), $30 +25.5 (+1.35 bp). 8.4 α per sim min.
+  - **H3 is not negative per $ (0.88 vs 1.07 bp), but structurally tiny.** At ≈ $3k taker per sim min it would need ≈ 40× the volume to matter, and its $30 maker leg earns a quarter of 54's per $.
+- Self-trades 0, locks 0, errors 0, PACE 0 blocked, no release.
+
+## §1617 — 2026-11-17 8:33 PM CT — x4 (228) switched from H3 to the 54 recipe in the ≥ 1.5× lane (user: "go ahead and switch x4 over now")
+
+- regcheck x4=228 REGISTERED. Agent e29ace21. live_params_228.json = NEXT_L2 (backup live_params_228.pre-L2.json):
+  - lean 1.5, no ceiling, rest_none 1.
+  - vol 0.1, calm 0.12, $30 0.066 (all accepted; no "out of range"). max_inv 0.3; take300 0.
+- **pace_burst kept at 900** (no unit flag). Only the PROVEN part of 54's recipe; the bucket caps step-ins at ≈ $4.7k, as in 54's §1612 pass; no restart burst. Add 3600 later if 54's burst read passes.
+- Restart 02:33:10 UTC (sim ≈ 85967); tape= stays on x4, tape fresh at 85971; 0 errors. Warm-up until ≈ sim 86270.
+- **Collision check:** 54's $300 and $30 α per sim min (ratio to 252) before 85967 vs after 86270.
+  The census (§1615) says the lanes don't share signals; 47 also leans ≥ 1.5 until it is pruned.
+- **x4 read** ≈ 11 sim min after warm-up: α per sim min ($300 + $30), bp, kept ≥ 20, vs 54 and 252.
+- H3 summary (§1616): +0.88 bp per $ on the taker leg but ≈ $3k per sim min. Code kept (570517c8 knobs) for a later, higher-volume taker idea.
+
+## §1618 — 2026-11-17 8:45 PM CT — UID 47 (x1) PRUNED
+
+- User: "x1 was pushed". regcheck run twice: x1=47 NOT REGISTERED; 54 and 228 REGISTERED.
+- mvtrx-x1 stopped and disabled. our_uids.txt is now 54 / 228 (backup our_uids.txt.bak-47prune). x1 did not write the tape.
+- Watcher grep: autorefit.sh / fix_trim.sh / go_skill.sh restart mvtrx-x1, but none is scheduled (mvtrx-autorefit.timer disabled, service static and inactive; no crontab entries). Left as is.
+- 47 lived ≈ 23.5 h; pay ≈ $93–103, ending below a $112–117 line.
+  Its last test (hold-longer, mk_exit_k 2) was NOISE+ and the most budget-efficient of the old recipe (89% of $ on lean).
+- **Now:** two miners on two lanes of the passed recipe — 54 (1.0–1.5×) and 228 (≥ 1.5×). With 47 gone, the collision check for 228's lane is clean (no other lane-2 maker of ours).
+- Comparisons now use 252 only (the 47 ratio has ended).
+
+## §1619 — 2026-11-17 8:50 PM CT — brief: 54's big buckets still draining (read moved); 228 in warm-up
+
+- regcheck: 54 and 228 REGISTERED. Prune line $112. Pay: 54 $24 (ramping), 228 $0.
+- **54** (4 sim min, 85932–86172):
+  - $300 +43.6 on $495k (+0.88 bp, 12+/1− kept). ≈ $124k per sim min = ≈ 3× the refill: the $18.8k buckets are still draining.
+  - $30 +2.0 on $76k (+0.26 bp vs +1.35 before the size-up; 4 min, noisy). Watch it.
+  - **Read timing:** at ≈ $970 per book per sim min against a $312 refill, the buckets drain in ≈ 25–30 sim min.
+    A fair bucket read must cover a full cycle (≥ 40 sim min from 85900) or compare after the drain. Earlier reads would be inflated by the saved budget.
+- **228:** still in warm-up (until ≈ 86270); 1 $300 fill.
+- Self-trades 0, locks 0, errors 0, PACE 0 blocked, no release.
+
+## §1620 — 2026-11-17 9:30 PM CT — SIM RESET handled; old-day final reads; $30 size-up DISPROVEN and reverted
+
+- **Sim reset** ≈ 9:05 PM CT (old day ended at sim 86400; the new day's tape starts at sim 600).
+  - Both miners logged CLOCK RESET, shifted pace ledgers (−85.8k s), and received new-day states.
+  - 256 books on the tape; no release (release_watch unchanged).
+  - The new-day model edge can't be measured yet (leanfreq3 needs 300 s of history + a 120-s horizon). Check next brief.
+- **Tape split** so that tools taking tmax read the right day: the whole file was copied to live_tape_x3.day1117.jsonl, truncated in place (O_APPEND writer on x4), and the new-day lines (from offset 1,932,598,478) appended back. Logged in tape_rotate.log.
+  - **Lesson:** after every sim reset, split the tape (otherwise skill_cls2 "last N min" windows read the old day).
+- **Old-day final** (archive, 85902–86400, 8.3 sim min; 54 still in its bucket drain):
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +115.0 on $945k (+1.22 bp, 22+/1− kept, ELIGIBLE) | +45.4 on $229k (+1.98 bp, 28+/1−, ELIGIBLE) | +11.3 (+0.48 bp) |
+  | $300 notes | $114k per sim min (drain-inflated) | ≈ 2 sim min after warm-up | — |
+  | $30 α | +5.0 (+0.34 bp) | +2.7 (+0.45 bp) | +3.5 (+0.84 bp) |
+
+  - 228's P-mix: 41% of $ at P ≥ 1.5 (+1.91 bp at 120 s), 50% at 1–1.5 (+1.49).
+  - 54's P-mix: 67% of $ at P ≥ 1 (+1.41 / +1.89).
+- **$30 size 0.066: DISPROVEN** (two reads: +0.26 and +0.34 bp vs +1.35 before). $30 α ratio to 252 fell 2.1× → 1.4× while volume rose ≈ 65%: bigger $30 orders get worse fills.
+  Reverted to 0.033 on 54 and 228 (backups live_params_*.pre-low033.json).
+- **54 bucket test (pace_burst 3600 + vol 0.1 / calm 0.12):** still not readable; the drain continues into the new day. Read over a full cycle on the new-day tape.
+
+## §1621 — 2026-11-17 9:55 PM CT — BUG: after the sim reset the model leans never fired → no $300 orders on 54/228; fixed (agent d8f4bf42), both restarted
+
+- **Symptom:** after the reset (03:24 UTC) the new-day tape had 0 $300 orders from x4 and 0 fills for 54/228 after sim ≈ 700, while 252 traded normally and the model was active 53% of the time (+3.46 bp de-drifted, leanfreq3 900–906).
+  No GATE log lines at all.
+- **Cause:** the CLOCK RESET handler clears _mids/_sflow/_oflow/_mid_hist/_pending/_mk_mid/_bbo, but NOT `_mh` / `_fh2` (the model-lean mid and fundamental histories, added 11-15).
+  Their old-day entries (t ≈ 86,000) are never trimmed (trim = older than now − 305), so `_at()` sees history that "starts in the future" and returns None. No lean for the whole day; lean-only + rest_none means no $300 quoting at all.
+- **Fix:** agent d8f4bf42 = e29ace21 + "_mh", "_fh2" in the reset's clear list. equiv 0 diffs (tape, ledger, locks identical); test_pace ALL PASS. newminer.sh now expects d8f4bf42 (backup .bak-reset).
+- regcheck, then restart x3 03:55:11 and x4 03:55:14 UTC; 0 errors, 0 out-of-range; tape fresh. Warm-up ≈ 300 sim s.
+- **Damage:** ≈ 50 wall min (≈ 400 sim s) of no $300 trading tonight. This was the FIRST sim reset since the model lean existed (a sim day ≈ 6 wall days at today's speed), so 85/47 were never affected.
+- **Lesson:** the brief must check that each miner has $300 fills in the last few sim minutes (a zero-fill miner is an ALERT, not a quiet line). Added to the brief prompt.
+- 54's bucket test restarts its cycle (full buckets again); read on the new day.
+
+## §1622 — 2026-11-17 10:20 PM CT — brief: waiting for warm-up after the fix; the old watcher's no-fill ALERT matched the bug
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $28, 228 $0. Lowest non-immune: 43 at $15, so neither of ours is near the line (both immune until ≈ 1:10 PM / 3:10 PM 11-18).
+- The sim slowed again: 1232 → 1356 in 16 wall min (≈ 8 sim s per wall min). The fixed agents' leans start at sim ≈ 1360, so no fills are expected before then.
+- watch_extra's "x4 UID 228: no fills for 58 wall min" ALERT (04:15 UTC) matched the §1621 bug.
+- Self-trades 0, locks 0, errors 0. No release (last line = the 03:24 UTC sim reset, layout 0 mismatches).
+- The brief cron was re-created (b9f48fef). It now leads with a per-miner $300 fill check.
+
+## §1623 — 2026-11-17 10:45 PM CT — outlook + first collision measurement between the two lanes (user Q)
+
+- **Tool:** speed/overlap.py = share of a uid's $300 maker $ with a same-book, same-side fill by the other uid within ±W s.
+
+  | Pair | Window | 30-s overlap | Notes |
+  |---|---|---|---|
+  | 54 ↔ 228 | old day 86270–86400 | 32% / 22% of $ | — |
+  | 54 ↔ 228 | new day 1360–now | 33% / 34% of $ | 10-s window: 16% / 20% |
+  | 54 ↔ 252 (unrelated miner) | new day | 13.5% | baseline |
+  | 228 ↔ 252 (unrelated miner) | new day | 6.5% | baseline |
+  | 85 ↔ 47 (identical recipe) | old day | 33% / 66% | reference |
+
+- **Reading:** the lanes overlap ≈ 2.5–5× the chance level, but less than identical miners. The threshold lanes are adjacent in time: a move that takes P through 1.0–1.5 into ≥ 1.5 fills 54 first and 228 seconds later, on the same book and side.
+- Overlap ≠ loss: one sweep can fill both. The cost is how much fill each loses, which needs a clean before/after.
+  Today's data are confounded (54's bucket test, the reset, restarts). Measure 54's α per $ and volume ratio to 252 over full windows with 228 on, against §1612 (alone).
+- **Outlook (rough):**
+  - 54 alone ≈ $165/mo market-normalised (§1612).
+  - 228's lane (≥ 1.5) has fewer lean episodes (≈ ½ of the 1.0 band's active time) at a better bp (+1.3–2.0). Expect ≈ 60–80% of 54 → ≈ $100–130/mo, minus collision.
+  - Two lanes ≈ $250–300/mo before the remaining levers (bucket, hold-longer, model retrain).
+  - Scaling with more threshold lanes makes bands narrower and overlap higher. For more miners, better separation is needed (a different signal or horizon per miner); to be studied.
+
+## §1624 — 2026-11-17 10:41 PM CT — 228 switched to EXACTLY 54's settings: identical-copy collision test on the new recipe (user: "move 228 to 54s setup and see how they clash")
+
+- **Why re-test:** the old-recipe collision was −15–20% per miner (§1568), with the band lane at −9% (§1590). The new recipe is lean-only (rest_none), so two copies compete for exactly the same lean moments, and the cost may be larger.
+- regcheck x4=228. live_params_228.json = live_params_54.json (verified identical; backup live_params_228.pre-same.json).
+- Unit: pace_burst=3600 added (backup mvtrx-x4.service.bak-same). The launch params now differ from x3 only by tape=.
+- Restart 04:40:32 UTC at sim ≈ 1589; 0 errors, 0 out of range; tape fresh. Warm-up until ≈ sim 1890. 228 starts with full $18.8k buckets; 54 has been draining since 1060.
+- **Read** (≥ 11 sim min after 1890; then again after 228's drain):
+  1. speed/overlap.py 54 vs 228 (lanes: 33% at 30 s; baseline vs 252: 6.5–13.5%).
+  2. 54's $300 α per $ and volume as a ratio to 252: identical-copy period vs lanes period (1360–1589) and vs alone (§1612).
+  3. Combined 54 + 228 $300 α per sim min vs 54 alone.
+- **Decision rule:** if the identical pair earns more in total than the lanes AND each miner stays ≥ the survival mark, copies are the scaling path; otherwise lanes (or different signals).
+
+## §1625 — 2026-11-17 10:47 PM CT — target restated (user): $200/month per miner; the survival gate is only a floor
+
+- User: "i dont want to make the survival mark the target. the target is 200/m".
+- **§1624 decision rule changes to:** copies vs lanes is decided by which setup moves each miner closer to $200 (≈ 11.8 α per sim min) and gives the higher total. Clearing 1.3× the prune line is not a pass.
+- The survival gate stays only as the minimum before any registration.
+
+## §1626 — 2026-11-17 11:15 PM CT — test plan over survival (user): copy test runs its full cycle, then lanes for the same length
+
+- User: survival matters less than data. Switch 228 back only if that is better for testing; finding a strategy and learning how it performs alongside exact copies and slight variations is the priority.
+- **Decision:** do NOT switch at 12:30 AM. Reason: 228's first ≈ 30 sim min are a pace_burst-3600 drain (spending at ≈ 3× the refill), so an early read measures the burst, not the steady collision.
+- **Plan:**
+  1. Identical copies (54 + 228, same band) until ≈ 40 sim min after warm-up (sim 1890 → ≈ 4300; ≈ 3:30 AM CT at ≈ 8 sim s per wall min).
+     Read: overlap.py, 54's $300 α per $ and volume ratio to 252, and the pair total. Use the post-drain part as the main window.
+  2. Then 228 → ≥ 1.5× lane (live_params_NEXT_L2.json, keeping pace_burst 3600 so both setups match apart from the lane) for the same length.
+  3. Morning: copies vs lanes, judged on per-miner progress toward $200 and the pair total.
+- 228 may be pruned ≈ 3:10 PM (skill 0 until the H3 flush leaves the 180-sim-min window, ≈ sim 7970). Accepted.
+
+## §1627 — 2026-11-17 11:25 PM CT — phase 3 + overnight model refit queued (user away from the laptop after 7:30 AM; laptop stays open)
+
+- **PHASE 3** (after the phase-2 lane read, ≈ 7:30 AM → ≈ 1 PM CT): mk_exit_k 2.0 on 54 (live knob, bounds 0–10; agent d8f4bf42 has it).
+  - A signal against an open position must be 2× stronger before 54 trades out of it, so holds get longer. Lever toward $200: exposure × edge; fills keep paying 5–10 min.
+  - Old recipe on 47: NOISE+ (§1600 census covered the inventory-against-lean path; today's census on a flat seeded state can't exercise it).
+  - 228 stays on whichever phase 1/2 setup did better and serves as the second miner.
+  - Read: 54's α per sim min and $300 α per $ as a ratio to 252, vs the phase-2 window; exposure via speed/alphadecomp2.py.
+- **Model refit** (offline, running, PID 1636388): speed/modelfit7.py on live_tape_x3.day1117.jsonl sim 60000–86400. Same 7 features. Output goes to speed/model_lean.json (NOT live) plus speed/modelfit_1118.log.
+  - The live model is backed up as agents/model_lean.live-1117.json. It was trained on only sim 45139–49219 (11-15, 68 sim min), thr 0.704.
+  - Compare on held-out data (the last 30% plus the new day). Deploy as a morning test ONLY if clearly better (de-drifted top-30% move and corr). Swapping the model file needs a restart.
+
+## §1628 — 2026-11-17 11:50 PM CT — where 252's no-lean edge comes from: fast fundamental moves (dF10); model refits running
+
+- **speed/edgesrc.py** (old day, sim 78000–86000): for $300 maker fills where OUR model has no lean (|P| < 1 thr), which candidate signal agrees with the fill side, and the 120-s de-drifted move.
+  - **252** ($2.9M, 1,225 fills, +0.9–1.4 bp overall): agrees with dF10 (10-s fundamental change) on **92%** of $, dF30 80%; fade 36%, imbalance 44%, sw60 41%, gap 49%.
+    Agree +1.17 bp vs disagree +0.84 bp (dF10).
+  - **54:** dF10 agreement 50% (chance); fade 74% (it fills against recent moves); no-lean fills ≈ ±0.3 bp.
+  - **Reading:** 252 keeps its quotes on the side the fundamental just moved, so it gets filled by traders going against the fundamental (uninformed flow). As a pure predictor, dF10 is weak (held-out top-30% +0.43/+0.57 bp at 60/120 s).
+    So the value is in WHO fills you, not in a forecast.
+  - Earlier fund_mv tests (§1425 "alone: no skill change") were on the old recipe and moved fair value only.
+- **Model refit 7 features** (old day 60000–86400, train 70% / test 30%): H120 test corr +0.341, top-30% +1.60 bp; 4 test windows corr 0.31–0.39, +1.48–1.76 bp. Saved speed/model_lean.json (not live).
+- **Running:** speed/modelfit8.py adds dF10 as an 8th feature and scores the LIVE model (11-15 fit) and REFIT7 on the same held-out set → speed/modelfit8_1118.log; 8-feature model → speed/model_lean8.json.
+  The agent needs a small change to read "dF10" if the 8-feature model wins.
+- **Scaling idea:** a third lane keyed on fast fundamental moves (dF10 side, lean-only) would overlap less with the model lanes. Needs a live test on a free miner.
+
+## §1629 — 2026-11-18 12:15 AM CT — model refit = NO GAIN (the live model is as good as any refit); dF10 adds nothing as a predictor
+
+- speed/modelfit8.py, same held-out set (old day, last 30% of 60000–86400):
+
+  | Model | H120 test corr | H120 top-30% move | H60 corr | H60 top-30% move |
+  |---|---|---|---|---|
+  | LIVE (11-15 fit) | +0.345 | +1.58 bp | +0.327 | +1.19 bp |
+  | REFIT7 | +0.341 | +1.60 bp | +0.329 | +1.22 bp |
+  | MODEL8 (+dF10, weight +0.06) | +0.342 | +1.60 bp | +0.329 | +1.22 bp |
+
+- **Verdict: DISPROVEN as a lever.** The 11-15 model generalises fully to the next day; neither retraining nor dF10 helps. Model retrain is removed from the path to $200, and the live model stays.
+- 252's dF10 effect (§1628) is about counterparty selection (who fills you), not forecasting. It can only be tested live: a lean-only lane keyed on the dF10 side, or dF10 as a tie-breaker for which side to quote when the model has no lean. Queue it for the next free miner after phase 3.
+
+## §1630 — 2026-11-18 12:40 AM CT — scaling ceiling study (user: "each lane can only house 2–3 miners … can't create enough lanes at 200/m?")
+
+- **Pool size** (speed/poolsize.py, chain emission × price): total miner pay ≈ $56,750/mo over 248 paid UIDs.
+  - Median $185; p75 $279; 111 UIDs > $200; top $1,050.
+  - Split ≈ $28k making / $28k skill. Skill by class 50/25/25 → $300 ≈ $14.2k, $30 ≈ $7.1k, 4-dec ≈ $7.1k.
+  - We earn only skill on $300 + $30 → our addressable pool ≈ $21.3k/mo (making share = 0 for all of ours).
+- **Fleet evidence** (fleets.json × gauges × pay):
+
+  | Fleet | UIDs | Earns from | Median net α | Total pay | Per UID |
+  |---|---|---|---|---|---|
+  | **5E2fVqiW** | 20 | skill only, making 0 — same kind as ours | 1,627 | $3,290/mo | $154–174, median $165 |
+  | 5CAXJT4t | 35 | — | — | $5,794 | median $178 |
+  | 5GCSdbyd | 17 | — | — | $4,328 | median $265 |
+  | 5F1F2JMu | 27 | 26 making + 16 skill | — | $5,396 | median $153 |
+
+  - 5E2fVqiW: 20 near-identical $300 makers on the same books; the copies do NOT deplete each other's alpha to nothing.
+- **Conclusions:**
+  1. Lanes are not the only way to scale: 20 identical skill makers each hold ≈ 1,600 net α (≈ $165). Per-miner alpha is limited mostly by each UID's own volume cap, and the uninformed flow is large next to one UID's cap.
+     Our own copy cost (−15–20% for 2, §1568; re-measured tonight) is the number to watch: if the loss stops growing with more copies (as the fleet shows), copies scale.
+  2. **Dilution:** pay is a share of a fixed pool. If 54 reaches ≈ 2,000 net α (≈ $0.10/unit today), 20 copies add ≈ 40k units to the ≈ 210k-unit $300+$30 pool → ≈ −16% per unit (≈ $170 each). 40 copies → ≈ −27% (≈ $145 each).
+     So 20 × $200 ($4k ≈ 19% of the pool) is hard but in the range the top fleets reach ($3.3k–5.8k); 40 × $200 ($8k ≈ 38% of our pool) is not realistic from skill alone.
+  3. $10k+/mo needs more than one pool: the making half ($28k, where 5F1F2JMu, 5ECLVeLz, 5GVu1hrR and 5FNTAiDo earn) and/or 4-dec ($7k), on separate miners. Skill-only copies plausibly cap around $3–4k/mo for us.
+- **Next research:** after tonight's copy test, project copies-vs-lanes with dilution; study what makes 5E2fVqiW's no-lean fills profitable (dF10 counterparty effect, §1628); revisit a making-credit miner design for the $28k half.
+
+## §1631 — 2026-11-18 12:55 AM CT — do copies divide alpha? 5E2fVqiW history + our own 2-copy data (user Q)
+
+- **Hypothesis (user):** maybe one miner would earn ≈ 20× what each of the fleet's 20 copies earns (alpha simply divided).
+- **speed/fleethist.py, 5E2fVqiW, 10 days at 6-h steps** (validator net alpha of its current UIDs):
+  - If alpha were divided, the fleet TOTAL would stay roughly constant and the per-UID median would fall as more copies trade.
+  - Observed: the total moves with the number of active copies, 1.8k (6 UIDs, 11-11) → 41k (20 UIDs, 11-17). The median is HIGHEST with all 20 active (1,600–2,055 on 11-17).
+    With 6–9 active it was 209–819. So more copies coincided with more total and NOT lower per-copy alpha.
+  - Caveat: the active count isn't controlled (bad market regimes also turn copies negative), so this is correlation, not proof.
+- **Our direct test (controlled):** 85 alone → 85 + 47 identical gave ≈ 1.7× one miner's alpha (§1568: −15–20% per miner), not 1× as a pure division would.
+- **Mechanism:** each UID has its own per-book volume cap, so 20 copies have 20× the budget. Fills come from a large uninformed flow, so copies mostly add fills rather than split a fixed set.
+  The cost is partial overlap (we measure it tonight), not a 1/N split.
+- **Proof plan:** tonight's copy test (2 copies on the new recipe), then measure the incremental α of each added copy when we scale (copy 3, 4, …); stop adding when the increment gets small.
+
+## §1632 — 2026-11-18 1:00 AM CT — scaling plan approved, conditional (user)
+
+- User: start the scaling plan (add copies one at a time, measure each copy's incremental α, stop when the increment gets small; §1631) TOMORROW, PROVIDED the overnight results push one of our miners toward $200/mo.
+- **Condition check (morning):** a miner's validator-exact α per sim min over a clean full window (post-drain) projects ≥ ≈ 11.8 α/min ($200), or is clearly trending there. Read it from phases 1–3.
+  If met, ask the user to register the first added copy (spending: user runs btcli). If not, keep testing levers.
+
+## §1633 — 2026-11-18 12:25 AM CT — brief: copy test interim (228 still in its bucket drain)
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $46 (rising), 228 $0.
+- Validator net α: 54 967 (skill 0.91), 228 421 (skill 0.00 — the H3 flush is still in its window), 252 1,788.
+- **Copy phase, sim 1945–2725 (13 sim min; 228 drain-inflated):**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +97.2 on $671k (+1.45 bp, 46+/4− kept) | +221.5 on $2.0M (+1.11 bp, 23+/3−) | +71.4 (+1.35 bp) |
+  | $30 α | +14.7 (+1.02 bp) | +14.7 (+0.97 bp) | +3.5 |
+
+  - 54's $300 ratio to 252 = 1.36× (alone, old day §1612: 2.7×). 252 had a strong window, so wait for the post-drain part.
+  - overlap.py: 70% of 54's $ shares a same-book/side fill with 228 within 30 s (lanes: 33%; chance 13.5%); 33% of 228's $.
+  - 54 ≈ 8.6 α per sim min ($300 7.5 + $30 1.1) → ≈ $146/mo projected vs the $200 target.
+- 228's drain ends ≈ sim 3700; the phase-1 main read runs ≈ 3700–4300. Self-trades 0, locks 0, errors 0, no release.
+
+## §1634 — 2026-11-18 1:30 AM CT — scaling cost accepted (user)
+
+- User: if one miner reaches ≈ $200/mo, scaling to ≈ 20 with each copy dropping to ≈ $165 is fine; that is the accepted cost of scaling.
+- Scaling go condition (§1632) unchanged: one miner at ≈ $200 (≈ 11.8 α per sim min on a clean window).
+- **Stop rule for adding copies:** stop when an added copy's incremental α pushes per-copy pay meaningfully below ≈ $165, or the fleet total stops rising.
+
+## §1635 — 2026-11-18 12:55 AM CT — brief: copy test continuing
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $70 (rising fast), 228 $4. Validator net α: 54 999 (skill 0.91), 228 495 (skill 0), 252 1,750.
+- **Last 6 sim min (2685–3045):**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +19.1 on $216k (+0.89 bp) | +33.1 on $347k (+0.95 bp) | +14.0 (+0.63 bp) |
+  | $30 α | +1.6 | +2.5 | +2.6 |
+
+  - 54's $300 ratio to 252 = 1.36× (same as the last read). Market slow: 252 at 2.8 α per sim min.
+  - 54 ≈ 3.5 α per sim min in this window.
+- 228's drain is nearly over (volume down from ≈ $150k to ≈ $58k per sim min). Main read window ≈ 3700–4300 (≈ 3:30 AM CT).
+- Self-trades 0, errors 0, no release.
+
+## §1636 — 2026-11-18 1:25 AM CT — brief: copy test, both copies now at similar volume
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $71, 228 $4. Validator net α: 54 1,076 (skill 1.09), 228 568 (skill 0), 252 1,784.
+- **Last 6 sim min (3006–3366):**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +31.7 on $296k (+1.07 bp) | +39.3 on $332k (+1.18 bp, 26 kept, ELIGIBLE) | +22.1 (+1.22 bp) |
+  | $30 α | +4.9 | +4.1 | +8.3 |
+
+  - 54's $300 ratio to 252 = 1.43×.
+  - Totals: 54 6.1 α per sim min, 228 7.2, 252 5.1. The pair makes 13.3 α per sim min vs 252's 5.1.
+- 228's drain is done (volume ≈ $55k per sim min, the same as 54). Main read window 3700–4300.
+- Self-trades 0, errors 0, no release.
+
+## §1637 — 2026-11-18 1:40 AM CT — 54 vs 252 on ALL books over long windows (user: "what about 30 books?")
+
+- **New day, sim 1412–3572 (36 sim min; 228 is a copy for most of it, with its drain early):**
+
+  | | 54 | 228 | 252 | 54 / 252 |
+  |---|---|---|---|---|
+  | $300 α | +276.9 (+1.33 bp, $2.08M) | +400.3 (+1.23 bp) | +208.1 (+1.35 bp, $1.55M) | 1.33× |
+  | $30 α | +59.4 (+1.51 bp) | +41.6 | +55.9 (+2.06 bp) | 1.06× |
+  | Total α | 336 → **9.3 per sim min** | 442 → 12.3 (drain-inflated) | 264 → 7.3 per sim min | **1.27×** |
+
+- **Old day, 54 alone after rest_none (84378–86400, 34 sim min):**
+
+  | | 54 | 252 | 54 / 252 |
+  |---|---|---|---|
+  | $300 α | +276.3 | +87.1 | 3.2× |
+  | $30 α | +56.6 | +29.5 | 1.9× |
+  | Total α per sim min | 9.8 | 3.4 | — |
+
+- **Reading:**
+  - 54's own rate is stable: 9.8 alone vs 9.3 with a copy (≈ −5%). The ratio drop vs 252 (2.85× → 1.27×) is mostly 252 recovering (3.4 → 7.3), not 54 losing.
+  - 252: net α 1,784 → pay $157 ($0.088 per unit), long-run average ≈ 8.9 per sim min. 1.27× 252 in the same window ≈ $199/mo.
+    Normalised by 252's long-run rate (8.9 / 7.3), 54 ≈ 11.3 per sim min ≈ $198 — at the $200 target.
+  - **Weak spot = $30:** 252 earns +2.06 bp per $ there vs our +1.51; we are only 1.06× 252 on $30. Raising $30 quality is the next $-lever (the size-up was disproven; look at quoting depth/lean on $30).
+
+## §1638 — 2026-11-18 1:50 AM CT — is 54 still climbing toward $200? (user Q)
+
+- **Validator net α (speed/nahist.py), 54:** 780 (9:47 PM) → 841 (11:17) → 948 (12:17 AM) → 1,056 (1:17) → 1,125 (1:47). The last four half-hours added +36, +49, +60, +68: accelerating, not flattening.
+- **Window mechanics (lookback 10,800 sim s = 180 sim min; now sim ≈ 3631):**
+  - The window still reaches back to before 54 was registered (old-day 81201), so nothing is leaving yet. Growth = everything new.
+  - From ≈ sim 5600 (≈ 5 AM CT at 8–10 sim s per wall min), 54's pre-rest_none alpha (band lane, ≈ 5.9 per sim min) starts leaving. Growth slows to (new − old) ≈ +3.5–5 per sim min (≈ +30–45 per half-hour).
+  - Fully steady from ≈ sim 8770 (≈ 11 AM–noon CT). The ≈ 13 sim min with no trading after the reset (bug, §1621) stays in the window until ≈ sim 12,200 (≈ −7%).
+- **Projection:** ≈ 1,550–1,600 by 5 AM; ≈ 2,000–2,100 by noon; steady ≈ 2,000–2,260 at 9.3–11.3 per sim min (market-dependent).
+  At $0.088 per unit ≈ $180–200/mo. Chain pay lags net α by a few hours, so expect pay near $180–200 by Wed evening, not morning.
+
+## §1639 — 2026-11-18 1:55 AM CT — brief
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $71, 228 $4. Validator net α: 54 1,151 (skill 1.11, still rising), 228 601 (skill 0), 252 1,619 (falling).
+- **Last 6 sim min (sim ≈ 3320–3680):**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +35.5 (+1.19 bp, 25+/0− kept) | +31.5 (+0.98 bp) | +19.9 (+1.02 bp) |
+  | $30 α | +3.9 | +3.5 | +3.1 |
+  | Total per sim min | 6.6 | 5.8 | 3.8 |
+
+  - 54's total ratio to 252 = 1.7×.
+- Phase-1 main window (3700–4300) starts now. Self-trades 0, errors 0, no release.
+
+## §1640 — 2026-11-18 2:25 AM CT — brief (user away; overnight changes approved)
+
+- regcheck: 54 and 228 REGISTERED. **Pay: 54 $112** (up from $71), 228 $2. Validator net α: 54 1,217 (skill 1.14), 228 620 (skill 0), 252 1,647.
+- **Last 6 sim min (≈ 3616–3976):**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +20.9 (+0.99 bp) | +26.6 (+1.14 bp) | +15.2 |
+  | $30 α | +7.5 | +8.3 | +1.0 |
+  | Total per sim min | 4.7 | 5.8 | 2.7 (slow market) |
+
+  - 54's ratio to 252 = 1.7×.
+- Phase 1 ends ≈ sim 4300 (≈ 3:00 AM CT at the current speed). Self-trades 0, errors 0, no release.
+
+## §1641 — 2026-11-18 2:57 AM CT — PHASE 1 (identical copies) read; PHASE 2 (lanes) started
+
+- **Main window, post-drain (sim 3754–4294, 9 sim min):**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +39.3 (+1.22 bp, 30+/4− kept) | +39.9 (+1.09 bp, 29+/2−) | +16.1 (+0.55 bp) |
+  | $30 α | +6.3 | +6.3 | +5.0 |
+  | Total per sim min | 5.1 | 5.1 | 2.3 |
+
+  - 54's ratio to 252 = 2.2× (alone, old day: 2.85×) → ≈ −20–25% per copy. The pair = 4.4× 252 ≈ 1.55× one miner.
+  - overlap.py post-drain: 36% / 38% of $ within 30 s (lanes 33%; 54 vs 252 = 10.5%). Once the drain is over, identical copies overlap about as much as the lanes did.
+- **Full copy phase (1890–4289, 40 sim min, includes 228's drain):** 54 6.3 per sim min (+1.10 bp $300, +1.43 bp $30); 228 9.9 (drain); 252 6.5. 54's ratio 0.97×, pulled down by 228's drain volume and a strong 252 stretch.
+- **Verdict (noisy, 9-min clean window):** an identical copy costs each miner ≈ 20–25%; two copies ≈ 1.55× one. Consistent with §1568 (−15–20%). Pair total and per-miner progress to be compared with phase 2.
+- **PHASE 2:** regcheck x4=228; live_params_228.json = NEXT_L2 (lane ≥ 1.5×, no ceiling; backup live_params_228.pre-L2b.json); pace_burst 3600 kept. Restart 08:56:26 UTC at sim ≈ 4311. 0 out of range, 0 errors, tape fresh.
+  Warm-up until ≈ 4610; drain ≈ 30 sim min → main read window ≈ 6400–7000 (≈ 7:30–8:30 AM CT).
+
+## §1642 — 2026-11-18 3:25 AM CT — brief (phase 2 warm-up)
+
+- regcheck: 54 and 228 REGISTERED. **Pay: 54 $127** (rising), 228 $10. Validator net α: 54 1,246 (skill 1.37), 228 623, 252 1,576.
+- **54, last 4 sim min:** $300 +16.2 (+0.85 bp), $30 +5.1 → 5.3 per sim min; 252 4.2.
+- **228:** in warm-up after the 2:56 AM lane switch (until ≈ sim 4610); no fills yet, as expected.
+- Self-trades 0, errors 0, no release. Brief cron updated to the phase-2 state.
+
+## §1643 — 2026-11-18 3:57 AM CT — brief
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $127, 228 $10. Validator net α: 54 1,317 (+71 in 30 min; skill 1.54), 228 653, 252 1,626.
+- **Last 3 sim min:**
+
+  | | 54 | 228 (lane ≥ 1.5×, trading again after warm-up) | 252 |
+  |---|---|---|---|
+  | $300 α | +8.3 | +13.2 (+0.91 bp) | +6.5 |
+  | $30 α | +2.4 | +2.5 | +1.9 |
+
+- Phase-2 read window ≈ 6400–7000. Self-trades 0, errors 0, no release.
+
+## §1644 — 2026-11-18 4:28 AM CT — brief
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $126, 228 $9. Validator net α: 54 1,344 (skill 1.77), 228 671, 252 1,672.
+- **Last 3 sim min:**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +17.7 (+1.30 bp) | +13.3 (+1.25 bp) | +12.0 (+0.95 bp) |
+
+- Sim at 5162 (≈ 9.6 sim s per wall min). Phase-2 read window ≈ 6400–7000 → ≈ 6:40–7:40 AM CT. Self-trades 0, errors 0, no release.
+
+## §1645 — 2026-11-18 4:58 AM CT — brief
+
+- regcheck: 54 and 228 REGISTERED. **Pay: 54 $139**, 228 $18. Validator net α: 54 1,376 (skill 1.94), 228 726, 252 1,726.
+- **Last 3 sim min:**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +6.4 (+0.63 bp) | +14.1 (+1.16 bp) | +1.7 (+0.14 bp) |
+
+  - Quiet market.
+- Sim 5445; phase-2 read window ≈ 6400–7000 → ≈ 6:40–7:40 AM CT. Self-trades 0, errors 0, no release.
+
+## §1646 — 2026-11-18 5:28 AM CT — brief
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $138, 228 $18. Validator net α: 54 1,416 (skill 2.77), 228 750, 252 1,784.
+- **Last 3 sim min:**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +11.0 (+0.75 bp) | +14.2 (+1.40 bp) | +1.1 |
+
+- 54's window now starts dropping its pre-rest_none alpha (≈ sim 5600+), so its net α growth slows as expected.
+- Sim 5726; phase-2 read ≈ 6400–7000 (≈ 6:40–7:40 AM CT). Self-trades 0, errors 0, no release.
+
+## §1647 — 2026-11-18 5:58 AM CT — brief
+
+- regcheck: 54 and 228 REGISTERED. **Pay: 54 $150**, 228 $26. Validator net α: 54 1,428 (growth slowing as expected; skill 2.26), 228 785, 252 1,840.
+- **Last 3 sim min:**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +9.4 | +15.4 (+1.37 bp) | +6.4 |
+  | $30 α | +3.3 | +2.6 | +3.1 |
+
+- Sim 6014; phase-2 read ≈ 6400–7000 (≈ 6:40–7:40 AM CT). Self-trades 0, errors 0, no release.
+
+## §1648 — 2026-11-18 6:28 AM CT — brief
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $150, 228 $26. Validator net α: 54 1,383 (dipped −44 as older alpha leaves the window; skill 2.24), 228 861 (+77), 252 1,759.
+- **Last 3 sim min:**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +16.1 (+1.11 bp) | +15.8 (+1.24 bp) | +8.7 |
+  | $30 α | +2.7 | +2.5 | +1.6 |
+
+- Sim 6309; phase-2 read at ≈ sim 7000 (≈ 7:40 AM CT). Self-trades 0, errors 0, no release.
+
+## §1649 — 2026-11-18 6:58 AM CT — brief
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $150, 228 $30. Validator net α: 54 1,426 (skill 2.57), 228 892, 252 1,830.
+- **Last 3 sim min:**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +11.8 | +12.6 (+1.33 bp) | +11.5 |
+  | $30 α | ≈ 0 | ≈ 0 | ≈ 0 |
+
+- Sim 6605; phase-2 read at ≈ sim 7000 (≈ 7:40 AM CT). Self-trades 0, errors 0, no release.
+
+## §1650 — 2026-11-18 7:30 AM CT — PHASE 2 (lanes) read → LANES WIN; PHASE 3 (mk_exit_k 2.0 on 54) started
+
+- **Phase 2 main window, post-drain (sim 6437–6917, 8 sim min):**
+
+  | | 54 (band 1.0–1.5×) | 228 (lane ≥ 1.5×) | 252 |
+  |---|---|---|---|
+  | $300 α | +46.6 (+1.39 bp, 32+/4−) | +48.7 (+1.61 bp, 35+/2−) | +35.1 (+1.16 bp) |
+  | $30 α | +2.4 | +1.5 | +2.4 |
+  | Total per sim min | 6.1 | 6.3 | 4.7 |
+
+  - Pair 12.4 per sim min (2.65× 252).
+  - overlap.py: 19% / 20% within 30 s; 54 vs 252 13%.
+- **Phase 2 full post-warmup (4654–6934, 38 sim min):** 54 6.2 per sim min ($300 +1.22 bp), 228 7.8 ($300 +1.72 bp), 252 6.3.
+- **Copies (phase 1, §1641) vs lanes (phase 2), clean windows:**
+
+  | | Copies | Lanes |
+  |---|---|---|
+  | Overlap | 36–38% | 19–20% |
+  | $300 α per $, 54 | +1.22 bp | +1.39 bp |
+  | $300 α per $, 228 | +1.09 bp | +1.61 bp |
+  | Pair α per sim min | 10.2 | 12.4 |
+
+  - Ratios to 252 are too noisy (252 2.3 vs 4.7 per sim min in the two windows) to compare pair totals directly.
+- **Verdict: LANES WIN** on per-$ quality and overlap, for both miners. 228 stays on the ≥ 1.5× lane.
+- **Scaling implication:** spread copies across the two lanes (e.g. half per lane) rather than all on one recipe. Measure the incremental α per added copy within each lane.
+- **$30 weak spot persists:** full phase 2 $30 +1.09 / +0.86 bp vs 252 +2.52.
+- **PHASE 3:** mk_exit_k 0 → 2.0 on 54 (live; bounds 0–10; no out of range) at sim ≈ 6964. Backup live_params_54.pre-exitk.json.
+  Baseline = phase 2 (54 $300 +1.39 / +1.22 bp; 6.1–6.2 α per sim min; ratio to 252 1.31× main / 0.98× full).
+  Read ≈ 2,400 sim s (≈ sim 9400, ≈ 11:40 AM CT): α per sim min, $300 α per $ as a ratio to 252, exposure (alphadecomp2).
+
+## §1651 — 2026-11-18 8:00 AM CT — brief (phase 3 early)
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $151, 228 $31. Validator net α: 54 1,356 (skill 4.29), 228 926, 252 1,882.
+- **Phase 3 first 4 sim min (7014–7254):**
+
+  | | 54 (exit_k 2) | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +11.2 on $108k (+1.04 bp) | +28.3 on $180k (+1.57 bp) | +6.0 (+0.53 bp) |
+
+  - 54 is trading less volume (holding longer cuts exits, as intended). Too early to read.
+- Self-trades 0, errors 0, no release.
+
+## §1652 — 2026-11-18 8:30 AM CT — PHASE 3 mis-specified (mk_exit_k 2.0 × lean 1.0 > band max 1.5 → no exits); restarted as exit_k 1.4
+
+- **10 sim min of exit_k 2.0 (6977–7577):**
+
+  | | 54 | 228 (control) | 252 |
+  |---|---|---|---|
+  | $300 α | +25.9 on $253k (+1.02 bp) | +83.2 on $429k (+1.94 bp) | +33.8 (+1.00 bp) |
+  | $30 α | +10.1 | +11.5 | +3.6 |
+
+  - 54's $300 α relative to 228 fell 0.96× (phase 2) → 0.31×; volume ≈ 60% of 228's.
+- **Cause (interaction miss):** with mk_exit_k 2.0 a lean against the position needs |pred| ≥ 2.0 × thr. But 54's band (mk_model_lean_max 1.5) zeroes every lean ≥ 1.5 × thr, so 54 could NEVER exit a position. Books sat at max_inv and stopped trading.
+  The 47 test (§1600) had no ceiling, so it never hit this.
+- **Fix:** mk_exit_k 2.0 → 1.4 live at sim ≈ 7609 (no out of range). Exits now need 1.0–1.4 × thr → 1.4–1.5 × thr, i.e. stronger but possible inside the band. Phase 3 restarts from 7609. Read ≥ 2,400 sim s later (≈ sim 10,000, ≈ 12:30 PM CT).
+- **Lesson:** for any lean-gating knob, check it against the band (exit_k × model_lean must be < model_lean_max).
+
+## §1653 — 2026-11-18 9:00 AM CT — brief: 228 now ELIGIBLE (skill 1.58); exit_k 1.4 early read
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $153, 228 $34.
+- Validator: **228 skill 0 → 1.58** (the H3 flush has left its window; pay should start rising); net α 1,057. 54 1,379 (skill 2.50). 252 2,058.
+- **exit_k 1.4, first 4 sim min (7644–7884):**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +25.2 on $177k (+1.43 bp, 16+/0−) | +40.0 on $182k (+2.20 bp) | +9.7 |
+
+  - 54's volume is back to equal 228's (exits possible again). 54/228 $300 α = 0.63 (phase 2 0.96). Too early.
+- Self-trades 0, errors 0, no release. Brief cron updated to exit_k 1.4 from sim 7609.
+
+## §1654 — 2026-11-18 9:23 AM CT — brief (phase 3 interim, 8 sim min)
+
+- regcheck: 54 and 228 REGISTERED. Pay: 54 $149, 228 $35. Validator net α: 54 1,394, 228 1,089 (skill 1.59), 252 2,082.
+- **exit_k 1.4, 7631–8111 (8 sim min):**
+
+  | | 54 | 228 | 252 |
+  |---|---|---|---|
+  | $300 α | +43.0 on $299k (+1.44 bp, 24+/3−) | +68.8 (+1.91 bp) | +23.9 (+0.84 bp) |
+  | $30 α | +7.0 | +6.5 | +5.2 |
+  | Total per sim min | 6.3 | 9.4 | 3.6 |
+
+  - 54/228 $300 α = 0.63 (phase 2 0.96); 54/252 $300 = 1.80× (phase 2 1.31×). Mixed so far: better vs 252, worse vs 228 (228 itself is having a strong window).
+- Self-trades 0, errors 0, no release.
