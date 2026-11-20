@@ -25779,3 +25779,1205 @@ The 181/234 template makes ≈ 7.5 trades per sim min.
 - **Pay: 228 $86, 38 $14, 252 $187.** Validator net α: **228 2,000**, 252 1,635, 38 1,374. Prune line $87. Both REGISTERED, 0 errors; upstream 20e97853.
 - **Last 4 sim min $300:** 228 +35.1 (+1.83 bp, 22+/1−), 38 +14.2 (+0.88), 252 +11.2 (+0.63).
 - The start-burst exit hasn't shown yet (it lands ≈ sim 23,050–24,850; the sim is slow, so it is likely later this morning).
+
+## §1718 — 2026-11-19 9:45 AM CT — CORRECTION to §1711/§1714: no 60%-at-24h lag; x3's pay ≈ its real level; field $ fell overnight; levers to rise in the pack
+
+- **apply_track_record_ema (reward.py ≈ 2103):** deregistered slots are RESET, and young miners are annealed with alpha_eff = max(alpha_dt, 1/(k+1)), so standing tracks live performance during immunity.
+  The §1711 "≈ 60% of steady at 24 h" claim is WRONG.
+  The remaining smoothing is neuron.moving_average_alpha = 0.0083 per scoring cycle on post-Pareto weights. x3's pay flat at $84–90 since ≈ 3 AM implies it has converged: ≈ $84 is its real level.
+- **Per class, last 180 sim min (live_tape_x5.jsonl 12373–23173):**
+
+  | | $300 α | $30 α | Validator net α | Incentive | Pay |
+  |---|---|---|---|---|---|
+  | 228 | 1,646 (+2.06 bp) | 307 (+1.46) | 1,921 | 0.0016 | $84 |
+  | 5E2fVqiW 128 / 175 / 123 | 1,160–1,350 | 557–646 | ≈ 2,000 | 0.0019–0.0021 | $101–108 (≈ $162 last evening) |
+  | 252 | 1,303 | 89 | 1,591 | 0.0034 | $181 (incl. making share 0.0038) |
+
+  - The fleet earns ≈ 2× our $30 alpha (separate class pool).
+  - Fleet UID 1 now has net α −850 (4-dec −894) and incentive 0.
+  - 38 shows 4-dec fills (−87 α) despite mk_skip_dec 1; likely the first seconds before live params loaded at its start. To verify.
+- **Field $ fell** (fleet $162 → ≈ $105; token price), and the prune line fell with it (≈ $87–111). Top skill-only miners sit ≈ 1.0–1.2× the line, so 1.7× is not attainable from skill alone.
+  Survival = not being among the lowest non-immune earners. On skill alone x3 ≈ 80% of a fleet UID ≈ level with the line, a coin flip at each immunity end (as for the fleet, which churns).
+- **Levers, ranked:**
+  1. MAKING credit: the making half ≈ ½ of all pay; we earn 0. 252 earns making + skill and gets 2× x3 on lower net α.
+  2. $30 class alpha (fleet ≈ 2× ours).
+  3. Remove the 4-dec drag.
+- **Next test plan** (new test miner + 38): a making-credit layer on top of the skill recipe, plus a $30 improvement. Offline design and census first.
+
+## §1719 — 2026-11-19 10:05 AM CT — MAKING TEST M1 on BOTH x3 (228) and x4 (38): balanced $30 touch maker (the 181/234 template); user released x3 for making tests
+
+- **User (≈ 9:50 AM):** run making-credit tests on x3 and x4 to try to save them before immunity ends; any changes or restarts OK. Then: "before we were targeting skill we had a decent making setup … maybe add that back".
+- **Gauges before:** making_captured / realized / share = 0 for 228, 38 and fleet 128/175, despite two-sided maker notional $8–10M. 252: captured 106, realized 63, share 0.0038.
+  Top making UIDs: making share ≈ 0.018–0.023 → incentive ≈ 0.005–0.016 even with negative skill net α.
+- **Prior finding (§1584/§1586):** long-lived makers 181/234/51 earn making credit from BALANCED ≈ $600 touch quotes on the $30 books. Making quality (R/C) is miner-wide, so poor-capture $300 fills can zero it.
+- **Census (speed/mkcensus.py on x3 params):** $30 orders change from ≈ $1.65k 3 ticks back (lean-only) to ≈ $600 at the touch on both sides; $300 unchanged.
+- **Live** at sim ≈ 23,345, on both: mk_model_lean_30 0.75 → 0, mk_lean30_only 1 → 0, mk_low_size / mk_low_lad_size 0.033 → 0.012, mk_low_inside −1 → 0 (38 also mk_low_rest_none → 0). 0 out of range. Backups live_params_{228,38}.pre-making30.json.
+- **Read:** making_captured / realized / share gauges every brief (non-zero within ≈ 1–2 h if capture is positive), plus skill net α and $300/$30 α vs before.
+  If making stays 0 → M2 on x3: $300 step-ins at the touch instead of 1 tick inside (fix miner-wide quality); 38 keeps M1 as the control.
+- **Immunity ends:** x3 ≈ 3:25 PM, 38 ≈ 4:55 PM CT. Honest caveat: the making window is long (≈ 3 sim h ≈ many wall hours at today's speed), so pay may not move enough before then.
+
+## §1720 — 2026-11-19 10:17 AM CT — brief (M1, ≈ 10 min in)
+
+- **Pay: 228 $85, 38 $29, 252 $182.** Validator net α 228 1,818, 38 1,531, 252 1,393. Prune line $101. Both REGISTERED, 0 errors; upstream 20e97853.
+- **Making gauges:** 228 and 38 captured / realized / share = 0 (still early); 252 captured 110, realized 66, share 0.0038.
+- **Last 4 sim min:**
+
+  | | 228 | 38 | 252 |
+  |---|---|---|---|
+  | $300 α | +31.9 (+1.89 bp) | +16.5 (+0.91 bp) | +10.8 |
+  | $30 α | +2.3 on $116k (60 books, +0.20 bp) | +2.4 on $115k (+0.21 bp) | — |
+
+  - Both now quote balanced $30 on 60 books.
+- M2 decision ≈ 11:35 AM if making is still 0.
+
+## §1721 — 10:45 AM CT brief + why our making credit is 0 (offline replica of the validator)
+
+| | 228 (x3) | 38 (x4) | 252 |
+|---|---|---|---|
+| pay | $87/mo ($2.92/d) | $37/mo ($1.25/d) | $182/mo ($6.06/d) |
+| net α | 1,841 | 1,581 | 1,433 |
+| making captured / share | 0 / 0 | 0 / 0 | 117 / 0.0039 |
+| $300 α (4 sim min) | +30.5 (+1.82 bp) | +16.9 (+1.33 bp) | +17.3 (+1.02 bp) |
+| $30 α (4 sim min) | +0.7 on $119k | +0.7 on $121k | +0.9 on $31k |
+
+- Prune line ≈ $94–104. Both miners registered, 0 tracebacks; upstream 20e97853.
+- Offline validator replica (speed/making_diag.py: captured + 20-s realized, fee 0.005 × Mf, W 15, last 60 sim min):
+
+| uid | maker C | realized R | quality R/C | $300 Σ2·min | $30 Σ2·min |
+|---|---|---|---|---|---|
+| 228 | +10.4 | −22.2 | **0.00** | −37.2 (31 of 127 books positive on both sides) | −21.2 |
+| 38 | +0.7 | −29.4 | **0.00** | −37.3 | −19.2 |
+| 252 | +90.7 | +51.2 | 0.56 | +39.4 (92 of 128) | −7.4 |
+| 181/234/51 | +47 to +106 | +24 to +65 | 0.51–0.62 | — (no $300) | +27 to +31 |
+
+- **Two blockers:**
+  1. Realized markout at 20 s is negative miner-wide, so the quality factor is 0 and zeroes every class.
+  2. The lean makes per-book capture one-sided, so Σ2·min < 0.
+- M1 (balanced $30 at 0.012) has not fixed either one.
+
+## §1722 — 11:32 AM CT — Root cause of our $30 making loss: queue position (60-s order expiry) → M2 on 38
+
+**Finding 1: M1-only window (12 sim min), validator replica**
+
+| uid | maker C | realized R | $30 R | $300 R | quality |
+|---|---|---|---|---|---|
+| 228 | +5.1 | −3.9 | −2.9 | −1.0 | 0 |
+| 38 | +2.7 | −7.9 | −3.4 | −4.5 | 0 |
+| 252 | +14.5 | +5.7 | — | +5.1 | 0.39 |
+| 181 | — | — | +3.0 | — | 0.36 |
+| 234 | — | — | — | — | 0.66 |
+
+- Fee netting (0.005 × Mf ≈ 0.69 bp of notional) is identical for us and 181.
+- Gross capture against the validator mid: us 0.75 bp/$ against 181's 1.27 bp/$.
+
+**Finding 2: $30 style matches the long-lived makers; the queue spot doesn't**
+- makerstyle (12 sim min): touch, balanced, $528 vs $600 per fill, same quote-mid markout (+1.9 bp at 20 s). We trade 2.3× their volume on 63 books against their 38.
+- Fills split by whether a reference maker filled the same book, side and second: ours are worse even in shared moments (−0.53 vs −0.14 bp/$ against a print-centred mid). So book choice and timing are ruled out.
+- speed/qpos30.py: nearly every fill is part of a background sweep. Our mean position in the level is **0.64** (0 = first), against **0.32–0.35** for 181/234/51.
+- speed/orderage30.py: none of our fills came from an order older than 60 s, against 13–17% for theirs.
+- Cause: $30 orders take the default expiry (60 sim s), lapse and re-post at the back of the queue. A back-of-queue order fills only when a sweep eats the whole level, which is the adverse case.
+
+**M2 (11:32 AM, 38 only)**
+- agents_test 3cc9f5fa = a1fbedb4 + live knob `mk_low_expiry` (sim s; $30 touch + ladder orders; default 0 = old behaviour).
+- equiv 0 diffs (tape, ledger, locks identical); test_pace ALL PASS.
+- live_params_38 mk_low_expiry 500 (backup .pre-lowexp); x4 restarted 11:31 AM. The "SETTLEMENT NOT READY" banner has appeared on all 12 starts since 11-18 and is harmless; fills resumed.
+- 228 stays on M1 (d8f4bf42) as the control.
+
+**Read and decision (≈ 12:45 PM)**
+- Read: 38's $30 queue position (target ≤ 0.45), $30 R per $ against 228, $300 α unchanged.
+- If it passes, port the knob to agents/ and x3.
+
+## §1723 — 11:53 AM CT brief + who earns making credit (fleet table, speed/mkfleet.py)
+
+| | 228 (x3, M1 control) | 38 (x4, M2) | 252 |
+|---|---|---|---|
+| pay | $91/mo ($3.05/d) | $32/mo ($1.06/d) | $180/mo ($6.00/d) |
+| making captured / share | 0 / 0 | 0 / 0 | 119 / 0.0039 |
+| net α | 1,767 | 1,344 | 1,268 |
+| $30 queue position (7 sim min; refs 0.31–0.38) | 0.64 | **0.56** (falling) | — |
+| $300 α (last 2 sim min) | +25.2 (+2.10 bp) | +20.7 (+1.45 bp) | — |
+
+- Prune line ≈ $108–111. Both miners registered, 0 tracebacks; upstream 20e97853.
+- 38's $300 side was thin for ~5 sim min after the restart (model warm-up), then recovered.
+- **Making credit by coldkey** (incentive → $ at ≈ $53k per unit, from 252's $180 ↔ 0.0034):
+
+| coldkey | uids | making > 0 | making share per uid | median net α | ≈ $/uid/mo |
+|---|---|---|---|---|---|
+| **5F1F2JMu** (252's fleet) | 22 | **22** | 0.006–0.008 | **+958** | **≈ $190** |
+| 5ECLVeLz | 13 | 11 | 0.009–0.013 | +3,267 | ≈ $325 |
+| 5GVu1hrR | 15 | 15 | ≈ 0.008 | −1,810 | ≈ $175 |
+| **5E2fVqiW** | 19 | **0** | 0 | — | **≈ $116** |
+
+- **Conclusion: making + skill is the combination that scales.**
+  - 5F1F2JMu runs 22 copies, every one earning making credit AND positive skill, at ≈ $190 each.
+  - The skill-only fleet 5E2fVqiW has slid to ≈ $116 each.
+- New reference: 5F1F2JMu's making UIDs (study their $30/$300 quoting and queue position next).
+
+## §1724 — 12:13 PM CT — 5F1F2JMu study: how 252's fleet earns making credit AND skill (last 20–30 sim min)
+
+Tools: making_diag 30, qpos30 20, makerstyle / makerstyle300 20 sim min.
+
+**$300 books**
+
+| uid | fills/sim min | $/fill | inside the spread (depth −1) | +2 s / +20 s markout | $300 R (validator) | quality |
+|---|---|---|---|---|---|---|
+| 228 | 26 | $1,020 | **68%** | +0.81 / +1.36 bp | −5.9 | 0 |
+| 38 | 29 | $854 | **68%** | +0.62 / +0.96 | −8.4 | 0 |
+| 55 | 16 | **$3,186** | 19% | +1.10 / +1.83 | **+27.6** | 0.55 |
+| 251 | 13 | **$3,544** | 4% | +1.02 / +1.86 | **+20.9** | 0.60 |
+| 210 | 13 | **$3,543** | 12% | +1.13 / +2.29 | **+33.2** | 0.68 |
+| 250/238 (pure makers) | 97–104 | $889 | ≈ 20% | +0.7 / +0.6 | −9 to −12 | 0.03–0.09 |
+
+**$30 books**
+
+| uid | fills/sim min | $/fill | queue position | +20 s markout | $30 R |
+|---|---|---|---|---|---|
+| 228 / 38 | 57–59 | $505 | 0.64 / 0.60 | +2.0 bp | −4.4 / −3.9 on $807k / $826k |
+| 55 / 251 / 210 / 245 | 2.5–5 | **$1,800–3,600** | 0.34–0.47 | +2.6–2.8 bp | +5 to +18 on $140–420k |
+
+- **Conclusions:**
+  1. The fleet's skill + making UIDs quote $300 in **big orders AT or BEHIND the touch** and rarely step inside. Our step-ins are 68% inside the spread: they earn skill α (+1.75 bp) but lose at the validator's 20-s horizon, which zeroes miner-wide quality.
+  2. On $30 they rest a few **large** orders near the queue front (fills ≈ 1/12 of our count, 4–7× the size), with better markouts.
+- **M3 candidates (on 38, after the M2 read):**
+  - $30 size up (mk_low_size ≈ 0.04–0.08 ≈ $1.8–3.5k per order) with long expiry. Same pace budget, fewer and better fills.
+  - $300: fewer inside step-ins (mk_vol_inside / mk_vol_jump) and bigger touch orders. This touches the skill engine, so it gets a separate test, read on skill α AND quality.
+
+## §1725 — 12:25 PM CT — Does leaving the inside step-ins cost skill? (speed/depth300.py, 30 sim min, quote-mid markouts)
+
+| uid | depth | share of $300 $ | +20 s net (bp) | +600 s (skill-like horizon, bp) |
+|---|---|---|---|---|
+| 228 | inside | 67% | +1.05 | +2.75 |
+| 228 | behind | 23% | +1.28 | +2.54 |
+| 38 | inside | 62% | +0.49 | +2.07 |
+| 38 | behind | 22% | +0.80 | +2.11 |
+| 55 | behind | 58% | +1.65 | +3.04 |
+| 210 | behind | 66% | +1.83 | +3.16 |
+
+- Per dollar, our fills behind the touch earn about the same long-horizon value as our inside step-ins (2.5 vs 2.75 bp on 228; 2.1 vs 2.1 on 38), and do better at 20 s.
+- The fleet's behind fills earn more than both.
+- So moving volume from inside to behind need not cost skill **if volume is kept** (we are pace-bound either way). The risk is fill volume, not edge per $.
+- **Value check** (incentive → $ ≈ $53k per unit):
+  - Skill-only 5E2fVqiW: ≈ $0.07/month per net α.
+  - UID 55: 0.0047 incentive (≈ $250/mo) = ≈ $70 skill (α 999) + ≈ $180 making (share 0.0065).
+  - Losing even 40% of 228's α (≈ −$50/mo) is outweighed by a making share near the fleet's (≈ +$180/mo).
+- M3 design: keep the lean signal; post the lean-side order AT or BEHIND the touch in larger size instead of stepping inside.
+  - Before starting: census for interactions with every live knob.
+  - Read on skill α per $ AND validator quality.
+
+## §1726 — 12:20–12:50 PM CT — brief, M2 read, M3a started on 38 ($30 size 0.06)
+
+| | 228 (M1 control) | 38 (M2) | 252 |
+|---|---|---|---|
+| pay | $92/mo ($3.07/d) | $32/mo ($1.06/d) | $181/mo ($6.04/d) |
+| making captured / share | 0 / 0 | 0 / 0 | 124 / 0.004 |
+| net α | 1,828 | 1,409 | 1,346 |
+| $300 α (4 sim min) | +29.0 (+2.19 bp) | +32.3 (+1.28 bp) | +11.7 (+0.69 bp) |
+| $30 queue position (12 sim min; refs 0.31–0.35) | 0.66 | **0.55** | — |
+| $30 validator C / R | +1.9 / −0.8 | +5.0 / 0.0 | — |
+| $300 R | −6.1 | −8.4 | +12.2 |
+| quality | 0 | 0 | 0.56 |
+
+- Prune line ≈ $108–111. Both miners registered, 0 tracebacks; upstream 20e97853.
+- **M2 verdict:** queue position improves (0.66 → 0.55) and $30 R slightly better (NOISE-level), but it misses the 0.45 bar. **KEPT** on 38 as a base step, not ported to x3.
+- **M3a (12:49 PM, 38):** mk_low_size / mk_low_lad_size 0.012 → 0.06 (≈ $1.6–2.0k orders, the 5F1F2JMu style; backup live_params_38.pre-lowsize06.json).
+- Census (speed/lowsizecensus.py, buckets $4,700 / $1,500 / $600 / $200): both sides on every $30 book, at the touch or 1 tick behind, no empty books. Pace far from cap (busiest book $79k of $450k).
+- Read ≈ 1:50 PM (≈ 10 sim min):
+  - $30 queue position, R per $, $30 fills/min.
+  - $300 α unchanged.
+  - Next is M3b ($300 orders at/behind the touch instead of inside), started only after M3a is read.
+
+## §1727 — 1:25 PM brief + 1:52 PM M3a verdict (KEEP) + M3b started on 38 (2:05 PM)
+
+- **1:25 PM brief:**
+  - Pay: 228 $91/mo ($3.04/d), 38 $39/mo ($1.31/d); 252's pay query returned empty (was $181 at 12:20).
+  - Making: 0 for both; 252 124 / share 0.0041. Net α: 228 1,705, 38 1,334, 252 1,529.
+  - **Prune line up to ≈ $121–123** (above x3's $91 → x3 at risk after ≈ 3:25 PM). Both registered, 0 tracebacks; upstream 20e97853.
+  - Pace: busiest book $85k of $450k, none blocked.
+- **M3a read (validator replica, 10 sim min):**
+
+| | $30 notional | $30 C (per $) | $30 R (per $) | $300 R | quality |
+|---|---|---|---|---|---|
+| 228 | $243k | +0.8 (+0.03 bp) | −2.2 (−0.09 bp) | +0.5 | 0 |
+| 38 | $819k | **+16.3 (+0.20 bp)** | **−1.4 (−0.02 bp)** | −5.6 | 0 |
+| 55 | $48k | +3.3 | +1.4 | +9.4 | 0.58 |
+| 252 | $80k | +3.6 | +2.1 | +12.4 | 0.60 |
+
+- 38 $30: queue position 0.54 (228 0.66); fills 62/sim min at $1,477 each; $30 skill α +0.23 bp vs 228 +0.27 on 2.6× the $.
+- **Verdict: M3a KEEP.** $30 C 7× and R 5× better per $ than the control, but still slightly negative. $300 R is now the main drag.
+- **M3b (2:05 PM, 38):** mk_vol_inside 3 → 0, mk_vol_jump 1 → 0 (lean gating kept; backup live_params_38.pre-m3b.json).
+- Read ≈ 3:05 PM on $300 depth split, α per $, R and quality. Port to x3 if quality > 0 with α per $ ≥ 70% of 228's.
+
+## §1728 — 2:07 PM CT brief (M3b on 38 for ≈ 2 min)
+
+| | 228 (x3) | 38 (x4) | 252 |
+|---|---|---|---|
+| pay | $90/mo ($2.99/d) | $49/mo ($1.64/d) | $175/mo ($5.84/d) |
+| making | 0 | 0 | 136 / share 0.0041 |
+| net α | 1,732 | 1,382 | 1,601 |
+| $300 α (4 sim min) | +20.3 (+1.45 bp) | +15.1 (+1.03 bp) | +12.2 (+0.84) |
+| $30 α (4 sim min) | +3.2 (+0.29 bp) | +8.6 (+0.38 bp) on 2× the $ | +5.4 |
+
+- Lowest non-immune: 219 $42, 16 $115, 221 $121 → once x3's protection ends (≈ 3:25 PM) it sits 2nd lowest, with UID 219 below it.
+- Pace: busiest book $87k of $450k, 0 blocked. Both registered, 0 tracebacks; upstream 20e97853.
+
+## §1729 — 2:24–2:36 PM CT — M3b FAILED (no $300 fills) → reverted; M3b2 = new knob mk_jump_touch on 38
+
+- **2:24 PM brief:**
+  - Pay: 228 $89/mo ($2.97/d), 38 $49/mo ($1.63/d), 252 $174/mo ($5.81/d). Making 0 for both; 252 133 / share 0.0041.
+  - Lowest non-immune: 16 $114, 221 $119, 39 $123 (219 has gone).
+- **M3b (mk_vol_inside 0 + mk_vol_jump 0, 2:05–2:33 PM): 38 made ZERO $300 fills.**
+  - Why: the gate's "lean side" is the side the lean JUMP marks (`_jumped`). With jump 0 nothing is marked, so with mk_gate_side 1 + mk_rest_none 1 every $300 side was pulled.
+  - The test switched $300 quoting off; it did not test "lean at the touch". **DISPROVEN as configured;** reverted to pre-m3b at 2:33 PM (failed params kept as live_params_38.m3b-failed.json).
+- **M3b2:**
+  - agents_test **907fc75d** = 3cc9f5fa + live knob `mk_jump_touch` (0/1): 1 prices the lean side AT the touch (min(fair − edge, ask − tick, bid)) and still marks it as the lean side.
+  - equiv 0 diffs (tape, ledger, locks identical); test_pace ALL PASS.
+  - x4 restarted 2:35 PM; mk_jump_touch 1 (backup live_params_38.pre-m3b2.json; agent backup agents_test/QuoteAgent.py.bak-3cc9f5fa).
+  - Watch: $300 fills resume within minutes, otherwise revert.
+  - Read ≈ 3:40 PM on depth split, α per $, $300 R and quality.
+- Lesson recorded: knobs that look independent are coupled through `_jumped` (jump ↔ gate side ↔ rest_none). Check what a knob marks, not only what it prices.
+
+## §1730 — 2:54 PM CT brief; M3b2 $300 fills resumed (sim min 448, after the post-restart warm-up)
+
+| | 228 (x3) | 38 (x4, M3b2) | 252 |
+|---|---|---|---|
+| pay | $89/mo ($2.96/d) | $49/mo ($1.62/d) | $174/mo ($5.80/d) |
+| making | 0 | 0 | 142 / share 0.0042 |
+| net α | 1,790 | 1,348 | 1,722 |
+
+- 228 $300 α (3 sim min): +17.9 (+1.50 bp). 38 had no $300 fills during the warm-up (≈ 6 sim min, same as the 11:31 restart), then 32 fills in sim min 448.
+- Lowest non-immune: 221 $120, 39 $123, 138 $123. x3's protection ends ≈ 3:25 PM; at $89 it would sit lowest.
+- Both registered, 0 tracebacks; upstream 20e97853. M3b2 read ≈ 3:40 PM.
+
+## §1731 — 3:24 PM CT — x3 (UID 228) PRUNED as its protection ended; 38 continues M3b2
+
+- regcheck twice: x3 228 NOT REGISTERED. The journal shows "Wallet … hotkey x3 is not registered on netuid 79".
+- Pay at the end: ≈ $89/mo, net α ≈ 1,790. The lowest non-immune UID was ≈ $111–120, so x3 was the lowest once unprotected and the next registration took the slot.
+- Done:
+  - systemctl stop + disable mvtrx-x3.
+  - our_uids.txt now has only "38 maker x4 12900" (backup our_uids.txt.bak-x3prune).
+  - Final params kept as live_params_228.FINAL-1119.json.
+- **Lesson:** a skill-only miner at ≈ 0.75× the prune line cannot survive its first day. x3's α per $ was the best we have had, so the gap is the making half: 252 ≈ $188 with net α below x3's.
+- 3:24 PM gauges:
+  - 38: $40/mo ($1.33/d), net α 1,389, making 0; $300 α +18.8 (+0.92 bp, 52 books, M3b2 at the touch).
+  - 252: $188/mo ($6.25/d), making 137 / share 0.0042.
+- 38's protection ends ≈ 4:55 PM CT. At $40 it will likely be pruned too.
+- What we keep from 38 is the recipe read (M2 + M3a + M3b2), used to choose the next miner's starting setup.
+
+## §1732 — 3:43–4:05 PM CT — M3b2 KEEP; new-miner build ready (agents 406b6379 + live_params_NEXT = 38's recipe)
+
+**M3b2 read (38, since the 2:35 PM restart; $300 fills resumed at sim s ≈ 26,880)**
+
+$300 depth split, sim s 26,880–27,029:
+
+| | inside | touch | behind |
+|---|---|---|---|
+| share of fills (pre-M3b2 shares: 66% / 14% / 20%) | 22% | **58%** | 21% |
+| +20 s / +120 s markout (bp) | — | +1.28 / +2.98 | +1.08 / +2.46 |
+
+Validator replica (8 sim min):
+
+| | 38 | 252 | 55 |
+|---|---|---|---|
+| $300 R | **−2.3 on $391k (−0.06 bp/$; was −0.15)** | +5.7 | +0.3 |
+| $30 R | **+0.3** (first positive) | — | — |
+| whole-miner R | **−2.0** (was −7 to −12) | — | — |
+| C | +12.9 | — | — |
+| quality | 0 (just short) | 0.52 | 0.25 |
+| $300 α (8 sim min) | **+59.3 (+1.52 bp)** on 91 books | +0.63 bp | +0.18 bp |
+
+- **Verdict: KEEP.** Skill per $ up, R much closer to 0.
+- **New-miner build:**
+  - agents/QuoteAgent.py **406b6379** = d8f4bf42 + patch_lexp + patch_jt. Knobs default off; equiv 0 diffs vs d8f4bf42 (tape, ledger, locks identical); test_pace ALL PASS. Backup agents/QuoteAgent.py.bak-d8f4bf42.
+  - live_params_NEXT.json = 38's live params: M2 + M3a + M3b2, lean 1.0 / max 1.5; backup .bak-1119.
+  - newminer.sh expects 406b6379 (backup newminer.sh.bak-406b).
+  - mvtrx-x3 unit: agents/, tape x5, pace_start 4,700, pace_burst 3,600.
+- Registration: `~/btcli/bin/btcli subnet register --netuid 79 --wallet.name main --wallet.hotkey x3` (x3 hotkey is free since the prune). Then `HK=x3 sh newminer.sh <uid>`.
+
+## §1733 — 4:08–4:13 PM CT — brief; NEW MINER x3 = UID 113 live on the making + skill recipe
+
+- **4:08 PM brief:**
+  - 38: $40/mo ($1.32/d), making 0, net α 1,376.
+  - 252: $187/mo ($6.22/d), making 132 / share 0.0043.
+  - 38 registered, 0 tracebacks; upstream 20e97853.
+- **User registered hotkey x3 → UID 113** (the slot was the lowest non-immune, ≈ $120). User: go-ahead for any tests or changes.
+- `HK=x3 sh newminer.sh 113 228` → regcheck OK, agent md5 406b6379, settings live_params_NEXT.json (= 38's recipe), unit restarted 22:11:18 UTC, our_uids "113 maker x3 27741".
+- LIVE PARAMS applied: mk_low_size 0.06, mk_low_expiry 500 s, mk_jump_touch 1 (+ the rest of 38's recipe); 0 tracebacks.
+- Recipe = M1 balanced $30 + M2 + M3a + M3b2 on the 38 lane (lean 1.0, max 1.5, rest_none 1, skip_dec 1, max_inv 0.3).
+- Watch: first fills ($30 at once, $300 after ≈ 6 sim min of model warm-up), then making_diag quality, skill_cls2 α per $, pay.
+- 38 stays the test bed until it is pruned (protection ends ≈ 4:55 PM). Only clear wins move to 113.
+
+## §1734 — 4:21 PM CT — M3c on 38: full-size $300 step-ins only (mk_gate_part 0.5 → 0)
+
+- Why: the fleet's skill + making UIDs fill $300 at ≈ $3.2–3.5k per fill (§1724). Ours fill at ≈ $850–1,000, because the part-size path (mk_gate_part 0.5) sends a step-in once the bucket holds half an order.
+- With 0, only full-size orders go out (≈ $5k at a full bucket, census §1726 C arm). Between them, rest_none 1 leaves the book without quotes. Expect fewer and bigger fills (≈ 8 per sim min at the $312/book/sim-min refill, vs the fleet's 13–16).
+- Interaction:
+  - jump_touch 1 still prices the lean side at the touch.
+  - M2/M3a ($30) are unaffected.
+  - Pace: busiest book $95k of $450k.
+- Applied 4:21 PM (sim s 27,836); backup live_params_38.pre-m3c.json.
+- Checks:
+  - 4:35 PM: $300 fills continue (lesson §1729).
+  - ≈ 5:20 PM read: $/fill and fills per sim min, $300 α per $ (skill_cls2), depth split, R and quality (making_diag), vs 113 (same recipe without M3c) and 55.
+- 38's protection ends ≈ 4:55 PM; testing continues until it is pruned.
+
+## §1735 — 4:36 PM CT — M3c fill check: OK (38 $300 fills continue at fleet size); 113 still in $300 warm-up
+
+- Tape end sim s 28,010 (+174 s since M3c).
+- **38:**
+  - $300 fills 8 / 4 / 2 per sim min; median **$3,241 per fill** (was ≈ $850–1,000; fleet $3.2–3.5k).
+  - $30 fills 65–76 per sim min; 4-dec 0.
+- **113:**
+  - $30 fills 64–74 per sim min. $300 fills 0 so far: 270 sim s after start, the model warm-up (≈ 6 sim min on 38's restarts) is not over yet. PACE: 63 books traded ($30 only), busiest $16.9k.
+  - If $300 is still 0 by the 4:52 PM brief (≈ 9 sim min after start), investigate.
+- 0 tracebacks on both. 38's pace: busiest book $94.7k of $450k.
+
+## §1736 — 4:52–5:25 PM CT — briefs; 38 PRUNED 5:09 PM; M3c verdict (NOT better); 113 start burst hurts quality
+
+- **4:52 PM brief:**
+  - Pay: 113 $0 (40 min old), 38 $31/mo ($1.05/d), 252 $205/mo ($6.82/d).
+  - Net α: 113 135, 38 1,396, 252 1,787. Making 0 for ours; 252 146 / share 0.0043.
+  - Lowest non-immune: 38 $31, then $103.
+- **Validator replica (8 sim min to ≈ 4:55 PM):**
+
+| uid | C | R | quality | $300 R | $30 R |
+|---|---|---|---|---|---|
+| 113 | +25.4 | −13.9 | 0 | −3.9 on $664k | **−10.0 on $1.04M** |
+| 38 | +4.2 | −1.5 | 0 | −0.9 on $129k | −0.6 on $155k |
+| 252 | — | — | 0.39 | — | — |
+| 55 | — | — | 0.61 | — | — |
+
+- **113's start burst** (full buckets) trades ≈ 7× steady volume: $300 $932k in 4 sim min at +0.76 bp α. All its orders are young, so its $30 sits at the back of the queue and R goes negative (lesson of 11-12, x2).
+  - Expect quality to recover as the buckets drain (pace: busiest book $25.7k).
+  - Net α 281 by 5:21 PM.
+- **38 PRUNED 23:09 UTC (5:09 PM CT)**, regcheck twice. mvtrx-x4 stopped and disabled; our_uids.txt = "113 maker x3 27741" (backup our_uids.txt.bak-x4prune); final params live_params_38.FINAL-1119.json.
+- **M3c verdict** (38, mk_gate_part 0, sim s 27,836–28,398; makerstyle300):
+
+| | fills/sim min | $/fill | $300 volume | +20 s markout |
+|---|---|---|---|---|
+| 38 (M3c) | 6.4 | $2,915 | $166k | +1.12 bp |
+| 113 (part 0.5) | 64.6 | $1,563 | $1,259k | +1.14 bp |
+| 55 | 12.2 | $3,538 | $303k | +1.84 bp |
+
+- → **Bigger orders do NOT raise markout; volume drops ≈ 60–85%. NOT ADOPTED** (not moved to 113). The fleet's markout edge is not size.
+- Next lever to find: what 55's $300 fills do differently (timing/selection; +1.84 vs +1.13 bp). Study offline on 113's tape before any 113 test.
+
+## §1737 — 5:25–5:29 PM CT — 113 = test miner (user); fleet fill study → M4 (lean side 1 tick BEHIND the touch) on 113
+
+- User: "we can make changes to 113, its a test miner since we dont have a good settled strategy anymore." Saved to memory (feedback-uid113-goahead).
+- **Study** (speed/fillclass300.py, sim s 27,576–28,476). Taker event = prints sharing (ts, taker, side); sweep = ≥ 2 price levels.
+
+| uid | $ from sweeps | $ behind the touch | +20 s net | +120 s |
+|---|---|---|---|---|
+| 55 | 64% | 53% | +1.51 bp | +3.09 |
+| 210 | 63% | 64% | +1.61 | +2.97 |
+| 251 | 72% | 67% | +1.53 | +2.57 |
+| 113 (start burst) | 29% | 24% | +0.65 | +1.93 |
+
+- 113: 62% of $ from small single-level hits; 60% of $ at the touch.
+- Fleet fills behind the touch are their best (+1.6–1.8 bp at 20 s, +3.0–3.8 at 120 s).
+- Nearly all takers are background (ALGO sweeps = uninformed per the market model). Resting behind the touch gets the better price inside sweeps, and the price comes back.
+- **M4:**
+  - agents/QuoteAgent.py **2457bbcf** = 406b6379 + live knob `mk_jump_back` (0–5; with mk_jump_touch 1 the lean side rests N ticks behind the touch, still marked as the lean side).
+  - equiv 0 diffs vs 406b6379 (tape, ledger, locks identical); test_pace ALL PASS with the knob off and on.
+  - newminer.sh now expects 2457bbcf. Backups agents/QuoteAgent.py.bak-406b6379 and live_params_113.pre-m4.json.
+  - x3 restarted 5:28 PM with mk_jump_back 1 (sim s 28,639).
+  - Watch: $300 fills after the ≈ 5-sim-min warm-up.
+  - Read: sweep/behind shares and markouts (fillclass300), α per $ (skill_cls2), R and quality (making_diag), ≈ 1 h after the warm-up.
+
+## §1738 — 5:30–5:37 PM CT — start burst explained + fixed (pace_cold); 113 moved to x3's (228) lean lane
+
+- **Why the start burst hurts making:**
+  - Each book's token bucket starts at max(rate × pace_burst, pace_start) = $5.21/sim s × 3,600 = **$18.75k per book** (192 books ≈ $3.6M), against a steady refill of ≈ $312 per book per sim min. Every start AND every restart front-loads ≈ 60 sim min of trading into the first minutes.
+  - Those fills come from brand-new orders at the back of every queue, so they fill mostly when sweeps eat whole levels. That gave 113 $30 R −10 on $1.04M in 8 sim min.
+  - The fills stay in the validator's making window (≈ 180 sim min ≈ 15 wall h at ≈ 11.7 sim s per wall min), dragging miner-wide quality for most of the first day.
+  - It also inflates early skill α, which later leaves the window (the 54 lesson).
+- **Fix:**
+  - Agent **d8d9f7a7** = 2457bbcf + unit param `pace_cold` (1 = a new bucket starts at min(pace_start, burst) instead of a full burst; the refill and the 3,600-s burst cap are unchanged).
+  - equiv 0 diffs (tape, ledger, locks identical); test_pace ALL PASS with it off.
+  - With it on, 4 start-up assumption tests "fail" by design: no full burst at start, first-day total $355k vs $450k, two soft-pacing tests that assume a full bucket. Every hard-cap test passes.
+  - mvtrx-x3.service: pace_start 4700 → **1500 + pace_cold=1** (backup /opt/mvtrx/mvtrx-x3.service.bak-cold). newminer.sh expects d8d9f7a7.
+- **Lean:** 113 was on 38's band lane (lean 1.0, max 1.5). It is now on x3 228's lane: **mk_model_lean 1.5, no ceiling** (228 reached net α 1,841 with the best $300 α per $: +1.8–2.2 bp vs 38's +0.9–1.5). Backup live_params_113.pre-lean15.json. That lane is free since 228's prune. Revisit lanes when scaling.
+- Restart 5:37 PM (sim s 28,743). 113 now = M2 + M3a + M3b2 + M4 (jump_back 1) + lean 1.5 + cold start.
+- The M4 read at 6:47 PM covers this combination against the fleet refs (there is no same-time control).
+
+## §1739 — 5:43–5:45 PM CT — CORRECTION to §1738: restarts do NOT re-burst; pace_cold on a running miner blocked it → reverted
+
+- Check at 5:43 PM: after the cold restart, **153–155 of 190 books blocked** and 0 fills. No PACE SYNC charges.
+- Cause: at start the agent replays the whole pace ledger through the buckets (lines 199–203), so a restart RESUMES the previous balance.
+  - With pace_cold 1, the replay assumed 113's first bucket (4:11 PM) began at $1,500 instead of $18,750, then subtracted the real start-burst fills (≈ $19k per book). Most books ended below the −$5,000 soft floor, i.e. blocked for hours (refill ≈ $312 per sim min).
+- **Corrections to §1738:**
+  - (1) Restarts never re-burst; only a brand-new UID with an empty ledger does. 113's 5:28 restart did not add a burst.
+  - (2) pace_cold must be set before a miner's FIRST start and never changed for that miner's life, because the replay must match how it really started.
+- Fix 5:45 PM: mvtrx-x3.service back to pace_start=4700 pace_cold=0; restart → **0 of 190 books blocked**. The live knobs stay: lean 1.5 no ceiling + M2 + M3a + M3b2 + M4.
+- For the NEXT new miner: set pace_cold=1 (+ pace_start ≈ 1,500) in its unit BEFORE its first start (newminer.sh does not do this yet).
+
+## §1740 — 5:51 PM CT brief (113 only) + user: no deadline on SN79
+
+- 113:
+  - Registered, 0 tracebacks; PACE 0 of 190 blocked (busiest $27.7k).
+  - Pay $1/mo ($0.04/d; 1.7 h old), net α 363, making 0.
+  - $300: no fills in the last 4 sim min (warm-up after the 5:45 PM restart). $30: $90k at −0.13 bp.
+- 252: $216/mo ($7.22/d), making 139 / share 0.0044, net α 1,684. Upstream 20e97853.
+- My view, given to the user:
+  - SN79 is winnable: fleets earn $190–325 per UID, our skill already beats the fleet median, and the making gap is now specific (whole-miner R ≈ −2 vs positive).
+  - The whole miner pool is ≈ $52k/mo, so a realistic outcome is $2–4k/mo from 10–20 miners, not $10k.
+- **User: no 24–48 h deadline; keep working while progress continues** (memory feedback-mvtrx-no-deadline).
+
+## §1741 — 6:16 PM CT brief (113, M4 + lean 1.5 since the 5:45 PM restart)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $1/mo ($0.04/d; 2 h old) | $217/mo ($7.25/d) | — |
+| making | 0 | 144 / share 0.0044 | — |
+| net α | 390 | 1,797 | — |
+| $300 α (4 sim min) | +14.2 on $123k (**+1.15 bp**, 30 books) | +0.96 bp | +0.43 bp |
+| $30 α (4 sim min) | +1.1 on $146k (+0.08 bp) | — | — |
+
+- 113: registered, 0 tracebacks, PACE 0 of 190 blocked. $300 fills resumed ≈ 300 sim s after the restart (sim s 29,118).
+- Lowest non-immune ≈ $107–119. Upstream 20e97853.
+- Stage-1 read at 6:52 PM.
+
+## §1742 — 6:43–7:05 PM CT — 113 READ: stage 1 PASS, stage 2 first positive (quality 0.22) → KEEP all; hold to confirm
+
+- 6:43 PM brief:
+  - 113: $1/mo ($0.04/d), net α 460, making 0, 0 tracebacks, 0 blocked.
+  - 252: $216/mo ($7.20/d), making 147.
+- **Stage 1** (fillclass300, sim s 29,118–29,450):
+
+| | 113 (pre-M4 → now) | 55 | 210 |
+|---|---|---|---|
+| $ behind the touch | 24% → **85%** | 71% | 83% |
+| $ from sweeps | 29% → **67%** | 75% | 75% |
+| +20 s net | +0.65 → **+1.29 bp** | +1.40 | +1.09 |
+| +120 s | +2.92 bp | +3.15 | +2.69 |
+| $300 volume | $214k | $185k | $175k |
+
+- $300 α (skill_cls2, 8 sim min): 113 **+60.6 on $315k = +1.92 bp** (x3/228 level), 252 +0.80, 55 +0.30. $30: +0.23 bp.
+- **Stage 2** (making_diag, 8 sim min):
+
+| uid | C | R | $300 R | $30 R | quality |
+|---|---|---|---|---|---|
+| 113 | +9.5 | **+2.1** | +1.8 | +0.3 | **0.22** (FIRST positive quality on any of our miners) |
+| 252 | — | — | — | — | 0.37 |
+| 55 | — | — | — | — | 0.59 |
+
+- Σ2·min per class is still < 0 for all three in an 8-min window (refs too). Two-sided credit needs longer windows.
+- **Verdict: KEEP all** (M2 + M3a + M3b2 + M4 + lean 1.5). Every bar met: +20 s ≥ +1.0, α ≥ +1.2 bp, quality > 0.
+- **Plan:** HOLD 113 unchanged to confirm stage 2 over several reads (hourly) and let the start burst age out of the ≈ 15-wall-h making window.
+- Offline meanwhile: per-book two-sidedness of the fleet over 60–180 sim min (how their Σ2·min turns positive).
+
+## §1743 — 7:16 PM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | **$5/mo ($0.18/d)**, first non-zero; incentive 0.0001 | $232/mo ($7.74/d) | — |
+| net α | 551 | 1,890 | — |
+| making | 0 | 154 / share 0.0044 | — |
+| $300 α (4 sim min) | +18.3 on $112k (**+1.64 bp**) | +1.04 bp | +0.72 bp |
+| $30 α (4 sim min) | +0.30 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 of 190 blocked (busiest book $33.5k). Upstream 20e97853.
+- Replica confirmation every hour at :28.
+
+## §1744 — 7:37 PM CT — hourly stage-2 read #2: 113 quality 0.32 (≈ 252's 0.38)
+
+Replica, 20 sim min:
+
+| uid | C | R | quality | $300 R / Σ2·min (books both > 0) | $30 R / Σ2·min (books both > 0) |
+|---|---|---|---|---|---|
+| 113 | **+26.9** | **+8.6** | **0.32** | +5.9 / −9.3 (11) | +2.7 / −2.4 (25) |
+| 252 | +20.6 | +7.9 | 0.38 | +7.2 / −9.4 (23) | +0.7 / −5.6 (4) |
+| 55 | +26.5 | +14.8 | 0.56 | +8.8 / −7.4 (11) | +6.0 / −0.3 (4) |
+
+- 113 now captures more than 252 and has about the same quality. Σ2·min is still < 0 for all three in 20-min windows (refs too), so credit 0 in this window.
+- 252's live gauge shows captured 141 / share 0.0045, built over the full window.
+- $300 α (8 sim min): 113 **+57.4 on $280k = +2.05 bp** (252 +0.36). $30 +0.31 bp. Net α 673; live making 0; incentive 0.0001.
+- Stage 2: **2 of 3** positive reads (0.22, 0.32). HOLD continues.
+- Note: `pgrep -f making_diag` over ssh matched its own command line (false "running"). Use the ps-args check (lesson recorded).
+
+## §1745 — 7:46 PM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $5/mo ($0.18/d) | $231/mo ($7.70/d) | — |
+| net α | 692 | 1,913 | — |
+| making (live) | 0 | 141 / share 0.0045 | — |
+| $300 α (4 sim min) | +13.1 on **$69k** (+1.89 bp, 19 books) | +0.82 bp on $165k | +0.26 bp on $122k |
+| $30 α (4 sim min) | +0.15 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 blocked (busiest book $35.6k). Lowest non-immune ≈ $115–117. Upstream 20e97853.
+- Watch: 113's $300 volume dipped in this 4-min window ($69k vs $112–315k earlier). The buckets are draining after the start burst toward steady refill. Check the next brief; not blocked.
+
+## §1746 — 8:16 PM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | **$13/mo ($0.45/d)**, rising; incentive 0.0003 | $238/mo ($7.94/d) | — |
+| net α | 828 | 1,915 | — |
+| making (live) | 0 | 143 / share 0.0045 | — |
+| $300 α (4 sim min) | +22.4 on $138k (**+1.62 bp**) | +0.71 bp | +0.78 bp |
+| $30 α (4 sim min) | +0.16 bp | — | — |
+
+- 113's $300 volume back to normal ($138k; the 7:46 PM dip was one quiet window).
+- Registered, 0 tracebacks, 0 blocked (busiest book $37.7k). Lowest non-immune ≈ $97–107. Upstream 20e97853.
+
+## §1747 — 8:34 PM CT — hourly read #3: 113 quality 0.24 → STAGE 2 CONFIRMED (3/3 positive); first positive $30 two-sided
+
+Replica, 20 sim min:
+
+| uid | C | R | quality | $300 R / Σ2·min (books) | $30 R / Σ2·min (books) |
+|---|---|---|---|---|---|
+| 113 | +27.4 | +6.5 | **0.24** | +4.7 / −7.2 (16) | +1.7 / **+0.1 (27)**, first positive two-sided |
+| 252 | +21.5 | +11.4 | 0.53 | — | — |
+| 55 | +22.4 | +6.1 | 0.27 | — | — |
+
+- 113 quality reads: 0.22 → 0.32 → 0.24, all positive → **stage 2 CONFIRMED**. Its quality now sits inside the fleet's range (55 0.27, 252 0.37–0.53).
+- $300 α (8 sim min): 113 **+49.2 on $274k = +1.80 bp** (252 +0.69). $30 +0.16 bp.
+- Live (stage 3): making 0, incentive 0.0003, net α 859.
+  - The validator's window still holds the 4:11 PM start burst (≈ 15 wall h), and two-sided Σ2·min must turn positive over its full window.
+  - Expect the live gauge to move as the burst ages out (≈ tomorrow morning).
+- Plan: keep 113 unchanged (no reason to touch a recipe that is now working); briefs continue. Next study (offline): what makes the $300 Σ2·min positive for long-window makers (both sides on the same book within the window).
+
+## §1748 — 8:46 PM CT brief (113 HOLD, stage 2 confirmed)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $13/mo ($0.44/d) | $237/mo ($7.90/d) | — |
+| net α | 893 | 1,949 | — |
+| making (live) | 0 | 147 / share 0.0045 | — |
+| $300 α (4 sim min) | +19.8 on $99k (**+2.00 bp**) | +0.95 bp | +0.63 bp |
+| $30 α (4 sim min) | +0.09 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 blocked (busiest book $39.0k). Lowest non-immune ≈ $108–110. Upstream 20e97853.
+
+## §1749 — 9:16 PM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | **$28/mo ($0.93/d)**, doubling every ≈ hour as smoothing catches up | $253/mo ($8.43/d) | — |
+| net α | 920 | 1,885 | — |
+| making (live) | 0 | 141 / share 0.0045 | — |
+| $300 α (4 sim min) | +16.6 on $130k (**+1.27 bp**) | +0.95 bp | +0.47 bp |
+| $30 α (4 sim min) | +0.07 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 blocked (busiest book $41.5k). Lowest non-immune ≈ $89–116. Upstream 20e97853.
+
+## §1750 — 9:38 PM CT stage-3 watch
+
+| | making captured / share | incentive | net α | pay |
+|---|---|---|---|---|
+| 113 | 0 / 0 (not passed yet) | 0.0005 | 913 | $28/mo |
+| 252 | 144 / 0.0045 | 0.005 | — | — |
+
+- Replica skipped (odd hour); next replica read at the 10:28 PM watch.
+
+## §1751 — 9:46 PM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $28/mo ($0.93/d) | $254/mo ($8.45/d) | — |
+| net α | 940 | 1,925 | — |
+| making (live) | 0 | 146 / share 0.0045 | — |
+| $300 α (4 sim min) | +16.6 on $107k (**+1.55 bp**) | +0.57 bp | +0.38 bp |
+| $30 α (4 sim min) | 0.00 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 blocked (busiest book $43.1k). Lowest non-immune ≈ $116–122. Upstream 20e97853.
+
+## §1752 — 10:16 PM CT brief — FIRST LIVE making_captured > 0 on any of our miners (113: 1.333)
+
+- **Live validator gauge:** 113 making_captured **1.333** (was 0 at 9:46 PM), realized 0.0, share 0.0.
+  - Captured > 0 = the validator's own two-sided spread capture (Σ_b 2·min(buy, sell) per class) has turned positive.
+  - Realized (the 20-s markout basis the pool pays on) is still 0. Share follows once realized > 0.
+  - **Stage 3: first signal (captured); full pass = share > 0.**
+- 113:
+  - Pay $28/mo ($0.92/d), net α 998, incentive 0.0005.
+  - $300 α (4 sim min) +15.9 on $109k = **+1.45 bp** (252 +0.83, 55 +0.44); $30 +0.03 bp.
+  - Registered, 0 tracebacks, 0 blocked (busiest book $44.9k).
+- 252: $251/mo ($8.36/d), making 132 / share 0.0046.
+- Lowest non-immune ≈ $121–122. Upstream 20e97853.
+
+## §1753 — 10:38 PM CT stage-3 watch + replica: live captured 6.09; first replica CREDIT (0.4, $30)
+
+- **Live gauges:**
+  - 113: making_captured **6.089** (1.333 at 10:16 PM), realized 0, share 0; incentive **0.001** (doubled); net α **1,020**; pay **$49/mo** ($1.65/d).
+  - 252: captured 139, share 0.0046, incentive 0.0053.
+- **Replica** (20 sim min):
+
+| uid | C | R | quality | $300 R | $30 R / Σ2·min (books both > 0) | credit |
+|---|---|---|---|---|---|---|
+| 113 | +24.3 | +2.6 | **0.11** (4th positive read) | −2.2 (this window) | +4.8 / **+3.6 (40)** | **0.4 ($30), the first replica credit on any of our miners** |
+| 252 | — | — | 0.65 | — | — | 0 in this window |
+| 55 | — | — | 0.44 | — | — | 0 in this window |
+
+- Watch: $300 R dipped negative in this window (quality 0.11, lowest read yet); one read, not a trend. The rule needs 2 reads at 0 with R < 0 before investigating.
+
+## §1754 — 11:02 PM CT — evening summary (user back ≈ 11 PM)
+
+**Live 11:02 PM**
+
+| | 113 | 252 |
+|---|---|---|
+| registered / tracebacks / blocked | yes / 0 / 0 (busiest book $48.2k) | — |
+| pay | **$49/mo ($1.65/d)** ($1 at 6 PM) | $261/mo ($8.71/d) |
+| net α | ≈ 1,000 | — |
+| making captured (live) | **8.28** (first > 0 at 10:16 PM) | — |
+| realized / share | 0 / 0 | share 0.0046 |
+| incentive | 0.001 | — |
+
+- Lowest non-immune: 43 $58, 242 $101, 167 ≈ $10x.
+
+**Stage 1 (fill mechanics): PASSED and still improving**
+
+fillclass300, last 900 sim s:
+
+| | 113 | 210 | 55 |
+|---|---|---|---|
+| +20 s net | **+1.64 bp** | +1.68 | +1.36 |
+| +120 s | +3.21 bp | — | — |
+| sweeps | 60% | — | — |
+| behind the touch | 69% | — | — |
+
+- $300 α (8 sim min): 113 **+46.1 on $207k = +2.23 bp** (252 +1.00, 55 +0.40).
+
+**Stage 2 (replica quality > 0, held): CONFIRMED**
+- Reads: 0.22 (7:05) → 0.32 (7:37) → 0.24 (8:34) → 0.11 (10:38).
+- 10:38 PM: first replica CREDIT 0.4 ($30 Σ2·min +3.6 over 40 books); refs had 0 in that window.
+
+**Stage 3 (live making share > 0): IN PROGRESS**
+- Live captured 0 → 1.33 (10:16) → 6.09 (10:38) → 8.28 (11:02).
+- Realized / share still 0. The 4:11 PM start burst is still in the ≈ 15-wall-h window.
+
+**Stage 4 (pay ≥ 1.3× prune line ≈ $130–150 → $200): NOT YET.** $49 and rising; 113's protection ends ≈ 4:10 PM 11-20.
+
+**Tests since §1740:**
+- M4 mk_jump_back 1 (lean side 1 tick behind the touch, agents 2457bbcf): KEEP, the decisive change.
+- Lean 1.5 no ceiling (228's lane): KEEP.
+- pace_cold on a running miner: FAILED (blocked 153 books), reverted in 8 min. pace_cold is now only for new UIDs via newminer.sh.
+- M3c (full-size $300 only, on 38): NOT adopted.
+- 38 pruned 5:09 PM.
+
+**Live recipe on 113:** agents d8d9f7a7 + M2 mk_low_expiry 500 + M3a $30 size 0.06 + M3b2 mk_jump_touch 1 + M4 mk_jump_back 1 + mk_model_lean 1.5 (no ceiling).
+
+**Next:**
+- Hold 113 unchanged overnight. Briefs every 30 min; stage-3 watch hourly with a replica every 2 h.
+- Milestones: live realized / share > 0, then pay ≥ 1.3× the line.
+- Only intervene if broken, or if replica quality reads 0 with R < 0 twice in a row.
+
+## §1755 — 11:16 PM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $49/mo ($1.65/d) | $261/mo ($8.71/d) | — |
+| making captured (live) | **11.57** (8.28 at 11:02 PM), rising | — | — |
+| realized / share | 0 / 0 | share 0.0046 | — |
+| net α | 999 | — | — |
+| incentive | 0.001 | — | — |
+| $300 α (4 sim min) | +17.9 on $86k (**+2.07 bp**) | +0.82 bp | +0.61 bp |
+| $30 α (4 sim min) | +0.05 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 blocked (busiest book $49.1k). Lowest non-immune ≈ $105–108. Upstream 20e97853.
+
+## §1756 — 11:38 PM CT stage-3 watch
+
+| | captured | realized | share | net α | incentive | pay |
+|---|---|---|---|---|---|---|
+| 113 | **14.89** (11.57 at 11:16 PM) | 0 | 0 | 971 | 0.001 | $50/mo |
+| 252 | 125.5 | 68.5 | 0.0046 | — | — | — |
+
+- Why realized stays 0: the live realized credit = captured × miner-wide quality (R/C over the validator's whole window; 252 68.5/125.5 = 0.55).
+  - 113's window still holds the 4:11–4:52 PM start burst, whose realized R was strongly negative ($30 R −10 on $1.04M). Its whole-window quality is therefore still 0, even though every replica read since 7 PM is positive.
+  - Expect realized and share to turn on once the burst leaves the window: ≈ 180 sim min after it ≈ sim s 38,500 ≈ 6–7 AM CT 11-20 at ≈ 11.7 sim s per wall min.
+- Replica skipped (odd hour); next at 12:28 AM.
+
+## §1757 — 11:46 PM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | **$61/mo ($2.02/d)** | $267/mo ($8.90/d) | — |
+| making captured (live) | 14.13 | 128 | — |
+| realized / share | 0 / 0 | share 0.0046 | — |
+| net α | 959 | — | — |
+| incentive | 0.0012 | — | — |
+| $300 α (4 sim min) | +23.4 on $136k (**+1.73 bp**) | +1.00 bp | +0.16 bp |
+| $30 α (4 sim min) | −3.0 (−0.29 bp; one window) | — | — |
+
+- 113: registered, 0 tracebacks, PACE 0 of 192 blocked (the status line logs every ≈ 6 min; busiest book $51.6k). Lowest non-immune ≈ $101–106. Upstream 20e97853.
+
+## §1758 — 11-20 12:16 AM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $61/mo ($2.03/d) | $267/mo ($8.91/d) | — |
+| making captured (live) | **26.12** (14.13 at 11:46 PM) | 142 | — |
+| realized / share | 0 / 0 | share 0.0047 | — |
+| net α | 1,043 | — | — |
+| incentive | 0.0012 | — | — |
+| $300 α (4 sim min) | +30.3 on $204k (**+1.49 bp**) | +0.80 bp | +0.51 bp |
+| $30 α (4 sim min) | +0.20 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 of 192 blocked (busiest book $52.6k). Lowest non-immune ≈ $101–106. Upstream 20e97853.
+
+## §1759 — 11-20 12:38 AM CT stage-3 watch: FIRST LIVE making_realized > 0 (113: 0.146); replica credit 2.5 (≈ 55's, 5× 252's)
+
+- **Live gauges:**
+  - 113: captured **32.66**, realized **0.146** (first > 0, hours before the ≈ 6–7 AM estimate), share 0.0000 (4-dp rounding); net α 1,054; incentive 0.0012; pay $61/mo.
+  - 252: captured 134, realized 73, share 0.0047.
+- **Replica** (20 sim min):
+
+| uid | C | R | quality | $300 R / Σ2·min | $30 R / Σ2·min (books both > 0) | credit |
+|---|---|---|---|---|---|---|
+| 113 | +32.7 | +6.7 | 0.20 (5th positive read) | **−6.0** / −8.5 | **+12.7 / +12.5 (55)** | **2.5** |
+| 252 | +47.1 | +26.1 | 0.55 | — | +0.9 | 0.5 |
+| 55 | +45.4 | +25.5 | 0.56 | — | — | 3.4 |
+
+- **113's $30 making is now on par with the fleet.**
+- **Watch:** $300 R was negative in the last two windows (−2.2 at 10:38 PM, −6.0 now) while $300 α stays +1.5–2.2 bp. The lean step-ins still lose at 20 s on some windows and cap quality at ≈ 0.2 vs the fleet's 0.55.
+  - Next lever once stage 3 is complete: $300 20-s markout (e.g. mk_jump_back 2 on the $300 lean side, or study which $300 fills carry the negative R).
+
+## §1760 — 12:46 AM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $61/mo ($2.03/d) | $268/mo ($8.92/d) | — |
+| making captured / realized (live) | 33.72 / **0.307** (0.146 at 12:38 AM) | 135 / share 0.0047 | — |
+| share | 0.0000 | — | — |
+| net α | 1,049 | — | — |
+| incentive | 0.0012 | — | — |
+| $300 α (4 sim min) | +18.8 on $96k (**+1.95 bp**) | +0.97 bp | +0.50 bp |
+| $30 α (4 sim min) | 0.00 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 of 192 blocked (busiest book $54.5k). Lowest non-immune ≈ $107. Upstream 20e97853.
+
+## §1761 — 1:16 AM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | **$68/mo ($2.27/d)** | $251/mo ($8.38/d) | — |
+| making captured / realized (live) | **42.95 / 0.863** (realized ≈ 3× in 30 min) | 144 / share 0.0047 | — |
+| share | 0.0000 | — | — |
+| net α | **1,185** | — | — |
+| incentive | 0.0013 | — | — |
+| $300 α (4 sim min) | +40.3 on $145k (**+2.78 bp**) | +0.83 bp | +0.50 bp |
+| $30 α (4 sim min) | +0.06 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 of 192 blocked (busiest book $55.8k). Lowest non-immune ≈ $99–107. Upstream 20e97853.
+
+## §1762 — 1:38 AM CT stage-3 watch
+
+| | captured | realized | share | net α | incentive | pay |
+|---|---|---|---|---|---|---|
+| 113 | 47.66 | **1.656** (0.863 at 1:16 AM) | 0.0000 | 1,197 | 0.0013 | $68/mo |
+| 252 | 137.5 | 75.4 | 0.0047 | — | — | — |
+
+- At 252's ratio (share 0.0047 per 75 realized), 113's 1.66 realized ≈ share 0.0001, below the 4-dp display or not yet in the smoothed share.
+- Replica skipped (odd hour); next at 2:28 AM.
+
+## §1763 — 1:46 AM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $68/mo ($2.26/d) | $251/mo ($8.35/d) | — |
+| making captured / realized (live) | 47.81 / **2.074** | 140 / share 0.0047 | — |
+| share | 0.0000 | — | — |
+| net α | 1,173 | — | — |
+| incentive | 0.0013 | — | — |
+| $300 α (4 sim min) | +28.6 on $135k (**+2.11 bp**) | +0.44 bp | +0.47 bp |
+| $30 α (4 sim min) | +0.26 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 of 192 blocked (busiest book $57.7k). Lowest non-immune ≈ $108–109. Upstream 20e97853.
+
+## §1764 — 2:16 AM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $68/mo ($2.28/d) | $234/mo ($7.79/d) | — |
+| making captured / realized (live) | **55.28 / 3.68** (realized ×1.8 in 30 min) | 150 / share 0.0047 | — |
+| share | 0.0000 | — | — |
+| net α | 1,222 | — | — |
+| incentive | 0.0014 | — | — |
+| $300 α (4 sim min) | +15.3 on $117k (**+1.30 bp**) | +0.80 bp | +0.26 bp |
+| $30 α (4 sim min) | −0.08 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 of 192 blocked (busiest book $59.3k). Lowest non-immune ≈ $106–114. Upstream 20e97853.
+
+## §1765 — 2:38 AM CT stage-3 watch + replica
+
+- **Live:** 113 captured 58.40, realized 3.69, share 0.0000; net α 1,199; incentive 0.0014; pay $69/mo. 252: captured 153, realized 87, share 0.0047.
+- **Replica** (20 sim min):
+
+| uid | C | R | quality | $300 R / Σ2·min | $30 R / Σ2·min (books) | credit |
+|---|---|---|---|---|---|---|
+| 113 | +29.0 | +8.2 | **0.28** (6th positive read) | **0.0** / −6.9 | +8.3 / **+5.1 (40)** | **1.4** |
+| 252 | +38.7 | +26.4 | 0.68 | +23.6 / +1.1 | — | 0.7 |
+| 55 | +33.7 | +21.2 | 0.63 | +17.4 | — | 2.1 |
+
+- 113 again beats 252 on replica credit.
+- The gap to the fleet's quality is still the $300 side: their $300 R is +17 to +24, ours ≈ 0.
+- Next lever (after the live share shows): the $300 20-s markout.
+
+## §1766 — 2:45 AM CT — offline: why 113's $300 validator R ≈ 0 while the fleet's is +17 to +24 (no live change)
+
+fillclass300, last 1,500 sim s:
+
+| uid | $300 $ | +20 s net (quote mid) | +120 s | behind the touch: share / +20 s |
+|---|---|---|---|---|
+| 113 | $832k | **+1.17 bp** | +2.95 | 78% / +1.14 |
+| 252 | $1,027k | **+1.23 bp** | +2.63 | 31% / +1.71 |
+| 55 | $908k | **+1.26 bp** | +2.76 | 51% / +1.64 |
+
+- Quote-mid markouts are now **equal**. The fleet's $300 edge is no longer fill quality.
+- What differs is the validator's basis. Per fill, realized is capped by |captured| (vs the print-centred mid), and the making pool needs **two-sided** capture per book (Σ_b 2·min(buy, sell)).
+  - 113 quotes $300 ONE-sided (lean side only; mk_rest_none 1), so $300 Σ2·min ≈ −7 to −11 every window.
+  - The fleet is ≈ 0 to +3 there (252 +1.1, 55 +3.4 at 2:38 AM), with R +17 to +24.
+- **Next test design, M5** (after the live share shows; not now):
+  - Quote the non-lean $300 side too, behind the touch: mk_rest_none 0, mk_gate_rest ≈ 2 ticks, mk_rest_frac ≈ 0.5. This makes $300 books two-sided.
+  - Risk: non-lean fills dilute $300 α per $ (§1605 saw this with deep rests).
+  - Census + interaction check first; judge on $300 Σ2·min, R, quality AND α per $.
+
+## §1767 — 2:46 AM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $69/mo ($2.28/d) | $234/mo ($7.80/d) | — |
+| making captured / realized (live) | 59.82 / 4.15 | 153 / share 0.0048 | — |
+| share | 0.0000 | — | — |
+| net α | 1,234 | — | — |
+| incentive | 0.0014 | — | — |
+| $300 α (4 sim min) | +31.8 on $138k (**+2.31 bp**) | +0.90 bp | +0.18 bp |
+| $30 α (4 sim min) | +0.06 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 of 192 blocked (busiest book $61.1k). Lowest non-immune ≈ $106–114. Upstream 20e97853.
+
+## §1768 — 3:16 AM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $68/mo ($2.27/d) | $235/mo ($7.83/d) | — |
+| making captured / realized (live) | 63.49 / 4.34 | 154 / share 0.0048 | — |
+| share | 0.0000 | — | — |
+| net α | **1,327** | — | — |
+| incentive | 0.0014 | — | — |
+| $300 α (4 sim min; quiet market, all three lower volume) | +10.7 on $63k (+1.69 bp) | +1.06 bp | +0.76 bp |
+| $30 α (4 sim min) | +0.06 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 of 192 blocked (busiest book $63.1k). Lowest non-immune ≈ $94–102. Upstream 20e97853.
+
+## §1769 — 3:38 AM CT stage-3 watch: realized 4.79 but share still 0 → the pool is per CLASS
+
+- **Live:**
+  - 113: captured 66.2, realized 4.79, share 0.0000; net α **1,381**; incentive 0.0014; pay **$72/mo**.
+  - 252: captured 162, realized 94, share 0.0048, net α 2,080.
+- Why share stays 0 although realized > 0 (reward.py making_pool_inputs / class_pool_shares):
+  - Share = max(0, making_raw) / Σ, normalised **within each class** ($300 / $30 / 4-dec), then mixed across classes at the class weights.
+  - making_raw is two-sided per book: Σ_b 2·min(buy, sell) for that class, × miner-wide quality.
+  - The captured/realized gauges are the uid's totals. A class whose two-sided sum is ≤ 0 contributes 0 share.
+  - 113's $300 Σ2·min is −7 to −11 every window (lean side only) → $300 making share 0. The $30 class is positive in recent replicas (+5 to +12.5).
+  - The published debeta_making_share is ≈ 0 so far. Most likely the $300 class dominates (largest weight), or the $30 two-sided total over the full window is not yet positive.
+- ⇒ **M5 ($300 two-sided: rest the non-lean side behind the touch) is the step that unlocks the $300 making pool.** Planned for the morning (census + interaction check first; §1766).
+
+## §1770 — 3:41 AM CT — M5 on 113: two-sided $300 (non-lean side rests behind the touch)
+
+- Started now rather than in the morning: §1769 shows the $300 making pool stays at 0 for 113 while $300 quoting is one-sided, whatever its quality.
+- **Census** (speed/m5census.py, 113's live params, buckets $18k / $4.7k / $800):
+
+| arm | lean side | non-lean side + no-lean books | books with no order |
+|---|---|---|---|
+| A (now) | $4.7k at +1 tick | none | 15–25 |
+| B (M5: rest_none 0, gate_rest 2, rest_frac 0.5) | $4.7k at +1 (unchanged) | $2.35–3k ≈ 4 ticks behind the others' best, both sides | **2** |
+
+- Lean marking unchanged (jumps = predicted 45 vol / 19 calm in both arms).
+- **Applied 3:41 AM** (sim s 35,836): mk_rest_none 1 → 0, mk_gate_rest 30 → 2, mk_rest_frac 0.1 → 0.5. Backup live_params_113.pre-m5.json. Ignored keys mk_dfm, mk_dfm_frac, mk_low_rest_none are agents_test-only (harmless).
+- Checks:
+  - ≈ 3:55 AM: $300 fills continue, both sides.
+  - ≈ 4:45 AM read: $300 Σ2·min (target ≥ 0), $300 R and miner quality (replica), $300 α per $ (skill_cls2; must stay ≥ ≈ +1.2 bp), depth/sweep split (fillclass300).
+- Revert to pre-m5 if $300 α per $ drops below ≈ +1.0 bp with no Σ2·min gain.
+
+## §1771 — 3:46 AM CT brief — M5 first 5 min: $300 volume ×3, α −0.30 bp (early warning)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $72/mo ($2.39/d) | $235/mo ($7.84/d) | — |
+| making captured / realized (live) | 70.5 / 5.16 | — / share 0.0048 | — |
+| share | 0.0000 | — | — |
+| net α | 1,371 | — | — |
+| **$300 (4 sim min, ≈ all M5)** | **$406k on 85 books, α −12.0 (−0.30 bp)**, kept 16 (+2 −14) | +0.17 bp on $195k | +0.09 bp on $126k |
+| $30 α | +0.06 bp | — | — |
+
+- The refs are near zero in the same window (a weak market window for everyone), but 113's −14 kept books is a clear early warning: the two-sided rests fill big ($2.4–3k) and against the lean.
+- Not reverted yet (one 4-min window, refs also flat). Watch:
+  - The 3:57 AM fill check now also runs skill_cls2 4 on 113.
+  - If the next read is also ≤ 0 bp while refs are positive → revert to pre-m5 before the 4:47 AM read.
+- 113: registered, 0 tracebacks, 0 blocked (busiest book $64.9k). Lowest non-immune ≈ $95–107. Upstream 20e97853.
+
+## §1772 — 3:57 AM CT — M5 REVERTED: two-sided $300 rests cost skill (−0.56 bp while refs +0.29 to +0.68)
+
+- Mechanics worked. Since sim s 35,836: $300 fills 426 (262 buy / 164 sell) on 93 books, **42 books filled on both sides** (was ≈ 10–16). PACE 2 of 192 blocked; 0 tracebacks.
+- **Skill broke:**
+
+| $300, 4 sim min | M5 first 5 min | 3:57 AM read |
+|---|---|---|
+| 113 | −12.0 (−0.30 bp) | **−31.3 on $555k (−0.56 bp)**, kept 19 (+5 −14) |
+| 252 | +0.17 bp | **+0.68 bp** |
+| 55 | +0.09 bp | +0.29 bp |
+
+- The non-lean rests ($2.4–3k, ≈ 4 ticks behind) fill in sweeps that go AGAINST the lean signal and swamp the lean-side edge. $300 volume ×3–4.
+- Rule (§1771): second read ≤ 0 while refs positive → **reverted 3:58 AM** to live_params_113.pre-m5.json (failed set kept as .m5-failed.json). M5 read job cancelled.
+- **DISPROVEN as configured** (rest size 0.5 × full, 2 ticks back).
+- What is left to try for $300 two-sidedness:
+  - (a) Much smaller non-lean rests (rest_frac 0.1–0.2) further back (gate_rest 4–6), so they fill only in deep sweeps.
+  - (b) Two-sided only on books with NO lean (where no direction is predicted), keeping lean books one-sided.
+  - Both would need a knob, plus census/equiv, on a fresh read.
+
+## §1773 — 4:16 AM CT brief (113 back on the pre-M5 recipe)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $72/mo ($2.39/d) | $236/mo ($7.85/d) | — |
+| making captured / realized (live) | **90.3 / 6.37** (M5's two-sided burst lifted captured) | 159 / share 0.0048 | — |
+| share | 0.0000 | — | — |
+| net α | **1,435** (M5's loss did not dent it) | — | — |
+| incentive | 0.0014 | — | — |
+| $300 α (4 sim min) | +9.3 on $76k (**+1.23 bp**; recovered) | +0.32 bp | +0.54 bp |
+| $30 α (4 sim min) | +0.16 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 of 192 blocked (busiest book $66.2k). Lowest non-immune ≈ $103–109. Upstream 20e97853.
+
+## §1774 — 4:38 AM CT stage-3 watch + replica
+
+- **Live:** 113 captured 94.5, realized 7.74, share 0.0000; net α **1,475**; incentive 0.0013; pay $68/mo. 252: captured 171, realized 101, share 0.0048.
+- **Replica** (20 sim min; window includes M5's 3:41–3:58 AM stretch):
+
+| uid | C | R | quality | $300 R / Σ2·min (books both > 0) | $30 R / Σ2·min (books) | credit |
+|---|---|---|---|---|---|---|
+| 113 | +38.3 | +4.4 | 0.11 (7th positive read) | −1.9 / **+0.3 (42)** | +6.3 / +6.6 (46) | 0.8 ($30) |
+| 252 | — | +27.3 | 0.65 | +18.2 / +1.2 | — | 0.8 |
+| 55 | — | +18.5 | 0.67 | +14.6 / −2.2 | — | 0 |
+
+- 113's $300 Σ2·min turned positive (M5's two-sided fills), but M5 dragged R/quality and cost α. As expected, the two-sidedness gain came with the α loss that made us revert.
+
+## §1775 — 4:46 AM CT brief (113 HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $69/mo ($2.29/d) | $247/mo ($8.25/d) | — |
+| making captured / realized (live) | 95.8 / 7.24 | 178 / share 0.0048 | — |
+| share | 0.0000 | — | — |
+| net α | 1,479 | — | — |
+| incentive | 0.0013 | — | — |
+| $300 α (4 sim min) | +26.0 on $134k (**+1.95 bp**) | +0.96 bp | +0.75 bp |
+| $30 α (4 sim min) | +0.11 bp | — | — |
+
+- 113: registered, 0 tracebacks, 0 of 192 blocked (busiest book $68.2k). Lowest non-immune ≈ $84–99. Upstream 20e97853.
+
+## §1776 — 4:57–5:05 AM CT — overnight summary to the user; Option A started on 113 + lab-side guard
+
+- **Overnight (11 PM → 5 AM):**
+  - Pay $49 → $68/mo; net α ≈ 1,000 → ≈ 1,450.
+  - Live captured 8 → 98, realized 0 → 7.6 (first > 0 at 12:38 AM), share still 0.
+  - Replica quality positive on all 7 reads (0.11–0.32); $300 α +1.2 to +2.8 bp; 0 errors.
+  - M5 failed and was reverted (§1772).
+- **Survival risk:** 113's protection ends ≈ 4:10 PM CT today. At $68 it is below the lowest non-immune UIDs (≈ $83, $91, $98); pay has been flat at $68–72 since ≈ 1 AM.
+- **User: "start A".**
+  - Option A (live 5:04 AM, sim s 36,764): mk_rest_none 1 → 0, mk_gate_rest 30 → 5; mk_rest_frac stays 0.1. Non-lean $300 side and no-lean books get tiny (≈ 0.1 × full ≈ $470) rests 5 ticks behind (+ edge/fee offset).
+  - Backup live_params_113.pre-optA.json.
+- **User closes the laptop for ≈ 1 h**, so session crons won't fire. Started speed/optA_guard.sh on the lab (nohup, 12 × 5 min). It reverts to pre-optA on:
+  - no $300 fills in 3 sim min;
+  - ≥ 20 blocked books;
+  - $300 α ≤ 0 bp twice in a row while 252 > 0.
+  - It logs to /opt/mvtrx/optA_guard.log and writes a NOTE to alerts.txt.
+  - This is allowed under the auto-switch-off rule (tweak to a winning recipe).
+- Read when the user is back (≈ 6:05 AM): guard log, skill_cls2, making_diag 20, fillclass300 (two-sided books), mkgauges.
+
+## §1777 — 6:22 AM CT — Option A: guard ran 60 min with NO revert; FIRST live making_share > 0 (113: 0.0001)
+
+- **optA_guard.log** (12 checks, 5:10–6:09 AM CT):
+
+| check | result |
+|---|---|
+| $300 fills / 3 sim min | 8–45, never 0 |
+| blocked books | 0 |
+| $300 α (113) | **+0.31 to +1.93 bp** (+1.93 +1.15 +0.52 +0.69 +0.77 +0.71 +0.99 +1.04 +0.31 +0.93 +1.25 +1.65) |
+| $300 α (252), same windows | +0.49 to +1.61 |
+
+- 113 never went ≤ 0, unlike M5's −0.30 / −0.56. Option A stays live.
+- **Live 6:22 AM:**
+  - 113: captured **121.7**, realized **10.76**, **making_share 0.0001**: first non-zero share on any of our miners → **STAGE 3 PASSED**.
+  - 113: net α **1,625**, incentive 0.0014, pay **$70/mo ($2.35/d)**.
+  - 252: $256/mo ($8.55/d), share 0.0048, net α 2,075.
+- Lowest non-immune ≈ $101–111. 113's protection ends ≈ 4:10 PM CT. 0 tracebacks, 0 blocked; upstream 20e97853.
+- Replica (20 sim min) running for $300 Σ2·min / quality.
+
+## §1778 — 6:26 AM CT — replica on Option A (20 sim min, all Option A)
+
+| uid | C | R | quality | $300 R | $300 Σ2·min (books both > 0) | $30 Σ2·min (books) | credit |
+|---|---|---|---|---|---|---|---|
+| 113 | +30.4 | +3.1 | 0.10 (8th positive) | −0.5 | **−4.6 (39)** (pre-A −7 to −11 with ≈ 11–16 books) | +2.2 (34) | 0.2 |
+| 252 | +40.4 | +25.2 | 0.62 | +19.6 | +1.1 (33) | — | 0.7 |
+| 55 | — | +14.0 | 0.44 | +11.1 | +2.1 (16) | — | 0.9 |
+
+- **Option A verdict: KEEP** (better $300 two-sidedness at no α cost), but it does not yet get $300 Σ2·min ≥ 0.
+- Next step **A2**: rest_frac 0.1 → 0.2 (rests ≈ $940), keeping gate_rest 5, with the lab-side guard again. That stays far below M5's 0.5 × 2 ticks.
+
+## §1779 — 6:28 AM CT — A2 on 113: mk_rest_frac 0.1 → 0.2 (gate_rest 5, rest_none 0 unchanged)
+
+- Backup live_params_113.pre-A2.json (= Option A).
+- Lab guard speed/A2_guard.sh (copy of optA_guard pointing at pre-A2; log /opt/mvtrx/A2_guard.log): 12 × 5 min with the same revert rules.
+- Read ≈ 7:30 AM: guard log, replica 20 sim min ($300 Σ2·min target ≥ 0, R, quality), mkgauges (share).
+
+## §1780 — 6:38 AM CT stage-3 watch (A2 for 10 min)
+
+- 113: captured 125.1, realized 10.37, share 0.0001; net α **1,679**; incentive 0.0014; pay $70/mo.
+- 252: captured 173, realized 101, share 0.0048, net α 2,153.
+- A2 guard checks:
+
+| time (UTC) | $300 fills / 3 sim min | blocked | $300 α 113 vs 252 |
+|---|---|---|---|
+| 12:33 | 49 | 0 | +0.91 vs +0.64 bp |
+| 12:39 | 86 | 0 | +0.63 vs +0.73 bp |
+
+- No revert. Stage 3 already passed (§1777); the hourly watch now continues as a light gauge check.
+
+## §1781 — 6:51 AM CT brief (A2 for 23 min)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $70/mo ($2.33/d) | $255/mo ($8.51/d) | — |
+| making captured / realized / share (live) | 129.8 / 10.63 / **0.0001** | 169 / 99 / 0.0048 | — |
+| net α | **1,710** | — | — |
+| incentive | 0.0014 | — | — |
+| $300 α (4 sim min) | +13.3 on $190k (+0.70 bp, 57 books) | +0.73 bp | −0.11 bp |
+| $30 α (4 sim min) | +0.12 bp | — | — |
+
+- A2 guard: 4 checks, α 113 +0.54 / +0.40 vs 252 +0.37 / +0.80 at the latest two; fills 13–86; blocked 0–1. No revert.
+- **Survival:**
+  - Lowest non-immune ≈ $107 / $108 / $114. 113 at $70 = **≈ 0.65× the line**, with ≈ 9 h of protection left.
+  - Net α 1,710 is rising (≈ x3's 1,840 when it paid $89), but pay has been flat at ≈ $70 since ≈ 1 AM: the validator's pay smoothing lags.
+- Registered, 0 tracebacks, PACE 1 of 192 blocked. Upstream 20e97853.
+
+## §1782 — 7:21 AM CT brief (A2 for 53 min) — skill softening
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $72/mo ($2.41/d) | $254/mo ($8.48/d) | — |
+| making captured / realized / share (live) | 136.9 / 10.13 / 0.0001 | — / — / 0.0048 | — |
+| net α | **1,782** | — | — |
+| $300 α (4 sim min) | +3.6 on $161k (**+0.22 bp**, kept +3 −6) | +0.52 bp | +0.60 bp |
+| $30 α (4 sim min) | +0.12 bp | — | — |
+
+- A2 guard latest two checks: 113 **−0.27** / +0.19 vs 252 +0.79 / +0.41.
+- Under A2, 113's $300 α runs below 252 in the latest windows. Under Option A it ran level with 252.
+- Not two consecutive ≤ 0 → no auto revert. The 7:33 AM A2 read (replica: Σ2·min, R, quality) decides; lean toward reverting to Option A if Σ2·min shows no clear gain.
+- **Survival:** lowest non-immune ≈ $108 / $114 / $114; 113 at $72 ≈ 0.65×.
+- Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1783 — 7:25–7:40 AM CT — user: "most of today is left to you, any changes and tests are a go"; Option B built + checked (not deployed)
+
+- Memory: feedback-away-2026-11-20.
+- **Option B:**
+  - agents_next/QuoteAgent.py **186bbabb** = d8d9f7a7 + live knob `mk_rest_lean_none` (0/1). With mk_rest_none 0 and this knob at 1, $300 books WITH a lean pull the non-lean side (in both the full-bucket and low-bucket branches); books with NO lean keep two-sided rests.
+  - equiv 0 diffs vs d8d9f7a7 (tape, ledger, locks identical); test_pace ALL PASS.
+- **Census** (speed/bcensus_rln.py, 113's live params = A2, bucket $4.7k):
+  - A2: lean books carry a $940 counter-side rest (vol LEAN ASK 11, calm LEAN ASK 2).
+  - B (rln 1): lean books show only the lean side ($4.7k at +1). No-lean books stay two-sided at $940 (f 0.2) or $1,880 (f 0.4), 6–7 ticks behind. Books with no order: 2 in all arms.
+- Deploy = copy agents_next → agents (+ newminer.sh md5 186bbabb) + restart x3 (ledger replay keeps the balance; ≈ 5-sim-min model warm-up) + mk_rest_lean_none 1.
+- Decide after the 7:33 AM A2 read.
+
+## §1784 — 7:33 AM CT — A2 verdict NOT KEPT (quality → 0); Option B deployed on 113 (7:34 AM)
+
+- **A2 guard** (11 checks, 6:33–7:29 AM): never reverted, but 113's $300 α fell behind 252 in the last 5 checks (+0.82 / +0.49 / −0.27 / +0.19 / +0.20 vs +1.14 / +1.11 / +0.79 / +0.41 / +0.69).
+- **Replica** (20 sim min, all A2):
+
+| | A2 | Option A |
+|---|---|---|
+| $300 Σ2·min (books both > 0) | **−2.7 (45)** | −4.6 (39) |
+| $300 R | **−7.1** | −0.5 |
+| whole-miner R | −6.0 | — |
+| quality | **0.00** (first zero in 9 reads) | — |
+
+- Refs: 252 quality 0.52, 55 0.58.
+- → **A2 NOT KEPT:** bigger counter-lean rests win two-sidedness but lose 20-s value.
+- Live 7:33 AM: 113 captured 140, realized 9.1, share 0.0001, net α **1,831**; 252 share 0.0049.
+- **Option B deployed 7:34 AM** (sim s 38,431):
+  - agents/QuoteAgent.py ← agents_next **186bbabb** (backup agents/QuoteAgent.py.bak-d8d9f7a7); newminer.sh expects 186bbabb.
+  - live mk_rest_lean_none 1 (rest_none 0, gate_rest 5, rest_frac 0.2 kept; backup live_params_113.pre-B.json). x3 restarted; pace_cold stays 0; PACE 0 blocked.
+- Lab guard speed/B_guard.sh (waits 1,800 s for the model warm-up, then 12 × 5 min; same revert rules → pre-B; log B_guard.log), pid 2289917.
+- Read ≈ 8:55 AM: replica $300 R / Σ2·min / quality, α vs 252, share.
+
+## §1785 — 7:51 AM CT brief (Option B, 17 min after the restart = model warm-up)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $72/mo ($2.41/d) | $255/mo ($8.50/d) | — |
+| making captured / realized / share (live) | 138.0 / **13.52** / 0.0001 | — / — / 0.0049 | — |
+| net α | 1,668 | — | — |
+| $300 α (4 sim min) | **−8.8 on $69k (−1.27 bp, 46 books, kept +1 −13)** | +1.09 bp | +0.33 bp |
+| $30 α (4 sim min) | +0.01 bp | — | — |
+
+- Why the $300 loss: during the ≈ 5-sim-min model warm-up NO book has a lean yet, so under Option B every $300 book counts as "no-lean" and gets two-sided rests. Those small rests fill without any signal behind them.
+  - Before Option B (rest_none 1) the warm-up simply had no $300 quotes.
+- Expected to end as leans arrive (≈ 8:00 AM). The B guard's first check (≈ 8:05 AM) and the 8:57 AM read judge the post-warm-up behaviour.
+- **Lesson / follow-up:** a restart with Option B should hold no-lean rests until the model is warm (e.g. require the mid history before resting). Note for the next build.
+- **Survival:** lowest non-immune ≈ $114 / $114 / $117; 113 $72 ≈ 0.63×.
+- Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1786 — 8:21 AM CT brief (Option B, post-warm-up)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | **$77/mo ($2.56/d)**, first rise since ≈ 1 AM | $253/mo ($8.45/d) | — |
+| making captured / realized / share (live) | 144.5 / 12.6 / 0.0001 | — / — / 0.0049 | — |
+| net α | 1,712 | — | — |
+| incentive | 0.0015 | — | — |
+| $300 α (4 sim min) | **+21.6 on $175k (+1.24 bp, kept +15 −4)** | +0.81 bp | +0.55 bp |
+| $30 α (4 sim min) | +0.05 bp | — | — |
+
+- Recovered after the warm-up.
+- B guard checks:
+
+| time (UTC) | $300 α 113 | 252 |
+|---|---|---|
+| 14:10 | −0.44 (warm-up tail) | +1.58 |
+| 14:16 | +0.18 | +1.22 |
+| 14:22 | **+0.99** | +0.62 |
+
+- **Survival:** lowest non-immune ≈ $112 / $113 / $114; 113 $77 ≈ 0.68×.
+- Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1787 — 8:51 AM CT brief (Option B)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $76/mo ($2.54/d) | $251/mo ($8.35/d) | — |
+| making captured / realized / share (live) | 145.1 / **20.32** (highest; ≈ 1.5× since 8:21 AM) / 0.0001 | — / — / 0.0049 | — |
+| net α | 1,625 | — | — |
+| $300 α (4 sim min) | +4.1 on $125k (+0.33 bp) | +0.96 bp | +0.70 bp |
+| $30 α (4 sim min) | +0.06 bp | — | — |
+
+- B guard, last 4 checks: 113 **+1.01 / +1.09 / +1.05** / +0.52 vs 252 +0.74 / +0.78 / +0.97 / +0.84. Ahead of 252 on 3 of 4.
+- **Survival:** lowest non-immune ≈ $111–113; 113 $76 ≈ 0.68×.
+- Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1788 — 8:57 AM CT — Option B verdict: NOT better than Option A → back to Option A (8:59 AM)
+
+- **Replica, post-warm-up only** (last 10 sim min, sim s 38,779–39,379):
+
+| uid | C | R | quality | $300 R | $300 Σ2·min (books) |
+|---|---|---|---|---|---|
+| 113 | +16.8 | −4.4 | **0.00** | **−6.5** | −3.3 (17) |
+| 252 | — | — | 0.49 | +10.2 | — |
+| 55 | — | — | 0.49 | +6.0 | — |
+
+  (15-sim-min read incl. the warm-up: $300 R −6.7, Σ2·min +0.4 (37).)
+- $300 α (8 sim min): 113 **+0.93 bp on $359k** (252 +0.81, 55 +0.55). B guard: no revert; 113 ahead of 252 on 3 of the last 4 checks.
+- **Comparison of the two-sided variants:**
+
+| variant | rest size | where | $300 R | quality |
+|---|---|---|---|---|
+| Option A | 0.1 | everywhere | −0.5 | 0.10 |
+| A2 | 0.2 | everywhere | −7.1 | 0 |
+| B | 0.2 | no-lean books only | −6.5 | 0 |
+
+- → **Rest SIZE drives the 20-s loss** more than lean vs no-lean. Caveat: $300 R swings −6 to +6 between 10–20-sim-min windows even with no change (pre-A reads), so single reads are noisy.
+- **Action 8:59 AM:** live params → Option A (live_params_113.pre-A2.json with explicit mk_rest_lean_none 0, rest_frac 0.1); B_guard stopped. Agent 186bbabb stays (knob off = d8d9f7a7 behaviour).
+- **Plan:** hold Option A for the survival afternoon (pay $76, rising). Any further test only if clearly safer. Candidate: B at rest_frac 0.1 (no-lean books only).
+- Live 8:51 AM: realized 20.3 (highest).
