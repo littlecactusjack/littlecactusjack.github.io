@@ -26981,3 +26981,1319 @@ fillclass300, last 1,500 sim s:
 - **Action 8:59 AM:** live params → Option A (live_params_113.pre-A2.json with explicit mk_rest_lean_none 0, rest_frac 0.1); B_guard stopped. Agent 186bbabb stays (knob off = d8d9f7a7 behaviour).
 - **Plan:** hold Option A for the survival afternoon (pay $76, rising). Any further test only if clearly safer. Candidate: B at rest_frac 0.1 (no-lean books only).
 - Live 8:51 AM: realized 20.3 (highest).
+
+## §1789 — 9:21 AM CT brief (Option A, HOLD for survival)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | **$78/mo ($2.60/d)** | $239/mo ($7.97/d) | — |
+| making captured / realized (live) | 151.1 / 19.73 | — | — |
+| share | **0.0002** (doubled) | 0.0049 | — |
+| net α | 1,614 | — | — |
+| incentive | 0.0016 | — | — |
+| $300 α (4 sim min) | +13.6 on $181k (+0.75 bp) | +1.05 bp | +0.30 bp |
+| $30 α (4 sim min) | +0.20 bp | — | — |
+
+- **Survival:** lowest non-immune ≈ $105 / $105 / $110; 113 $78 ≈ 0.74× (gap closing: 0.63× at 7:51 AM).
+- Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1790 — 9:44 AM CT brief (Option A, HOLD)
+
+| | 113 | 252 | 55 |
+|---|---|---|---|
+| pay | $76/mo ($2.54/d) | $234/mo ($7.81/d) | — |
+| making captured / realized / share (live) | 149.4 / 16.91 / 0.0002 | — / — / 0.0049 | — |
+| net α | 1,528 (drifting down from 1,831 at 7:33 AM as the strong overnight stretch leaves the window) | — | — |
+| incentive | 0.0016 | — | — |
+| $300 α (4 sim min) | +10.4 on $126k (+0.82 bp) | +0.63 bp | −0.25 bp |
+| $30 α (4 sim min) | +0.10 bp | — | — |
+
+- **Survival:** lowest non-immune ≈ $102 / $103 / $107; 113 $76 ≈ 0.74×.
+- Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1791 — 10:15–10:20 AM CT — brief; Option A costs ≈ half the $300 skill edge → back to the M4-only recipe for survival
+
+- **10:15 AM gauges:**
+  - 113: $75/mo ($2.48/d); captured 144.7, realized **12.05** (20.3 at 8:51 AM), share 0.0002; net α **1,485** (1,831 at 7:33 AM).
+  - $300 α (4 sim min) +2.7 on $121k = +0.22 bp, kept +9 −14 (252 +0.46, 55 −0.18).
+  - 252: $229/mo, share 0.0049.
+  - Lowest non-immune ≈ $105 / $105 / $106.
+- **Relative-to-252 comparison** (controls for market):
+
+| period | 113 $300 α | 252 same windows | 113 relative to 252 |
+|---|---|---|---|
+| before Option A (7 PM–5 AM, M4 only) | +1.3 to +2.8 bp | +0.4 to +1.0 | ≈ 2× |
+| Option A / A2 / B (5 AM–now) | +0.2 to +1.9 bp | +0.5 to +1.6 | ≈ 1× |
+
+- The tiny two-sided rests (Option A) bought a making share of 0.0002 (≈ $5/mo at 252's ≈ $1 per 0.00002) but cost ≈ half of the $300 α edge. Skill is what pays 113 (and the prune rank) today.
+- **Action 10:20 AM:** mk_rest_none 0 → **1**, mk_gate_rest 5 → **30** (rest_frac 0.1, rest_lean_none 0 explicit). This is the §1742 recipe (M2 + M3a + M3b2 + M4 + lean 1.5), the one with 6 positive quality reads and +1.3–2.8 bp. Backup live_params_113.optA-final.json.
+- live_params_NEXT.json updated to the same.
+- **Verdict on the two-sided $300 line (M5, A, A2, B): NOT worth the skill cost with our lean engine.** Option A was the least bad; it stays a candidate for a dedicated making miner, not for the survival miner.
+
+## §1792 — 10:27 AM CT — user: "this isnt a survival miner, its a test miner until we have a good strategy. keep running tests" → ABAB test of Option B at rest_frac 0.1
+
+- **Correction recorded:** the survival holds in §1788–§1791 were wrong in spirit. Memory feedback-uid113-goahead updated + lesson.
+- **Test** speed/abab_b01.sh (lab, nohup, pid 2363775; log /opt/mvtrx/abab_b01.log). 4 blocks × 30 wall min (≈ 6 sim min each):
+  - A = §1742 recipe (mk_rest_none 1, gate_rest 30).
+  - B = Option B tiny (mk_rest_none 0, gate_rest 5, rest_frac 0.1, mk_rest_lean_none 1): two-sided only on no-lean $300 books; lean books exactly as in A.
+  - Logged:
+    - every 5 min: $300 notional and α for 113 and 252 (skill_cls2 4);
+    - end of each block: making_diag 5 (C, R, $300 R).
+  - Safety: no $300 fills in 3 sim min or ≥ 20 blocked → A + stop.
+  - Ends ≈ 12:27 PM CT, back on A.
+- Judge: per-block 113 − 252 $300 α (bp), A vs B; $300 R per block; volume.
+- Backup live_params_113.pre-abab.json.
+
+## §1793 — 10:49 AM CT brief (ABAB block 1 = A)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $78/mo ($2.59/d) | $224/mo ($7.47/d) |
+| making captured / realized / share (live) | 148.6 / 10.9 / 0.0002 | — / — / 0.0050 |
+| net α | **1,571** (recovering) | 1,602 |
+| incentive | 0.0017 | — |
+
+- ABAB block A, $300 α checks (113 vs 252, bp):
+
+| check | 1 | 2 | 3 | 4 |
+|---|---|---|---|---|
+| 113 | +0.19 | **+1.64** | **+1.75** | +0.81 |
+| 252 | +0.84 | +1.04 | +0.53 | +0.76 |
+
+- $300 fills 19–52 per 3 sim min; 0 blocked.
+- Lowest non-immune ≈ $99–102. Registered, 0 tracebacks; upstream 20e97853.
+
+## §1794 — 11:19 AM CT brief (ABAB block 2 = B)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $77/mo ($2.58/d) | $223/mo ($7.43/d) |
+| making captured / realized / share (live) | 147.1 / 12.5 / 0.0002 | — / — / 0.0050 |
+| net α | 1,418 | 1,432 |
+| incentive | 0.0017 | — |
+
+- **Block A** (5 checks, 113 − 252 bp): −0.65, +0.60, +1.22, +0.05, +1.03 → **mean +0.45**. End replica (5 sim min): 113 quality 0.15, $300 R +1.2, Σ2·min −1.2 (3 books).
+- **Block B so far** (3 checks): 113 +1.11 / +1.04 / +0.81 vs 252 +1.10 / +1.01 / +1.15 → mean 113 − 252 ≈ −0.10, on $143–172k.
+- Lowest non-immune ≈ $103–104. Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1795 — 11:49 AM CT brief (ABAB block 3 = A)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $75/mo ($2.50/d) | $220/mo ($7.32/d) |
+| making captured / realized / share (live) | 152.7 / 12.6 / 0.0002 | — / — / 0.0050 |
+| net α | 1,447 | 1,446 |
+| incentive | 0.0016 | — |
+
+- **Block B complete** (6 checks, 113 − 252 bp): +0.01, +0.03, −0.34, +0.02, +0.45, +0.02 → **mean ≈ +0.03**.
+- B end replica (5 sim min): 113 **quality 0.00**, $300 R −1.9, Σ2·min −2.4 (7 books both > 0); 252 quality 0.56.
+- Block A1 end (for comparison): quality 0.15, $300 R +1.2, Σ2·min −1.2 (3 books).
+- Block A2, first check: 113 +0.77 vs 252 +0.54.
+- Lowest non-immune ≈ $107–110. Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1796 — 12:19 PM CT brief (ABAB block 4 = B started 12:19 PM)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $75/mo ($2.51/d) | $222/mo ($7.40/d) |
+| making captured / realized / share (live) | 146.3 / 8.67 / 0.0002 | — / — / 0.0050 |
+| net α | 1,422 | 1,398 |
+
+- **Block A2 complete** (113 − 252 bp per check): +0.23, +0.88, +1.02, +1.42, +0.77 → **mean +0.86** on $134–173k.
+- A2 end replica (5 sim min): 113 quality **0.00**, $300 R −3.0 (252 0.51).
+- So far:
+
+| | mean 113 − 252 α | end replica quality |
+|---|---|---|
+| A1 | +0.45 | 0.15 |
+| B1 | +0.03 | 0.00 |
+| A2 | +0.86 | 0.00 |
+
+- **The 5-sim-min end-of-block replica is too short to separate arms** (A itself reads 0.15 and 0.00).
+- α is the clear signal: **A ≈ +0.65 bp over 252, B ≈ +0.03.**
+- Lowest non-immune ≈ $111–113. Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1797 — 12:49 PM CT brief (ABAB block B2 ending)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $75/mo ($2.51/d) | $222/mo ($7.39/d) |
+| making captured / realized / share (live) | 151.1 / 8.9 / 0.0002 | — / — / 0.0050 |
+| net α | 1,467 | 1,506 |
+
+- **Block B2 checks** (113 − 252 bp): +0.83, +0.95, +0.05, +0.22, +0.47 → mean ≈ +0.50, on higher $300 volume ($143–251k vs 252's $144–188k).
+- Lowest non-immune ≈ $111–112. Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+- Full ABAB verdict follows when the script ends (≈ 12:50 PM).
+
+## §1798 — 12:57 PM CT — ABAB B-0.1 verdict: TIE on skill → B adopted as base (tie → copy the fleet); jump_back 2 ABAB started
+
+**Per arm** (5-min checks, 113 vs 252 in the same windows):
+
+| block | 113 − 252 (bp) | mean (bp) | 113 − 252 Σα per check | end replica quality | two-sided $300 books |
+|---|---|---|---|---|---|
+| A1 | −0.65, +0.60, +1.22, +0.05, +1.03 | +0.45 | 3.7 | 0.15 | 3 |
+| A2 | +0.23, +0.88, +1.02, +1.42, +0.77 | +0.86 | 11.9 | 0.00 | 1 |
+| B1 | +0.01, +0.03, −0.34, +0.02, +0.45, +0.02 | +0.03 | 1.6 | 0.00 | 7 |
+| B2 | +0.83, +0.95, +0.05, +0.22, +0.47, +0.25 | +0.46 | 12.3 | 0.16 | 16 |
+
+| arm | mean (bp) | Σα per check | $300 volume |
+|---|---|---|---|
+| A | **+0.65** | +7.8 | $111–173k |
+| B | +0.25 | **+7.0** | $141–251k (higher) |
+
+- Pay counts total α, not α per $. B trades more at a lower bp, so its total α matches A's: **TIE**. The 5-sim-min replicas cannot separate the arms.
+- B makes more $300 books two-sided, the route to the $300 making pool, and that is how the fleet quotes.
+- **Rule feedback-tie-copy-fleet → B adopted as the new base.** live_params_NEXT.json = base + Option B 0.1 (mk_rest_none 0, gate_rest 5, rest_frac 0.1, mk_rest_lean_none 1, jump_back 1).
+- **Next test started 12:58 PM** — speed/abab_jb2.sh (log /opt/mvtrx/abab_jb2.log; 4 × 30 min; ends ≈ 2:58 PM):
+  - A = new base (jump_back 1); B = new base with **mk_jump_back 2** (lean side 2 ticks behind the touch).
+  - Aim: $300 20-s markout / R (the fleet's behind fills sit 2–3 ticks back).
+  - Judge on Σα per check vs 252 (primary) and bp, plus replica.
+
+## §1799 — 1:28 PM CT brief (jb2 ABAB block A1 = new base)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $75/mo ($2.50/d) | $216/mo ($7.18/d) |
+| making captured / realized / share (live) | 144.9 / 9.1 / 0.0002 | — / — / 0.0050 |
+| net α | 1,411 | 1,490 |
+
+- Block A1 (new base = one-sided lean + Option B 0.1) checks:
+
+| check | 113 | 252 |
+|---|---|---|
+| 1 | +32.1 (+1.50 bp) on $214k | +10.5 (+0.60) |
+| 2 | +35.3 (+1.76) | +11.1 (+0.59) |
+| 3 | +31.6 (+1.66) | +7.6 (+0.47) |
+| 4 | +35.0 (+1.83) | +12.0 (+0.75) |
+| 5 | +23.2 (+1.46) | +8.3 (+0.51) |
+
+- → **Σα ≈ 3× 252's, bp ≈ 2.7×**, the strongest block of the day.
+- Lowest non-immune: 31 $90, 181 $108; 113 $75. Registered, 0 tracebacks, 0–1 blocked. Upstream 20e97853.
+
+## §1800 — 1:58 PM CT brief (jb2 ABAB block B1 = jump_back 2)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $76/mo ($2.53/d) | $218/mo ($7.26/d) |
+| making captured / realized / share (live) | 141.7 / 8.6 / 0.0002 | — / — / 0.0050 |
+| net α | 1,341 | 1,367 |
+
+- **Block A1 end replica:** 113 **quality 0.31**, $300 R **+3.0**, Σ2·min −0.8 (11 books both > 0); 252 0.46.
+  - The new base gives the best block-end making read so far, and its α was 3× 252's (§1799).
+- **Block B1 (jump_back 2) so far:**
+
+| check | 113 Σα (bp) | $300 volume | 252 Σα (bp) |
+|---|---|---|---|
+| 1 | +7.0 (+0.54) | $129k | +7.0 (+0.41) |
+| 2 | +11.0 (+0.86) | $129k | +13.6 (+0.92) |
+| 3 | +8.3 (+0.76) | $109k | +12.3 (+0.79) |
+
+  - ≈ level with 252, far below A1's ≈ 3×. Volume lower ($109–129k vs $159–214k): 2 ticks back fills less.
+- Lowest non-immune ≈ $109–110. Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1801 — 2:28 PM CT brief (jb2 ABAB block A2)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $72/mo ($2.41/d) | $217/mo ($7.24/d) |
+| making captured / realized / share (live) | 148.7 / 9.4 / 0.0002 | — / — / 0.0050 |
+| net α | 1,417 | 1,465 |
+
+- **Block B1 (jump_back 2) complete:**
+  - 113 − 252 Σα per check: 0.0, −2.6, −4.0, +2.3, −3.7, −1.4 → **mean −1.6**.
+  - bp: +0.13, −0.06, −0.03, +0.40, −0.07, +0.24 → mean +0.10.
+  - $300 volume falling $129k → $83k.
+  - End replica: quality 0.14, $300 R +1.6, Σ2·min **+0.1** (8 books).
+- **Block A1 (jump_back 1)** for comparison: Σα +21.6, +24.2, +24.0, +23.0, +14.9 → **mean +21.5**; quality 0.31.
+- **Block A2 so far:** +8.5 vs 11.8 (+0.78 vs +0.76 bp), +8.4 vs 9.9: a quieter market window (252 lower too).
+- Lowest non-immune ≈ $110 / $110. Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1802 — 2:58 PM CT brief (jb2 ABAB block B2 running)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $71/mo ($2.38/d) | $214/mo ($7.15/d) |
+| making captured / realized / share (live) | 146.2 / 6.7 / 0.0002 | — / — / 0.0050 |
+| net α | 1,303 | 1,366 |
+
+- Block A2 end replica: 113 quality 0.00, $300 R −1.3 (252: quality 0.07, $300 R +1.6). A weak window for both.
+- B2 first check: 113 +10.7 (+1.03 bp) on $104k vs 252 +17.6 (+1.06).
+- Lowest non-immune ≈ $113–114. Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1803 — 3:19 PM CT — user: keep fixing $300 making on this miner ("a maker-only miner failed for weeks"); per-fill validator-basis study finds the mechanism
+
+speed/fillvalue.py: the validator's own accumulate_book_capture with _attribute_capture wrapped to record every maker fill's captured C and realized R; $300 books, last 30 sim min.
+
+| uid | C per $ | R per $ | **R/C** |
+|---|---|---|---|
+| 113 | +0.28 bp | +0.01 bp | **0.04** |
+| 55 | +0.28 bp | +0.10 bp | 0.37 |
+| 252 | +0.31 bp | +0.16 bp | 0.52 |
+| 210 | +0.35 bp | +0.20 bp | 0.56 |
+
+- **Captured per $ is the same for all** (≈ 0.3 bp). The gap is entirely realized/captured.
+- **113's losses:**
+  - Single-level small hits: 1,108 fills, R/C −0.17 (fleet +0.39 to +0.61).
+  - Fills 1 tick inside a sweep ("depth1"): $279k, R −2.07, R/C **−0.92** (fleet +0.17 to +0.31).
+  - Deeper sweep fills (depth 2–3) are fine for everyone.
+- **Interpretation:** our lean predicts minutes-scale moves. We buy into short-term dips (and sell into pops) that keep going for the next seconds. At the validator's 20-s horizon those fills look adverse; at 120–600 s they pay (our skill). The fleet barely leans on $300, so its fills are not tilted against the short-term move.
+- **Skill α and 20-s making value conflict structurally on the lean side.** That is also why adding two-sided rests never fixed it, and why the maker-only miner failed.
+- **Next tests (ABAB, judged on per-fill R/C via fillvalue.py + Σα vs 252):**
+  1. **Delayed lean entry:** step in only once the last few seconds of prints stop moving against the lean (short-term momentum filter on the lean step-in).
+  2. **Split books:** lean only where our 20-s R/C is positive; neutral (no lean, two-sided) elsewhere.
+
+## §1804 — 3:28 PM CT brief (jb2 ABAB last block B2 finishing)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $70/mo ($2.33/d) | $217/mo ($7.22/d) |
+| making captured / realized / share (live) | 151.8 / 5.6 / 0.0002 | — / — / 0.0049 |
+| net α | 1,358 | 1,459 |
+
+- B2 checks (113 vs 252 Σα): 10.7 vs 17.6, 12.3 vs 16.3, 11.9 vs 6.0, 12.5 vs 12.1, 11.7 vs 16.3.
+- Lowest non-immune ≈ $107–113. Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1805 — 3:34–3:37 PM CT — jb2 ABAB verdict: jump_back 2 NOT KEPT; delayed-entry build deployed + ABAB started
+
+**jump_back 2 ABAB** (log /opt/mvtrx/abab_jb2.log):
+
+| arm | 113 − 252 Σα per check (blocks) | mean | bp vs 252 | $300 volume | end quality |
+|---|---|---|---|---|---|
+| A (jump_back 1) | +21.5 / −0.8 | **+10.4** | ≈ +0.7 | — | 0.31 / 0.00 |
+| B (jump_back 2) | −1.6 / −3.2 | **−2.4** | +0.10 | lower ($83–134k) | 0.14 / 0.00 |
+
+- → jump_back 1 stays (live already on A).
+
+**Delayed lean entry:**
+- agents/QuoteAgent.py **58a77a8a** = 186bbabb + live knobs `mk_lean_mom_s` / `mk_lean_mom_bp`. A new _mom_ok() check gates the lean jump: no step-in while the mid moved against the lean by more than X bp over the last N sim s.
+- equiv 0 diffs vs 186bbabb (tape, ledger, locks identical); test_pace ALL PASS. Backup agents/QuoteAgent.py.bak-186bbabb; newminer.sh expects 58a77a8a.
+- x3 restarted 3:35 PM; pace_cold 0, 0 blocked, 0 tracebacks.
+- **ABAB** speed/abab_mom.sh (pid 2502612; log /opt/mvtrx/abab_mom.log):
+  - Waits 1,500 s for the model warm-up, then 4 × 30 min.
+  - A = base (mom off); B = mk_lean_mom_s 10, mk_lean_mom_bp 1.0.
+  - Block ends now run speed/fillvalue.py 6 (per-fill validator R/C: ALL / single / depth1) instead of the 5-min making_diag.
+  - Ends ≈ 6:35 PM CT.
+- (A first launch had a quoting slip in the edit; it was killed during its warm-up sleep before any change and relaunched patched.)
+
+## §1806 — 3:45 PM CT brief (delayed-entry ABAB in its warm-up wait)
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $71/mo ($2.36/d) | $220/mo ($7.34/d) |
+| making captured / realized / share (live) | 157.4 / 7.0 / 0.0002 | — / — / 0.0050 |
+| net α | 1,387 | 1,495 |
+
+- abab_mom.sh running (warm-up wait until ≈ 4:02 PM, then block A).
+- Lowest non-immune ≈ $117–119. 113 ($71) is protected until ≈ 4:10 PM.
+- Registered, 0 tracebacks, 0 blocked. Upstream 20e97853.
+
+## §1807 — 3:53 PM CT — user: "can you get any information out of the test when it's pruned?" → offline counterfactual for delayed entry (speed/momcf.py)
+
+- After a prune the tape stops (no more states). Blocks completed before it are still scored offline from the tape.
+- More useful: tag every recorded fill by the mid move over the 10 sim s before it (vs the fill side), then score each group on the validator basis plus +120/+600 s quote-mid markouts (skill proxy).
+- Last 90 sim min:
+
+| uid / group | share of $300 $ | C per $ | R/C | +120 s | +600 s |
+|---|---|---|---|---|---|
+| 113 against > 1 bp | 49% | +0.21 bp | **−0.41** | +2.17 bp | +1.93 bp |
+| 113 against 0–1 bp | 28% | +0.17 bp | **−0.49** | +2.57 bp | +2.43 bp |
+| 113 with / flat | 22% | **+0.42 bp** | **+0.18** | +2.03 bp | +2.02 bp |
+| 113 all | — | +0.25 bp | −0.20 | +2.25 bp | +2.09 bp |
+| 252 all (against > 1 bp: only 15%) | — | +0.32 bp | +0.57 | +2.66 bp | +3.00 bp |
+
+- 252's R/C is ≈ 0.57 in every group.
+- **Conclusions:**
+  1. The §1803 diagnosis is confirmed: 77% of 113's $300 $ fills into an adverse 10-s move.
+  2. Delayed entry should lift R/C (with/flat fills +0.18, C ×2) at **no per-$ skill cost** (+120/+600 s equal across groups). We are pace-bound, so the skipped budget is spent at better moments.
+  3. The 0–1 bp group is as bad as > 1 bp → the stronger setting **mk_lean_mom_bp 0.0** should beat the live test's 1.0. Next variant.
+  4. Even good fills reach only 0.18 vs 252's 0.57: delayed entry is a step, not the whole gap.
+- This offline method lets the next miner start with the best setting without waiting for a live ABAB.
+
+## §1808 — 3:54 PM CT — delayed entry at 0 bp put live directly (ABAB stopped in its warm-up wait)
+
+- abab_mom.sh killed before any block ran; no params were changed by it.
+- Reason: the prune is likely soon after ≈ 4:10 PM, so the ABAB would not complete, and §1807's offline evidence already favours the stronger setting.
+- Live 3:54 PM (sim s 43,954): **mk_lean_mom_s 10, mk_lean_mom_bp 0.0** (no lean jump while the 10-s mid move is against the lean at all). Backup live_params_113.pre-mom0.json.
+- live_params_NEXT.json includes it, so the next miner starts with it.
+- Live read ≈ 4:38 PM (cron), done on the tape even if 113 is pruned first:
+  - $300 fills not collapsed;
+  - momcf: share of "against" fills down from 77%, R/C up from −0.20;
+  - skill_cls2: Σα vs 252.
+
+## §1809 — 4:15 PM CT brief: 113 is now NON-IMMUNE and the LOWEST in the prune order
+
+| | 113 | 252 |
+|---|---|---|
+| pay | $71/mo ($2.38/d) | $222/mo ($7.39/d) |
+| making captured / realized / share (live) | 143.5 / 5.5 / 0.0002 | — / — / 0.0049 |
+| net α | 1,275 | 1,530 |
+
+- Prune order: **113 $72 first**, then 182 $118, 95 ≈ $12x → pruned at the next registration on the subnet.
+- **Delayed entry** (mom 10 s / 0 bp, since sim s 43,954), 113 fills per sim min:
+
+| sim min since 43,954 | $300 | $30 |
+|---|---|---|
+| 3 | 3 | 28 |
+| 4 | 9 | 34 |
+
+  - $300 trading continues but is lighter (post-restart warm-up + filter). The 4:38 PM read judges it.
+- Registered, 0 tracebacks, 0 blocked. Upstream 20e97853. The ABAB was stopped in §1808 (no script running).
+
+## §1810 — 4:38 PM CT — 113 PRUNED (≈ 4:36 PM CT, right after its protection ended); final delayed-entry read inconclusive; next-miner setup
+
+- regcheck twice: x3 113 NOT REGISTERED (journal "not registered" 22:36:39 UTC).
+- mvtrx-x3 stopped + disabled; our_uids.txt now empty (backup our_uids.txt.bak-113prune); final params live_params_113.FINAL-1120.json. No test script running.
+- **Final delayed-entry read** (mom 10 s / 0 bp; tape sim s ≈ 44,000–44,439 incl. the warm-up tail; speed/momcf.py 7):
+  - "Against" share **77% → 18%**: the filter works mechanically.
+  - 113 ALL R/C −0.28 (with/flat −0.38) on only 197 fills / $96k → **INCONCLUSIVE** (too small, partly warm-up).
+  - $300 α +9.8 on $96k (+1.02 bp) vs 252 +21.9 on $249k (+0.88 bp): per $ fine, volume 2.5× lower.
+- **Next miner:**
+  - live_params_NEXT.json = proven base (§1742 recipe + Option B 0.1 + jump_back 1), with mk_lean_mom_s 0 (delayed entry OFF).
+  - The first test after warm-up = delayed-entry ABAB (mom 10 / 0 bp).
+  - Agent 58a77a8a; newminer.sh sets pace_cold=1 + pace_start 1500 (no start burst).
+  - Registration (user, VS Code closed): `~/btcli/bin/btcli subnet register --netuid 79 --wallet.name main --wallet.hotkey x3`, then `HK=x3 sh newminer.sh <uid> 113`.
+- 113's life (4:11 PM 11-19 → 4:36 PM 11-20):
+  - first positive making quality, first live making credit and share; peak net α 1,831; pay peak $78/mo.
+  - Never above ≈ 0.75× the prune line; the $300 making pool was never opened.
+
+## §1811 — 4:47 PM CT — NEW MINER x3 = UID 101 live; delayed-entry ABAB queued
+
+- User registered hotkey x3 → **UID 101**.
+- `HK=x3 sh newminer.sh 101 113` → regcheck OK, agent 58a77a8a, settings live_params_NEXT.json (proven base, delayed entry OFF), unit pace_start=1500 **pace_cold=1** (first cold start), restarted 22:45:49 UTC, our_uids "101 maker x3 44540".
+- LIVE PARAMS applied: mk_model_lean 1.5, mk_low_expiry 500 s, mk_jump_back 1, mk_rest_lean_none 1, … (mk_dfm ignored). 0 tracebacks, 0 blocked.
+- **ABAB** speed/abab_mom101.sh (pid 2532016; log /opt/mvtrx/abab_mom101.log):
+  - 1,500-s warm-up wait, then 4 × 30 min.
+  - A = base; B = delayed entry mk_lean_mom_s 10 / **mk_lean_mom_bp 0.0**.
+  - 5-min skill checks vs 252; fillvalue 6 at block ends.
+  - Ends ≈ 7:50 PM CT. The cold start means small buckets early: both arms share that, but early blocks trade less.
+
+## §1812 — 6:33 PM CT brief (laptop back) + per-book study
+
+- **101:** registered, 0 tracebacks, 0 of 183 blocked (cold start: 24 h notional median $5.0k, max $11.0k). Pay $0 (2 h old), net α 125, making 0.
+- **252:** $220/mo ($7.32/d), share 0.0048. Lowest non-immune ≈ $121–122. Upstream 20e97853.
+- **Delayed-entry ABAB on 101** (log abab_mom101.log), Σα per check, 101 − 252:
+
+| block | per-check diffs | mean | 101 $300 volume | 101 bp | 252 bp | end fillvalue R/C |
+|---|---|---|---|---|---|---|
+| A | −11.7, −5.7, −4.5, −6.0, −5.7, −5.0 | **−6.4** | $68–154k | −0.08 to +0.98 | +0.46 to +1.40 | +0.10 (single +0.61, depth1 −2.37) |
+| B (so far, 5 checks) | — | **−16.6** | $67–130k | −0.04 to +0.82 | — | — |
+
+  - B is trending worse.
+  - 101 trails 252 even in A (cold-start buckets; 101's bp below 113's usual 1–2 bp).
+- **Per-book study** (speed/bookcf.py, 113's tape, the 120 sim min before its prune, END=44439):
+
+| uid | books with R < 0 | $ | R | +600 s skill | books with R ≥ 0 | $ | R | +600 s skill |
+|---|---|---|---|---|---|---|---|---|
+| 113 (total R/C −0.22) | **76 of 128** | $2.50M | −46.0 | **+1.72 bp** | 52 | $1.72M | +22.8 | **+2.72 bp** |
+| 252 (total R/C +0.57) | 21 of 128 | — | — | +2.49 bp | 107 | — | — | +3.08 bp |
+
+  - 113's worst 20% of books carry R −28.1 of −23.2 total.
+- **Conclusions:**
+  - The loss is BROAD (60% of books), so a fixed-list split-books fix would only touch part of it.
+  - Books with negative 20-s R also have WEAKER skill: bad making fills and weak lean come together → **"lean only when the signal is strong" (higher $300 lean threshold) could improve both.** Moves up the queue.
+- Next offline:
+  - (a) Persistence: does a book's R sign hold hour to hour? This decides whether split books is worth building.
+  - (b) Counterfactual of a higher lean threshold on 113's tape.
+- Next live (after the 7:57 PM verdict): the higher lean threshold if (b) supports it.
+
+## §1813 — 6:40 PM CT — per-book 20-s R does NOT persist hour to hour → split books by book is weak
+
+- bookcf, 113's tape: hour 1 (sim s 37,239–40,839, R/C −0.38) vs hour 2 (40,839–44,439, R/C −0.06); 113 books with > $5k in both.
+- Correlation of per-book R per $: **+0.07**; same sign 66/113 (58% ≈ coin flip).
+- Books negative in hour 1: hour-2 R −0.048 bp vs others +0.028 bp (a small carry-over).
+- → A fixed or rolling "lean only on good books" list would mostly chase noise. **Split books DOWN-ranked.**
+- Next lever = **lean strength** (the "R<0 books have weaker skill" link in §1812 points to weak-lean fills, not to specific books). Needs a counterfactual on fills tagged by lean strength. The tape lacks the model prediction, so the next step is to reconstruct the lean-model input from the tape or log it live (e.g. a pred value per step-in in the agent log).
+
+## §1814 — 6:44 PM CT — lean-strength counterfactual: STRONG-lean fills are the 20-s losers (not weak ones)
+
+- speed/leancf.py rebuilds the agent's market-model pred for each fill from the tape (mid + fund; model_lean.json).
+- 113's tape, the 90 sim min to END = 44,439; 113 ALL R/C −0.17.
+
+| 113 group (|pred|/thr, fill side vs pred) | share of $ | C | R/C | +600 s |
+|---|---|---|---|---|
+| WITH < 1 | 8% | +0.48 | **+0.34** | +2.22 |
+| WITH 1–1.5 | 11% | +0.35 | +0.15 | +1.93 |
+| WITH 1.5–2 | **44%** | +0.15 | **−0.47** | +2.60 |
+| WITH 2–3 | 19% | +0.10 | **−1.66** | **+3.18** |
+| WITH ≥ 3 | 1% | — | +0.28 | +4.48 |
+
+| 252 group | share of $ | C | R/C | +600 s |
+|---|---|---|---|---|
+| WITH < 1 | 38% | — | +0.42 | — |
+| WITH 1–1.5 | 20% | — | +0.50 | — |
+| WITH 1.5–2 | 12% | — | +0.66 | — |
+| WITH 2–3 | 8% | +0.42 | **+0.88** | **+4.77** |
+| ALL | — | — | +0.56 | — |
+
+- **Conclusions:**
+  - A higher lean threshold is WRONG (it would cut our best-skill fills and keep the losses).
+  - The 20-s loss sits in **strong-lean fills with low capture** (C +0.10–0.15 bp: filled near the print-centred mid). 252's strong-pred fills capture 3–4× more and keep 66–88%.
+  - 63% of our $300 $ is in the strong bands vs 20% for 252.
+- **Next test design: strength-scaled jump_back.** Rest further behind the touch only on strong leans (e.g. 1 tick for |pred| < 1.5 thr, 2–3 ticks above).
+  - The flat jump_back 2 (§1805) cut volume on ALL leans; this keeps volume on the normal ones and seeks capture where it is lowest.
+  - Needs a small knob (e.g. mk_jump_back_strong + mk_jump_strong_z) + equiv/test_pace, then ABAB on 101 after the delayed-entry ABAB.
+
+## §1815 — 6:55 PM CT — strength-scaled jump_back built (staging, not deployed)
+
+- agents_next/QuoteAgent.py **1a2de99b** = 58a77a8a + live knobs:
+  - `mk_jump_back_strong` (0–5 ticks);
+  - `mk_jump_strong_pred` (|pred| cut, model units; 1.5 × thr ≈ 1.06).
+  - New _jb_for(lean) replaces mk_jump_back in the 6 jump-block uses: strong leans rest MK_JUMP_BACK_STRONG ticks behind the touch, others MK_JUMP_BACK.
+- equiv 0 diffs vs 58a77a8a (tape, ledger, locks identical); test_pace ALL PASS.
+- Plan: after the delayed-entry ABAB on 101 ends (≈ 7:50 PM):
+  - deploy 1a2de99b (restart; the ledger replay keeps the balance; ≈ 5-sim-min warm-up);
+  - ABAB A = base vs B = mk_jump_back_strong 3 + mk_jump_strong_pred 1.06;
+  - judge on Σα vs 252, fillvalue R/C and leancf per strength band.
+
+## §1816 — 6:50 PM CT — user: "the mvtrx discord says 0.6.8 came out yesterday" → it is on the TEST branch; watcher fixed; layout auto-switch armed
+
+- Upstream: `test` = **de323b82 "20261119 - 0.6.8"** (11-19 14:34 UTC); `main` still 20e97853 "0.6.7 final".
+- Our release watcher polled main only, so 0.6.8 went unseen. It now polls **main + test** (state files release_watch.state / .state.test; backup release_watch.py.bak-mainonly). First run logged + ALERTed the 0.6.8 testnet release.
+- **0.6.8 changes that matter to us** (commit message + debeta/config diff):
+  1. **Order-to-trade discount on MAKING** (making_otr_threshold **200** messages per fill, power 1, ON by default): making credit × min(1, 200 / msgs-per-fill) over the making window; placements + cancels count; a GTT expiry now counts as a cancel.
+     - 101 now: ≈ 156 instructions per state × ≈ 1 state per sim s ≈ 46.8k per 300 sim s vs 217 maker fills → **≈ 216 msgs per fill**, ≈ 7% discount (cold start lowers fills; should improve).
+     - Watch: the $30 500-s expiry and $300 re-quotes add to it.
+  2. **Layout change — CRITICAL:**
+
+| books | 0.6.7 (now) | 0.6.8 |
+|---|---|---|
+| 0–63 | $300 | $300 |
+| 64–127 | $300 | **$30** |
+| 128–191 | $30 | **4-dec** |
+| 192–255 | 4-dec | **new simulation_3** (price ≈ 100, 4 decimals) |
+
+     - Our book_map (calm:63-101;low:128-191;dec:192-255) would mis-quote every moved class.
+  3. Others: scoring seam split at a run change (no skill charge across a run), drand checks, unfilled IOC/FOK cancelled, rebates within fees.
+- Mainnet now (tape): book 64 bid $298.6, 128 $29.0, 192 $289.99 → still 0.6.7.
+- **Armed /opt/mvtrx/layout_switch.py** (nohup, pid 2542577; log layout_switch.log):
+  - Every 60 s it reads the tape. When book 64 < $100 (and book 128 is off the 2-dp grid or above $100), it sets book_map = "low:64-127;dec:128-255" in every live_params of our_uids.txt + live_params_NEXT (backups .pre-068layout), ALERTs and exits.
+  - No calm group and simulation_3 as dec until measured.
+- **To do when 0.6.8 hits main:**
+  - check skip_dec vs the new class (simulation_3 has its own pool);
+  - re-measure groups;
+  - update the analysis tools' class ranges (skill_cls2, fillvalue, momcf, leancf, bookcf all assume $300 < 128);
+  - re-fit the lean model if the class params changed.
+
+## §1817 — 6:53 PM CT brief (101, delayed-entry ABAB block A2)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $0 (2 h old) | $226/mo ($7.54/d) |
+| making captured / realized / share (live) | **1.74 / 0.12** (first live making on 101) / 0.0 | — / — / 0.0048 |
+| net α | 166 | 1,637 |
+
+- 101: registered, 0 tracebacks, 0 of 186 blocked; cold start busiest book $12.0k.
+- Upstream: main 20e97853 (0.6.7), test de323b82 (0.6.8). Layout switcher waiting (mainnet still on 0.6.7).
+- **ABAB:**
+  - Block B end (delayed entry): fillvalue R/C **+0.05** (single −0.24, depth1 −0.18) on $97k vs A1's +0.10.
+  - A2 checks: 101 +0.32 / +0.90 bp vs 252 +0.89 / +0.86.
+- Lowest non-immune ≈ $119–128.
+
+## §1818 — 7:23 PM CT brief (101, ABAB block B2)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $0 (2.6 h old) | $225/mo ($7.51/d) |
+| making captured / realized / share (live) | **6.28 / 0.60** (rising) / 0.0 | — / — / 0.0048 |
+| net α | 206 | 1,616 |
+
+- **Block A2 ended:**
+  - last check 101 **+19.6 on $204k (+0.96 bp)** vs 252 +5.0 (+0.32);
+  - end fillvalue R/C **+0.03** on $284k.
+  - Block-end R/C so far: A +0.10, B +0.05, A +0.03 → the 6-sim-min fillvalue reads ≈ 0 for both arms.
+- B2 first check: 101 +26.6 (+1.55 bp) vs 252 +3.3 (+0.20).
+- 101: registered, 0 tracebacks, 0 of 190 blocked (busiest book $15.0k). Upstream: main 0.6.7, test 0.6.8.
+- Lowest non-immune ≈ $110–119.
+
+## §1819 — 7:53 PM CT brief (101, ABAB ending) — delayed entry clearly losing
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $0 (3.1 h) | $225/mo ($7.51/d) |
+| making captured / realized (live) | **10.30 / 1.12** | — / — (share 0.0047) |
+| net α | 206 | 1,703 |
+
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $15.8k).
+
+**ABAB so far** (101 − 252 Σα per check):
+
+| block | per-check diffs | mean | 101 $300 volume |
+|---|---|---|---|
+| A1 | −11.7, −5.7, −4.5, −5.9, −5.7, −5.0 | **−6.4** | — |
+| B1 | −4.6, −18.1, −22.3, −18.9, −19.0, −23.9 | **−17.8** | $65–130k |
+| A2 | −12.5, −3.6, +9.7, −1.7, +2.2, +14.6 | **+1.5** | $113–204k |
+| B2 (5 checks) | +23.3, +3.4, −11.7, −18.4, −13.2 | **−3.3** | falling to **$42–57k** |
+
+- Block-end fillvalue R/C: A +0.10 / B +0.05 / A +0.03.
+- → A ≈ −2.5 vs B ≈ −11.0: **delayed entry is clearly worse.** It cuts $300 volume (the filter blocks most lean entries) with no gain in 20-s value. Formal verdict when the script ends (≈ 8:02 PM).
+
+## §1820 — 7:58 PM CT — delayed-entry ABAB on 101: DISPROVEN (stopped at its last check; 101 back on A)
+
+| arm | blocks (mean 101 − 252 Σα per check) | overall | $300 volume | block-end R/C |
+|---|---|---|---|---|
+| A (base) | −6.4, +1.5 | ≈ **−2.5** | $68–204k | +0.10, +0.03 |
+| B (mk_lean_mom_s 10 / bp 0) | −17.8, ≈ −3.3 (B2: +23.3 +3.4 −11.7 −18.4 −13.2 −13.2) | ≈ **−11** | collapsing to $42–65k | +0.05 |
+
+- **DISPROVEN:**
+  - The momentum filter blocks most lean entries, so $300 volume and total α fall.
+  - The 20-s value (R/C) did not improve: block-end ≈ 0 in both arms, and the earlier 113 live read gave R/C −0.28 at an 18% against-share.
+  - Removing the "against-move" fills does not make the remaining fills score well. Consistent with §1814: the loss is about how strong-lean fills are filled (low capture), not when.
+- Script stopped at 7:58 PM (its last check: −1.0 vs +12.2); live_params_101 mk_lean_mom_s 0 (A). The momcf re-read was skipped (verdict clear; saves the lab for the next deploy).
+- **Next:** strength-scaled jump_back (§1815, agents 1a2de99b), deploy + ABAB now.
+
+## §1821 — 7:59 PM CT — strength-scaled jump_back deployed on 101 + ABAB started
+
+- agents/QuoteAgent.py ← agents_next **1a2de99b** (§1815; backup agents/QuoteAgent.py.bak-58a77a8a); newminer.sh expects 1a2de99b.
+- x3 restarted 7:59 PM; 0 tracebacks, PACE 1 of 190 blocked.
+- **ABAB** speed/abab_jbs101.sh (log /opt/mvtrx/abab_jbs101.log):
+  - 1,500-s warm-up, then 4 × 30 min, ends ≈ 10:30 PM CT.
+  - A = base (strong knobs 0); B = mk_jump_back_strong 3 + mk_jump_strong_pred 1.06 (≈ 1.5 × thr): strong leans rest 3 ticks behind the touch, others 1.
+  - Judge on Σα vs 252 (primary), $300 volume, block-end fillvalue R/C. Afterwards leancf on the tape per strength band (does the strong band's C / R/C rise?).
+
+## §1822 — 8:15 PM CT — user: "is this the last idea for $300 making?" → no; queue-position check on 113's $300 fills
+
+Ideas ranked:
+1. Queue position / hold the lean order (new).
+2. Strength-scaled jump_back (running).
+3. Copy 252's quoting at strong pred (where it rests, size, two-sidedness).
+4. Order size on strong leans.
+5. A 252-style balanced making layer at its size/depth (not tiny rests).
+
+**$300 queue/age** (speed/qpos300.py, orderage300.py; END = 44,439, 40 sim min):
+
+| uid | mean queue position (0 = first) | sole-fill share | order age p75 | R/C (§1803) |
+|---|---|---|---|---|
+| 113 | 0.26 | 59% | 0 s | 0.04 |
+| 252 | 0.10 | 74% | 1 s | 0.52 |
+| 210 | 0.09 | 73% | **12 s** | 0.56 |
+| 55 | 0.22 | 56% | 1 s | 0.37 |
+
+- → Partly supported: the best R/C UIDs (252/210) sit at the queue front and 210 holds orders longest. But 55 sits ≈ where we do with R/C 0.37, so it is not the whole story.
+- The agent's "hold" (keep our touch order when the target drifts ≤ HOLD ticks behind, if not inside the others' best; §1317) exists only for calm books (mk_calm_hold); vol books pass hold=0.
+- **Queued test:** a live knob mk_vol_hold (ticks) for $300 vol books, holding the lean-side order through small touch moves. Expected gains: queue position, capture, fewer messages (0.6.8 OTR). Build + equiv/test_pace after the jbs ABAB.
+
+## §1823 — 8:20 PM CT — mk_vol_hold built (staging) + strong-pred positioning study started
+
+- agents_next/QuoteAgent.py **b5da5bcf** = 1a2de99b + live knob `mk_vol_hold` (0–5 ticks).
+  - On $300 vol books the order call now passes hold=MK_VOL_HOLD (and others-best when set): our touch/lean order is kept when its target drifts ≤ HOLD ticks behind it and it is not inside the others' best. Uses the existing §1317 hold path, until now calm-books only.
+  - equiv 0 diffs vs 1a2de99b (tape, ledger, locks identical); test_pace ALL PASS with hold off and with hold 2.
+  - Deploy after the jbs ABAB; ABAB A = winner of jbs, B = + mk_vol_hold 2.
+- **Strong-pred positioning study** (speed/strongpos.py, END = 44,439, 60 sim min; 113 / 252 / 210): for strong with-pred fills (|pred| ≥ 1.5 thr), C and R/C by depth vs the prior touch, fill size and event type. How does 252 sit when its signal is strong?
+
+## §1824 — 8:08 PM CT — strong-pred positioning (speed/strongpos.py): 252 steps INSIDE on strong signals; touch / 1-behind is the worst spot
+
+Strong with-pred $300 fills (|pred| ≥ 1.5 thr); END = 44,439, 60 sim min. Cells are share of $ / R/C.
+
+| depth | 113 | 252 | 210 |
+|---|---|---|---|
+| inside | 3% / −0.45 | **53% / +0.88** | 15% / +0.94 |
+| touch | **23% / −9.10** (C +0.01) | 12% / −0.60 | 26% / +0.35 |
+| 1 behind | **41% / −1.59** (C +0.09) | 13% / +0.50 | 22% / +0.41 |
+| 2 behind | 27% / +0.10 | 6% / +0.76 | 19% / +0.31 |
+| 3+ behind | 6% / **+0.47** (C +0.56) | 15% / +0.98 | 18% / +0.70 |
+| ALL strong | R/C −0.41 (C +0.16) | R/C +0.81 (C +0.34) | R/C +0.60 (C +0.33) |
+
+- 113 sweep fills R/C 0.00, single −0.92; 252 single +0.79.
+- **Conclusions:**
+  - At the touch, strong-pred fills are bad for everyone; 113 has 64% of its strong $ at touch / 1-behind.
+  - Two positions keep value on strong leans: **inside the spread** (252's main mode, 53% at R/C 0.88) and **3+ ticks back** (works for us too, +0.47).
+- The running jbs ABAB (strong → 3 behind) is aimed correctly.
+- **Next variant: "strong → inside":**
+  - strong leans step one tick inside the others' best (as 252 does), normal leans stay 1 behind;
+  - small extension of _jb_for (negative back = inside) + equiv/test_pace;
+  - ABAB vs the jbs winner, together with the mk_vol_hold test.
+
+## §1825 — 8:30 PM CT — "strong leans step inside" built (with hold + strong-3back in one build) + test timeline
+
+- agents_next/QuoteAgent.py **4b19d295** = b5da5bcf (1a2de99b + mk_vol_hold) + live knob `mk_jump_strong_inside` (0/1).
+  - New _si(lean): strong lean (|pred| ≥ mk_jump_strong_pred) with jump_touch → the lean side is priced one tick INSIDE the OTHERS' best (_others_best, our own orders excluded, so it cannot penny itself), capped so it never crosses (ask − tick / bid + tick).
+- equiv 0 diffs vs b5da5bcf (tape, ledger, locks identical); test_pace ALL PASS.
+- Census (speed/sicensus.py, 101 params, bucket $4.7k, seeded leans with strong_pred 0.05), LEAN BID ticks behind the others' best:
+
+| arm | ticks behind others' best |
+|---|---|
+| base | +1 |
+| strong-inside | **−1** |
+| strong-3back | +3 |
+
+- **Timeline (UID 101; ABAB = 4 × 30 min after a 25-min warm-up when a restart is needed):**
+
+| test | when (CT) | what |
+|---|---|---|
+| T1 (running) | 7:59 → ≈ 10:30 PM | strong leans 3 ticks back vs base. Verdict 10:37 PM |
+| T2 | ≈ 10:45 PM → 1:10 AM | deploy 4b19d295 (restart); strong leans step INSIDE vs the T1 winner |
+| T3 | ≈ 1:15 → 3:20 AM | mk_vol_hold 2 (hold lean orders, queue position + fewer messages) on top of the T2 winner, no restart |
+| T4 | ≈ 3:30 → 5:35 AM | quote-traffic trim for 0.6.8 OTR (from the message breakdown, done during T2's warm-up) or order size on strong leans, whichever the data favours |
+| T5 | morning 11-21 | a 252-style two-sided $300 layer at real size/depth (design from the positioning data) |
+| any winner with R/C ≥ ≈ 0.3 and skill held | — | a 4-h confirm run before stacking the next change |
+
+- 101's protection ends ≈ 4:45 PM 11-21.
+- 0.6.8 → mainnet at any time: layout_switch.py remaps book groups automatically; then re-measure.
+
+## §1826 — 8:25 PM CT brief (T1 block A starting after the warm-up)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | **$4/mo ($0.12/d)**, first non-zero; incentive 0.0001 | $226/mo ($7.54/d) |
+| making captured / realized / share (live) | **14.0 / 1.46** / 0.0 | — / — / 0.0047 |
+| net α | 215 | 1,651 |
+
+- 101: registered, 0 tracebacks, 0 of 190 blocked; cold start busiest book $17.5k.
+- T1 (abab_jbs101) BLOCK A started 02:25 UTC (8:25 PM CT).
+- Upstream: main 0.6.7, test 0.6.8. Layout switcher waiting. Lowest non-immune ≈ $120–128.
+
+## §1827 — 8:55 PM CT brief (T1 block A1)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $4/mo ($0.12/d) | $224/mo ($7.47/d) |
+| making captured / realized / share (live) | 14.6 / 0.38 / 0.0 | — / — / 0.0047 |
+| net α | 246 | 1,645 |
+
+- T1 block A1 checks (101 vs 252, Σα):
+
+| check | 101 | 252 |
+|---|---|---|
+| 1 | −3.6 (−0.31 bp) on $114k | +12.2 |
+| 2 | +9.5 (+0.57) | +12.5 |
+| 3 | **+26.3 (+1.26) on $209k** | +7.6 |
+| 4 | +22.2 (+1.20) | +15.8 |
+
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $19.2k). Upstream unchanged; layout switcher waiting. Lowest non-immune ≈ $118–127.
+
+## §1828 — 9:25 PM CT brief (T1 block B1 = strong leans 3 back)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | **$7/mo ($0.25/d)** | $225/mo ($7.51/d) |
+| making captured / realized / share (live) | 17.6 / 0.0 / 0.0 | — / — / 0.0046 |
+| net α | **325** | 1,597 |
+| incentive | 0.0002 | — |
+
+- **Block A1 ended:**
+  - 101 − 252 Σα per check: −15.8, −3.0, +18.7, +6.4, +10.9 (+ last +21.2 vs +10.3) → **mean ≈ +3.6**.
+  - End fillvalue R/C −0.33 on $274k.
+- **Block B1 so far:** 101 +13.8 (+0.75 bp) on $185k vs 252 +7.2; +17.7 (+1.20) vs +5.3.
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $20.9k). Upstream unchanged.
+- Prune order: 34 $31, 14 $111, 72 $119.
+
+## §1829 — 10:13 PM CT brief (T1 block A2)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $7/mo ($0.23/d) | $214/mo ($7.13/d) |
+| making captured / realized / share (live) | 23.4 / 0.0 / 0.0 | — / — / 0.0046 |
+| net α | 337 | 1,529 |
+
+- **Block B1 end fillvalue:** R/C **−0.54** on $102k (single −0.80).
+- **Block A2 so far** (101 vs 252): +2.6 vs +3.7, +14.2 vs +9.1, +14.2 vs +5.6.
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $23.5k). Upstream unchanged. Lowest non-immune ≈ $89–117.
+
+## §1830 — 10:20 PM CT — skill-only fleet re-check: 5E2fVqiW now ≈ 8.5k net α per UID, edge on 4-dec; PARKED per user (making first)
+
+- speed/mkfleet.py:
+  - 5E2fVqiW: 20 UIDs, making 0, **net α ≈ 8,200–8,900 per UID** (≈ 1,600 on 11-19), incentive ≈ 0.0035 (≈ $165/UID).
+  - 5F1F2JMu (252's fleet): 24 UIDs, making 0.007–0.009, median net α 1,423, ≈ $205/UID.
+- skill_cls2 (6 sim min), 5E2fVqiW 108 / 82 / 148:
+
+| class | 5E2fVqiW | 101 | 252 |
+|---|---|---|---|
+| $300 | +0.38 to +1.14 bp | +0.89 | +0.44 |
+| $30 | +0.70 to +0.83 | +0.40 | +1.12 |
+| **4-dec** | **+6.7 to +12.3 bp** (Σα +31 to +49 on $40–50k) | not traded (mk_skip_dec 1) | not traded |
+
+- → Skill-only works today via the 4-dec class, which we skip.
+- **User: "we can look at that once we've exhausted every possibility to increase our making credit. lets leave it alone for now."** Saved as memory feedback-making-first-4dec-later. No 4-dec work until the $300 making queue is exhausted.
+
+## §1831 — 10:37 PM CT — T1 (strong leans 3 back) NOT KEPT; T2 (strong leans step inside) started
+
+**T1** (abab_jbs101.log), 101 − 252 Σα per check:
+
+| block | per-check diffs | mean | $300 volume | end R/C |
+|---|---|---|---|---|
+| A1 | −15.8, −3.0, +18.7, +6.4, +6.6, +10.9 | +3.8 | — | −0.33 |
+| B1 | +6.6, +12.4, +7.4, −0.3, −11.5, −7.7 | **+1.2** | **$185k → $64k, fading** | −0.54 |
+| A2 | −1.1, +5.1, +8.6, +11.6, +17.3, −7.6 | +5.7 | $96–147k | — |
+
+- A ≈ **+4.7**, B ≈ +1.2: the same pattern as the flat jump_back 2 (strong leans further back fill less and less).
+- B2 had just started; stopped at 10:37 PM (verdict clear). **NOT KEPT**; live_params_101 back on A (mk_jump_back_strong 0, strong_pred 0).
+- **T2 deploy:**
+  - agents/QuoteAgent.py ← **4b19d295** (backup .bak-1a2de99b); newminer.sh expects 4b19d295.
+  - x3 restarted 10:38 PM (pace_cold stays 1), 0 tracebacks.
+  - speed/abab_si101.sh (log abab_si101.log): 1,500-s warm-up, then A/B/A/B × 30 min, ends ≈ 1:12 AM.
+    - A = base (strong-inside 0, hold 0); B = mk_jump_strong_inside 1 + mk_jump_strong_pred 1.06 (strong leans one tick inside the others' best; 252's mode, §1824).
+- Next: T3 = mk_vol_hold 2 on top of the T2 winner (no restart).
+
+## §1832 — 10:45 PM CT — message-traffic breakdown: not readable from a pcap; counter goes into the next build
+
+- Offline replay over cap14 rejected: only 5 captured states, from another miner, with none of our resting orders. Every reply would be pure placements; it cannot show churn.
+- Live pcap of 101's replies (tcpdump "tcp src port 8105", 30 s, 133 KB): the bodies are compressed/binary, so instruction types cannot be grepped.
+- Plan: a tiny counter in the agent (placements vs cancels, per class $300 / $30 / 4-dec, logged every 60 states beside the REPLIES line). Goes into the next build and deploys with the next needed restart (after T2/T3), so it never disturbs a running ABAB.
+- Known now: ≈ 156 instructions per state (≈ 216 msgs per maker fill at the cold start) vs 0.6.8's 200 threshold (§1816).
+
+## §1833 — 11:00 PM CT — deep dive (user): what the subnet designs making credit to reward → a design-consistent making layer
+
+**Design statements** (0.6.8 test-branch FAQ + config help):
+- FAQ Q2: making = spread captured against the centred mid, two-sided per book, scaled by markout quality at 20 s.
+- FAQ Q20: "quoting width, and how long a quote is left in front of flow, are what is priced. Resting time on its own is not paid."
+- making_horizon_s help: **"past about 20 seconds the mark mostly measures the trend, which the skill half already prices with the drift removed."**
+- Fees: DIS rewards liquidity where scarce. making_fee_weight is 0.005 now, "raised at later boundaries".
+- Counterparty: discount when fills vs miners > 4× fills vs background (ours ≈ 95% background → n/a).
+
+→ **Making and skill are deliberately separated.** Making pays short-horizon NON-directional liquidity (width-priced); skill pays directional trading. Our lean fills are directional by construction and are meant to score ≈ 0 at 20 s. Every attempt to make the LEAN fills score as making (T1, delayed entry, …) fights the design.
+
+**Fundamental-cycle check** (speed/fundphase.py, END = 44,439, 60 sim min): R/C by seconds since the fund update.
+
+| uid | 0–9 s | 10–19 s | 20–25 s | 26 s+ | note |
+|---|---|---|---|---|---|
+| 113 | −0.22 | −0.05 | +0.02 | +0.07 | late fills with the next update AGAINST: −1.19 (16% of $) |
+| 252 | +0.59 | +0.49 | +0.43 | +0.80 | 75% of $ in 0–9 s |
+| 210 | +0.72 | +0.35 | +0.50 | +0.53 | — |
+
+- → Phase gating is not the main lever (we trail by ≈ 0.5–0.8 in every phase). Consistent with "directional fills, by design".
+
+**Design-consistent fix = a separate NON-directional making layer** whose own fills carry positive R and enough C to lift the miner-wide quality ΣR/ΣC, while the lean engine keeps earning skill.
+- Evidence: 3+ ticks-back fills hold value (113 +0.47, 252 +0.98; ALGO sweeps are uninformed and revert within ≈ 60 s).
+- Earlier two-sided tries were too close (M5 gate 2; A2/B 5 back at 0.2) or too small (Option A 0.1).
+
+**T5 redesigned and moved up to right after T2:** "deep two-sided sweep ladder" via existing live knobs: mk_rest_none 0, mk_gate_rest 6, mk_rest_frac 0.5, mk_rest_lean_none 0 (both sides on lean books too). Census first; ABAB vs the T2 winner; no restart. Then T3 hold, T4 traffic/size.
+
+## §1834 — 11:10 PM CT — T5 deep-layer census (speed/deepcensus.py, agents 4b19d295, 101 params)
+
+Bucket $4.7k:
+
+| arm | LEAN BID | LEAN ASK (counter side) | no-lean books |
+|---|---|---|---|
+| A base | $4.7k at +1 | — | $470 rests at +7 |
+| B deep6 f0.5 | $4.7k at +1 (unchanged) | **$2.35k at +8** | **$2.35k both sides at +8** |
+| C deep8 f0.5 | $4.7k at +1 | $2.35k at +11 | $2.35k both sides at +10 |
+
+- Bucket $800: B rests ≈ $2.5k at 7–9 back on both sides everywhere. Books with no order: 2 in all arms.
+- → B gives every $300 book a deep two-sided layer. Watch the shared pace budget (deep fills could crowd out lean step-ins = skill cost).
+- T2 verdict cron (1:17 AM) now starts **T5 (B deep6 f0.5) straight after T2**, ahead of T3 hold / T4.
+
+## §1835 — 10:55 PM CT brief (T2 in its warm-up wait)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | **$9/mo ($0.29/d)** | $213/mo ($7.10/d) |
+| making captured / realized / share (live) | 28.8 / 0.0 / 0.0 | — / — / 0.0046 |
+| net α | **458** | 1,498 |
+| incentive | 0.0002 | — |
+
+- 101: registered, 0 tracebacks, 0 of 192 blocked; cold start busiest book $26.6k.
+- T2 script running (no log yet: its 1,500-s warm-up wait ends ≈ 11:04 PM). Upstream unchanged; layout switcher waiting. Lowest non-immune ≈ $119–122.
+
+## §1836 — 11:20 PM CT brief (T2 block A1; user away overnight with full permission)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $9/mo ($0.29/d) | $212/mo ($7.06/d) |
+| making captured / realized / share (live) | 31.0 / 0.0 / 0.0 | — / — / 0.0045 |
+| net α | **511** | 1,589 |
+
+- T2 block A1 (base) checks: 101 +0.2 on $58k vs 252 +11.5; +13.0 (+0.92 bp) on $142k vs +13.7 (+0.91).
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $27.8k). Upstream unchanged; layout switcher waiting. Lowest non-immune ≈ $121–126.
+
+## §1837 — 11:50 PM CT brief (T2 block A1 ended; B1 started)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | **$14/mo ($0.47/d)** | $209/mo ($6.97/d) |
+| making captured / realized / share (live) | 35.2 / 0.0 / 0.0 | — / — / 0.0045 |
+| net α | 533 | 1,479 |
+| incentive | 0.0003 | — |
+
+- Block A1 checks (101 vs 252): +0.2 vs +11.5, +13.0 vs +13.7, +23.1 vs +13.5, +14.4 vs +21.0, +12.0 vs +10.8.
+- A1 end fillvalue R/C −0.03 on $216k.
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $29.6k). Upstream unchanged. Lowest non-immune ≈ $111–123.
+
+## §1838 — 12:20 AM CT brief (T2 block B1 = strong-inside)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $14/mo ($0.47/d) | $209/mo ($6.97/d) |
+| making captured / realized / share (live) | 35.0 / 0.0 / 0.0 | — / — / 0.0044 |
+| net α | **604** | 1,544 |
+
+- **Block B1 (strong-inside):**
+
+| check | 101 Σα (bp) | $300 volume | 252 Σα | 101 − 252 |
+|---|---|---|---|---|
+| 1 | +23.5 (+1.16) | $202k | +10.8 | +12.7 |
+| 2 | +26.4 (+1.34) | $198k | +7.5 | +18.9 |
+| 3 | +25.6 (+1.00) | $257k | +4.4 | +21.2 |
+| 4 | +26.2 (+1.05) | $249k | +7.0 | +19.2 |
+
+  - mean so far ≈ **+18**, vs A1's +3.4. Volume UP ($198–257k vs A1 $58–179k), the opposite of the "further back" variants.
+  - Early but strong; making read at block end.
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $31.9k). Upstream unchanged.
+
+## §1839 — 12:50 AM CT brief (T2 block A2) — strong-inside: skill up, making quality badly down
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $15/mo ($0.50/d) | $220/mo ($7.33/d) |
+| making captured / realized / share (live) | 31.1 / 0.0 / 0.0 | — / — / 0.0044 |
+| net α | **679** | 1,433 |
+
+- **Block B1 (strong-inside) ended:**
+  - Σα vs 252 per check: +12.7, +18.9, +21.2, +19.2, +8.9 (≈ **+16 mean**).
+  - **End fillvalue R/C −2.69: C only +0.06 bp, R −0.17 bp on $355k**; single fills C +0.01 bp, R −4.82.
+  - Stepping inside on strong leans earns skill but captures ≈ nothing at the fill (the fill is ≈ at the centred mid) and loses at 20 s. That is the opposite of 252's +0.88 for inside fills.
+- **Block A2 started:** 101 +17.1 vs +9.2, +20.1 vs +2.9. 101 is also strong on the base now (market phase), so part of B1's edge is the market.
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $33.5k). Upstream unchanged. Lowest non-immune ≈ $129–134.
+
+## §1840 — 1:17 AM CT — T2 (strong-inside) preliminary verdict: NOT kept for making; strong skill effect noted
+
+**T2** (abab_si101.log), 101 − 252 Σα per check:
+
+| block | per-check diffs | mean | $300 volume | end fillvalue R/C |
+|---|---|---|---|---|
+| A1 (base) | −11.3, −0.7, +14.4, +9.6, −6.6, +1.2 | +3.4 | $58–179k | −0.03 |
+| B1 (strong-inside) | +12.7, +18.9, +21.2, +19.2, +14.0, +8.9 | **+15.8** | $188–257k | **−2.69** (C +0.06 bp, R −0.17 bp; single C +0.01, R/C −32) |
+| A2 (base, so far) | +7.9, +17.2, +2.4, −1.9, +6.1 | ≈ +6.3 | $127–162k | — |
+
+- **Making verdict: NOT kept.**
+  - Strong-inside fills sit ≈ at the centred mid (no capture) and lose at 20 s.
+  - It would also sink T5's miner-wide quality.
+  - It is the lean made MORE directional: skill up, making down, as §1833 predicts.
+- **Skill effect:** ≈ +10 per check over base (B1 vs the A blocks), on higher volume. Kept as a **SKILL candidate**, to revisit when the making route is exhausted (or for a skill-focused miner).
+- B2 (the last block) runs 1:20–1:50 AM to confirm the skill effect; T5 starts right after (cron 1:55 AM).
+
+## §1841 — 1:20 AM CT brief (T2 block B2 running)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | **$22/mo ($0.73/d)** | $222/mo ($7.38/d) |
+| making captured / realized / share (live) | 33.3 / 0.0 / 0.0 | — / — / 0.0044 |
+| net α | **751** | 1,422 |
+| incentive | 0.0005 | — |
+
+- **Block A2 ended:** last checks +16.1 vs +10.0, +20.2 vs +17.3 → A2 mean ≈ +5.5; end fillvalue R/C −0.41.
+- B2 started 1:21 AM.
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $35.0k). Upstream unchanged. Lowest non-immune ≈ $125–128.
+
+## §1842 — 1:50 AM CT brief (T2 B2 nearly done)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $22/mo ($0.73/d) | $220/mo ($7.33/d) |
+| making captured / realized / share (live) | 35.7 / 0.0 / 0.0 | — / — / 0.0043 |
+| net α | **875** | 1,475 |
+
+- **Block B2 (strong-inside) checks:**
+
+| check | 101 Σα (bp) | $300 volume | 252 Σα | 101 − 252 |
+|---|---|---|---|---|
+| 1 | +18.8 (+1.10) | $170k | +6.1 | +12.7 |
+| 2 | +18.7 (+0.95) | $197k | +7.0 | +11.7 |
+| 3 | +32.1 (+1.51) | $212k | +9.3 | +22.8 |
+| 4 | **+35.0 (+1.79)** | $196k | +7.3 | +27.7 |
+
+  - ≈ **+18.7 mean**, repeating B1's +15.8. The skill effect is confirmed.
+- 101: registered, 0 tracebacks, 0 blocked. Upstream unchanged. Lowest non-immune ≈ $104–127.
+
+## §1843 — 2:08 AM CT — T2 FINAL: strong-inside NOT kept for making / CONFIRMED skill candidate; T5 deep layer started
+
+**T2 final** (abab_si101.log), 101 − 252 Σα per check:
+
+| block | per-check diffs | mean | end fillvalue R/C |
+|---|---|---|---|
+| A1 | — | +3.4 | −0.03 |
+| B1 | — | +15.8 | −2.69 |
+| A2 | +7.9, +17.2, +2.4, −1.9, +6.1, +2.9 | +5.5 | −0.41 |
+| B2 | +12.7, +11.7, +22.8, +27.7, +15.1, +12.8 | **+17.1** | **−1.12** |
+| **A (both)** | — | **≈ +4.5** | ≈ −0.2 |
+| **B (both)** | — | **≈ +16.5** | ≈ −1.9 |
+
+- B's $300 volume is higher ($165–257k vs A $127–179k).
+- **Verdict:**
+  - Making: NOT kept (R/C far worse). Live 101 is on A (mk_jump_strong_inside 0); live_params_NEXT stays base.
+  - **SKILL: CONFIRMED gain ≈ +12 Σα per check over base** (≈ 3.7× base's lead over 252). Top skill candidate for when the making route is exhausted (feedback-making-first-4dec-later).
+- **T5 started 2:08 AM** — speed/abab_deep101.sh (pid 2579050; log abab_deep101.log; no warm-up needed):
+  - A = base; B = base + deep two-sided sweep layer (mk_rest_none 0, mk_gate_rest 6, mk_rest_frac 0.5, mk_rest_lean_none 0: ≈ $2.35k both sides ≈ 8 ticks behind the others' best on every $300 book; §1834 census).
+  - Blocks run ≈ 47 min (skill_cls2 checks take ≈ 2.5 min each) → ends ≈ 5:15 AM.
+  - Judge: block-end fillvalue R/C (miner-wide quality), Σα vs 252 (skill cost), live making_realized.
+
+## §1844 — 2:25 AM CT brief (T5 block A1)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | **$33/mo ($1.09/d)** | $222/mo ($7.41/d) |
+| making captured / realized / share (live) | **41.4** (≈ 252's 41.7) / 0.0 / 0.0 | — / 18.2 / 0.0043 |
+| net α | 876 | 1,344 |
+| incentive | 0.0007 | — |
+
+- T5 block A1 checks: 101 +21.5 (+1.48 bp) vs 252 +12.8; +16.3 (+1.22) vs +10.9.
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $38.9k). Upstream unchanged. Lowest non-immune ≈ $120–122.
+
+## §1845 — 2:55 AM CT brief (T5 block A1 ended, B1 = deep layer started)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $33/mo ($1.10/d) | $224/mo ($7.46/d) |
+| making captured / realized / share (live) | **44.4** (> 252's 40.9) / 0.0 / 0.0 | — / 17.2 / 0.0042 |
+| net α | **965** | 1,556 |
+
+- Block A1 (base): last check +20.2 (+1.61) vs +10.1; end fillvalue R/C **−1.26** (C +0.08 bp on $173k: a noisy 6-sim-min block).
+- Block B1 (deep layer) started 2:57 AM.
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $41.0k). Upstream unchanged. Lowest non-immune ≈ $123–126.
+
+## §1846 — 3:25 AM CT brief (T5 block B1 = deep layer; quiet market)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | **$47/mo ($1.57/d)** | $230/mo ($7.65/d) |
+| making captured / realized / share (live) | 49.0 / 0.0 / 0.0 | 28.2 / 10.7 / 0.0042 |
+| net α | **999** | 1,517 |
+| incentive | 0.0010 | — |
+
+- **Block B1 checks** (101 − 252 Σα): 1.1 vs 1.7, −1.2 vs +0.3, −0.8 vs +1.0, −0.1 vs +4.5, +5.1 vs +10.5 → mean ≈ **−2.8** (A1 was +5.4).
+  - Volumes are low for both (quiet stretch: 252 $28–144k). Not a sim reset: sim time is continuous (51,561 → 51,838); the daily reset is at 86,400.
+  - Early sign: the deep layer costs some skill. Its point is miner-wide R/C (block-end read ≈ 3:45 AM).
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $42.9k). Upstream unchanged. Lowest non-immune ≈ $128–129.
+
+## §1847 — 3:55 AM CT brief (T5 block B1 ended; A2 running)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $47/mo ($1.58/d) | $231/mo ($7.69/d) |
+| making captured / realized / share (live) | 55.3 / 0.0 / 0.0 | 28.3 / 10.6 / 0.0041 |
+| net α | **1,046** | 1,608 |
+
+- **Block B1 (deep layer):**
+  - Σα vs 252 per check: −0.6, −1.5, −1.8, −4.6, −5.4, −8.4 → mean **−3.7** (A1 +5.4).
+  - End fillvalue R/C **+0.07** on $239k (A1 −1.26). In the same window **252's R/C was −10.1**: a bad window for makers in general.
+  - → The 6-sim-min R/C reads swing far more than any arm effect.
+- **Block A2 so far:** +6.4, +2.9, +2.8, +6.2.
+- Interim T5 picture: the deep layer costs ≈ 9 Σα per check vs base; its R/C effect is not separable from noise at this block length.
+- Plan: a longer read is needed for any making verdict on T5. Run momcf/fillvalue over the whole B periods offline at the end (≈ 12 sim min each) before deciding.
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $44.7k). Upstream unchanged. Lowest non-immune ≈ $130.
+
+## §1848 — 4:25 AM CT brief (T5 block B2 running)
+
+| | 101 | 252 |
+|---|---|---|
+| pay | $48/mo ($1.60/d) | $233/mo ($7.76/d) |
+| making captured / realized / share (live) | **64.3** (252 15.6) / 0.0 / 0.0 | — / 5.2 / 0.0040 |
+| net α | 1,035 | 1,542 |
+
+- **Block B2 (deep layer) checks** (101 − 252 Σα): −7.6, −17.4, −18.6, −11.3 (101 −0.42 to +0.17 bp, volume up to $219k).
+  - The deep layer clearly costs skill: B1 −3.7, B2 ≈ −13.7 vs A ≈ +5.
+- 101's live making_captured keeps rising (64 vs 252's 16), but realized stays 0 (miner-wide quality still ≤ 0 over the window).
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $46.8k). Upstream unchanged.
+
+## §1849 — 4:55 AM CT — T5 (deep two-sided layer) NOT KEPT; checkpoint: $300 making route looks exhausted; T3 hold started
+
+**T5** (abab_deep101.log), 101 − 252 Σα per check:
+
+| block | per-check diffs | mean | end fillvalue R/C |
+|---|---|---|---|
+| A1 | — | +5.4 | −1.26 |
+| B1 | — | −3.7 | +0.07 |
+| A2 | +2.6, +6.4, +2.9, +2.8, +6.2, −4.5 | +2.7 | +0.19 |
+| B2 | −7.6, −17.4, −18.6, −11.3, +2.2 | −10.5 | +0.01 (C +0.38 bp on $290k, R ≈ 0) |
+
+- → The deep layer costs ≈ 13 Σα per check (A ≈ +4 vs B ≈ −7) for no measurable R/C gain.
+- It raises capture per $ (C +0.38 bp), but R ≈ 0. Live making_captured kept rising (64 → 76) but realized stayed 0.
+- **NOT KEPT.** The design-consistent layer does not get positive markouts for us either.
+- **Checkpoint (agreed in §1831 context):** T2 (strong-inside) and T5 (deep layer) both failed to lift R/C to ≥ ≈ 0.2 with skill held.
+  - Together with T1 / delayed entry / M5 / A / A2 / B (all failed), the $300 making route looks **largely exhausted**.
+  - T3 (hold) is still run for completeness (it also cuts messages for 0.6.8).
+- **T3 started 4:59 AM:** speed/abab_hold101.sh (pid 2591574; log abab_hold101.log); A = base, B = base + mk_vol_hold 2; blocks ≈ 30–47 min; ends ≈ 8:00 AM.
+- For the morning: the parked skill leads per the user's rule are next — **strong-inside** (confirmed ≈ +12 Σα/check) and the **4-dec class** (5E2fVqiW +7–12 bp).
+
+## §1850 — 5:15 AM CT — user: "create our own making strategy for the $300s … i dont want to give up on making yet" → 20-s adverse-selection predictor plan; Phase 1 started
+
+- Memory: feedback-own-making-strategy.
+- **Why the old route failed:** every test either copied the fleet's placement or moved our lean orders. None predicts WHICH fills hold value at the validator's 20-s mark; our lean model predicts 2–10 min (the wrong horizon for making).
+- **Plan:**
+  - **Phase 1 (offline, started 5:19 AM):** speed/mo20fit.py.
+    - Per ($300 book, second) features known at t: imb1, imb5 (book imbalance), micro (microprice − mid), spread, flow5 / flow15 (signed taker $ volume), algo5 (signed ALGO taker volume), gap (fund − mid), dF30, r5 / r20 (recent mid moves), since (time since the fund update).
+    - Target = 20-s mid move (bp). Ridge on the first 70% of time, evaluated on the last 30%. Model saved to agents/model_mo20.json.
+    - Next: score 101's / 113's actual maker fills with the model and check that predicted-favourable fills carry higher validator R/C.
+  - **Phase 2:** quote gating in the agent (pull/shade a side, incl. the lean side, when the 20-s prediction is adverse beyond a threshold) + a modest two-sided layer near the touch protected by the same model; equiv / test_pace / census.
+  - **Phase 3:** ABAB on 101, judged on block-end R/C + Σα vs 252.
+- Timeline: live answer by ≈ this evening. T3 (hold) keeps running until ≈ 8 AM.
+
+## §1851 — 6:09 AM CT brief + Phase 1 result: our 20-s model predicts the markout
+
+- **Brief:**
+  - 101: $72/mo ($2.41/d), net α **1,307**, captured 85.4, realized 0, incentive 0.0015.
+  - 252: $245/mo ($8.16/d), share 0.0039.
+  - T3 hold block B1 ended with fillvalue R/C −0.71; A2 started 6:03 AM.
+- **Phase 1** (speed/mo20fit.py, $300 books, sim s 47,827–53,227, 128 books, target sd 1.43 bp; ridge 10; model → agents/model_mo20.json):
+
+| | TRAIN (n 139k) | **TEST (n 59.5k, last 30%)** |
+|---|---|---|
+| corr | +0.295 | **+0.229** |
+| R² | +0.087 | +0.022 |
+| top-quintile hit | 60.9% | **60.4%** |
+| mean move in the predicted direction (top quintile) | +0.74 bp | **+0.77 bp** (vs our capture ≈ +0.2–0.3 bp per $) |
+
+- Weights (standardised):
+
+| imb1 | dF30 | micro | imb5 | r20 | flow5 | gap | r5 | algo5 | spread | since | flow15 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| +0.327 | +0.212 | −0.207 | +0.197 | −0.160 | +0.127 | +0.072 | −0.052 | −0.037 | −0.023 | +0.005 | −0.005 |
+
+- Book imbalance (not used by our lean model) + 30-s fundamental change + short-term reversion + recent flow carry the 20-s signal.
+- **Phase 1b running** (speed/mo20fills.py): score 113's (END 44,439) and 101's actual $300 maker fills by the model's prediction in the fill's favour → validator R/C per group, and the counterfactual R/C without the adverse groups.
+
+## §1852 — 6:25 AM CT — Phase 1b: the 20-s model separates 252's fills cleanly but INVERTS on our strongest lean fills; Phase 2 redesigned
+
+- **Brief:** 101 $73/mo ($2.43/d), net α 1,346, captured 87.8, realized 0; 252 $247/mo. T3 A2: 101 +17.8 / +15.0 / +20.8 vs 252 −2.9 / +8.2 / +10.3.
+- The 113 run (END 44,439) returned nothing: the daily tape rotation (09:07 UTC) had already dropped 11-20's data. Lesson: snapshot the tape before the rotation when an analysis needs older windows.
+- **101's $300 maker fills** (last 60 sim min), grouped by the model's 20-s prediction in the fill's favour:
+
+| prediction for the fill | 101: share of $ / C / R/C | 252: share of $ / C / R/C |
+|---|---|---|
+| ADVERSE < −0.5 bp | 15% / +0.38 / −0.10 | 5% / — / **−0.64** |
+| adverse −0.5…−0.2 | 14% / +0.47 / +0.18 | 12% / — / −0.03 |
+| neutral | 27% / +0.36 / +0.15 | 30% / — / −0.07 |
+| fav 0.2…0.5 | 22% / +0.26 / **+0.30** | 28% / — / +0.21 |
+| FAV > 0.5 bp | 21% / **+0.06** / **−1.86** | 25% / +0.29 / **+0.57** |
+| ALL | R/C +0.04 | R/C +0.26 |
+
+- Counterfactual without the adverse groups: 101 R/C +0.03 (no gain); 252 +0.30.
+- **Reading:**
+  - For 252 the model sorts fills as intended.
+  - For 101 the worst fills are those where the model STRONGLY AGREES with the fill side: our lean step-ins when a move looks most certain. A resting order on the side the price is expected to move toward fills mainly when the prediction FAILS (conditional adverse selection), so it captures ≈ 0.
+  - 252's fills come from regular flow, not from failed predictions.
+- **Phase 2 redesign:**
+  - (a) When the 20-s prediction strongly favours the lean side (fav > ≈ 0.5 bp), step that lean order BACK 1–2 ticks instead of at/inside the touch.
+  - (b) A small two-sided layer that quotes only when the model is neutral (|pred| < ≈ 0.2 bp), where our fills already hold value and are balanced.
+  - Needs the model live in the agent (features from the state: book top-5, recent prints, fund) → a build + equiv/test_pace + census, then ABAB on 101 after T3.
+
+## §1853 — 6:55 AM CT brief
+
+| | 101 | 252 |
+|---|---|---|
+| pay | **$82/mo ($2.72/d)** | $248/mo ($8.26/d) |
+| making captured / realized / share (live) | 92.6 / 0.0 / 0.0 | — / — / 0.0038 |
+| net α | 1,355 | 1,629 |
+| incentive | 0.0017 | — |
+
+- T3 block B2 (hold 2) checks: 101 +19.5 vs +14.1, +14.3 vs +7.7, +23.8 vs +5.4.
+- Second 20-s-model sample (101's earlier fills from live_tape_x5.jsonl.prev, 80 sim min) still running.
+- 101: registered, 0 tracebacks, 0 blocked (busiest book $56.0k). Upstream unchanged. Lowest non-immune: 90 $56, 38 $129.
+
+## §1854 — 7:10 AM CT — T3 (mk_vol_hold 2) VERDICT: NOT KEPT
+
+abab_hold101.log, 101 − 252 Σα per check:
+
+| block | per-check diffs | mean | end fillvalue R/C |
+|---|---|---|---|
+| A1 | +2.8, +8.3, +2.5, +8.4, +4.3, +0.3 | +4.4 | −0.71 |
+| B1 | +2.6, +0.1, −5.7, +4.3, +9.3, +5.2 | +2.6 | −0.71 |
+| A2 | +12.4, +20.7, +6.8, +10.5, +2.4, +15.0 | +11.3 | −0.48 |
+| B2 | +2.0, +5.4, +6.6, +18.4, +13.7, +3.2 | +8.2 | **−2.03** |
+
+- **A ≈ +7.9 / R/C ≈ −0.6 vs B ≈ +5.4 / R/C ≈ −1.4** → hold costs skill and does not help markouts. NOT KEPT; live 101 on base (the script reverted to A).
+- 101's base beats 252 in every block (≈ 1.0–1.4 bp vs 252's 0.3–0.9).
+- Overnight queue summary:
+
+| test | result |
+|---|---|
+| T1 strong-3back | not kept |
+| T2 strong-inside | skill +12/check, making worse → skill candidate |
+| T5 deep layer | not kept |
+| T3 hold | not kept |
+
+- Making continues via the own 20-s-model approach (§1850–§1852).
+
+## §1855 — 7:25 AM CT — second 20-s-model sample does NOT confirm the band pattern; next diagnostic = WHO fills us
+
+- **Brief:** 101 $83/mo ($2.76/d), net α 1,375, captured 94.1, realized 0; 252 $251/mo. PACE 2 of 192 blocked (transient).
+- **Second sample** (101's earlier fills, live_tape_x5.jsonl.prev, END 51,600, 80 sim min, mixed test settings), R/C by band:
+
+| band | 101 first sample | 101 second sample | 252 (both samples) |
+|---|---|---|---|
+| ADVERSE < −0.5 | −0.10 | −0.50 | −0.64 / +0.16 |
+| adverse −0.5…−0.2 | +0.18 | −0.74 | −0.03 / +0.09 |
+| neutral | +0.15 | −0.60 | −0.07 / +0.32 |
+| fav 0.2…0.5 | **+0.30** | **−1.41** (worst) | +0.21 / +0.11 |
+| FAV > 0.5 | −1.86 | −0.67 | **+0.57 / +0.68** |
+| ALL | +0.04 | **−0.72** | +0.26 / +0.35 |
+
+- → For 101 the band differences are NOISE (the "mildly favourable" band flips from best to worst). Our fills lose at 20 s across ALL predicted states.
+- 252's fills hold value consistently, best when the model strongly favours them.
+- **Conclusion:** the 20-s model predicts the market (§1851) and works for 252's fills, but cannot select good fills for us. Our fills get filled when the move goes against us regardless of the observable state. That points at WHO fills us (counterparty/taker type), not WHEN we quote.
+- **Next diagnostic:** break our and 252's $300 maker fills by taker identity/type from the tape (background agent ID groups — ALGO sweeper, others; miner takers), with validator C/R per group.
+- Neither band rule ("mildly favourable only" / "skip both extremes") goes on the miner.
+
+## §1857 — 7:40 AM CT — own 20-s model GATE built, checked and deployed; ABAB started
+
+- User: "okay go ahead and build it" (use the 20-s model defensively).
+- **agents/QuoteAgent.py 75966cb2** = 4b19d295 + live knobs:
+  - `mk_mo20_gate` (bp, 0 = off) and `mk_mo20_back` (ticks; 0 = pull);
+  - `mk_mo20_file` (default agents/model_mo20.json, copied next to the agent).
+- New _mo20_pred(): the §1851 model live, with features computed exactly as in speed/mo20fit.py.
+  - Inputs: per-book trade-flow deque from book.events (signed taker $k over 5/15 s, ALGO −1 flow), fund-change tracking, the existing _mh/_fh2 histories, book top-5.
+- Gate (before the 4-dec branch, $300 vol + calm books, not $30): if pred > gate the ASK is pulled (or stepped back); if pred < −gate the BID is. Applies to every side, lean side included.
+- Checks:
+  - equiv 0 diffs vs 4b19d295 (tape, ledger, locks identical; handle 81 vs 79 ms); test_pace ALL PASS.
+  - Functional test (speed/gatetest.py, captured state + seeded histories):
+
+| gate | preds computed | sides pulled | new $300 orders |
+|---|---|---|---|
+| 0 | — | 0 | 42 |
+| 0.3 | 128 (median +0.03 bp, −0.85…+0.79) | 43 | 33 |
+
+- **Deploy 7:38 AM:** backup agents/QuoteAgent.py.bak-4b19d295; newminer.sh expects 75966cb2; x3 restarted; 0 tracebacks, 0 blocked.
+- **ABAB** speed/abab_mo20101.sh (pid 2604039; log abab_mo20101.log):
+  - 1,500-s warm-up, then A/B/A/B; ends ≈ 11:00 AM–12:00 PM.
+  - A = base (gate 0); B = mk_mo20_gate **0.4** (≈ the strongest-quintile predictions), pull.
+  - Judge on block-end fillvalue R/C, Σα vs 252, $300 volume, live making_realized.
+
+## §1858 — 7:55 AM CT — morning summary (night 11-20 → 11-21) + taker breakdown
+
+**Fresh checks (13:48 UTC):**
+- x3 = 101 REGISTERED. mvtrx-x3 active on agents 75966cb2.
+- PACE STATUS: 0 of 192 books blocked; max ledger $59k of $450k.
+- The startup "SETTLEMENT NOT READY" banner appears at every start (also 22:45 / 01:59 / 04:37). Fills are flowing: 101 traded $272k on $300 books in the last 8 sim min. Not a problem.
+- 0.6.8: still only on the test branch (de323b82); main stays 20e97853. layout_switch.py is waiting and has not fired.
+- Prune pressure: 60 registrations per 24 h. Line ≈ $135 (mypay). 101's protection ends ≈ 4:45 PM CT.
+
+**Pay / making trend for 101:**
+
+| time | 101 pay | 101 net α | captured / realized | 252 pay / share |
+|---|---|---|---|---|
+| 10:55 PM | $9/mo | 458 | 28.8 / 0 | $213 / 0.0046 |
+| 6:09 AM | $72/mo | 1,307 | 85.4 / 0 | $245 / 0.0039 |
+| 7:48 AM | **$84/mo ($2.79/d)** | **1,407** (252: 1,729) | 97.3 / **0** | $251 / 0.0037 |
+
+- Pay is still ramping toward its α level. Net α is 81% of 252's, but pay is 33% of 252's because pay lags.
+- Making realized = 0 all night.
+
+**Skill now** (skill_cls2, last 8 sim min, $300 class):
+- 101: +17.8 Σα (+0.66 bp, ELIGIBLE).
+- 252: +26.6 Σα (+1.04 bp).
+
+**Overnight tests:**
+
+| test | verdict |
+|---|---|
+| T2 strong-inside | NOT kept for making (R/C ≈ −1.9); skill +12 Σα/check CONFIRMED |
+| T5 deep layer | NOT kept (−13 Σα/check, R/C no gain) |
+| T3 hold | NOT kept |
+| 20-s model diagnostics | model separates 252's fills, not ours |
+| gate ABAB | running (warm-up until ≈ 8:05 AM, verdict ≈ 11:50 AM) |
+
+**Taker breakdown** (whofills, last 90 sim min, $300), R/C by taker group:
+
+| taker group | 101 | 252 | 55 |
+|---|---|---|---|
+| bg id 2–99 | −0.27 (47% of $) | +0.38 | +0.37 |
+| 1000–1999 | −0.31 | +0.12 | −0.14 |
+| 2000+ | −0.20 | −0.11 | +0.56 |
+| ALGO | +5.65 (2% of $) | +3.91 (9% of $) | positive |
+
+- The same background takers fill both of us; their fills lose for us and win for 252.
+- No counterparty to avoid. The cause is where and when our quotes sit.
+- Lead: ALGO sweeps hold value best, but they are only 2% of our $ vs 9% of 252's.
+
+**Route status:**
+- The $300 making route is NOT yet at R/C ≥ 0.2 with skill held: every fleet-copy variant failed.
+- The own 20-s gate is the last open making idea. If the gate shows no R/C gain, the making route is exhausted, and the parked leads come next per the user: 4-dec (5E2fVqiW) and strong-inside skill.
+
+## §1859 — 7:56 AM CT brief (gate ABAB warm-up)
+- x3 = 101 REGISTERED; 0 tracebacks; PACE STATUS 0 of 192 books blocked (max $59.9k of $450k).
+- 0.6.8: main 20e97853 / test de323b82, unchanged; layout_switch still waiting.
+- **101:** $84/mo ($2.80/d), net α 1,431, making captured 97.1 / realized 0 / share 0.0.
+- **252:** ≈ $252/mo (incentive 0.0051 = 3.0× 101's), share 0.0036, net α 1,767.
+- Gate ABAB (abab_mo20101.sh) still in its 1,500-s warm-up; the log starts ≈ 8:03 AM.
+- The 30-min brief cron text was stale (it named T5 and agents 4b19d295); it is replaced to cover the gate ABAB on 75966cb2.
+
+## §1860 — 8:20 AM CT — PAIRED fill analysis: WHERE our $300 fills lose (speed/pairfills.py, last 90 sim min)
+
+Our $300 maker fills, split by whether another miner's maker order filled in the same taker event, and by whether our fill was at the event's first price level or deeper in a sweep:
+
+| bucket | 101 $ share / R/C | 252 $ share / R/C | 55 $ share / R/C |
+|---|---|---|---|
+| ALONE at the front (only miner hit, first level) | **27% / −0.49** | 19% / +0.31 | 10% / +0.60 |
+| shared event, first level | 15% / +0.02 | 47% / +0.23 | 31% / −0.13 |
+| shared event, deeper in a sweep | **53% / −0.19** | 23% / +0.25 | 42% / +0.41 |
+| ALL | −0.24 | +0.18 | +0.30 |
+
+- The losses come from two specific buckets:
+  1. **Alone at the front:** when we are the only miner at the best price and get hit, we lose (−0.49); 252/55 win in the same situation. These are most likely our lean orders improving the price alone just before the move.
+  2. **Behind others, filled by sweeps:** most of our $ sits behind other quotes and only fills when a big taker sweeps through (53% of $). We lose there (−0.19); 252 is mostly at the front instead (47% first-level, +0.23).
+- Next: re-run pairfills at the gate test's block ends (does the gate fix bucket 1?). Then candidate tests: (a) never be the sole best on $300 — join the existing best instead of improving alone; (b) fewer behind-the-queue resting orders that only sweeps reach.
+
+## §1861 — 8:35 AM CT — Fix 1 "join, don't lead" built (mk_join300) + the user's staggering idea checked against the scorer
+
+**User idea:** stagger in time — lean (skill) quotes, then 20-s (making) quotes, alternating — so lean fills stop hurting making.
+- **Scorer check** (repo067 debeta.markout_quality): quality = clamp(ΣR/ΣC, 0, 1) per uid, summed over **every maker fill on every book** in the window. Taker legs are excluded.
+- So fills from both phases land in the same ratio, and staggering in time does not separate them. It would roughly halve the lean's skill and still leave the lean fills' −R in the making ratio.
+- Real separators: (a) a separate miner (one lean/skill, one pure making); (b) doing the lean as taker legs, which the scorer excludes from making. Option (b) is ruled out on maker miners by the user (11-13/11-16).
+- The kept part of the idea: the lean orders should not be the ones sitting alone at the front (§1860 bucket 1). Fix 1 does exactly that.
+
+**Fix 1 = mk_join300** (agents 3ee9e1d9, staged as agents/QuoteAgent.py.next-3ee9e1d9; live is still 75966cb2):
+- On $300 vol+calm books (not low), each wanted side is clamped to the OTHERS' best (our own size removed). So we never improve the price alone, and never stay as the sole best after others cancel.
+- Logs `JOIN300: n of m sides clamped` once per sim minute. Default 0 = unchanged behaviour.
+- Test: speed/abab_join101.sh. Env G = gate setting for both arms (from the gate verdict). 600-s warm-up, then A/B/A/B. Each block end runs pairfills (30 sim min) + fillvalue.
+- Deploy and start are scheduled right after the gate verdict (≈ 11:58 AM).
+
+## §1862 — 8:45 AM CT — user: no splitting skill and making across two miners
+- User: "neither can settle with only skill or making alone". Making fixes must work next to the lean on the same miner. The split option from §1861 is dropped.
+
+## §1863 — 8:55 AM CT — gate test length: early read added
+- User asked why the gate needs ≈ 4 h.
+- Breakdown: 25-min warm-up after the restart; then A/B/A/B blocks of ≈ 45–50 min each (six 5-min checks + ≈ 2.5 min per skill read + a ≤ 10-min fillvalue at block end). Started 7:39 AM; A1 began 8:04 AM.
+- Change: early read at 10:42 AM after A1/B1/A2 (cron). If the gate is clearly not working, stop it and start Fix 1 then (≈ 75 min sooner).
+- Also noted: the gate does not log how often it binds (`_mo20_n` is never printed), so binding can only be judged from B-block behaviour. Fix 1 logs JOIN300 counts.
+
+## §1864 — 9:05 AM CT — bucket 2 (behind other quotes, sweep fills) → Fix 2 queued
+- Bucket 2 (101: 53% of $300 $, R/C −0.19) is mostly the lean side resting 1 tick behind the touch (mk_jump_back 1, §1737 fleet copy). It was positive on 113 on 11-19 (+1.29 bp @20 s, replica quality 0.22–0.32, §1742) but loses now. The fleet (55) still earns +0.41 there.
+- Every test that moved further back was worse (jump_back 2 §1805, strength-scaled 3-back §1831, deep layer §1849, hold §1854). The untested direction is forward: mk_jump_back 0 (lean side at the touch with the others), which is 252's mix (47% first-level, +0.23).
+- Fix 2 = ABAB mk_jump_back 1 vs 0 (live knob, no restart), on top of whatever Fix 1 leaves. Queued after the Fix 1 verdict (cron 2:37 PM).
+
+## §1865 — 8:30 AM CT — user: offline-check every idea first → Fix 1 / Fix 2 / gate dropped on offline bounds; spread finding; spread test live
+
+**User rule (11-21):** check ideas on offline data first; only ideas that pass offline get live time.
+
+**Offline bounds from §1860's buckets** (101 now R/C −0.24). Best case: the fixed fills behave like our own shared-front fills (+0.02); optimistic case: like 252's (+0.23).
+
+| change | best case (our front quality) | optimistic (252's front quality) |
+|---|---|---|
+| Fix 1 join300 alone | −0.11 | −0.05 |
+| Fix 2 jump_back 0 alone | −0.12 | −0.00 |
+| both | +0.01 | +0.19 |
+
+- None reaches ≥ 0.2 → Fix 1 / Fix 2 are NOT run live. Their crons were deleted.
+- The gate was also stopped (14:25 UTC, during A1): §1855 already showed the 20-s model does not separate our fills offline.
+
+**leancf (90 sim min):**
+- 101 has 55% of $300 $ at strong lean (|pred| 1.5–3), R/C −0.32 / −1.26.
+- 252 at the same strength keeps +0.20 / +0.90, with C 3× ours in the 2–3 band.
+- +600 s skill proxy is similar for both (101 +2.03 bp, 252 +2.23).
+
+**strongpos:**
+- 101's strong fills: 57% are 1 tick behind (−1.61).
+- 252's strong fills: 53% INSIDE the prior best (+0.81).
+- T2 strong-inside failed for us. Hypothesis: we stepped inside at tight spreads (fills ≈ at the mid).
+
+**NEW speed/spreadfills.py** (60 sim min; prior-second spread in ticks; inside = strictly better than the prior best):
+
+| spread | 101 $ share / R/C | 252 $ share / R/C |
+|---|---|---|
+| 1–2 t | 22% / **−3.30** (C +0.07, R −0.24) | 15% / C −0.16, R −0.19 |
+| 3–5 t | 37% / **−0.72** | 29% / −0.04 (inside +0.46) |
+| 6–10 t | 39% / +0.10 | **54% / +0.52 (35% of $ inside, +0.56)** |
+
+- → Our losses are the tight-spread fills; 252 earns at wide spreads stepping inside.
+- Offline bound for pulling ≤ 5 t: R/C −0.39 → ≈ +0.10 with our current wide-spread quality. Higher if the wide-spread inside step works like 252's.
+- Skill cost of losing ≈ 59% of volume is unknown → live test.
+
+**Built agents 99b9f646** (on top of 3ee9e1d9's join300):
+- mk_tight300 K: pull both $300 sides while the others' spread ≤ K ticks.
+- mk_wide_inside W: at others' spread ≥ W (and ≥ 3), each wanted side moves 1 tick inside the others' best.
+- Logs SPREAD300 counts per sim minute.
+- Deployed 14:26 UTC: regcheck OK, 0 tracebacks, PACE 0 blocked, fills resumed (81 in 60 sim s). newminer.sh now expects 99b9f646. Backup agents/QuoteAgent.py.bak-75966cb2.
+
+**ABAB:** speed/abab_spread101.sh (pid 2609599, started 8:27 AM, G=0); log abab_spread101.log.
+- A = base; B = mk_tight300 5 + mk_wide_inside 6.
+- Blocks ≈ 60 min incl. block-end pairfills + fillvalue.
+- Early read 10:42 AM; verdict 12:45 PM.
