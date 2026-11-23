@@ -29470,3 +29470,705 @@ blockcmp + pos30 (A1 sim 11678–12071, B1 12071–12450):
   - A = behind 1, size 0.1, keep 0 (base);
   - B = behind 2, size 0.1, keep 1 (rest two ticks behind early, keep the order as it becomes one behind).
 - Early read 9:57 AM, verdict 11:12 AM.
+
+## §1951 — 8:50 AM CT — FLEET comparison (5F1F2JMu, 26 UIDs incl. 252): making alone pays ≈ $200; top makers rest BIG $30 orders at the front of the queue
+User: compare against the whole fleet (252 fluctuates).
+- speed/fleetg.py (gauges, ≈ $50k per 1.0 incentive):
+  - **fleet median $158/mo**, score 0.226, skill_rank 0.06, making_rank 0.41, call_time 0.188 s.
+  - Top: **210 $272** (making_rank 0.83, skill 0.30, share 0.0074, captured 248 / realized 148), 169 $224 (making 0.71, skill 0), 245 $224, 251 $214 (making 0.73, skill 0.35), 217 $204, 236 $201.
+  - **6 fleet UIDs earn $180–224 from making ALONE (skill_rank 0, negative net α).** 252 = $138 (below the fleet median).
+  - **253: skill_rank 0.410 = highest in the fleet**, making 0; call_time 0.164 (better than the fleet median).
+- speed/fleetfills.py (new tape, sim 13248–13917; 253 was warming up after the 8:23 restart):
+  - top makers' **$30**: $8–15k per sim min, R/C **0.51–0.69** (C +0.7–1.3 bp), **70–80% of $ AT BEST** (+ 21–33% 1 behind), **average fill ≈ $3.0–3.5k**.
+  - **$300**: $27–33k per sim min, R/C 0.49–0.69, positions mostly behind (53–64%), inside 4–20%.
+  - 252 is the outlier: $300 inside 67%; $30 average fill $1.76k, R/C 0.08.
+  - 253: $30 average fill $1.67k, 99% at best (losing).
+- **Inference:** the fleet's $30 profit comes from LARGE (≈ 2× ours) long-lived orders at the FRONT of the queue at the best, filled by ordinary takers before the price moves. Ours are small, re-placed (median life 13 sim s), and sit behind ≈ 67% of the queue.
+- **Next $30 test after the running queue test:** fleet-style $30 = size cap raised (code; mk_low_size bound 0.1 → ≈ 0.25), resting at best + 1 behind, kept in place (queue priority). Evidence: the fleet's fills at 0.5–0.7. The $300 class already matches the fleet style (mostly behind).
+- **Reference from now on: the 5F1F2JMu fleet** (medians and top makers), not 252 alone.
+
+## §1952 — 9:05 AM CT — the biggest fleet difference is ORDER SIZE (6×); fleet-style size build staged
+fillrecs2 over the last 15 sim min ($300 maker fills):
+
+| uid | $300 $ per sim min | fills | books | median fill | p90 | R/C |
+|---|---|---|---|---|---|---|
+| 210 / 169 / 251 / 245 / 225 | $25–31k | 158–200 | 72–95 | **$3.05–3.58k** | $3.606–3.610k | 0.54–0.68 |
+| 252 | $36k | 275 | 105 | $1.80k | $3.60k | 0.69 |
+| **253** | **$4.2k** | 103 | 46 | **$0.50k** | $0.60k | 0.36 |
+
+- The fleet's order size caps at ≈ $3.6k (identical p90s), **≈ 6× ours**. Its $300 and $30 making capture (hence making_rank) is several times ours.
+- The fleet trades near the 450k/book/day cap; we use ≈ $35k per book per day (headroom; our pacer enforces the cap).
+- Caveat: the §1894 2× $300 size test (post-reset) raised volume but cut $300 R/C. Our $300 orders carry the lean, so bigger = more directional exposure.
+- **Staged agents d2cde35e** (= aa6a73eb + bounds mk_low_size / mk_low_lad_size ≤ 0.3, mk_vol_size ≤ 0.6, mk_calm_size ≤ 0.72 + KEEP30: a resting $30 order at / 1 behind the others' best is kept in place when mk_low_behind = 0).
+- The 11:12 AM cron runs the queue-priority verdict, deploys d2cde35e, and starts a combined test: B = $300 size 3× (0.3 / 0.36) + $30 fleet-style (behind 0, keep 1, size 0.2).
+
+## §1953 — 8:47 AM CT brief (queue-priority ABAB block A1; fleet reference)
+- x3 = 253 REGISTERED (new box); 0 tracebacks / fallbacks; PACE 0 blocked; release main unchanged; disk 12 G (25%).
+- **253:** $67/mo ($2.22/d), net α 1,178, making 0 / 0 / 0. Score 0.206; **skill_rank 0.412 (fleet median 0.056, 210 0.300)**; making_rank 0 (fleet median 0.412, 210 0.837). call_time **0.149** (fleet median 0.188).
+- **Fleet:** median $158/mo, score 0.221. **210 $272** (score 0.568). 252 $138 (score 0.346, captured 114.5 / realized 70.7).
+- Prune line $83 (253 ≈ 0.81×).
+- Queue-priority ABAB: A1 (base) from 14:39 UTC after the 900-s warm-up; first check −14.9 vs 252 ($15k notional; lean still warming).
+- The brief cron is updated to the fleet reference.
+
+## §1954 — 9:00 AM CT — more fleet checks: no 4-dec making; two-sidedness is NOT the differentiator; volume (order size) is
+Tape, last 20 sim min, maker $ by class and books (two-sided share = Σ_b 2·min(buy $, sell $) / total):
+
+| uid | $300 | $30 | 4-dec |
+|---|---|---|---|
+| 210 | $485k / 88 books / 14% | $214k / 40 / 59% | 0 |
+| 169 | $488k / 84 / 9% | $140k / 30 / 40% | 0 |
+| 225 | $466k / 100 / 14% | $195k / 38 / 51% | 0 |
+| 245 | $499k / 87 / 14% | $169k / 32 / 51% | 0 |
+| 251 | $424k / 80 / 7% | $181k / 34 / 55% | 0 |
+| 55 | $445k / 81 / 9% | $47k / 26 / 8% | 0 |
+| 252 | $603k / 110 / 30% | $102k / 41 / 46% | 0 |
+| **253** | **$82k** / 55 / 19% | $86k / 29 / 54% | 0 |
+
+- **No fleet UID makes on 4-dec** (the parked lead stays parked; it isn't something the fleet does).
+- Per-book two-sidedness over 20 sim min is low for the fleet on $300 (7–14%). Ours (19%) is no worse. Their large captured comes from VOLUME: $300 ≈ 6× ours at ≈ 6× our order size.
+- **Fleet style:** big passive orders mostly behind the best on $300; big front-of-queue orders at the best on $30; little lean (fleet median skill_rank 0.06). We add a strong lean (skill_rank 0.41).
+- → Order size is the lever (11:12 AM test). Watch that bigger lean orders don't cost $300 R/C.
+
+## §1955 — 9:15 AM CT brief (queue-priority ABAB: A1 done, B1 running)
+- x3 = 253 REGISTERED (new box); 0 tracebacks / fallbacks; PACE 0 blocked; BEHIND30 4,605 of 5,520; release main unchanged; disk 25%.
+- **253:** $66/mo ($2.21/d), incentive 0.0013, net α 1,176, **making_captured 1.97** (> 0 again), realized 0.
+  - Score 0.206 vs **fleet median 0.219** (210 0.546, 252 0.344). Skill_rank 0.411 (fleet median 0.051). Making_rank 0 (fleet median 0.387). call_time 0.153 (fleet median 0.187).
+- Fleet median $158/mo; 210 $272; 252 $138.
+- **Prune line $96** (253 ≈ 0.69×).
+- Queue test: A1 ended 15:09 UTC; B1 (behind 2 + keep) first check −6.4 vs 252. Early read with fast-chain at 9:57 AM.
+
+## §1956 — 9:45 AM CT brief — **FIRST making_realized > 0 on any of our miners** (253: realized 0.41, making_rank 0.007)
+- x3 = 253 REGISTERED (new box); 0 tracebacks / fallbacks; PACE 0 blocked; release main unchanged; disk 25%.
+- **253:** **$77/mo ($2.56/d)** (incentive 0.0015).
+  - **making_captured 7.18 / realized 0.41 / making_rank 0.007** (quality ≈ 0.06): the validator now pays us making, for the first time on any of our UIDs. Share still rounds to 0.
+  - Net α 1,040; skill_rank 0.391 (fleet median 0.071); score 0.199 (fleet median 0.242; 210 0.579; 252 0.358).
+  - call_time 0.158 (fleet median 0.197).
+- **Prune line $92** (253 ≈ 0.84×).
+- Queue test B1 (behind 2 + keep), Σα vs 252: −6.4, −14.3, −10.8, −4.9, +2.0, −2.1. Early read 9:57 AM.
+
+## §1957 — 10:00 AM CT — queue-priority EARLY READ: ZERO $30 fills in both arms → stopped; fleet-size combined test started (fast chain)
+- blockcmp (A1 sim 13909–14292, B1 14292–14664):
+  - **253 $30 = $0 in both arms**, under behind 1 / size 0.1 (base) and behind 2 + keep. The $30 class is effectively untraded since the stay-behind became base.
+  - $300: A1 R/C −0.05 ($13.1k per sim min) vs B1 +0.51 ($15.5k) (block noise; $300 unchanged by this test).
+  - Miner-wide = the $300 ratio (making_realized first > 0 at 9:45, §1956).
+  - Σα vs 252: A −9.4, B −6.1. 252: $300 +0.61 / +0.72, $30 R/C 3.67 / 0.69.
+- **Not working → stopped** (pid 7673), base set (behind 1, keep 0, size 0.1).
+- **Deployed agents d2cde35e** (size bounds raised + KEEP30 at best): restart 15:57:38 UTC, 0 tracebacks, FASTDEC installed. newminer.sh → d2cde35e.
+- **speed/abab_fleet253.sh** (started ≈ 16:00 UTC, 900-s warm-up; log abab_fleet253.log):
+  - A = base;
+  - B = $300 mk_vol_size 0.3 / mk_calm_size 0.36 (3×) + $30 fleet-style (behind 0, keep 1, size 0.2).
+- Early read 11:35 AM, verdict 12:55 PM (chains to 6× if 3× wins).
+
+## §1958 — 10:15 AM CT brief (fleet-size ABAB block A1)
+- x3 = 253 REGISTERED (new box); 0 tracebacks / fallbacks; PACE 0 blocked; release main unchanged; disk 25%.
+- **253:** $77/mo ($2.55/d), incentive 0.0015; making captured 3.78 / **realized 0.32** / making_rank 0.007 (still > 0); net α 954; skill_rank 0.364 (fleet median ≈ 0.07); score 0.185 (fleet median 0.267; 210 0.586; 252 0.344). call_time 0.151 (fleet median 0.196).
+- Fleet median $156/mo; 210 $265; 252 $137. Prune line $95 (253 ≈ 0.81×).
+- Fleet-size ABAB: warm-up done, A1 (base) started 16:12:53 UTC.
+
+## §1959 — 10:45 AM CT brief (fleet-size ABAB: A1 done, B1 starting)
+- x3 = 253 REGISTERED (new box); 0 tracebacks / fallbacks; PACE 0 blocked; release main unchanged; disk 25%.
+- **253:** **$84/mo ($2.79/d)** (incentive 0.0016); **making captured 10.4 / realized 1.30 / making_rank 0.013** (all rising); net α 962; skill_rank 0.383; score 0.198 (fleet median 0.273; 210 0.621; 252 0.355). call_time 0.163 (fleet median 0.203).
+- Fleet median $156; 210 $267; 252 $147. Prune line $93 (253 ≈ 0.90×).
+- A1 (base): $30 = 3 fills / $10k. B1 (3× $300 + fleet-style $30) started 16:44:01 UTC; KEEP30 active.
+
+## §1960 — 11:15 AM CT brief (fleet-size ABAB block B1) — first making_SHARE > 0
+- x3 = 253 REGISTERED (new box); 0 tracebacks / fallbacks; PACE 0 blocked; KEEP30 1,292 orders kept in place per sim minute; release main unchanged; disk 26%.
+- **253:** $83/mo ($2.78/d), incentive 0.0016; **making captured 11.3 / realized 1.83 / share 0.0001 (first non-zero share)** / making_rank 0.013; net α 977; **skill_rank 0.407**; score 0.210 (fleet median 0.307; 210 0.636; 252 0.372). call_time 0.150 (fleet median 0.200).
+- Fleet median $156; 210 $267; 252 $147. Prune line $97 (253 ≈ 0.86×).
+- **B1 (3× $300 + fleet-style $30):** 253 $300 notional **$161–183k per check (≈ 3× A1's ≈ $60k, now above 252's $148–205k)**. Σα vs 252: +17.7, +18.1, +8.0, +8.0, +5.9, +0.8 → **mean +9.8** (A1 ≈ −).
+
+## §1961 — 11:40 AM CT — fleet-size EARLY READ: $300 3× = clear WIN so far; $30 fleet-style = big volume but ≈ 0 quality (orders 2× too big) → let it run
+blockcmp + fleetfills (A1 sim 15065–15448, B1 15448–15835):
+
+| | A1 base | B1 (3× $300 + fleet-style $30) | fleet 210 / 169 / 251 in B1 |
+|---|---|---|---|
+| $300 $ per sim min | 30.4k | **41.7k (+37%)** | 33.3 / 38.9 / 30.3k |
+| $300 R/C (C / R per $) | +0.49 (+0.45 / +0.22) | **+0.62** (+0.50 / +0.31) | 0.64 / 0.67 / 0.41 |
+| Σα vs 252 per check | +0.5 | **+9.8** | — |
+| $30 $ per sim min | 2.2k (100% 1 behind, R +0.76 bp) | **48.9k** (100% at best) | 18.3 / 11.7 / 14.5k |
+| $30 R/C (C / R per $) | +0.78 | **−0.06** (+0.20 / −0.01) | 0.50 / 0.44 / 0.43 (C +1.0–1.4 bp) |
+| $30 average fill | $3.4k | **$7.3k** | $2.7–3.2k |
+| $30 Σ 2·min | −0.53 | −15.38 | +1.4 / +0.8 / −0.7 |
+| miner-wide | +0.53 | +0.40 | — |
+
+- **$300 at 3× size** now matches the fleet on volume and R/C, and skill jumps +9.3 Σα/check.
+- **$30 fleet-style at size 0.2:** 22× the volume (2.7× the fleet's) at ≈ break-even. Our at-best fills capture only +0.20 bp vs the fleet's +1.0–1.4. Our fills are ≈ 2× the fleet's ($7.3k vs ≈ $3k), so size 0.2 is too big.
+- In A1 the base $30 (behind 1, size 0.1) traded only $2.2k per sim min, but kept +0.76 bp (100% 1 behind).
+- Not a clear loss (miner-wide +0.40 > 0, $300 R/C up) → **continue**.
+- Next candidates: $300 6× (fleet size); $30 fleet-style at size 0.1 (≈ $3.5k fills, the fleet's size).
+
+## §1962 — 11:50 AM CT — volume-cap check: the validator cap can't be hit; per-book PACE is the limit → skip 6×, keep 3×, re-test $30 at 0.1
+- User: 3× already = fleet size; revert to 3× if 6× fails; make sure we won't hit a volume cap.
+- Pacer: pace_cap 450,000 per book per sim day (< the validator's 10 × wealth ≈ $500k), steady 450k, burst 3,600 s (≈ $18.75k reserve). **The hard cap cannot be hit.**
+- **Per-book rate in B1** (busy window, fillrecs2):
+  - 253 (3× $300 + $30 0.2): median **$1,290 / sim min** (p90 $2,370) → ≈ $1.86M / day pace;
+  - fleet 210 / 169 / 251: median ≈ $559 (p90 ≈ $1,115);
+  - sustainable refill = $312 / sim min.
+  - → In busy stretches our books drain their reserve in ≈ 20 sim min and are then pace-paused. Short ABAB blocks didn't show it (PACE 0 blocked).
+  - Most of the excess came from the $30 half at size 0.2 ($7.3k fills, 22× the $30 volume).
+- **Decision:** no 6× (it would just hit the pacer harder and cost presence). Keep $300 3× if the verdict holds. Next test = $30 fleet-style at size 0.1 (≈ $3.5k fills, the fleet's size). Watch PACE blocked counts; if books pause repeatedly, step size DOWN.
+
+## §1963 — 11:45 AM CT brief (fleet-size ABAB block A2)
+- x3 = 253 REGISTERED (new box); 0 tracebacks / fallbacks; **PACE 0 blocked in all 6 status lines of the last 30 min** (24h ledger median $39.7k); release main unchanged; disk 26%.
+- **253:** $79/mo ($2.64/d), incentive 0.0016.
+  - **making captured 15.5 / realized 3.10 / share 0.0001 / making_rank 0.034** (×2.6 in 30 min).
+  - Net α 960; **skill_rank 0.449**; score **0.241** (fleet median 0.326; 210 0.664; 252 0.409). call_time 0.165 (fleet median 0.205).
+- Fleet median $156; 210 $267; 252 $147. Prune line $99 (253 ≈ 0.80×).
+- A2 (base), Σα vs 252: −0.8, +1.4, +1.1, +1.9.
+
+## §1964 — 12:15 PM CT brief (fleet-size ABAB block B2)
+- x3 = 253 REGISTERED (new box); 0 tracebacks / fallbacks; **PACE 0 blocked in all 7 status lines (30 min)**; release main unchanged; disk 26%.
+- **253:** $79/mo ($2.64/d), incentive 0.0016; making captured 10.1 / realized 2.41 / share 0.0001 / making_rank 0.007 (dipped from 0.034; noisy window); net α 896; skill_rank 0.406; score 0.206 (fleet median 0.315; 210 0.665; 252 0.432). call_time 0.155 (fleet median 0.195).
+- Fleet median $159; 210 $274; 252 $152. **Prune line $104** (253 ≈ 0.76×).
+- B2 (3× + $30 0.2), Σα vs 252: −15.8, −8.8, −4.6, +1.7, +3.5 ($300 notional $81–147k).
+
+## §1965 — 12:50 PM CT — fleet-size VERDICT: $300 3× KEPT; $30 at size 0.2 NOT kept; $30 fleet-style at size 0.1 test started
+- 12:45 brief: 253 $79/mo ($2.64/d); making captured 9.5 / realized 2.31 / making_rank 0.014; skill_rank 0.455; score 0.234 (fleet median 0.316; 210 0.671; 252 0.435). Prune line $104 (≈ 0.76×). **PACE 0 blocked** (6 status lines, 30 min).
+- **Pooled verdict** (A1 15065–15448 + A2 15835–16219 vs B1 15448–15835 + B2 16219–16619; the ABAB finished 18:18 UTC; read early instead of waiting for the 12:55 cron):
+
+| | A base | B |
+|---|---|---|
+| $300 $ per sim min | 28.5k | **34.8k (+22%)** |
+| $300 R/C | +0.57 | **+0.57** |
+| Σα vs 252 per check | +0.6 | **+3.6** |
+| $30 $ per sim min / R/C | 1.1k / +0.78 | 42.6k / **+0.03** |
+| $30 Σ 2·min | −0.53 | **−25.63** |
+| miner-wide | +0.59 | +0.37 |
+| B2 vs fleet (fleetfills) | — | 253 $300 28.1k / 0.47; $30 36.4k / 0.14, average fill $5.9k (fleet 210 / 169 / 251: $30 0.11 / 0.25 / 0.60, $3.1–3.2k) |
+
+- **$300 3× (mk_vol_size 0.3 / mk_calm_size 0.36): KEPT.** Volume +22%, R/C held, skill +3/check, no pace blocks.
+- **$30 at size 0.2: NOT kept** (break-even, Σ 2·min −25.6).
+- Live + live_params_NEXT: $300 0.3 / 0.36; $30 behind 1, size 0.1, keep 0.
+- **speed/abab_fleet30_253.sh** (started ≈ 18:50 UTC, 60-s warm-up, no restart): A = base; B = $30 fleet-style at size 0.1 (behind 0, keep 1). Early read 2:05 PM, verdict 3:20 PM.
+
+## §1966 — 1:20 PM CT brief ($30 size-0.1 ABAB: A1 done, B1 starting)
+- x3 = 253 REGISTERED (new box); 0 tracebacks / fallbacks; PACE 0 blocked (6 status lines); release main unchanged; disk 26%.
+- **253:** $77/mo ($2.57/d), incentive 0.0015; **making captured 13.9 / realized 3.59 / share 0.0002 / making_rank 0.021**; net α 946; skill_rank 0.419; score 0.220 (fleet median 0.316; 210 0.636; 252 0.413). call_time 0.153 (fleet median 0.189).
+- Fleet median $160; 210 $281; 252 $153. mypay printed "prune line $0" (anomaly in its unprotected-UID calculation; last valid reading $104).
+- A1 (base, $300 3×): Σα vs 252 −2.4, −7.6, −11.5 at $52–81k $300 notional (quiet stretch). B1 ($30 fleet-style 0.1) started 19:19:57 UTC.
+
+## §1967 — 1:35 PM CT — making IS a long build for us: the validator's lookback is 3 SIM hours ≈ 15 wall hours at today's sim speed
+User: if $300 carries our making but we're far from the fleet, how would the $30 fix get us there? Is making a long build? Check vs other miners.
+- **Young fleet miners ramp fast** (making_captured / realized / making_rank, hourly):
+  - 182 (registered ≈ 4:50 AM): captured 8 → 46 (3 h) → 165 (8.5 h), rank 0.35;
+  - 130 (≈ 7 AM): 21 → 146 in 6 h, rank 0.33;
+  - 190 (re-registered ≈ 8 AM): 22 → 157 in 5 h.
+  - **253: 2 → 14 over ≈ 4 h after the gate opened**, rank 0.02.
+- **Our current flow is fleet-like.** Sim 15065–16619 (26 sim min), $300:
+
+| uid | total C | Σ 2·min(Cbuy, Csell) | books positive on both sides |
+|---|---|---|---|
+| 210 | 35.9 | +0.3 | 18 / 114 |
+| 169 / 251 | 32.6 / 28.6 | −2.7 / −4.7 | 14 / 107, 10 / 110 |
+| 252 | 29.4 | −8.4 | 31 / 123 |
+| **253** | **36.3** | **+2.0** | **35 / 99** |
+
+- **Cause = the lookback:** repo067 config `scoring.kappa.lookback` = 10,800,000,000,000 ns = **3 sim hours** (the assessment window for skill and making).
+  - Sim speed today ≈ 0.2 sim s per wall s (253: ≈ 13,750 sim s in ≈ 19.5 wall h) → **the window ≈ 15 wall hours**.
+  - 253's window still holds last night's low-volume / negative-capture hours. New fleet miners have only clean data.
+- **Expectation:**
+  - captured / realized keep rising as old hours age out;
+  - the morning base (≈ 5:30–8 AM) is fully in the window by ≈ 8–11 PM CT tonight; the 3× $300 (12:50 PM) by ≈ 4 AM.
+  - With fleet-like flow, making_rank should approach the fleet's 0.3–0.5. The $30 fix adds on top ($30 = 25% of the making pool).
+- **Timing risk:** protection ends ≈ 6:15 PM, before the window clears; pay $77 vs the last valid prune line $104. Per the user, no skill boosts to survive. A re-registration would start with a clean window on the current base (like the fleet's new miners).
+
+## §1968 — 1:45 PM CT — target reset to the FLEET TOP (≈ $275–300/mo per miner)
+- User: 130–170 is no longer the target; the fleet has miners well over 200 and the top is ≈ 300; we match the fleet on $300 and beat it on skill.
+- Fleet: 210 $265–281 (score 0.55–0.67 = making 0.81–0.93 + skill 0.30–0.43); 251 $214 (0.54); making-only UIDs $204–224. ≈ $420 per point of score.
+- 253 projection (skill ≈ 0.43): making 0.5 → ≈ $200; 0.73 → ≈ $240; 0.85–0.9 → ≈ $275–290. Reaching 210-level making needs the $30 volume (210 captured 250–390 incl. $30).
+
+## §1969 — 1:50 PM CT brief ($30 size-0.1 ABAB block B1)
+- x3 = 253 REGISTERED (new box); 0 tracebacks / fallbacks; PACE 0–1 blocked (4× 0, 2× 1 in 30 min); KEEP30 1,084 kept in place; release main unchanged; disk 26%.
+- **253:** $77/mo ($2.56/d), incentive 0.0015; making captured 9.1 / realized 2.8 / share 0.0002 / **making_rank 0.034**; skill_rank 0.423; score 0.228 (fleet median 0.328; 210 0.673; 252 0.447). call_time 0.148 (fleet median 0.192).
+- Fleet median $160; 210 $281; 252 $153. **Prune line $115** (253 ≈ 0.67×).
+- B1 ($30 fleet-style 0.1), Σα vs 252: −1.4, +0.9, +9.7, +2.5, +0.4.
+
+## §1970 — ≈ 2:05 PM CT — $30 fleet-style size 0.1 (stay-behind off, at best) STOPPED at early read → base kept
+- A1 (base, sim 16982–17382) vs B1 (fleet-style 0.1, 17382–17785): $30 volume 1.9k → 27.0k/min; avg fill $3,237 (= fleet size); 90% of fills at best (fleet 210: 54% best / 46% one behind).
+- **B1 $30 quality: C −0.01 / R −0.19 bp per $** → negative; miner-wide R/C +0.48 → +0.40. $300 in B1 R/C +0.71 (noise). Fast chain: clear loss → stopped (pid 15476), live_params back to base (behind 1, keep 0, size 0.1, vol 0.3, calm 0.36).
+- **At-best dissection (same window):** our at-best $30 fills C −0.12 / R −0.27 bp (48 fills, $163k) vs 210 C +1.20 / R +0.71, 251 C +1.00 / R +0.28. Gap holds in EVERY own-share, single/sweep and prior-move bucket → not a condition we can gate on. Size now matches the fleet, so the remaining difference is most likely **queue position** (fleet first at a new level; we join behind and fill only when the level is about to break).
+- Next: offline check of queue position on at-best fills from the tape's queue records (our size-ahead at fill time vs fill quality; fleet's implied position).
+
+## §1971 — 2:25 PM CT — $30 loss = QUEUE POSITION (offline-confirmed) → front-keep build + ABAB started
+- **qpos30.py** (our $30 fills by share of the level ahead at the last snapshot; validator C/R from fr2):
+  - long window (sim 15065–16619): front < 10% **C +2.87 / R +1.35 bp** (n 12, $41k); 10–50% C +0.20 / R −0.04 (n 44, $296k); back ≥ 50% C −0.18 / R −0.12 (n 30, $221k).
+  - B1 window: front C +1.76 / R +0.56; 10–50% R −0.23; back R −0.38.
+  - When we and the fleet sit at the same $30 price, the fleet is AHEAD 40 of 45 (top3 30 of 34 in B1).
+- **qage30.py:** top makers' at-best $30 fills mostly from orders ≥ 60 sim s old (top3 ≥ 60 s: C +1.24–1.55 bp); ours mostly 2–60 s.
+- **qfront30.py:** when our resting 1-behind order's level becomes best, ≥ 50% of the level is already ahead 65–69% of the time → waiting one behind does NOT win priority (others placed earlier).
+- **Raw payloads (3 captures, all order timestamps):** $30 top-2 queues turn over fast — qty-weighted median order age **44–58 sim s**; an order placed 60 s earlier is ahead of ≈ 90% of its level (ahead 0.07–0.15), 120 s → front (0.00). Ours live a median 13 s (§1950) because stay-behind re-places them at the back each time they reach best.
+- **Build (agents 16af5bff = d2cde35e + patch_front.py):** mk_low_front (thr): a resting $30 order AT the others' best stays while < thr of its level is ahead (raw FIFO list); mk_low_keep_deep (ticks): mk_low_keep keeps behind orders up to N ticks back so they age. Both default off. FRONT30 log line.
+- Deployed 20:14:40 UTC restart, 0 tracebacks, FASTDEC installed. Warm-up check with B on: KEEP 3,449 kept in place per sim min; FRONT30 1 of 4 kept.
+- **ABAB speed/abab_front253.sh** (pid 19740, 900-s warm-up, log abab_front253.log): A = base (behind 1, keep 0); **B = behind 1 + keep 1 + keep_deep 3 + front 0.25**. Blocks 30 min from ≈ 20:29:40 UTC; B1 ends ≈ 3:30 PM CT; ABAB ends ≈ 4:30 PM CT.
+
+## §1972 — 2:57 PM CT brief (NOTE; front-keep ABAB block A1)
+- x3 = 253 (agents 16af5bff); 0 tracebacks / 0 fastdec fallbacks in 30 min; PACE 0–2 blocked; disk 27%; ABAB pid 19740 alive. A1 (base) since 20:29:43 UTC: KEEP 0 (as expected in A).
+- **253:** $74/mo ($2.47/d); making captured 12.6 / realized 4.6 / share 0.0003 / **making_rank 0.034**; skill_rank 0.335; score 0.184; call_time 0.154.
+- Fleet median $164 / score 0.354 / making_rank 0.61 / call_time 0.209. Top: 210 $279 (making 0.96, skill 0.42), 169 $220, 251 $220, 225 $204 (0.93 / 0.41). 252 $161.
+- **Prune line ≈ $113** (lowest non-immune); 253 ≈ 0.65×; immunity ends in ≈ 3.1 h (≈ 6:05 PM CT).
+- A1 skill (253 vs 252, Σα / bp): −11.5 → −11.2 → −2.0 → +7.7 → +14.6 (post-restart lean warm-up, recovering) vs 252 +6.5 … +10.5.
+
+## §1973 — 3:27 PM CT brief (NOTE; front-keep ABAB block B1)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–2 blocked; disk 27%; ABAB pid 19740 alive. B1 since 21:02:43 UTC (sim 18640): KEEP 3,120–3,171 kept in place per sim min; **FRONT30 kept 0 of 1–3 at-best orders** (few of our orders reach best; none at the front yet).
+- **253:** $81/mo ($2.70/d); making captured 8.4 / realized 3.3 / share 0.0003 / making_rank 0.020; skill_rank 0.382; score 0.201; call_time 0.148.
+- Fleet median $164 / score 0.366 / making_rank 0.61 / call_time 0.209; 210 $282 (0.95 / 0.46), 169 $224, 251 $217; 252 $159.
+- **Prune line ≈ $105** (lowest non-immune); 253 ≈ 0.77×; immunity ends in ≈ 2.6 h (≈ 6:05 PM CT).
+- A1 end (sim 18225–18640): $30 3 fills / $10k (C +0.15 / R −0.14 bp); $300 144 fills / $304k, C +0.33 bp. A1 last skill +35.5 Σα vs 252 +9.4.
+- B1 skill (253 vs 252, Σα): +15.1 / +6.5, +4.5 / +5.3, +14.5 / +4.5, +4.9 / +6.3.
+
+## §1974 — 3:40 PM CT — front-keep ABAB B1 INVALID (order churn bug) → stopped; the earlier keep tests were invalid too; fix in progress
+- Early read (fillrecs2, A1 sim 18285–18640 vs B1 18700–19052; fleet in the same windows):
+  - A1: $30 1.7k/min, C +0.15 / R −0.14 bp; $300 51.3k/min R/C +0.31; miner-wide R/C +0.29; Σα vs 252 −2.9.
+  - B1: **$30 ZERO fills**; $300 55.8k/min R/C +0.25; miner-wide +0.25; Σα vs 252 +1.2.
+  - Fleet $30 (B1): 210 19.4k/min C +1.43 / R +0.73; 251 21.3k C +1.33 / R +0.50; 169 14.1k C +1.33 / R +0.82.
+- **Cause: churn, not the market.** B1 placed **10,170 $30 orders, median life 0 s** (A1: 715, median 18 s). FRONT30 kept 2 of 19; when our orders reached best, 64% had ≥ 50% ahead.
+  - Keep loops set want = the LAST qualifying order's price; with the $30 ladder order 1 tick behind the touch, the target walked down every round.
+  - **The §1965 fleet-style B1 churned too** (2,796 orders, median 0 s vs A 828 / 23 s) and so did, by the same code, the §1950 keep test → **those keep / queue-priority verdicts are VOID**. The queue-priority idea has not been tested yet.
+- ABAB pid 19740 killed; base params restored.
+- **Fix 1 (agents b4a82214, patch_front2.py):** each side keeps the qualifying order NEAREST the others' best (both keep loops). Deployed 21:40:50 UTC, 0 tracebacks; newminer.sh → b4a82214. Still churned with B on (3,727 orders per 120 sim s, median 0 s). Short-lived orders sit 2 ticks behind best.
+- **Second cause:** mk_low_touch_min 2 sets no_touch on every 1-tick-spread round (most $30 rounds). That cancels the touch order and walks the kept target. With stay-behind 1 the touch is never at best anyway, so B tries touch_min 0 (lifetime check running).
+- **§1974 cont. (4:05 PM CT):** B params + mk_low_touch_min 0 → 209 $30 orders per 120 sim s, **median life ≥ 120 s** (no churn). Queue priority is now testable.
+
+## §1975 — 4:05 PM CT — FIXED $30 front-keep ABAB started
+- speed/abab_front2_253.sh (pid 25242, log abab_front2_253.log, agents b4a82214, no restart): **A = base** (touch_min 2, behind 1, keep 0); **B = touch_min 0 + behind 1 + keep 1 + keep_deep 3 + front 0.25**. 33-min blocks from 22:05:07 UTC; B1 ≈ 4:38–5:11 PM CT, early read 5:14 PM CT; ABAB ends ≈ 6:17 PM CT.
+- Offline basis (§1971): front-of-queue $30 fills C +2–3 bp / R +1.3 bp; a 60-s-old order is ahead of ≈ 90% of its level.
+
+## §1976 — 4:17 PM CT brief (NOTE; fixed front-keep ABAB block A1)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–4 blocked; disk 27%; ABAB pid 25242 alive; A1 since 22:05:07 UTC (KEEP 0 as expected).
+- **253:** $81/mo ($2.70/d); making captured 21.2 / realized 8.1 / share 0.0004 / making_rank 0.041 (up from 0.020); skill_rank 0.390; score 0.215; call_time 0.150.
+- Fleet median $164 / score 0.366 / making_rank 0.63 / call_time 0.203; 210 $282 (0.95 / 0.48), 169 $224, 251 $217; 252 $159.
+- **Prune line ≈ $108**; 253 ≈ 0.75×; immunity ends in ≈ 1.8 h (≈ 6:05 PM CT).
+- A1 skill (253 vs 252, Σα): −7.5 / +8.8, −1.8 / +11.3 (just after the arm switch back from the B-param churn check).
+
+## §1977 — 4:45 PM CT brief (NOTE; fixed front-keep ABAB block B1 started)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 1–4 blocked; disk 27%; ABAB pid 25242 alive. B1 since 22:38:46 UTC (sim 19804): KEEP 1,959–3,896 kept per sim min; FRONT30 0 of 9; **no churn: 200 $30 orders in the window, median life 101 s (= window)**.
+- A1 (sim 19411–19804): 0 $30 fills in the pairfills block analysis (base $30 volume ≈ nil); A1 skill vs 252 +3.8/+11.2, +4.8/+8.2, +8.7/+7.6, +11.7/+7.0.
+- **253:** $75/mo ($2.50/d); making captured 25.8 / realized 9.6 / share 0.0004 / making_rank 0.060 (rising); skill_rank 0.339; score 0.199; call_time 0.169.
+- Fleet median $165 / score 0.467 / making_rank 0.67 / call_time 0.211; 210 $282, 169 $236, 251 $214; 252 $160.
+- **Prune line ≈ $103**; 253 ≈ 0.73×; immunity ends in ≈ 1.3 h (≈ 6:05 PM CT).
+
+## §1978 — 5:50 PM CT — fixed front-keep EARLY READ: B1 = FIRST POSITIVE $30 making (small n); ABAB continues
+- Churn check: A1 636 $30 orders (life p50 31 s); **B1 353 orders, life p50 160 s, p90 365 s** (resting as designed).
+- blockcmp (A1 sim 19471–19804 vs B1 19864–20229):
+  - A1: $30 0 fills; $300 45.8k/min R/C +0.39; **miner-wide R/C +0.39**; Σα vs 252 −2.8 (11 checks).
+  - **B1: $30 2.5k/min, C +0.91 / R +0.34 bp, R/C +0.38, SUM2MIN +0.60** (4 fills, $15k; 3 of 4 at the FRONT, C +1.15); $300 51.3k/min R/C +0.58; **miner-wide R/C +0.56**; Σα vs 252 +1.6.
+  - Fleet $30 in B1: 210 17.0k/min C +1.33 / R +1.01; 251 12.8k C +1.14 / R +0.54; 169 10.7k C +0.94 / R +0.52; 252 6.5k C +0.62 / R +0.42.
+  - FRONT30 in B1: 0/9, 4/13, 2/14, 35/43, 2/15, 2/20 at-best orders kept at the front.
+- Read: quality now fleet-like (R/C 0.38 vs fleet 0.5–0.76) but $30 volume ≈ 1/5–1/7 of the fleet; n small. Not a loss → ABAB continues (A2 running, B2 ≈ 23:46–00:19 UTC, ends ≈ 6:20 PM CT).
+- Brief: 0 tracebacks / fallbacks; PACE 1–3; disk 27%. **253 $75/mo**; making captured 46.5 / realized 17.9 / share 0.0005 / making_rank 0.079 (rising); skill_rank 0.328; score 0.204. Fleet median $165 / making_rank 0.67; 210 $282, 169 $236, 251 $214; 252 $160. **Prune line ≈ $101; immunity ends in ≈ 0.3 h (≈ 6:05 PM CT).**
+
+## §1979 — 6:20 PM CT — 253 PRUNED (immunity ended ≈ 6:05 PM); final front-keep reads; next miner starts on front-keep
+- regcheck x3=253 twice: NOT REGISTERED. Last 253 fill sim 20936. ABAB pid 25242 killed; mvtrx-x3 stopped + disabled; our_uids.txt.bak-253pruned. Pay at prune ≈ $75/mo vs line ≈ $101 (making still ramping through the 3-sim-hour lookback: making_rank 0.007 → 0.079 over the day).
+- **Final front-keep ABAB** (B2 cut short at sim 20936; churn check B2: 284 orders, life p50 134 s — no churn):
+  - B2 alone: $30 2.7k/min C +0.93 / **R −0.72** (4 fills, $9k); $300 R/C **−0.21** (unaffected by the $30 change → a bad window: fleet 210 $30 R +0.89 → +0.22, 252 +0.82 → −0.32). A2: $30 0 fills; $300 R/C +0.37.
+  - **Pooled:** A $30 0 fills, miner-wide R/C +0.38; **B $30 2.6k/min, C +0.92 / R −0.07 bp (8 fills, $24k), SUM2MIN +0.60**, miner-wide +0.30 (the $300 B2 dip). Σα vs 252 −1.2 (A) / −2.1 (B).
+- **Verdict: INCONCLUSIVE (8 fills).** The $30 capture C is fleet-like in both B blocks (+0.91 / +0.93 vs fleet +0.9–1.5), and only B makes $30 volume at all (base: 0). R swings with the window.
+- **Tie → copy the fleet (standing rule):** the next miner starts on B: **live_params_NEXT = base + mk_low_touch_min 0, mk_low_keep 1, mk_low_keep_deep 3, mk_low_front 0.25** (backup live_params_NEXT.json.bak-1979); agents b4a82214 (newminer.sh checks it).
+- Next on the new miner: keep reading front-keep (more $30 fills), then the fixed fleet-style $30 re-run (behind 0 + keep, size 0.1) after a churn check.
+
+## §1980 — 6:30 PM CT — x3 RE-REGISTERED as UID 165 (front-keep settings)
+- User registered x3 → UID 165. `HK=x3 sh newminer.sh 165 253`: regcheck REGISTERED; settings live_params_NEXT (front-keep: touch_min 0, behind 1, keep 1, keep_deep 3, front 0.25; $300 3×, tight 5); agents b4a82214; pace_cold=1 / pace_start 1500; restart 00:25:22 UTC; our_uids.txt = "165 maker x3 21165" (stale 253 line removed; backup our_uids.txt.bak-165).
+- 0 tracebacks; FASTDEC installed; first own fills within 3 min (7 $300 by 00:28 UTC; UID 165's previous owner's fills in the tape are before sim 21165 — filter on ts ≥ 21165).
+- "SETTLEMENT NOT READY (staking proxy missing)" banner: printed on every 253 start too while 253 filled all day → not a sim blocker (check for the exchange's staking-proxy settlement path).
+- Plan: ≈ 1 h of front-keep on the fresh miner (churn check + $30 quality vs fleet), then **speed/abab_fleetfix_165.sh** (A = front-keep, B = FIXED fleet-style $30: touch_min 0, behind 0, keep 1, size 0.1).
+
+## §1981 — 6:32 PM CT — fixed fleet-style $30 ABAB on 165 started straight at B1 (user: skip A1)
+- User: use the front-keep time as A1 and go straight to B1. The sim is slow (only ≈ 1 sim min of front-keep after the warm-up minute), so A1 has no usable data → arms **B1, A2, B2**; **A2 (front-keep) is the baseline**.
+- speed/abab_fleetfix_165.sh (pid 30375, log abab_fleetfix_165.log): A = front-keep (touch_min 0, behind 1, keep 1, keep_deep 3, front 0.25); **B = fixed fleet-style $30 (touch_min 0, behind 0, keep 1, size 0.1)**; only the $30 behind/front/keep_deep knobs differ. B1 from 00:32:16 UTC (sim 21229), 33-min blocks; churn check 6:47 PM, B1 read 7:09 PM, verdict ≈ 8:16 PM CT.
+- **§1981 churn check (6:47 PM CT, NOTE):** B1 sim 21229–21416: 498 $30 orders, life p25/p50/p75 26 / 84 / 181 s → **no churn**; KEEP30 2,571–2,843 kept per sim min; 0 tracebacks. Early skill 165 vs 252: −9.1 / +6.8, −14.3 / +7.7 (new-miner lean warm-up). ABAB continues.
+
+## §1982 — 6:58 PM CT brief (NOTE; 165 fleet-style ABAB block B1)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–3 blocked; disk 28%; ABAB pid 30375 alive; KEEP30 ≈ 2,576 kept per sim min; $30 orders last 2 sim min: 356, life p50 120 s (= window) → no churn.
+- **165 (32 min old):** $0/mo yet; making captured 0 / rank 0 (lookback ramp); skill_rank 0.095; score 0.048; call_time 0.183.
+- Fleet median $165 / score 0.453 / making_rank 0.67; 210 $287, 169 $247, 251 $215; 252 $165. Prune line (lowest non-immune) ≈ $72–97; 165 protected ≈ 23.5 h.
+- B1 skill 165 vs 252 (Σα): −14.3 / +7.7, −12.0 / +7.1, −8.4 / +0.7 (new-miner warm-up, improving).
+
+## §1983 — 7:12 PM CT — FIXED fleet-style $30 (at best, kept, size 0.1) LOSES on 165 → stopped after B1; front-keep restored
+- B1 (sim 21289–21662, no churn): **$30 34.1k/min (203 fills), C +0.01 / R −0.31 bp** vs fleet same window 210 9.8k/min C +0.99 / R +0.92, 169 9.1k C +0.97 / R +0.83, 251 10.9k C +1.00 / R +0.44 (252 10.5k C +0.17 / R −0.23).
+- $300 165: 24.8k/min C +0.63 / R +0.29 (R/C +0.46, fleet-like). **Miner-wide R ≈ +7.2 − 10.6 < 0 → R/C ≈ −0.2**: the $30 volume would wipe the quality multiplier → clear loss (pid 30375 killed; live_params_165 = front-keep).
+- Queue (qpos30_165): front < 10% n28 C +1.14 / R +0.10; 10–50% n128 R −0.37; back n47 R −0.36. Age (qage30_165): even ≥ 60-s orders lose (n104 C +0.10 / R −0.26), like the non-top fleet (≥ 60 s R −0.36); top3 ≥ 60 s C +1.00 / R +0.25.
+- **Read:** resting orders fixed the churn but not the quality. At-best $30 quoting all the time takes 3× the top makers' volume and gets the adverse flow; the top makers are at best SELECTIVELY (≈ 1/3 of our volume). Queue age alone is not their edge.
+- Next (offline first): compare our losing at-best fills with top3 presence at the same moment — fills where top3 also fill vs where they don't — and find the observable book state that separates them (imbalance, flow, fundamental gap, spread), as a selection gate on top of front-keep.
+
+## §1984 — 7:15 PM CT — offline: the fleet's $30 profit is in 1-BEHIND fills; ours sit 2–3 behind → "always 1 behind" ABAB started
+- **sel30.py (165 B1):** 186 of 203 of our at-best $30 fills had NO top3 fill on the same book+side within ±2 s (C −0.02 / R −0.34); the 17 shared ones C +0.28 / R +0.08. Own share, prior move, spread, sweep: our fills negative in every bin, top3 positive in every bin.
+- **fund30.py:** fundamental gap (signed for the maker side) does not separate either — top3 positive and ours negative in every gap bin (3 windows).
+- **Depth split (fr2 dep), every window:** top3 **1-behind** $30 fills C +1.5 to +3.2 / **R +1.1 to +3.0 bp** ($64–282k per window); top3 at-best C +0.6 to +1.2 / R −0.3 to +0.6. **Our 1-behind fills are positive in every window too (R +0.39 to +0.76) but tiny ($7–14k)**; our at-best fills R −0.35 to 0.
+- At size 0.1 our $30 fills already average ≈ $3.2k (= fleet), so size is not the gap. **where30.py** (nearest own order per side, ticks behind best): 253 base 25% at 1 / **69% at 2** (touch_min 2 pulls the touch on 1-tick spreads → ladder only); 253 front-keep 28% at 1 / 49% at 2 / 22% at 3 (keep_deep lets orders drift); 165 front-keep now 61% at 1.
+- **ABAB speed/abab_one1b_165.sh** (pid 32109, log abab_one1b_165.log; arms B A B): A = front-keep; **B = always 1 behind (touch_min 0, behind 1, keep 0, front 0.25, size 0.1)**. B1 from 01:14:32 UTC (sim 21758); position/churn check 7:27 PM, B1 read 7:51 PM, verdict ≈ 8:57 PM CT.
+
+## §1985 — 7:27 PM CT brief (NOTE; always-1-behind ABAB block B1) + position check
+- 0 tracebacks / 0 fastdec fallbacks; PACE 1–2 blocked; disk 28%; ABAB pid 32109 alive (B1 since 01:14:32 UTC).
+- **Position check (B):** nearest own $30 order per side **97% at 1 behind** (was 28–69% at 2–3 behind); 484 orders per 120 sim s, life p25/p50 15 / 61 s → re-pricing like base, **no churn**. FRONT30 25 of 112 at-best orders kept.
+- **165 (1 h old):** $0/mo yet; making captured 0 (lookback ramp); skill_rank 0.037; score 0.019; call_time 0.173. B1 skill vs 252: −4.9 / +5.0, −5.2 / +8.0 (warm-up).
+- Fleet median $161 / score 0.474 / making_rank 0.69; 210 $290, 169 $272, 251 $209; 252 $162. Prune line ≈ $85–97; 165 protected ≈ 23 h.
+
+## §1986 — 7:52 PM CT — always-1-behind B1 READ: $30 quality = FLEET level (small n); ABAB continues
+- B1 (sim 21818–22118, 5 sim min; 97% of time at 1 behind, no churn):
+  - **165 $30: 2.4k/min (13 fills), C +1.20 / R +0.87 bp, R/C +0.73** — best $30 read yet (front-keep §1979: C +0.92 / R −0.07).
+  - Depth: **165 1-behind n7 $7k C +1.80 / R +1.51** (top3 1-behind n20 $68k C +1.90 / R +1.63); 165 at-best n6 C +0.48 / R +0.11.
+  - Queue: front < 10% n6 C +2.08 / R +2.02; 10–50% n6 C +0.52 / R −0.11 (queue place still matters).
+  - Fleet $30 same window: 169 14.1k/min R/C 0.90, 210 17.7k R/C 0.60, 251 15.0k R/C 0.59, 252 9.1k R/C 0.44.
+  - $300 165 21.5k/min R/C +0.18 (window weak for all: 169 −0.02, 210 −0.05). 165 miner-wide R/C +0.30.
+- **Gap now = $30 volume** (2.4k vs 14–18k/min): our 1-behind fills average ≈ $1k vs top3 ≈ $3.4k.
+- Not a loss → A2 / B2 run (verdict ≈ 8:57 PM CT).
+
+## §1987 — 7:57 PM CT brief (NOTE; always-1-behind ABAB block A2 = front-keep)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 1 blocked; disk 28%; ABAB pid 32109 alive; A2 since ≈ 01:49 UTC (sim 22118). $30 orders last 2 sim min: 360, life p50 115 s (no churn); FRONT30 29–42 kept.
+- **165 (1.5 h old):** $0/mo yet; making 0 (lookback ramp); skill_rank 0.194 (rising); score 0.097; call_time 0.161 (fleet median 0.220).
+- Fleet median $161 / score 0.468 / making_rank 0.71; 210 $290, 169 $272, 251 $209; 252 $162. Prune line ≈ $96; 165 protected ≈ 22.5 h.
+- A2 skill vs 252: −7.8 / +13.1.
+
+## §1988 — 8:12 PM CT — Discord "MVTRX watchdog stopped" = the alert forwarder still read the OLD box → repointed (user approved)
+- futures-droplet labalerts.py (every 5 min) read alerts.txt from 157.245.86.147 (old box; its watchdog stopped after the migration, last heartbeat ≈ 9:30 AM CT) → posted "watchdog stopped". New-box alerts (e.g. "x3 UID 253: service is DOWN" at 6:20 PM) never reached Discord.
+- Fix (user yes): new box /root/.ssh/authorized_keys += the forwarder's forced-command key (tail -n 60 alerts.txt only; backup authorized_keys.bak-labalerts); labalerts.py host → root@192.241.128.48 (backup labalerts.py.bak-newbox); state _last_ts set to now so old new-box lines don't post. Test run OK (reads new-box heartbeats). Miner 165 was never affected.
+
+## §1989 — 8:27 PM CT brief (NOTE; always-1-behind ABAB: A2 done, B2 running)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 1–3; disk 28%; ABAB pid 32109 alive; B2 since 02:24:46 UTC (sim 22556). $30 orders: 355 per 120 sim s, life p50 67 s (no churn); where30 last 60 sim s (spans the A2→B2 switch): 53% at 1 behind.
+- **A2 (front-keep, sim 22118–22556): $30 16 fills / $16k, C +1.50 / R +1.33 bp, R/C +0.89** (strong too); $300 141 fills / $204k, R/C +0.17.
+- **165 (2 h old):** $0/mo yet; **first making capture: captured 2.4 / realized 0.4** (q 0.18); skill_rank 0.292 (> fleet median 0.271); score 0.146; call_time 0.161.
+- Fleet median $161 / score 0.442 / making_rank 0.73; 210 $287, 169 $279, 251 $208; 252 $157. Prune line ≈ $95; 165 protected ≈ 22 h.
+
+## §1990 — 8:35 PM CT — BUG: the ABAB scripts turned the settled $300 tight 5 OFF (tight 0) since 2:29 PM CT → restored
+- The ABAB template writes mk_tight300 = $TIGHT (default "0") in BOTH arms; earlier runs were started with TIGHT=5, today's (abab_front253, abab_front2_253, abab_fleetfix_165, abab_one1b_165) were not.
+- Miner log: "LIVE PARAMS applied: mk_tight300 5→0" at 20:29:45 UTC (253) and 00:32:36 UTC (165). So 253 ran tight 0 from 2:29 PM CT until its prune, and 165 since 6:32 PM CT. live_params_NEXT was never touched (tight 5) → 165 started on 5.
+- Restored tight 5 on 165 at 02:33:18 UTC ("mk_tight300 0→5"). Script default TIGHT → "5" in all abab_*_253/165 scripts. The running abab_one1b_165's in-memory mk() still writes 0 at its end → reset after it ends (verdict step).
+- Impact: the $30 A/B comparisons stay valid (both arms had tight 0). The afternoon/evening $300 reads (R/C +0.17 to +0.39) were NOT the settled recipe (tight 5 earlier: +0.48 to +0.71); 253's making ramp before the prune ran without it.
+
+## §1991 — 8:57 PM CT brief (NOTE; always-1-behind ABAB block B2, tight 5 back since 02:33 UTC)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–2; disk 28%; ABAB pid 32109 alive (B2 ends ≈ 02:58 UTC). tight 5 live (SPREAD300 2,421 pulled per sim min). $30: 502 orders per 120 sim s, life p50 68 s (no churn); **93% at 1 behind**; FRONT30 188 of 272 kept.
+- **165 (2.5 h old):** $0/mo yet; making captured 3.9 / realized 0.7 (q 0.18); skill_rank 0.220 (fleet median 0.172); score 0.110; call_time 0.162.
+- B2 skill vs 252 (Σα): −4.7 / +31.0, −1.7 / +42.9, −1.8 / +49.5 (252 on a big skill run; $300 fills 2–7 per 3 sim min).
+- Fleet median $161 / making_rank 0.73; 210 $287, 169 $279, 251 $208; 252 $157. Prune line ≈ $94; 165 protected ≈ 21.5 h.
+
+## §1992 — 9:10 PM CT — always-1-behind VERDICT: FRONT-KEEP STAYS ($30 profit per minute ≈ 2.3× higher)
+- tight 5 restored after the script's final write (03:02:30 UTC "mk_tight300 0→5"). B2 churn check: 757 orders, life p50 82 s (ok).
+- **$30 pooled:** A2 front-keep **2.6k/min, C +1.50 / R +1.33 bp, R/C +0.89**; B (B1+B2) always-1-behind **3.8k/min, C +0.90 / R +0.40, R/C +0.45**. $30 R per minute: A ≈ 3.5 vs B ≈ 1.5 → A.
+  - Per block: B1 C +1.20 / R +0.87; A2 +1.50 / +1.33; B2 +0.76 / +0.17 (B2 window weak for the fleet too: 210 R +0.06, 251 +0.47, 169 +0.67).
+  - Depth: 1-behind fills A n12 $14k R +1.28; B n12 $14k R +0.77 (same count). B's extra volume = at-best fills (n23 R +0.19). Top3 1-behind R +1.34–1.41.
+  - Relative to the fleet in the same window: B1 ours 0.87 vs top3 ≈ 1.07; A2 ours 1.33 vs ≈ 0.61; B2 ours 0.17 vs ≈ 0.40.
+- Skill (Σα vs 252) −24 / −29: 252 big skill run in this window; not arm-related.
+- live_params_165 = front-keep (script's final A) + tight 5; live_params_NEXT unchanged (front-keep, tight 5). No param change.
+- **Volume gap cause:** top3 $30 fills are always their full ≈ $3.6k order (p50 3,594, p90 3,611); ours p50 $991 / max $2,311 → 165's orders are still small because soft pacing (pace_cold start) scales size by the token bucket (_pace_factor). 253 at size 0.1 filled ≈ $3.2k. The gap should shrink as the bucket fills; re-measure fill sizes before any size test.
+- Next $30 candidate (offline first): deeper resting ladder (2 + 3 behind) so aged orders roll into 1-behind — check queue position of our 1-behind fills from aged vs fresh orders across today's front-keep windows.
+
+## §1993 — 9:07 PM CT — offline: aged / front 1-behind fills earn more → deeper $30 ladder ABAB started
+- speed/q1b.py (our $30 fills by depth × order age / queue share): 165 1-behind fills age ≥ 90 s n17 C +1.44 / R +1.24 vs < 30 s n5 R +0.80, 30–90 s n2 R 0.00; front < 10% n7 R +1.56 vs 10–50% n15 R +0.85. 253: 1-behind age ≥ 90 s n4 R +1.05 vs 30–90 s n2 R +0.06. Small n, same direction → offline-positive (weak).
+- **speed/abab_deeplad_165.sh** (pid 36687, log abab_deeplad_165.log; TIGHT default 5): A = front-keep (mk_low_lad "1"); **B = mk_low_lad "1:2"** (ladder orders 2 and 3 behind best, kept up to keep_deep). Arms diffed vs live_params_165: A identical, B differs only in mk_low_lad; miner log "mk_low_lad [1]→[1, 2]" only. B1 from 03:06:45 UTC (sim 22965); check 9:20 PM, B1 read 9:44 PM, verdict ≈ 10:50 PM CT.
+- **§1993 B1 check (9:21 PM CT, NOTE):** no churn (400 $30 orders per 120 sim s, life p50 120 s = window); orders per side now mostly 3 (5,259 snapshots vs 2 before) → deeper ladder active; nearest own order 38% at 1 behind / 36% at 2 / 25% at 3 (watch: less time at 1 behind than front-keep's 53–61%); 0 tracebacks; tight 5, lad "1:2". Skill vs 252: −1.5 / +31.2, +0.5 / +32.1.
+
+## §1994 — 9:28 PM CT brief (NOTE; deep-ladder ABAB block B1)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–1; disk 28%; ABAB pid 36687 alive. $30: 441 orders per 120 sim s, life p50 109 s (no churn); FRONT30 56 of 69 kept.
+- **165 (3 h old): $1/mo — first pay**; making captured 8.1 / realized 1.6 / rank 0.020 (q 0.20); skill_rank 0.306 (fleet median 0.218); score 0.163; call_time 0.175.
+- Fleet median $165 / score 0.447 / making_rank 0.73; 169 $291, 210 $286, 251 $211; 252 $158. Prune line ≈ $102; 165 protected ≈ 21 h.
+- B1 skill vs 252 (Σα): +0.5 / +32.1, +1.6 / +29.0.
+
+## §1995 — 9:47 PM CT — deep-ladder B1 READ: $30 positive and above the fleet in a weak window; ABAB continues
+- B1 (sim 23025–23312, tight 5, lad "1:2"): **165 $30 3.5k/min (11 fills), C +1.13 / R +0.58, R/C +0.52**. Fleet same window: 210 14.8k R/C +0.19, 251 14.4k +0.20, 169 9.3k −0.08, 252 −0.35 (weak $30 window).
+  - Depth: 165 1-behind n4 R +1.15, at best n7 R +0.16; top3 1-behind R +0.74, at best R −0.31. q1b: aged ≥ 90 s 1-behind R +1.61, front R +2.40 (tiny n).
+  - Reference: front-keep A2 (§1992, a stronger window) 2.6k/min R +1.33.
+- **$300 165: 21.3k/min, C +0.52 / R +0.10, R/C +0.20** vs 169 +0.77, 210 +0.95, 251 +0.29, 252 +0.60 → **$300 kept share is now our weakest part** (tight 5 on). 165 miner-wide R/C +0.28.
+- Not a loss → A2 / B2 run (verdict ≈ 10:50 PM CT).
+
+## §1996 — 9:58 PM CT brief (NOTE; deep-ladder ABAB block A2 = front-keep lad "1")
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–1; disk 28%; ABAB pid 36687 alive; tight 5, lad "1". $30: 330 orders per 120 sim s, life p50 120 s (no churn); FRONT30 60 of 71 kept.
+- **165 (3.5 h old):** $1/mo; making captured 9.5 / realized 1.7 / share 0.0001 / rank 0.000 (q 0.18); skill_rank 0.205 (fleet median 0.151); score 0.103; call_time 0.176.
+- Fleet median $165 / score 0.430 / making_rank 0.72; 169 $291, 210 $286, 251 $211; 252 $158. Prune line ≈ $103; 165 protected ≈ 20.5 h.
+- A2 skill vs 252 (Σα): +10.5 / +27.7, +11.3 / +25.1 (165 now positive).
+
+## §1997 — 10:28 PM CT brief (NOTE; deep-ladder ABAB: A2 done, B2 running)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0; disk 29%; ABAB pid 36687 alive; B2 since ≈ 04:19 UTC; tight 5, lad "1:2". $30: 365 orders per 120 sim s, life p50 78 s (no churn); FRONT30 80 of 97 kept.
+- **A2 (front-keep lad "1", sim 23312–23662, tight 5):** $30 10 fills / $18k, C +0.68 / **R −0.50** (R/C −0.73); **$300 63 fills / $148k, C +0.34 / R +0.23 bp, R/C +0.68** (first tight-5 $300 block: fleet-like).
+- **165 (4 h old):** $1/mo; making captured 8.8 / realized 1.7 / rank 0.007 (q 0.19); skill_rank 0.253 (fleet median 0.227); score 0.130; call_time 0.161.
+- Fleet median $165 / score 0.442 / making_rank 0.72; 169 $291, 210 $286, 251 $211; 252 $158. Prune line ≈ $104; 165 protected ≈ 20 h.
+- B2 skill vs 252: +5.5 (+0.48 bp) / +20.9 (+0.54 bp).
+
+## §1998 — 11:00 PM CT — deep-ladder VERDICT: $30 lad "1:2" ADOPTED (live + NEXT); $300 gap flagged
+- ABAB done 04:54:42 UTC; final A write restored lad "1" (tight 5 kept). B2 churn check ok (490 orders, life p50 183 s).
+- **blockcmp_165 (B = BK1+BK2 vs A = AK2):** $30 A 3.6k/min C +0.68 / R −0.50 (R/C −0.73); **B 2.9k/min C +1.12 / R +0.68 (R/C +0.60)**. $300 A 30.6k/min R/C **+0.68**; B 24.1k/min R/C **+0.19**. Miner-wide A +0.41 / B +0.30. Σα vs 252: A −17.4, B −23.9 (252 run).
+- Pooled with the other front-keep block (§1992 AJ2): **front-keep lad "1" $30 n26 $34k C +1.08 / R +0.39 (R/C 0.36) vs lad "1:2" n19 $28k C +1.12 / R +0.68 (R/C 0.60).**
+- q1b (B): 1-behind fills age ≥ 90 s R +1.34, front < 10% R +2.29 (n 3–5).
+- Fleet $30 same windows: R/C −0.08 to +0.66 (weak night); fleet $300 R/C 0.56–0.95 in all three windows.
+- **Decision:** the miner-wide criterion failed only via the $300 class, which the $30 ladder does not touch (reply load identical: 113–123 instructions per reply in every block; separate per-book instruction budgets). Judged on its own class, "1:2" wins → **adopted: mk_low_lad "1:2" in live_params_165 + live_params_NEXT** (diff: only mk_low_lad; backups *.bak-1998).
+- **Flag:** our $300 R/C in the two B blocks (0.20 / 0.16) while the fleet's was 0.71–0.95 → watch $300 kept share in the next clean reads; if it stays ≈ 0.2 with "1:2", re-test the ladder against the $300 class directly. Next study: the $300 kept-share gap (offline, fill-level vs 210 / 169 / 251).
+
+## §1999 — 11:10 PM CT — $300 kept-share gap, first offline cut (tight-5 blocks BK1+AK2+BK2)
+- **165 $300 R/C +0.38 ($378k) vs top3 +0.71 ($1,078k), 252 +0.65.**
+- By sweep: **165 single-taker (non-sweep) fills 23% of $ with R/C −1.06**, sweeps 77% R/C +0.44; top3 non-sweep 37% R/C +0.80, sweeps +0.63. → The gap is in NON-SWEEP fills (single takers).
+- By others' spread: 165 fills at 0–2 ticks (4% of $) R/C −4.89 despite tight 5 (stale quotes when the spread narrows?); top3 0–2 ticks +0.90.
+- By depth: 165 1-behind R +0.04 bp vs top3 +0.28; 2+ behind +0.15 vs +0.25; at best +0.23 vs +0.30.
+- Non-sweep split (165, n28 $83k): own share and depth don't isolate it (2+ behind R −0.44, at best −0.09, 1 behind +0.19); small n.
+- Next (offline): per-fill timing of our non-sweep $300 fills — how long the order had rested and whether the book moved toward it just before (stale quote picked off), vs top3; check whether tight-5 pulls arrive late (spread 0–2 fills).
+
+## §2000 — 11:28 PM CT brief (NOTE; no test running — settled so far: front-keep + lad "1:2" + tight 5)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0; disk 29%; no ABAB running. $30: 406 orders per 120 sim s, life p50 104 s (no churn); FRONT30 54 of 74 kept.
+- **165 (5 h old): $6/mo ($0.20/d)**; making captured 10.3 / realized 2.0 / share 0.0001 / rank 0.014 (q 0.20); skill_rank 0.251 (fleet median 0.262); score 0.133; call_time 0.152 (fleet median 0.216).
+- Fleet median $156 / score 0.460 / making_rank 0.73; 169 $311, 210 $280, 251 $204; 252 $156. Prune line ≈ $93; 165 protected ≈ 19 h.
+
+## §2001 — 11:58 PM CT brief (NOTE) + $300 CHURN FOUND
+- Brief: 0 tracebacks / 0 fastdec fallbacks; PACE 0; disk 29%; no test running; tight 5 (SPREAD300 2,308 of 7,634 book-rounds pulled), lad "1:2". $30: 353 orders per 120 sim s, life p50 120 s. **165: $6/mo**; making captured 15.1 / realized 3.7 (q 0.24) / rank 0.000; skill_rank 0.259 (fleet median 0.233); score 0.130; call_time 0.160. Fleet median $156; 169 $311, 210 $280, 251 $204; 252 $156. Prune line ≈ $94; 165 protected ≈ 18.5 h.
+- **$300 offline (qage300_165.py, tight-5 blocks BK1/AK2/BK2):** ≈ 80% of our $300 fill $ come from orders **< 2 s old** (single-taker < 2 s R −0.06; sweep < 2 s R +0.25, 2–10 s −0.20, 10–60 s +0.42). Top3 fills come from all ages, mostly 10–60 s (single 10–60 s R +0.58, < 2 s +0.51; sweep 10–60 s +0.25).
+- **qfront300.py: 165 $300 orders 6,521 per 120 sim s, life p50 0 s** (253 earlier today: 24,325 per 400 sim s, p50 0 s) → **our $300 quotes churn like the $30 ones did**.
+- **churn300.py:** cause = 1-tick target FLICKER: e.g. book 0 bid 303.76 ↔ 303.77 and ask 303.93 ↔ 303.94 almost every round → cancel + re-place each flick (back of queue).
+- History: mk_vol_hold 2 (keep an order the target moved BEHIND, i.e. our order more aggressive) NOT KEPT on 11-21 (§1854, R/C −1.4 vs −0.6). The safe half is the opposite: keep an order that is 1 tick BEHIND the target (less aggressive) instead of stepping up → absorbs the flicker without extra adverse exposure.
+- Next: build knob mk_vol_lag (ticks, default 0 = identical) — $300 vol/calm touch order up to `lag` ticks behind the target is kept as the touch order; churn check + ABAB.
+
+## §2002 — 11:45 PM CT — mk_vol_lag built + deployed (agents 526b35e7); $300 lag ABAB started
+- **patch_lag.py** (agents 526b35e7 = b4a82214 + mk_vol_lag): on $300 vol/calm books a resting touch order up to `lag` ticks BEHIND its target is kept as the touch order (skipped when an order already sits exactly at the target; never on $30 books). Default 0 = identical code path. SPREAD300 log adds "lag-kept". newminer.sh → 526b35e7; backup QuoteAgent.py.bak-b4a82214.
+- Restart 05:33:48 UTC, 0 tracebacks, FASTDEC installed. Warm-up check with lag 1: $300 orders 3,483 per 90 sim s, life p50 1 s (vs ≈ 4,900 / p50 0 s) → −29% churn; lag-kept 1,549 per sim min. Remaining churn mostly tight-5 pulls (2,163 of 7,230 book-rounds).
+- **speed/abab_lag_165.sh** (pid 43739, log abab_lag__165.log; arms B A B; 240-s wait): A = live (front-keep + lad "1:2" + tight 5, lag 0), **B = + mk_vol_lag 1**; arms diffed vs live: A identical, B only mk_vol_lag. B1 ≈ 05:46:47 UTC; B1 read 12:24 AM, verdict ≈ 1:31 AM CT.
+
+## §2003 — 12:28 AM CT brief (NOTE; $300 lag ABAB block B1)
+- 0 tracebacks / 0 fastdec fallbacks; **PACE 6–8 blocked** (was 0–2; after the 05:33 restart — watch, safety stop at 20); disk 29%; ABAB pid 43739 alive (B1 since 05:46:47 UTC). SPREAD300 2,141 pulled, **lag-kept 2,094** per sim min. $300 orders 3,537 per 90 sim s (life p50 1 s); $30 402 per 120 sim s (p50 101 s).
+- **165 (6 h old): $11/mo ($0.37/d)**; making captured 20.2 / realized 5.1 (q 0.25) / rank 0.007; skill_rank 0.193 (fleet median 0.127); score 0.100; call_time 0.141.
+- Fleet median $158; 169 $327, 210 $281, 251 $204; 252 $163. Prune line ≈ $99; 165 protected ≈ 18 h.
+- B1 skill vs 252: −10.2 / +21.2 (post-restart warm-up).
+
+## §2004 — 12:32 AM CT — $300 lag B1 READ: looks bad but CONFOUNDED by restart warm-up → ABAB continues (judge on B2 vs A2)
+- B1 (sim 24645–25047): $300 orders 15,289 (≈ 3,420 per 90 sim s, life p50 1 s). **165 $300 14.8k/min, C +0.21 / R −0.06, R/C −0.28**; $30 5.4k/min R/C −0.07; miner-wide −0.16. Fleet same window: $300 169 +0.66, 210 +0.63, 251 +0.78 (252 +0.08); $30 169 +0.61, 210 +0.23, 251 +0.22.
+- $300 split: single 32% (R/C ratio meaningless, C ≈ 0), sweeps 68% R/C +0.16; top3 single +0.84 / sweep +0.55. Order age: still mostly < 2 s and 2–10 s.
+- **Confound (my error):** B1 began 13 wall min (≈ 150 sim s) after the 05:33 restart — I cut the ABAB's warm-up wait from 900 s to 240 s; the lesson says ≥ 900 s (lean warm-up ≈ 300 sim s). Skill −10.2 and PACE 6–8 blocked in B1 = warm-up / cold-bucket signature, which also cuts $300 volume.
+- → Not stopped: A2 (now) and B2 run after warm-up; verdict ≈ 1:31 AM on B2 vs A2 only (B1 excluded).
+
+## §2005 — 12:58 AM CT brief (NOTE; $300 lag ABAB block A2)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 2–3 (down from 6–8); disk 29%; ABAB pid 43739 alive; A2 since 06:23:36 UTC (sim 25047). $300 orders 4,224 per 90 sim s, life p50 0 s (A = no lag); $30 342 per 120 sim s, p50 120 s.
+- **165 (6.5 h old): $11/mo**; making captured 25.1 / realized 6.2 (q 0.25) / rank 0.021; skill_rank 0.233 (fleet median 0.133); score 0.127; call_time 0.165.
+- Fleet median $158; 169 $327, 210 $281, 251 $204; 252 $163 (skill_rank 0.95 tonight). Prune line ≈ $100; 165 protected ≈ 17.5 h.
+
+## §2006 — 1:28 AM CT brief (NOTE; $300 lag ABAB end of A2 / B2)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 1–2; disk 29%; ABAB pid 43739 alive. A2 skill vs 252 (Σα): −1.2 / +20.9, +1.8 / +19.8, +0.9 / +17.8. $300 orders (A, no lag) 4,853 per 90 sim s, p50 0 s; $30 357 per 120 sim s, p50 115 s.
+- **165 (7 h old): $11/mo**; making captured 27.1 / realized 7.4 (q 0.27) / **making_rank 0.044**; skill_rank 0.206 (fleet median 0.150); score 0.125; call_time 0.158.
+- Fleet median $158 / making_rank 0.68; 169 $327, 210 $281, 251 $204; 252 $163. Prune line ≈ $96; 165 protected ≈ 17 h.
+- **§2006 add (1:27 AM, NOTE):** B2 (lag 1) since 07:00:42 UTC (sim 25497), 0 tracebacks; ABAB ends ≈ 07:34 UTC (1:34 AM CT); gauges unchanged from §2006.
+
+## §2007 — 1:45 AM CT — $300 lag VERDICT: mk_vol_lag 1 DISPROVEN (stays 0); live recipe matched the fleet in A2 → clean baseline read next
+- ABAB done; live = tight 5, lad "1:2", mk_vol_lag 0. Churn: A2 20,250 $300 orders / 390 sim s (p50 0 s); B2 14,539 / 389 sim s (p50 1 s). PACE A2 1–2, B2 0–1.
+- **A2 (live): $300 19.4k/min C +0.52 / R +0.36, R/C +0.69; $30 2.9k/min C +1.13 / R +0.72, R/C +0.63; miner-wide +0.67.** Fleet same window: $300 169 +0.78, 210 +0.87, 251 +0.43, 252 +0.78; $30 169 +0.44, 210 +0.52, 251 +0.37, 252 +0.08.
+- **B2 (lag 1): $300 20.0k/min C +0.19 / R −0.22, R/C −1.18**; $30 6.9k/min R/C +0.63; miner-wide +0.13. Fleet B2: $300 169 +0.12, 210 +0.43, 251 +0.76, 252 +0.48 (weaker window, still positive).
+- Both lag blocks negative on $300 (B1 −0.28 confounded, B2 −1.18) → lag 1 NOT KEPT. Keeping a quote that the target moved away from keeps it stale; less churn did not mean better fills.
+- **A2 = first block where BOTH classes match/beat the fleet on quality** ($300 0.69 vs fleet 0.43–0.87; $30 0.63 vs 0.37–0.52). But the tight-5 $300 history is volatile (0.20, 0.68, 0.16, 0.69) → one block is not enough to settle.
+- **Next: clean baseline read of the live recipe (no test), ≈ 1 h (two windows), per class vs fleet.** If both classes match/beat the fleet in both windows → SETTLED (user 11-22 night). Else → next $300 test.
+- **§2007 cont.:** clean baseline windows W1 = sim 26000–26390 (read 2:15 AM), W2 = 26390–26780 (read + settle decision 2:48 AM CT). No test running.
+
+## §2008 — 1:58 AM CT brief (NOTE; clean baseline window W1, no test)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–1; disk 29%; no test running (sim 26192, inside W1). $30: 352 orders per 120 sim s, life p50 120 s.
+- **165 (7.5 h old): $19/mo ($0.63/d)**; making captured 35.4 / realized 10.3 (q 0.29) / share 0.0002 / rank 0.044; skill_rank 0.222 (fleet median 0.161); score 0.133; call_time 0.155.
+- Fleet median $161 / making_rank 0.66; 169 $336, 210 $286, 251 $210; 252 $184. Prune line ≈ $108; 165 protected ≈ 16.5 h.
+
+## §2009 — 2:20 AM CT — clean baseline W1 (sim 26000–26390): $300 BEATS the fleet; $30 flat on 11 fills → judge pooled at W2
+- Live verified: tight 5, lad "1:2", lag 0, keep 1, front 0.25.
+- **$300: 165 16.9k/min C +0.26 / R +0.19, R/C +0.73** vs 169 +0.37, 210 +0.69, 251 +0.80 (median of the three 0.69), 252 +0.69.
+- **$30: 165 4.8k/min (11 fills) C +0.40 / R −0.00, R/C −0.01** vs 169 +0.69, 210 +0.42, 251 +0.39 (median 0.42); 252 −0.73.
+- 165 miner-wide R/C +0.51. **Skill (skill_cls2, $300, last 4 sim min): 165 Σα +7.4 = +0.95 bp vs 252 −3.2 = −0.20 bp.**
+- $30 with this recipe so far: +0.52, +0.74, +0.63, +0.63, −0.01 (n 8–27 per block) → W1 likely noise; the cron rule says "clearly misses" — not clear at n 11. Decision deferred to W2, judged on pooled A2 + W1 + W2 per class.
+
+## §2010 — 2:28 AM CT brief (NOTE; clean baseline window W2, no test)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–1; disk 30%; no test (sim 26554, inside W2). $30: 338 orders per 120 sim s, life p50 120 s.
+- **165 (8 h old): $24/mo ($0.80/d)**; making captured 36.4 / realized 11.1 (q 0.31) / share 0.0002 / rank 0.029; skill_rank 0.197 (fleet median 0.158); score 0.113; call_time 0.151.
+- Fleet median $168 / making_rank 0.63; 169 $338, 210 $283, 251 $216; 252 $199. Prune line ≈ $105; 165 protected ≈ 16 h.
+
+## §2011 — 2:55 AM CT — **SETTLED**: $300 and $30 match/beat the fleet top makers on kept share (user's overnight rule)
+- W2 (sim 26390–26780, no test): $300 165 21.7k/min R/C +0.62 (169 +0.67, 210 +0.74, 251 +0.58); $30 165 5.5k/min R/C +0.53 (169 +0.63, 210 +0.26, 251 +0.41); miner-wide 165 +0.60 vs 210 +0.33 / 169 +0.64 / 251 +0.44. Skill ($300, 4 sim min): 165 +0.22 bp vs 252 +0.23 bp.
+- **POOLED A2 + W1 + W2 (≈ 19.5 sim min, live recipe):**
+
+| class | 165 | 169 | 210 | 251 | median of the three |
+|---|---|---|---|---|---|
+| $300 R/C | **+0.66** (19.3k/min, n178) | +0.66 (26.8k) | +0.79 (25.9k) | +0.57 (26.7k) | 0.66 → **matched** |
+| $30 R/C | **+0.45** (4.4k/min, n35) | +0.61 (13.6k) | +0.38 (19.7k) | +0.39 (21.7k) | 0.39 → **beat** |
+| miner-wide R/C | **+0.61** | +0.63 | +0.46 | +0.43 | 0.46 → **beat** |
+
+- **SETTLED RECIPE** (agents **526b35e7**, newminer.sh checks it): §1742 base + $300 3× size (mk_vol_size 0.3 / mk_calm_size 0.36) + **mk_tight300 5** + $30 **front-keep** (mk_low_touch_min 0, mk_low_behind 1, mk_low_keep 1, mk_low_keep_deep 3, mk_low_front 0.25, mk_low_size 0.1) + **$30 ladder "1:2"**; mk_vol_lag 0; strong-inside / adapt / stale / imb / gate off. Snapshot live_params_165.SETTLED.json; **live_params_NEXT.json = live_params_165.json** (diff empty; backup NEXT.bak-settled).
+- From now on on 165: no more strategy tests — safety / rollbacks only (user's rule + stop-when-above-median).
+- **Remaining gaps (reported, not tested tonight):** (1) VOLUME — $300 ≈ 73% of the top makers' (19.3k vs 26–27k/min), $30 ≈ 1/4 (4.4k vs 13.6–21.7k; our $30 fills ≈ $1k vs their full $3.6k orders while the cold pace bucket ramps). (2) Gauges still ramping through the 3-sim-hour lookback: 165 $24/mo, making_rank 0.03, skill_rank 0.20 (fleet median 0.16).
+
+## §2012 — 3:22 AM CT brief (NOTE; SETTLED recipe, no tests)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–1; disk 27%; **no drift** vs live_params_165.SETTLED.json. Order life: $30 p50 120 s (350 per 120 sim s); $300 p50 0 s (6,069 per 120 sim s — the settled $300 behaviour; lag was disproven).
+- **165 (9 h old): $24/mo ($0.80/d)**; making captured 48.0 / realized 16.1 (q 0.34) / share 0.0002 / **rank 0.059**; skill_rank 0.233 (fleet median 0.111); score 0.146; call_time 0.160.
+- Fleet median $168 / score 0.393 / making_rank 0.60; 169 $338, 210 $283, 251 $216; 252 $199. Prune line ≈ $101; 165 protected ≈ 15 h.
+
+## §2013 — 3:52 AM CT brief (NOTE; SETTLED recipe, no tests)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–1; disk 27%; no drift vs SETTLED. $30 life p50 106 s; $300 p50 0 s (settled behaviour).
+- **165 (9.5 h old): $31/mo ($1.03/d)**; making captured 52.3 / realized 19.2 (q 0.37) / share 0.0003 / rank 0.059; skill_rank 0.242 (fleet median 0.115); score 0.150; call_time 0.170.
+- Fleet median $166 / making_rank 0.59; 169 $331, 210 $283, 251 $213; 252 $208. Prune line ≈ $90–110; 165 protected ≈ 14.5 h.
+
+## §2014 — 4:22 AM CT brief (NOTE; SETTLED recipe, no tests)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0; disk 27%; no drift vs SETTLED. $30 life p50 120 s; $300 p50 0 s.
+- **165 (10 h old): $31/mo ($1.03/d)**; making captured 55.7 / realized 18.8 (q 0.34) / share 0.0003 / **rank 0.074**; skill_rank 0.239 (fleet median 0.089); score 0.156; call_time 0.145.
+- Fleet median $166 / making_rank 0.61; 169 $331, 210 $283, 251 $213; 252 $208. Prune line ≈ $112; 165 protected ≈ 14 h.
+
+## §2015 — 4:52 AM CT brief (NOTE; SETTLED recipe, no tests)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0; disk 27%; no drift vs SETTLED. $30 life p50 119 s; $300 p50 0 s.
+- **165 (10.5 h old): $40/mo ($1.33/d)**; making captured 59.6 / realized 19.6 (q 0.33) / share 0.0003 / **rank 0.087**; skill_rank 0.230 (fleet median 0.150); score 0.158; call_time 0.148.
+- Fleet median $163 / making_rank 0.58; 169 $330, 210 $273, 251 $208; 252 $209. Prune line ≈ $104; 165 protected ≈ 13.5 h.
+
+## §2016 — 5:00 AM CT — user back; VOLUME tests approved (failures revert to SETTLED); combined volume ABAB started
+- User: "you can start the volume tests, anything that fails today gets stopped and we move back to the current settings."
+- Offline (last 10 sim min, sim ≈ 27770–28371): pace ramp is done ($30 fill p50 $1k → **$3.0k**, p90 $5.0k = our full order). Gap is FILL COUNT / coverage: $30 165 22 fills on 16 books (6.9k/min) vs top3 50–77 fills on 32–43 books (13.8–23.4k/min); $300 165 99 fills / 49 books (23.2k/min, fill p50 **$1.5k** — small ladder orders 0.027) vs top3 106–136 / 59–62 books (28–30k/min, p50 $3.1–3.6k, max $3.68k). PACE 0 blocked; 24h notional median $17k of the $450k cap.
+- **speed/abab_vol_165.sh** (pid 55336, log abab_vol__165.log; arms B A B; no restart): A = SETTLED; **B = $30 mk_low_size 0.2 + $300 mk_vol_lad_size 0.08 + mk_calm_lad_size 0.06** ($30 ladder keeps its own mk_low_lad_size). Diffed vs SETTLED: A identical, B only those three. Miner log: "mk_vol_lad_size 0.027→0.08, mk_calm_lad_size 0.02→0.06, mk_low_size 0.1→0.2". B1 from 10:59:59 UTC (sim 28380); safety check 5:12, B1 read 5:37 (per-class revert on failure), verdict ≈ 6:43 AM CT.
+- **§2016 safety check (5:13 AM CT, NOTE):** 0 tracebacks; PACE 0 blocked; no new churn ($30 life p50 99 s; $300 7,038 per 120 sim s p50 0 s = as SETTLED). First B fills since sim 28440: $30 2 fills p50 $7.9k (was $3.0k); $300 19 fills p50 $1.5k / p90 $11.0k (p90 was $5.4k). Skill vs 252: −0.4 / +10.2, +3.9 / +9.6. Running.
+
+## §2017 — 5:22 AM CT brief (NOTE; volume ABAB block B1)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0; disk 27%; ABAB pid 55336 alive. Live vs SETTLED differs only in the B-arm sizes (expected during the test). $30 life p50 120 s; $300 p50 0 s (as SETTLED).
+- **165 (11 h old): $40/mo ($1.33/d)**; making captured 65.9 / realized 23.0 (q 0.35) / share 0.0004 / rank 0.080; **skill_rank 0.286** (fleet median 0.151); score 0.183; call_time 0.162.
+- Fleet median $163 / making_rank 0.57; 169 $330, 210 $273, 251 $208; 252 $209 (skill_rank 0.000 this read). Prune line ≈ $107; 165 protected ≈ 13 h.
+
+## §2018 — 6:25 AM CT — volume B1 READ: BOTH classes win big (volume up, quality ≥ fleet) + brief
+- B1 (sim 28440–28714; read ran late, B2 already running since 12:01:56 UTC):
+  - **$300 165: 31.9k/min (n55, p50 $1.5k), C +0.52 / R +0.34, R/C +0.66** (SETTLED ref 19.3k/min R/C 0.66) vs fleet same window 169 21.7k +0.40, 210 16.6k +0.78, 251 18.2k +0.48, 252 35.6k +0.42 → volume now ABOVE the top makers, quality ≥ their median.
+  - **$30 165: 10.5k/min (n10, p50 $4.9k), C +1.42 / R +1.04, R/C +0.73** (ref 4.4k/min R/C 0.45) vs 169 20.5k +0.52, 210 24.7k +0.63, 251 18.2k +0.71.
+  - **165 miner-wide R/C +0.70.**
+- No failure → A2 / B2 continue (verdict ≈ 6:43 AM CT).
+- Brief: 0 tracebacks / fallbacks; PACE 0; disk 28%. **165 $53/mo ($1.77/d)**; making captured 70.3 / realized 26.2 (q 0.37) / rank 0.079; **skill_rank 0.309** (fleet median 0.138); score 0.194; call_time 0.147. Fleet median $163; 169 $329, 210 $270, 251 $202; 252 $209. Prune line ≈ $112; 165 protected ≈ 12 h.
+
+## §2019 — 6:46 AM CT — volume test 1 VERDICT: BOTH ADOPTED ($30 size 0.2, $300/calm ladder ×3); volume test 2 started
+- ABAB done 12:33:13 UTC; live == SETTLED (old) before adoption.
+- **A2 (SETTLED, sim 28774–29052):** $300 34.1k/min (n53) R/C **−1.05**; $30 5.4k/min (n6) R/C +0.86; miner-wide +0.44. Fleet A2: $300 169 +0.62, 210 +0.87, 251 +0.64; $30 169 +0.27, 210 +0.21, 251 +0.55.
+- **B pooled (B1 + B2):** $300 22.1k/min (n85) R/C **+0.66**; $30 **7.9k/min** (n16, p50 $4.9k) R/C **+0.69**; **miner-wide +0.67**; Σα vs 252 B +0.4 / A −1.8. Fleet B: $300 169 −0.18, 210 +0.79, 251 +0.57 (median 0.57); $30 169 +0.50, 210 +0.61, 251 +0.67 (median 0.61); miner-wide 169 +0.37, 210 +0.64, 251 +0.65.
+- **$30 size 0.2: WIN** (volume +46% vs A2, +80% vs the SETTLED ref 4.4k; R/C 0.69 ≥ fleet median 0.61).
+- **$300 ladder ×3: adopted** — R/C 0.66 vs A2 −1.05 (≥ fleet median 0.57), miner-wide 0.44 → 0.67; volume +15% vs the SETTLED ref (19.3k) but below A2's unusually high 34.1k → not "clearly up" on volume alone; bigger ladder orders = fleet-like (tie → copy the fleet).
+- **New SETTLED** = old + mk_low_size 0.2, mk_vol_lad_size 0.08, mk_calm_lad_size 0.06 → live_params_165.json, live_params_165.SETTLED.json, live_params_NEXT.json (backups *.bak-2019; all three equal). Miner log confirms.
+- $300 fills by depth (B): 165 2+ behind 53 fills p50 **$1.5k** (ladder orders) vs 210 24 fills p50 **$3.6k**; 165 1 behind p50 $5.4k (touch 0.3). The ladder-size knob tops out at 0.1 (≈ $1.9k).
+- **Volume test 2: speed/abab_vol2_165.sh** (pid 59455, log abab_vol2__165.log; arms B A B): A = new SETTLED; **B = $30 mk_low_size 0.3 + mk_vol_lad_size 0.1 + mk_calm_lad_size 0.075** (diffed: only those three). B1 from 12:45:39 UTC (sim 29515); B1 read 7:22 AM, verdict ≈ 8:28 AM CT.
+
+## §2020 — 6:50 AM CT brief (NOTE; volume test 2 block B1)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0; disk 28%; ABAB pid 59455 alive (B1 since 12:45:39 UTC). Live vs SETTLED = only the B-arm sizes (0.3 / 0.1 / 0.075). $30 life p50 120 s; $300 p50 0 s.
+- **165 (12.5 h old): $53/mo ($1.77/d)**; making captured 72.8 / realized 27.4 (q 0.38) / share 0.0005 / rank 0.066; skill_rank 0.313 (fleet median 0.123); score 0.189; call_time 0.141.
+- Fleet median $163 / making_rank 0.53 (fleet gauges drifting down this morning); 169 $329, 210 $270, 251 $202; 252 $209. Prune line ≈ $115; 165 protected ≈ 11.5 h.
+
+## §2021 — 7:21 AM CT brief (NOTE; volume test 2: B1 done, A2 running)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0; disk 28%; ABAB pid 59455 alive; A2 since 13:17:12 UTC (sim 29912). $30 life p50 116 s; $300 p50 0 s.
+- Block-end log for B1 (sim 29515–29912): $30 11 fills / $48k, C +1.59 / R +0.37 (R/C +0.23); $300 43 fills / $130k, C +0.27 bp / R ≈ +0.00 (R/C ≈ +0.01) → weak; the full B1 read (fleet same window) follows.
+- **165 (13 h old): $63/mo ($2.10/d)**; making captured 79.2 / realized 26.0 (q 0.33) / share 0.0005 / rank 0.073; skill_rank 0.328 (fleet median 0.164); score 0.200; call_time 0.154.
+- Fleet median $166 / making_rank 0.52; 169 $326, 210 $271, 251 $204; 252 $217. Prune line ≈ $100–111; 165 protected ≈ 11 h.
+
+## §2022 — 7:30 AM CT — volume test 2 ($30 size 0.3 + ladder 0.1/0.075) STOPPED after B1 → SETTLED
+- B1 (sim 29575–29912): $300 165 23.2k/min (n43, p50 $1.5k) C +0.27 / R +0.00, R/C +0.01 (ref 22.1k R/C 0.66) vs fleet 169 −0.58, 210 +0.51, 251 +0.26 (median 0.26); $30 165 8.5k/min (n11) C +1.59 / R +0.37, R/C +0.23 (ref 7.9k R/C 0.69) vs 169 +0.89, 210 +0.35, 251 +0.07 (median 0.35).
+- No volume gain (+5% / +8%) and quality below the fleet median on both → fail per the user rule; pid 59455 killed; live = SETTLED (A2 was already running SETTLED: "no change").
+
+## §2023 — 7:50 AM CT — $30 books are ONE-SIDED 78–84% of the time; cause = inventory cap on an INHERITED baseline
+- cover30.py: $30 book-rounds with a resting order on both sides only 16–22% (one side 78–84%; per-book median both-sides share 0.00); $300 47–56% both (rest = tight-5 pulls). Fills agree: our $30 fills on 33 books, 36% of them two-sided, vs 210 / 169 / 251 on 54–63 books, 63–82% two-sided; $300 normal (47% vs 41–43%).
+- $30 2+ behind fills are negligible for everyone (1% of $) → a bigger $30 ladder adds nothing; 1-behind is the profit (165 n43 R +1.03 vs top3 n245 R +1.17).
+- Log-only build **37ce4c12** (SIDES30, patch_sides.py), restart 13:28:34 UTC: per sim minute ≈ 3,840 $30 book-rounds: **both 651–660 (17%), buy-only 1,980–1,989, sell-only 1,200; every missing side = INVENTORY CAP** (price 0, funds 0), the same books each minute (≈ 33 capped long, 20 short).
+- Our own net $30 positions since 165's start are only ≈ ±$6k (p10 −$5.9k, p90 +$3.6k) vs the cap 0.3 × $50k wealth = $15k → the cap binds on the account's 'initial' baseline, i.e. holdings that are not ours (slot's previous owner / reset baseline). It also shifts fair value by skew 5 × inv.
+
+## §2024 — 7:45 AM CT — mk_inv_own built (agents 8d6265e3) + ABAB started
+- **patch_invown.py:** mk_inv_own (0/1, default 0 = identical): inventory = (base − OUR first-seen base per book) × mid / wealth0, baseline persisted in /opt/mvtrx/inv_base_<uid>.json (restarts keep it). Affects only max_inv side drops and the skew term.
+- Restart 13:40:08 UTC (0 tracebacks); newminer.sh → 8d6265e3. **speed/abab_inv_165.sh** (pid 63284, log abab_inv__165.log; 900-s warm-up, arms B A B): A = SETTLED; **B = + mk_inv_own 1** (diffed: only that knob). B1 ≈ 13:57 UTC; check 8:06, B1 read 8:33, verdict ≈ 9:07 AM CT.
+
+## §2025 — 7:52 AM CT brief (NOTE; inv-own ABAB in its 900-s warm-up, live = SETTLED)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0; disk 28%; ABAB pid 63284 waiting (B1 ≈ 13:57 UTC); live == SETTLED. SIDES30 (SETTLED): both 632 / buy-only 2,039 / sell-only 1,169 — all missing sides = inventory cap. $30 life p50 120 s; $300 p50 0 s.
+- **165 (13.5 h old): $63/mo ($2.10/d)**; making captured 85.4 / realized 27.8 (q 0.33) / share 0.0005 / rank 0.088; skill_rank 0.348 (fleet median 0.160); score 0.218; call_time 0.157.
+- Fleet median $166 / making_rank 0.52; 169 $326, 210 $271, 251 $204; 252 $217. Prune line ≈ $109; 165 protected ≈ 10.5 h.
+
+## §2026 — 8:10 AM CT — mk_inv_own had NO effect (B1 SIDES30 unchanged) → stopped; probe found the real cap
+- B1 (from 13:55:09 UTC): "mk_inv_own 0→1" applied, inv_base_165.json written (256 books), but SIDES30 stayed both ≈ 17% and every missing side still "inv"; cover30 $30 both 17%. pid 63284 killed; live = SETTLED.
+- Log-only probe (agents 41fc28bc, restart 14:08:14 UTC) printed inv / wealth0 / balances: **inv sits at exactly ±0.300** on 52 of 64 $30 books (wealth0 ≈ $50k) while the real deltas are much smaller (e.g. b130 base 642.5 vs initial 589.2 = +53 units ≈ +$1.6k ≈ 0.03).
+- Cause: the unit's **max_units=40** (hard position cap in BASE UNITS, all books): units ≥ 40 → inv forced to +max_inv (no bids); ≤ −40 → −max_inv (no offers). 40 units ≈ $12k on a $300 book but **≈ $1.2k on a $30 book — below one $30 fill ($3–5k = 100–170 units)** → nearly every $30 book sits at the cap, one side dropped, until a fill on the other side.
+- (mk_inv_own is harmless but irrelevant; left at 0.)
+
+## §2027 — 8:15 AM CT — mk_low_max_units built (agents d0ec22ad) + ABAB started
+- patch_lowunits.py: mk_low_max_units (base units; 0 = use max_units = identical) via the $30 per-book override (_low_ov sets max_units on $30 books only).
+- Restart 14:14:25 UTC, 0 tracebacks; newminer.sh → d0ec22ad. **speed/abab_units_165.sh** (pid 65404, log abab_units__165.log; 900-s warm-up, arms B A B): A = SETTLED; **B = + mk_low_max_units 400** (≈ $12k on $30 books = the $300 books' dollar cap). Diffed: only that knob. B1 ≈ 14:31 UTC; check 8:40, B1 read 9:08, verdict ≈ 9:41 AM CT.
+
+## §2028 — 8:23 AM CT brief (NOTE; $30 unit-cap ABAB in its 900-s warm-up, live = SETTLED)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0; disk 28%; ABAB pid 65404 waiting (B1 ≈ 14:31 UTC); live == SETTLED. $30 life p50 120 s; $300 p50 0 s.
+- **165 (14 h old): $76/mo ($2.53/d)**; making captured 87.6 / realized 28.5 (q 0.33) / share 0.0006 / **rank 0.103**; skill_rank 0.298 (fleet median 0.177); score 0.201; call_time 0.169.
+- Fleet median $166 / making_rank 0.54; 169 $319, 210 $261, 251 $197; 252 $215. Prune line ≈ $108; 165 protected ≈ 10 h.
+- **§2027 B1 check (8:41 AM CT, NOTE):** 'mk_low_max_units 0.0→400.0' applied (B1 from 14:29:26 UTC, sim 30743); 0 tracebacks; **SIDES30 both 3,702 / buy-only 60 / sell-only 78 per sim min (96% two-sided, was 17%)**; books at the inventory cap 2 of 64 (was 52); cover30 $30 both sides 96%, per-book median 1.00 (was 0.00). $30 orders 530 per 120 sim s (life p50 119 s, no churn). **PACE 6–7 blocked** (was 0) — more $30 quoting uses pace budget; watch (stop at 20).
+
+## §2029 — 9:01 AM CT — unit-cap B1 stopped on a FALSE alarm (market-wide burst); revert bug found; test re-run
+- 8:53 AM brief: 165 skill Σα −133 / −143 on $300 notional $775–926k per 4 sim min (normal ≈ $100k); score 0.201 → 0.112; PACE 6–7 → I stopped the ABAB (pid 65404) as a clear failure.
+- **Revert bug:** I copied live_params_165.SETTLED.json, which had NO mk_low_max_units key → the live reload only applies keys present ("no change") → the miner kept 400 for 5 more minutes. Fixed by writing explicit defaults (mk_low_max_units 0.0, mk_inv_own 0, mk_vol_lag 0) into live, SETTLED and NEXT; log "mk_low_max_units 400.0→0.0" at 14:59:37 UTC.
+- **Then the cause turned out to be the market:** our $300 maker volume per sim minute jumped at sim 30660 — BEFORE B1 (sim 30743) — and stayed high after the revert; the fleet spiked at the same time (per 2 sim min: 210 302k, 169 376k, 251 296k vs ≈ 20–30k normally; 165 303k). Code: quoting is single-threaded, the $30 override cannot reach $300 books. → B1 is confounded both ways; the stop was premature.
+- $30 effect itself was as designed (§2027 check: two-sided 96%).
+- **Re-run: speed/abab_units2_165.sh** (pid 67796, log abab_units2__165.log; no restart, arms B A B, A writes mk_low_max_units 0.0 explicitly). B1 from 15:00:48 UTC (sim 31130); B1 read 9:37 (with a market-burst check), verdict ≈ 10:43 AM CT.
+
+## §2030 — 9:12 AM CT — user: raise volume; if capture + skill stay ≈ the same, keep the settings and let 165 run UNTESTED
+- Plan: (1) unit-cap re-run verdict ≈ 10:43 AM; (2) if adopted, one last volume step = $30 size 0.3 retest with the cap fixed (0.3 failed while the cap bound); adopt only if volume up with R/C and skill ≈ unchanged; (3) then FREEZE 165 (no more tests; safety/rollback only; briefs continue).
+
+## §2031 — 9:21 AM CT brief (NOTE; unit-cap re-run block B1)
+- 0 tracebacks / 0 fastdec fallbacks; **PACE 4–10 blocked** (two-sided $30 uses more budget; script stop at 20); disk 28%; ABAB pid 67796 alive; live vs SETTLED = only mk_low_max_units 400. SIDES30: both 3,540 / B-only 60 / S-only 240 (92% two-sided). $30 life p50 120 s; $300 p50 0 s.
+- B1 skill vs 252 ($300, Σα / bp): **+51.5 (+1.14) / +0.0, +47.8 (+1.29) / +0.5, +10.9 (+0.46) / +0.4** — 165 notional still elevated after the burst ($236–450k).
+- **165 (15 h old): $76/mo**; making captured **173.9** (from 87.6) / realized 58.4 (q 0.34) / share 0.0007; **making_rank 0.000** in this read — also 0.000 for 169 and 252 (validator rank quirk after the burst, not ours alone); skill_rank 0.318 (fleet median 0.295); score 0.159; call_time 0.170.
+- Fleet median $166; 169 $319, 210 $261, 251 $197; 252 $215. Prune line ≈ $88–108; 165 protected ≈ 9 h.
+
+## §2032 — 9:40 AM CT — unit-cap re-run B1 READ: $30 VOLUME now fleet-level, $30 quality dipped (n 23) → continue to the verdict
+- Burst check (per 2 sim min, $300): 165 32–51k vs 210 25–48k, 169 30–51k, 251 24–43k → normal (≈ 1.5× quiet levels, no burst).
+- **$30: 165 17.1k/min (n23, 19 books) C +0.70 / R −0.09, R/C −0.13** (SETTLED ref 7.9k/min R/C 0.69) vs 169 15.6k +0.59, 210 19.2k +0.64, 251 18.1k +0.30 → volume ×2.2, now level with the top makers; R/C below their median (0.59).
+- **$300: 165 49.9k/min (n140, 66 books) R/C +0.59** vs 169 41.5k +0.69, 210 39.1k +0.85, 251 37.6k +0.82 (volume above the fleet; quality slightly below).
+- Miner-wide 165 +0.38 vs 169 +0.64 / 210 +0.71 / 251 +0.62. Skill ($300) B1: +51.5 / +47.8 / +10.9 Σα vs 252 ≈ 0.
+- Judgement: not a clear failure — $30 R/C is volatile block to block on SETTLED too (−0.01 … +0.86, n 6–27) and B1 has only 23 $30 fills; the user's rule is "keep if capture + skill stay about the same" → decide on pooled B1+B2 vs A2 at ≈ 10:43 AM.
+
+## §2033 — 9:52 AM CT brief (NOTE; unit-cap re-run block A2 = SETTLED)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 1–4; disk 29%; ABAB pid 67796 alive; live == SETTLED (A2). $30 life p50 120 s; $300 p50 0 s.
+- A2 skill vs 252 ($300): +16.0 (+1.05 bp) / −3.0, +7.6 (+0.46) / −1.8.
+- **165 (15.5 h old): $91/mo ($3.03/d)**; making captured 183.3 / realized 64.1 (q 0.35) / share 0.0007; making_rank 0.000 (still 0 for 169 and 252 too — validator rank quirk persists); skill_rank 0.231 (fleet median 0.324); score 0.116; call_time 0.160.
+- Fleet median $164; 169 $302, 210 $250, 251 $192; 252 $189. Prune line ≈ $105; 165 protected ≈ 8.5 h.
+
+## §2034 — 10:21 AM CT brief (NOTE; unit-cap re-run block B2)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 1–3; disk 29%; ABAB pid 67796 alive; B2 since ≈ 16:06 UTC; live vs SETTLED = mk_low_max_units 400 only. $30: 491 orders per 120 sim s, life p50 120 s; $300 p50 0 s.
+- B2 skill vs 252 ($300): +11.5 (+0.78 bp) / +4.4, +13.4 (+0.87) / +6.2.
+- **165 (16 h old): $91/mo ($3.03/d)**; making captured 181.1 / realized 66.8 (q 0.37) / share 0.0008; making_rank 0.000 (169 and 252 also 0.000); skill_rank 0.268 (fleet median 0.339); score 0.134; call_time 0.155.
+- Fleet median $164; 169 $302, 210 $250, 251 $192; 252 $189. Prune line ≈ $72–108; 165 protected ≈ 8 h.
+
+## §2035 — 10:45 AM CT — unit-cap VERDICT: mk_low_max_units 400 ADOPTED (volume ×2, capture + skill ≈ same); last volume step ($30 size 0.3) started
+- ABAB done 16:39:50 UTC. No market burst in any block (fleet $300 28–41k/min).
+- **A2 (SETTLED):** $30 8.5k/min (n14) R/C +0.25; $300 33.1k R/C +0.41; miner-wide +0.38. Fleet: $30 169 +0.41, 210 +0.60, 251 +0.46; miner-wide 0.46–0.71.
+- **B pooled (B1 + B2):** **$30 17.0k/min (n45) R/C +0.21** (B1 −0.13, B2 +0.38); $300 40.2k R/C +0.61; **miner-wide +0.43**. Fleet B: $30 169 12.1k +0.49, 210 17.1k +0.66, 251 14.8k +0.51; miner-wide 0.57–0.70. **Σα vs 252: B +15.1 vs A +9.0.**
+- User rule (9:10 AM: keep if volume up and capture + skill ≈ the same): $30 volume ×2.0 (now ≥ 169/251, = 210); $30 R/C 0.21 vs 0.25 (≈ same; both below the fleet this window); miner-wide 0.43 vs 0.38 (not worse); skill better → **ADOPTED: mk_low_max_units 400** in live_params_165.json, SETTLED, NEXT (explicit key; backups *.bak-2035); log "0.0→400.0".
+- **Last volume step: speed/abab_size3_165.sh** (pid 71806, log abab_size3__165.log; arms B A B, no restart): A = new SETTLED; **B = $30 mk_low_size 0.3** (diffed: only that). B1 from 16:44:17 UTC (sim 32447); B1 read 11:21 AM; verdict + FREEZE ≈ 12:27 PM CT.
+
+## §2036 — 10:52 AM CT brief (NOTE; $30 size 0.3 retest block B1)
+- 0 tracebacks / 0 fastdec fallbacks; PACE 0–2; disk 29%; ABAB pid 71806 alive; live vs SETTLED = mk_low_size 0.3 only. $30: 510 orders per 120 sim s, life p50 96 s; $300 p50 0 s.
+- B1 skill vs 252: +4.0 (+0.47 bp) / +2.7.
+- **165 (16.5 h old): $77/mo ($2.57/d)** (down from $91 — the incentive smoothing; making_rank still 0.000 for 165, 169, 252); making captured 180.3 / realized 70.0 (q 0.39) / share 0.0009; skill_rank 0.282 (fleet median 0.367); score 0.141; call_time 0.170.
+- Fleet median $185 / score 0.517; 169 $298, 210 $262, 251 $208; 252 $185. Prune line ≈ $91–111; 165 protected ≈ 7.5 h.
+
+## §2037 — 11:23 AM CT — size 0.3 B1 READ: promising, but a second market-wide BURST hit mid-block → continue
+- Burst check ($300 per 2 sim min): normal until sim 32520, then **sim 32640: 165 221k, 210 277k, 169 339k, 251 276k; 32760: 116k / 196k / 280k / 174k** (≈ 10× quiet) → B1's second half is a burst.
+- B1 (sim 32507–32806): **$30 165 28.1k/min (n27) R/C +0.52** (ref §2035 17.0k R/C 0.21) vs 169 18.7k +0.62, 210 22.1k +0.53, 251 21.5k +0.59 → $30 volume above all three top makers at fleet-level capture. $300 165 142.1k R/C +0.46 vs fleet 0.80–0.89 (burst; size 0.3 does not touch $300). Miner-wide 165 +0.48 (ref 0.43) vs fleet 0.76–0.86. Skill vs 252: +4.0, +0.7, +8.6, +3.0, +6.4, +39.4 vs +1.9…+6.5.
+- **PACE 17 → 24 blocked** — also in A2 (SETTLED, size back to 0.2 at 17:17:59) → burst-driven (pacer pulling quotes on books over budget), not the size; the ABAB's safety stop (≥ 20) may end the test early — if so, read what exists and decide at the verdict.
+
+## §2038 — 11:24 AM CT brief (NOTE; size 0.3 retest block A2 = SETTLED, just started)
+- 0 tracebacks / 0 fastdec fallbacks; **PACE 17–24 blocked** (market burst, §2037); disk 29%; ABAB pid 71806 alive (A2 since 17:17:53 UTC); live == SETTLED. $30 life p50 120 s; $300 p50 0 s.
+- **165 (17 h old): $77/mo**; making captured 204.2 / realized 81.2 (q 0.40) / share 0.0009 / **making_rank 0.190** (rank gauge back; was 0.000 glitch, 0.10 before); skill_rank 0.238 (fleet median 0.438); score 0.214; call_time 0.197.
+- Fleet median $185 / score 0.609 / making_rank 0.77 (burst lifts everyone's capture); 169 $298, 210 $262, 251 $208; 252 $185. Prune line ≈ $93–110; 165 protected ≈ 7 h.
+
+## §2039 — 11:40 AM CT — MISSED ALERTS reviewed: upstream 0.6.8 final (8:13 AM) adds a MAKING ORDER-TO-TRADE DISCOUNT; size-0.3 test safety-stopped
+- alerts.txt (Discord): 14:13 UTC "UPSTREAM RELEASE on MAINNET (main) d717c50e '20261123 - 0.6.8 final' — 39 sim-config/scoring files changed" (+ testnet); 14:23 UTC "x3 UID 165: scoring validator 5EWwdZB7 shows no gauges for us" (matches the making_rank 0.000 readings for 165/169/252 until ≈ 11 AM); 17:23 UTC abab_size3 SAFETY STOP (PACE 24 blocked in the market burst). The briefs did not read alerts.txt → missed for 3.5 h (user saw them in Discord).
+- **0.6.8 debeta.otr_discount** (repo068, d717c50e): making credit × min(1, (threshold / messages_per_fill)^power); messages = placements + cancels the engine applied, over the making window; **defaults threshold 200, power 1 (ON)**; a uid with messages and no fills keeps none. New gauges making_otr_factor / messages_per_fill — **not exported by the scoring validator yet** (only s3_factor etc.) → not live for us yet.
+- **Our estimate:** ≈ 115 instructions per reply × ≈ 55.6 validator rounds per sim min ≈ **6,400 messages / sim min**; fills ≈ 28/min normal (unit-cap B1) → **≈ 230 messages per fill** (quiet old-settings baseline 10/min → ≈ 620; burst 77/min → ≈ 83). → expected discount ≈ 0.85 normally, much worse in quiet periods. Main source: the $300 re-quote churn (§2001: ≈ 3,000–3,500 $300 orders per sim min, each placed + cancelled).
+- Size-0.3 retest: only B1 ran (burst-confounded but positive: $30 28.1k/min R/C 0.52); SAFETY STOP in A2 → live == SETTLED (size 0.2).
+
+## §2040 — 12:05 PM CT — OTR work: exact message counts + where they come from (offline)
+- **Log-only counter (agents dca3d037, patch_msgs.py; restart 17:39:48 UTC, 0 tracebacks):** MSGS per sim minute (placements / cancelled orders): **$300 vol 2,710–2,870 / 2,686–2,795; calm 784–906 / 757–889; $30 187–242 / 31–32** → **≈ 7,300–7,600 messages per sim min**, 93% on $300 books. At ≈ 28 fills per sim min (normal) → **≈ 270 messages per fill** (> 200 → discount ≈ 0.74 if 0.6.8 runs with defaults); in the current burst (≈ 77 fills/min) ≈ 97.
+- flick300.py: our $300 quote price changes on 30–38% of side-rounds; only 21–23% of changes revert within 3 rounds (pure flicker); 1-tick changes ≈ half.
+- pull300.py: ≈ 425 tight-5 pulls per sim min (on→off), median on/off spell 3 rounds; pulled at spread 4–6, resumed at 5–8 ticks.
+- hyst300.py (simulated on the spread series): resume only at ≥ 7 → transitions −16% (burst) / −28% (quiet), quoting time −5…−6 points → ≈ 4% fewer messages only.
+- Our $300 fills by others' spread: sp6–8 = 44% of $ with R/C 0.14–0.36 vs top3 0.66–0.69 at the same spreads; top3 trade every spread at R/C 0.43–0.82 (they do not pull on tight spreads).
+- **Read:** the top makers fill about as often as we do on $300 (≈ 15–28 fills/min each) but their orders rest 10–60 s, so their messages per fill must be far lower. Small filters (debounce, hysteresis) cut ≈ 10–15%; getting well under 200 needs the fleet's resting pattern on $300 (like our $30 front-keep: rest near the others' best and re-place only when the order drifts out of range).
+
+## §2041 — 12:00 PM CT — user: work on the 0.6.8 OTR discount now + re-run size 0.3 after the burst; $300 RESTING mode built + ABAB started
+- User 11:45 AM: OTR now (measure, offline, A/B, then freeze); size-0.3 retest after the burst.
+- rest300.py (offline, $300 best-price series): a resting pattern (rest 0–1 behind, re-place only when > k ticks off) needs ≈ 900–1,700 placements per sim min → **≈ 1,800–3,400 $300 messages vs ≈ 7,000 live (−55…−75%)** → ≈ 110–130 messages per fill at 28 fills/min.
+- **patch_rest300.py (agents 61cd0a0f):** mk_rest300 (0/1; default 0 = identical) runs the $30 resting logic (stay mk_rest300_behind behind the others' best, keep up to mk_rest300_keep_deep, keep at-best orders near the front < mk_rest300_front) on $300 vol/calm books via the per-book override; lean-jumped sides are never moved (the $300 skill). Explicit keys added to live / SETTLED / NEXT (mk_rest300 0, behind 1, keep_deep 3, front 0.25).
+- Restart 17:53:43 UTC, 0 tracebacks; newminer.sh → 61cd0a0f. **speed/abab_r300_165.sh** (pid 76729, log abab_r300__165.log; 900-s warm-up; arms B A B): A = SETTLED; **B = + mk_rest300 1** (diffed: only that knob). B1 ≈ 18:11 UTC; early check 12:21, B1 read 12:48, verdict ≈ 1:21 PM CT (then size-0.3 re-run if no burst, then FREEZE).
+
+## §2042 — 12:15 PM CT brief (NOTE; rest300 ABAB in its 900-s warm-up)
+- alerts.txt: no new real alerts since the last review (the UID 58 / 212 / abab_spread lines are old unstamped entries; abab_size3 safety stop already known, §2039).
+- 0 tracebacks / 0 fastdec fallbacks; **PACE 18–29 blocked** (burst continuing; the rest300 ABAB's safety stop at 20 may trip — watch); disk 29%; ABAB pid 76729 waiting (B1 ≈ 18:11 UTC); live == SETTLED. MSGS (SETTLED): vol 2,710 / 2,686, calm 906 / 889, $30 242 / 32 per sim min. $30 life p50 120 s; $300 p50 0 s.
+- **165 (17.5 h old): $73/mo**; making captured 244.4 / realized 96.8 (q 0.40) / share 0.0010 / **making_rank 0.257**; skill_rank 0.303 (fleet median 0.410); **score 0.280**; call_time 0.169.
+- Fleet median $194 / score 0.62 / making_rank 0.78; 210 $272, 169 $246, 251 $224; 252 $185. Prune line ≈ $99–116; 165 protected ≈ 6 h.
+- OTR watch: no making_otr_factor / messages_per_fill gauges anywhere yet (0 series).
+
+## §2043 — 12:00 PM CT — rest300 ABAB relaunched with a burst-tolerant safety stop
+- PACE 18–29 blocked in the continuing market burst (pacer protecting budget; same under SETTLED) would trip the ABAB's ≥ 20 stop for reasons unrelated to the arm → killed pid 76729 during its warm-up wait, safety threshold → ≥ 60 blocked (the no-fills stop stays), relaunched as **pid 77691** (700-s wait; B1 ≈ 18:09 UTC = same schedule). Crons re-created with the new pid.
+
+## §2044 — 12:10 PM CT — 0.6.8 impact assessment (user) + standing update procedure
+- git diff 0.6.7 final (20e9785) → 0.6.8 final (d717c50): 29 validator/protocol/config files, +2,526 / −233.
+- **Protocol:** trade events gain Tfb / Tfr / Mfb / Mfr / qs (fee base / refund, quote settled) + a new PriceBandEvent (y 'EPB'). Our fastdec FEv/FBook use forbid_unknown_fields=True → every payload would fall back to the slow decoder (≈ 2.3× slower → call_time) — no crash (fallback path). Fix: let fastdec ignore unknown fields (safe on 0.6.7 payloads); deploy after the rest300 ABAB (needs a restart).
+- **Scoring:** making order-to-trade discount (threshold 200, power 1) — §2039–2043; seam_split / charge_ref new debeta dials (to review).
+- **Market rules (to review):** price_band (volume cut on far orders), fee base/refund, queued_orders, delays, exchange_phases, kept_accounts, fundamental_seed, reward/scoring_shadow.
+- Adoption signals now watched in every brief: OTR gauges (still 0 series), FASTDEC fallbacks (still 0), alerts.txt.
+- Standing procedure saved to memory (mvtrx-update-procedure): detect same hour → diff (protocol → scoring → market) → exposure → default-off fixes → adoption signals → testnet early warning.
+- **§2044 add (12:15 PM):** tolerant decoder staged at /opt/mvtrx-lab:/tmp/fastdec_068.py (forbid_unknown_fields=False on FEv/FLevel/FBook): synthetic 0.6.8 trade event (Mfb/Mfr/Tfb/Tfr/qs) decodes with Ma/p intact, EPB price-band event decodes, 3 stored payloads still read. Deploy (restart) right after the rest300 verdict, before the size-0.3 re-run.
