@@ -30172,3 +30172,321 @@ User: if $300 carries our making but we're far from the fleet, how would the $30
 - Adoption signals now watched in every brief: OTR gauges (still 0 series), FASTDEC fallbacks (still 0), alerts.txt.
 - Standing procedure saved to memory (mvtrx-update-procedure): detect same hour → diff (protocol → scoring → market) → exposure → default-off fixes → adoption signals → testnet early warning.
 - **§2044 add (12:15 PM):** tolerant decoder staged at /opt/mvtrx-lab:/tmp/fastdec_068.py (forbid_unknown_fields=False on FEv/FLevel/FBook): synthetic 0.6.8 trade event (Mfb/Mfr/Tfb/Tfr/qs) decodes with Ma/p intact, EPB price-band event decodes, 3 stored payloads still read. Deploy (restart) right after the rest300 verdict, before the size-0.3 re-run.
+
+## §2045 — 12:35 PM CT — 0.6.8 review finished (user away; fixes/tests continue)
+- **Market-rule files** (price_band, queued_orders, delays, exchange_phases): mostly new validator GAUGES (band cuts/refusals, queued-order delays, exchange round phases); behaviour changes apply to the live-EXCHANGE engine mode (venue queue: cancels before placements, measured delay), not the sim we are scored in → no action.
+- **Scoring:** (1) making ORDER-TO-TRADE discount — effective default **threshold 200 (ON)**: debeta_dial falls back to the parser default (200); the "(0, off)" comment in reward.py is stale. (2) seam_split = 1 (default): skill drift strip done per run across a sim-run change — removes an old-run inventory × new-run move artefact; no action. (3) charge_ref = 'mark' (unchanged behaviour). (4) per-uid skill_share published beside making_share; dust-fill reading published, not paid.
+- **Protocol:** trade-event fields Tfb/Tfr/Mfb/Mfr/qs + PriceBandEvent → tolerant fastdec staged (§2044).
+- **Adoption check:** dashboard has 118 validator_gauges series; none with otr / band / queued / phase names; no miner otr gauges → no validator publishing 0.6.8 yet. The validator-level gauge 'debeta_making_otr_threshold' will show adoption.
+- Remaining 0.6.8 to-dos: rest300 verdict (OTR, 1:21 PM) → deploy tolerant fastdec (restart) → size-0.3 re-run → freeze.
+
+## §2046 — 12:24 PM CT brief + rest300 relaunched with keep_deep 8
+- Brief (NOTE): no new alerts; 0 tracebacks / fallbacks; PACE 15–24 (burst); disk 29%. **165 $73/mo**; making captured 273.9 / realized 110.0 (q 0.40) / share 0.0011 / rank 0.257; skill_rank 0.293; **score 0.275**; call_time 0.154. Fleet median $194 / score 0.57; 210 $272, 169 $246, 251 $224; 252 $185. Prune line ≈ $117; 165 protected ≈ 6 h. OTR gauges: none yet.
+- **rest300 (keep_deep 3) B1 (from 18:08:57 UTC):** MSGS vol 2,448–2,762 / 2,449–2,725, calm 631–743 per sim min (≈ unchanged vs 2,700 / 850); $300 order life p50 still 0 s; skill −12.9 / −5.1 → no effect. Cause (likely): our $300 quotes sit 5–9 ticks behind the others' best (churn300, wide $300 spreads) — outside the 1…3-tick keep range → re-priced as before.
+- Relaunch **speed/abab_r300b_165.sh** (pid 79455, log abab_r300b__165.log; no wait; arms B A B; safety ≥ 60): A = SETTLED; **B = mk_rest300 1 + keep_deep 8** (knob max). B1 from 18:23:14 UTC (sim 33647); early check 12:36, B1 read 1:00, verdict ≈ 2:06 PM CT (then tolerant-decoder deploy, size-0.3 re-run, freeze).
+- **§2046 early check (12:36 PM CT, NOTE):** keep_deep 8 WORKS on messages: MSGS per sim min **vol 840–1,001 / 793–980, calm 336–403 / 307–371, $30 111–130 / 27–44 → ≈ 2,600–3,000 total (was ≈ 7,400, −60%)**; $300 orders 1,809 per 90 sim s (was ≈ 5,000), life p25/p50/p75/p90 0 / 2 / 8 / 21 s (was 0 / 0 / 1–2 / 4–7); kept-in-place ≈ 9,900–10,400 sides per sim min; nearest $300 order mostly 4–8 ticks behind the best. 0 tracebacks; PACE 18–22 (burst). Fill / capture impact → B1 read 1:00 PM.
+
+## §2047 — 12:51 PM CT brief (NOTE; rest300 keep_deep 8 block B1)
+- No new alerts; 0 tracebacks / 0 fastdec fallbacks; PACE 10–22 (burst easing); disk 30%; ABAB pid 79455 alive; live vs SETTLED = mk_rest300 1 / keep_deep 8 only.
+- MSGS last sim min: vol 783/745, calm 307/244, $30 233/31 → **≈ 2,340 messages / sim min**; our fills (last 5 sim min, tape) **42.2 / min → ≈ 56 messages per fill** (SETTLED ≈ 7,400 → ≈ 175 at this fill rate, ≈ 270 at 28/min). $300 orders 2,398 per 120 sim s, life p50 2 s / p90 20 s; $30 p50 112 s.
+- B1 skill vs 252: +1.0 / +0.6, −0.4 / +4.1, +0.5 / +3.4 (flat — watch at the B1 read).
+- **165: $73/mo**; making captured 287.6 / realized 117.4 (q 0.41) / share 0.0011 / **making_rank 0.289**; skill_rank 0.285; **score 0.287**; call_time 0.169. Fleet median $194 / score 0.60 / making_rank 0.78; 210 $272, 169 $246, 251 $224; 252 $185 (skill_rank 0.64). Prune line ≈ $128; 165 protected ≈ 5.5 h.
+- OTR gauges: none published yet.
+
+## §2048 — 1:02 PM CT — rest300 (keep_deep 8) B1 READ: messages ✓, but $300 capture + skill DOWN → decide after A2 (likely stop before B2)
+- Burst check: moderately elevated, no spike (fleet $300 9–45k per 2 sim min).
+- B1 (sim 33707–34121): **MSGS ≈ 2,250–2,900 per sim min (first minute 5,673 = switch-over) vs ≈ 7,400 SETTLED**; our fills ≈ 40 / sim min → **≈ 60 messages per fill**.
+- **$300 165: 34.8k/min, 36.2 fills/min (top3 10–12), R/C +0.20** vs 169 +0.58, 210 +0.72, 251 +0.51 (SETTLED ref §2035 0.61). **$30 165 10.4k/min R/C +0.61** (fleet +0.20 … +0.60). Miner-wide 165 +0.38 (ref 0.43) vs 169 +0.41, 210 +0.66, 251 +0.45.
+- **Skill ($300, Σα vs 252): +2.0, +1.0, −0.4, +0.5, −2.7, −4.8** (SETTLED blocks today +8 … +16) → down.
+- Read: resting $300 orders 4–8 ticks deep get many small fills (36/min) with poor kept share — stale quotes hit when the market moves through them; skill (lean) also weaker. Messages per fill fixed, but capture + skill not ≈ the same → not the right $300 resting depth. Plan: let A2 (SETTLED) run for the paired comparison; if A2 confirms ($300 R/C and skill clearly higher), STOP before B2 and test an intermediate keep_deep (≈ 5) — a ≈ 30% message cut is enough for < 200 msgs/fill at 28–40 fills/min.
+
+## §2049 — 1:21 PM CT brief (NOTE; rest300 kd8 ABAB block A2 = SETTLED)
+- No new alerts; 0 tracebacks / fallbacks; PACE 4–13 (burst fading); disk 30%; ABAB pid 79455 alive; live == SETTLED (A2 since ≈ 18:57 UTC). MSGS (SETTLED): vol 2,415/2,404, calm 697/694, $30 166/25 ≈ 6,400 / sim min. $300 life p50 0 s; $30 p50 120 s.
+- **A2 skill vs 252: −3.1 / +2.7, +0.4 / +3.4, −3.4 / +3.1** → our skill is flat on SETTLED too in this period → B1's flat skill was NOT caused by rest300 (market phase); the B1 $300 R/C drop (0.20) stays the main concern — paired read at A2 end.
+- **165: $75/mo**; making captured 286.1 / realized 117.1 (q 0.41) / share 0.0012 / rank 0.272; skill_rank 0.273; score 0.272; call_time 0.169. Fleet median $214 / score 0.48; 210 $287, 251 $244, 169 $239; 252 $192. Prune line ≈ $107; 165 protected ≈ 5 h. OTR gauges: none.
+
+## §2050 — 1:36 PM CT — rest300 keep_deep 8 NOT KEPT; tolerant 0.6.8 decoder deployed; keep_deep 5 ABAB started
+- A2 (SETTLED, sim 34181–34579) vs B1 (kd 8): **$300 165 A2 9.7k/min R/C +0.50** (fleet same window 169 +0.48, 210 −0.05, 251 +0.45) vs **B1 34.8k/min R/C +0.20** (fleet 0.51–0.72) → relative to the fleet, SETTLED keeps clearly more on $300; $30 A2 +0.80 vs B1 +0.61; miner-wide A2 +0.76 vs B1 +0.38. Skill flat/negative in BOTH blocks (−3.4 … +0.4 SETTLED) → a market phase, not the arm. A2's low $300 volume = post-burst pace limits (PACE 4–13).
+- **mk_rest300 keep_deep 8 = NOT KEPT** (pid 79455 killed at B2 start; live = SETTLED with mk_rest300 0 / keep_deep 3 explicit; log "mk_rest300 1→0, mk_rest300_keep_deep 8→3").
+- **Tolerant decoder deployed:** agents/fastdec.py = /tmp/fastdec_068.py (md5 b6098dc7; backup fastdec.py.bak-pre068); restart 19:34:09 UTC; "FASTDEC installed", 0 tracebacks, 0 fallbacks. QuoteAgent unchanged (61cd0a0f).
+- **speed/abab_r300c_165.sh** (pid 82668, log abab_r300c__165.log; 840-s warm-up; arms B A B; safety ≥ 60): A = SETTLED; **B = mk_rest300 1 + keep_deep 5** (diffed: only those two). B1 ≈ 19:49 UTC; early check 2:01, B1 read 2:26, verdict ≈ 3:00 PM CT.
+
+## §2051 — 1:51 PM CT brief (NOTE; rest300 keep_deep 5 B1 just started)
+- No new alerts; 0 tracebacks / 0 fastdec fallbacks (tolerant decoder live); PACE 0–3 (burst over); disk 30%; ABAB pid 82668 alive, B1 from 19:48:28 UTC (sim 34770); live vs SETTLED = mk_rest300 1 / keep_deep 5 only. Last MSGS line (pre-switch, SETTLED): vol 2,503/2,512, calm 889/862, $30 455/32 ≈ 7,250 / sim min.
+- **165: $75/mo**; making captured 293.3 / realized 120.4 (q 0.41) / share 0.0013 / rank 0.289; skill_rank 0.247; score 0.268; call_time 0.162. Fleet median $214 / score 0.58; 210 $287, 251 $244, 169 $239; 252 $192. Prune line ≈ $105; 165 protected ≈ 4.5 h. OTR gauges: none yet.
+- **§2050 kd5 early check (2:01 PM CT, NOTE):** 'mk_rest300 0→1, mk_rest300_keep_deep 3→5' applied; 0 tracebacks, 0 fallbacks; PACE 0–2. MSGS per sim min **≈ 5,570–5,740** (vol 1,941–2,030 / 1,944–2,003, calm 656–664 / 637–639, $30 353–372 / 28–35) vs SETTLED ≈ 7,250 → **−22…−23%**; $300 orders 3,890 per 90 sim s, life p50 0 / p90 8 s. At ≈ 28–40 fills/min → ≈ 140–200 msgs/fill (borderline at low fill rates). Fills / capture at the B1 read.
+
+## §2052 — 2:21 PM CT brief (NOTE; rest300 keep_deep 5 block B1)
+- No new alerts; 0 tracebacks / 0 fallbacks; PACE 0–3; disk 30%; ABAB pid 82668 alive.
+- MSGS last sim min: vol 2,103/2,069, calm 673/644, $30 323/29 ≈ 5,840; our fills (tape, last 5 sim min) **54.6 / min → ≈ 107 msgs per fill** (SETTLED ≈ 7,250 → ≈ 133 at this fill rate). $300 orders 5,574 per 120 sim s (life p50 0 / p90 7 s).
+- B1 skill vs 252: −2.8 / +4.4, **+6.8 / +3.8, +5.3 / +3.3** (skill back positive).
+- **165: $79/mo**; making captured 292.3 / realized 117.3 (q 0.40) / share 0.0013 / **making_rank 0.301**; skill_rank 0.272; score 0.286; call_time 0.176. Fleet median $217 / score 0.58; 210 $290, 251 $251, 169 $247; 252 $193. Prune line ≈ $114; 165 protected ≈ 4 h. OTR gauges: none yet.
+
+## §2053 — 2:30 PM CT — rest300 keep_deep 5 NOT KEPT (same failure as kd 8); next OTR candidate = 1-tick debounce
+- B1 (sim 34830–35221, no burst): MSGS ≈ 5,190–5,930 / sim min (mean ≈ 5,570, −23% vs SETTLED ≈ 7,250); our fills ≈ 50 / sim min → ≈ 110 msgs/fill.
+- **$300 165 37.7k/min, 47 fills/min, R/C −0.03** vs 169 +0.41 (15.8 f/min), 210 +0.48 (24.6), 251 +0.43 (15.0); $30 165 R/C +0.49 vs 0.34–0.70; **miner-wide 165 +0.20** vs 0.37–0.65. Skill −8.9, −7.6, −2.8, +6.8, +5.3, +1.7.
+- → **mk_rest300 (any depth) = NOT KEPT**: resting $300 quotes 4–8 ticks deep collect many small fills when the market moves through them, keeping ≈ nothing (kd 8 R/C 0.20, kd 5 −0.03 vs SETTLED ≈ 0.5–0.6). pid 82668 killed after B1; live == SETTLED (A2 had already switched; "no change").
+- Next OTR candidate (smaller staleness): **mk_vol_debounce** — on $300 books a touch order whose target moved by exactly 1 tick (either direction) is kept for N rounds before re-pricing; moves ≥ 2 ticks re-price at once. Targets the flicker / 1-tick moves (≈ half of all $300 re-prices, §2040). Build → equivalence at 0 → restart → ≥ 900-s warm-up → ABAB.
+
+## §2054 — 2:31 PM CT — mk_vol_debounce built (agents b424e5df) + ABAB started
+- deb300.py (offline, our $300 quote-price sequences): a 1-tick debounce of N rounds → re-prices −25% (N 1) / −31% (N 2) / −34% (N 3), quoting 1 tick off target 11% / 16% / 19% of rounds (staleness capped at 1 tick, vs 4–8 ticks for the failed resting mode).
+- patch_deb.py: mk_vol_debounce (rounds; 0 = off = identical): on $300 vol/calm books a touch order whose target moved by exactly 1 tick is kept until the new target persisted N rounds; ≥ 2-tick moves re-price at once; an expired debounce takes the normal cancel / keep path (fix of a first-draft bug that would have left the old order resting beside the new one). SPREAD300 log adds "debounce-kept". Explicit key mk_vol_debounce 0 added to live / SETTLED / NEXT.
+- Restart 20:29:08 UTC, FASTDEC installed (tolerant b6098dc7), 0 tracebacks; newminer.sh → b424e5df. **speed/abab_deb_165.sh** (pid 85224, log abab_deb__165.log; 840-s warm-up; arms B A B; safety ≥ 60): A = SETTLED; **B = mk_vol_debounce 1** (diffed: only that knob). B1 ≈ 20:43 UTC; early check 2:55, B1 read 3:20, verdict ≈ 3:53 PM CT (then size-0.3 re-run if time, then FREEZE).
+
+## §2055 — 2:51 PM CT brief (NOTE; debounce ABAB block B1)
+- No new alerts; 0 tracebacks / 0 fallbacks; PACE 0–2; disk 30%; ABAB pid 85224 alive (B1 from 20:43:09 UTC, sim 35490); live vs SETTLED = mk_vol_debounce 1 only.
+- MSGS last sim min: vol 2,138/2,152, calm 757/749, $30 254/34 ≈ 6,080 (−16% vs SETTLED ≈ 7,250); SPREAD300 debounce-kept 1,384 per sim min. $300 order life p50 1 s (was 0) / p90 6 s.
+- B1 skill vs 252: −5.1 / +7.3 (1 check).
+- **165: $79/mo**; making captured 305.2 / realized 119.7 (q 0.39) / share 0.0014 / **making_rank 0.314**; skill_rank 0.290; **score 0.302**; call_time 0.164. Fleet median $217 / score 0.52; 210 $290, 251 $251, 169 $247; 252 $193. Prune line ≈ $119; 165 protected ≈ 3.5 h. OTR gauges: none yet.
+- **§2054 early check (2:55 PM CT, NOTE):** 'mk_vol_debounce 0→1' applied; 0 tracebacks, 0 fallbacks; PACE 1. MSGS ≈ 6,080 → 5,700 per sim min (vol 2,055/2,023, calm 692/675, $30 229/31) = **−16…−21%** vs SETTLED ≈ 7,250 (offline ≈ −20%); debounce-kept ≈ 1,383 per sim min. **Duplicate check OK:** $300 orders per side always 1 (10,083 side-rounds, like SETTLED 9,823).
+
+## §2056 — 3:22 PM CT — debounce NOT KEPT; OTR conclusion; $30 size 0.3 re-run started
+- Debounce B1 (sim 35550–35982, no burst): MSGS ≈ 5,440–6,520 (mean 5,920, −18%); **$300 165 17.3k/min, 11.1 fills/min, R/C +0.13** vs 169 +0.45, 210 +0.58, 251 +0.64; $30 165 18.4k/min R/C +0.49 (fleet 0.33–0.48); miner-wide 165 +0.44 vs 0.37–0.50; **skill −5.1, −3.1, −0.9, +0.2, −3.8, −5.4** vs 252 −0.4 … +7.3; our fills 16.2/min → ≈ 365 msgs/fill (worse). → **mk_vol_debounce NOT KEPT**; pid 85224 killed; live == SETTLED (log "mk_vol_debounce 1→0").
+- **OTR conclusion (0.6.8):** every message-reduction variant cut our $300 capture (rest300 kd 8: R/C 0.20, kd 5: −0.03, lag 1: −1.18, debounce: 0.13 vs SETTLED ≈ 0.5–0.66) — the $300 edge needs a fresh quote every round. The discount if it goes live ≈ 200/270 ≈ 0.74× (worse in quiet periods) costs less than any of these (making credit ∝ capture × quality). **Decision: keep SETTLED quoting; lower messages per fill via MORE FILLS (volume) instead.** Watch the OTR gauges; revisit only if the live factor is far below 0.74.
+- **$30 pooled since the cap fix (current settings, 5 blocks, 32 sim min):** 165 12.4k/min, 105 fills on 47 books, C +1.17 / R +0.53 bp, **R/C +0.45** vs 169 13.9k +0.39, 210 16.6k +0.63, 251 14.4k +0.41 → at the top makers' level (volume ≈ 75–90%).
+- **speed/abab_size3b_165.sh** (pid 87481, log abab_size3b__165.log; no restart; arms B A B; safety ≥ 60): A = SETTLED; **B = $30 mk_low_size 0.3** (diffed: only that). B1 from 21:21:21 UTC (sim 36010); B1 read 3:58, verdict + FREEZE ≈ 5:04 PM CT.
+
+## §2057 — 3:22 PM CT brief (NOTE; $30 size 0.3 re-run, B1 just started)
+- No new alerts; 0 tracebacks / 0 fallbacks; PACE 0–1; disk 30%; ABAB pid 87481 alive (B1 from 21:21:21 UTC); live vs SETTLED = mk_low_size 0.3 only. Last MSGS (SETTLED minute): vol 2,315/2,305, calm 799/785, $30 217/27 ≈ 6,450.
+- **165: $83/mo ($2.77/d)**; making captured 318.0 / realized 123.0 (q 0.39) / share 0.0015 / making_rank 0.314; skill_rank 0.285; score 0.299; call_time 0.162. Fleet median $216 / score 0.56; 210 $296, 251 $252, 169 $249; 252 $190. Prune line ≈ $118; 165 protected ≈ 3 h. OTR gauges: none yet.
+
+## §2058 — 3:51 PM CT brief (NOTE; $30 size 0.3 re-run block B1)
+- No new alerts; 0 tracebacks / 0 fallbacks; PACE 0–1; disk 31%; ABAB pid 87481 alive. MSGS last sim min: vol 2,868/2,872, calm 844/833, $30 198/26 ≈ 7,640. $30 life p50 120 s; $300 p50 0 s.
+- B1 skill vs 252: −6.3 / +3.5, −7.0 / +0.6, +1.8 / +0.3.
+- **165: $83/mo**; making captured 335.9 / realized 131.9 (q 0.39) / share 0.0015 / **making_rank 0.333**; skill_rank 0.295; **score 0.314**; call_time 0.160. Fleet median $216 / score 0.54; 210 $296, 251 $252, 169 $249; 252 $190. Prune line ≈ $123; 165 protected ≈ 2.5 h. OTR gauges: none yet.
+
+## §2059 — 3:58 PM CT — $30 size 0.3 re-run B1 READ: $30 volume +44% at higher capture → continue to the verdict
+- No burst (fleet $300 11–33k per 2 sim min). B1 sim 36070–36485.
+- **$30 165: 17.9k/min, 4.2 fills/min, R/C +0.65** (pooled SETTLED ref §2056 12.4k R/C 0.45) vs 169 15.9k +0.68, 210 26.4k +0.44, 251 24.3k +0.60.
+- $300 (size unchanged): 165 19.2k R/C +0.11 vs 169 +0.06, 210 +0.02, 251 −1.54 (weak $300 window for everyone).
+- **Miner-wide 165 +0.56** vs 169 +0.48, 210 +0.41, 251 +0.49. Skill −1.9, −6.3, −7.0, +1.8, −2.9, +3.4 vs 252 +0.3 … +6.0 (mixed; similar to SETTLED windows today).
+- Not a failure → A2 / B2 run; verdict + FREEZE ≈ 5:04 PM CT.
+
+## §2060 — 4:21 PM CT brief (NOTE; $30 size 0.3 re-run block A2 = SETTLED)
+- No new alerts; 0 tracebacks / 0 fallbacks; PACE 0–1; disk 31%; ABAB pid 87481 alive; live == SETTLED (A2). $30 life p50 120 s; $300 p50 0 s.
+- A2 skill vs 252: +6.2 / +4.0, +0.9 / +6.3.
+- **165: $83/mo**; making captured 336.4 / realized 129.3 (q 0.38) / share 0.0016 / making_rank 0.331; skill_rank 0.282; score 0.307; call_time 0.172. Fleet median $216 / score 0.55; 210 $296, 251 $252, 169 $249; 252 $190. Prune line ≈ $124; 165 protected ≈ 2 h. OTR gauges: none yet.
+
+## §2061 — 4:51 PM CT brief (NOTE; $30 size 0.3 re-run block B2)
+- No new alerts; 0 tracebacks / 0 fallbacks; PACE 0; disk 31%; ABAB pid 87481 alive (B2 since ≈ 22:27 UTC); live vs SETTLED = mk_low_size 0.3 only. $30 life p50 120 s; $300 p50 0 s.
+- B2 skill vs 252: +5.7 / +0.7, +4.0 / −0.6.
+- **165: $91/mo ($3.03/d)**; making captured 337.7 / realized 129.2 (q 0.38) / share 0.0016 / making_rank 0.312; skill_rank 0.302; score 0.307; call_time 0.167. Fleet median $222 / score 0.59; 210 $301, 169 $255, 251 $249; 252 $184. **Prune line ≈ $106** (lowest non-immune); 165 protected ≈ 1.5 h. OTR gauges: none yet.
+
+## §2062 — 5:02 PM CT — user closing the laptop until ≈ 6 PM: the size-0.3 verdict + FREEZE deferred to ≈ 6:05 PM CT (the ABAB ends on A = SETTLED size 0.2 by itself; 165's protection ends ≈ 6:25 PM CT).
+
+## §2063 — 6:12 PM CT — $30 size 0.3 NOT KEPT; **165 FROZEN** (final recipe)
+- 165 REGISTERED (regcheck); no ABAB running (done 23:10:55 UTC); live == SETTLED; no new alerts. No burst (fleet $300 20–37k per 2 sim min).
+- **Size 0.3 verdict:** A2 (SETTLED 0.2, sim 36545–36963): $30 19.6k/min R/C +0.41, $300 13.7k R/C +0.03, miner-wide +0.37, Σα vs 252 +2.3 / check. B pooled (B1 + B2): **$30 17.5k/min R/C +0.48**, $300 19.9k R/C −0.13, miner-wide +0.36, **Σα −2.3 / check**. Fleet B: $30 169 +0.63, 210 +0.36, 251 +0.63. → $30 volume NOT up vs the paired SETTLED block, skill worse → **mk_low_size stays 0.2** (user rule).
+- **FROZEN (user 9:10 AM rule: volume work done → keep settings, run untested):** agents **b424e5df** (all test knobs default off), fastdec **b6098dc7** (0.6.8-tolerant); snapshot **live_params_165.FROZEN.json** = live_params_165.SETTLED.json = live_params_NEXT.json (diff empty):
+  - $300: mk_vol_size 0.3, mk_calm_size 0.36, **mk_tight300 5**, mk_vol_lad_size 0.08, mk_calm_lad_size 0.06; lag / debounce / rest300 off.
+  - $30: front-keep (mk_low_touch_min 0, mk_low_behind 1, mk_low_keep 1, mk_low_keep_deep 3, mk_low_front 0.25), **mk_low_size 0.2**, **mk_low_lad "1:2"**, **mk_low_max_units 400**; mk_inv_own 0.
+- From now: no strategy tests on 165 — safety / rollbacks only; briefs check live == FROZEN, alerts.txt, OTR gauges. 0.6.8 OTR: accept the discount if it goes live (message cuts all hurt $300 capture); revisit only if the live factor is far below 0.74.
+- 165 at freeze: **$100/mo ($3.33/d)**; making captured 330.9 / realized 121.0 / share 0.0017 / rank 0.296; skill_rank 0.278; score 0.287; call_time 0.163. Fleet median $222 / score 0.59 / making_rank 0.81; 210 $299, 169 $256, 251 $248; 252 $180. **Prune line ≈ $124; 165's protection ends in ≈ 0.2 h** (pay still ramping through the lookback) → a prune is possible; if pruned: re-register → newminer.sh (b424e5df) starts on the frozen recipe.
+
+## §2064 — 6:55 PM CT brief (NOTE; 165 FROZEN, protection over)
+- Testnet TAO (coldkey 5HYHoi…): **0** (Discord request pending). No new alerts.
+- **165 REGISTERED** (regcheck ×2) but now **FIRST in the prune order** (lowest non-immune: 165 $99; next 171 $124, 246 $125) → the next mainnet registration on SN79 prunes it unless its pay passes ≈ $124. No action per the user's rule (no survival boosts; FROZEN).
+- 0 tracebacks / 0 fallbacks; PACE 0; disk 32%; no drift vs FROZEN. $30 life p50 116 s; $300 p50 0 s.
+- **165: $100/mo**; making captured 329.3 / realized 120.6 (q 0.37) / share 0.0018 / rank 0.294; skill_rank 0.287; score 0.291; call_time 0.175. Fleet median $222 / score 0.56; 210 $299, 169 $256, 251 $248; 252 $180. OTR gauges: none yet.
+
+## §2065 — 7:37 PM CT — 165 pruned; x3 RE-REGISTERED as UID 171 on the FROZEN recipe
+- User re-registered x3 → **UID 171** (165 had dropped to first in the prune order at $99). regcheck x3=171 ×2: REGISTERED. Burn at the time ≈ 0.1156 TAO (mainnet balance before ≈ 0.2288).
+- `HK=x3 sh newminer.sh 171 165`: settings live_params_NEXT (= live_params_165.FROZEN.json, diff empty); agents b424e5df; pace_cold start; restart 01:33:45 UTC; FASTDEC installed (fastdec b6098dc7); 0 tracebacks; first own fills by 01:36 UTC. our_uids.txt = "171 maker x3 39426" (backup our_uids.txt.bak-171b); live_params_171.FROZEN.json saved (= 165's frozen recipe).
+- Rules for 171: FROZEN — no tests, no restarts while protected (≈ 24 h); briefs check registration, drift, alerts, $30 two-sidedness, testnet TAO, 0.6.8 gauges.
+
+## §2066 — 7:45 PM CT brief (NOTE; 171 first brief)
+- Testnet TAO: **0**. New alert: "x3 UID 165: scoring validator 5EWwdZB7 shows no gauges for us" (165 was pruned — expected; watchdog still named the old UID before our_uids changed).
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 32%; no drift vs FROZEN.
+- **$30 two-sided from the start: SIDES30 both 3,840 / B-only 0 / S-only 0 (100%)** — the cap fix works on a fresh UID (165 started at ≈ 17%). $30 life p50 120 s; $300 p50 0 s.
+- 171 (10 min old): gauges not populated yet (captured 0, call_time 0.162). Fleet median $230 / score 0.57; 210 $295, 169 $256, 251 $249; 252 $176. Prune line ≈ $117; 171 protected ≈ 23.5 h. OTR gauges: none yet.
+
+## §2067 — 8:15 PM CT brief (NOTE; 171, 45 min old)
+- Testnet TAO: **0**. New alert (already discussed): "x3 UID 171: skill net alpha negative two checks in a row (−1.062)" — new-miner warm-up.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 32%; no drift vs FROZEN. **$30 two-sided 100%** (SIDES30 both 3,840); $30 life p50 75 s; $300 p50 0 s.
+- Skill ($300, last 4 sim min): 171 22 books, $44k notional ($2.0k/book — small orders while the pace bucket fills), Σα −2.8 (−0.64 bp); gauges: net_a +10 (turning positive), captured 0 yet, call_time 0.163.
+- Fleet median $222 / score 0.56; 210 $294, 169 $247, 251 $241; 252 $170. **Prune line ≈ $127**; 171 protected ≈ 23 h. OTR gauges: none yet.
+
+## §2068 — 8:45 PM CT brief (NOTE; 171, 1 h 15 min old)
+- Testnet TAO: **0** (first query timed out, retry 0). No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 32%; no drift vs FROZEN. $30 two-sided 100%; $30 life p50 94 s; $300 p50 0 s.
+- Skill ($300, last 4 sim min): 171 28 books, $51k ($1.8k/book), Σα −6.0 (−1.18 bp) vs 252 +7.0 (+0.57 bp) — still in warm-up (small paced sizes). Gauges: **skill_rank 0.156, score 0.078, $0/mo**; net_a +33; making not counted yet; call_time 0.170.
+- Fleet median $222 / score 0.55; 210 $294, 169 $247, 251 $241; 252 $170. Prune line ≈ $127; 171 protected ≈ 22.5 h. OTR gauges: none yet.
+
+## §2069 — 9:15 PM CT brief (NOTE; 171, 1 h 45 min old)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 32%; no drift vs FROZEN. $30 two-sided 100%; $30 life p50 120 s; $300 p50 0 s.
+- **Skill turned positive:** $300 last 4 sim min 171 Σα **+4.1 (+0.58 bp)** on 29 books, $2.4k/book vs 252 +3.1 (+0.44 bp). Gauges: skill_rank 0.166, score 0.083, net_a +51, $0/mo yet; making not counted yet; call_time 0.167.
+- Fleet median $222 / score 0.56; 210 $294, 169 $247, 251 $241; 252 $170. Prune line ≈ $125; 171 protected ≈ 22 h. OTR gauges: none yet.
+
+## §2070 — 9:45 PM CT brief (NOTE; 171, 2 h 15 min old)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 33%; no drift vs FROZEN. $30 two-sided 100%; $30 life p50 120 s; $300 p50 0 s.
+- Skill ($300, 4 sim min): 171 **Σα +8.7 (+1.09 bp)** on 34 books ($2.3k/book) vs 252 −1.9. Gauges: **skill_rank 0.280** (fleet median 0.313), score 0.140, net_a +85; making not counted yet; call_time **0.149** (fleet median 0.189); $0/mo yet.
+- Fleet median $218 / score 0.57; 210 $289, 251 $234, 169 $233; 252 $158. Prune line ≈ $123; 171 protected ≈ 21.5 h. OTR gauges: none yet.
+
+## §2071 — 10:15 PM CT brief (NOTE; 171, 2 h 45 min old)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 33%; no drift vs FROZEN. $30 two-sided 100%; $30 life p50 120 s; $300 p50 0 s.
+- Skill ($300, 4 sim min): 171 Σα −1.1 (−0.11 bp) on 35 books ($2.7k/book) vs 252 +2.6. Gauges: skill_rank 0.147 (was 0.280 — window noise), score 0.074, net_a +59; making not counted yet; call_time 0.162; $0/mo yet.
+- Fleet median $218 / score 0.52 / making_rank 0.74 (fleet capture dipped this window: 210 captured 402, 169 293); 210 $289, 251 $234, 169 $233; 252 $158. Prune order: 196 at $17 is lowest now, then ≈ $131; 171 protected ≈ 21 h. OTR gauges: none yet.
+
+## §2072 — 10:45 PM CT brief (NOTE; 171, 3 h 15 min old)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 33%; no drift vs FROZEN. $30 two-sided 98% (SIDES30 both 3,780 / S-only 60); $30 life p50 117 s; $300 p50 0 s.
+- Skill ($300, 4 sim min): 171 Σα **+6.0 (+0.45 bp)** on 35 books, **$3.8k/book** (pace ramp ≈ done) vs 252 +2.3. Gauges: **first pay $2/mo**; skill_rank 0.057 (window), score 0.028, net_a +84; making not counted yet; call_time 0.163.
+- Fleet median $227 / score 0.51 / making_rank 0.72; 210 $296, 251 $240, 169 $235; 252 $156. Prune line ≈ $120; 171 protected ≈ 20.5 h. OTR gauges: none yet.
+
+## §2073 — 11:16 PM CT brief (NOTE; 171, 3 h 45 min old)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 33%; no drift vs FROZEN. $30 two-sided 98%; $30 life p50 110 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 **Σα +12.0 (+0.88 bp)** on 31 books, $4.4k/book vs 252 +5.1 (+0.58). Gauges lag the live α: skill_rank 0.031, score 0.016, net_a +126, $2/mo; making not counted yet (253: first making_captured ≈ 12 h after registration, 165 ≈ 5 h); call_time 0.180.
+- Fleet median $227 / score 0.50 / making_rank 0.70; 210 $296, 251 $240, 169 $235; 252 $156. Prune line ≈ $121; 171 protected ≈ 20 h. OTR gauges: none yet.
+
+## §2074 — 11:45 PM CT brief (NOTE; 171, 4 h 15 min old; user away overnight — NO tests)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 33%; no drift vs FROZEN. $30 two-sided 94% (S-only 240 of 3,840); $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +0.0 on 28 books ($3.5k/book) vs 252 +5.4. Gauges: **$5/mo**; skill_rank 0.098; score 0.049; net_a +172; making not counted yet; call_time 0.166.
+- Fleet median $229 / score 0.51 / making_rank 0.76; 210 $300, 251 $256, 169 $235; 252 $160. Prune line ≈ $105–116; 171 protected ≈ 19.5 h. OTR gauges: none yet.
+
+## §2075 — 12:15 AM CT 11-24 brief (NOTE; 171, 4 h 45 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 33%; no drift vs FROZEN. $30 two-sided 92% (B-only 60, S-only 240 of 3,840); $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 **Σα +23.4 (+1.30 bp)** on 33 books ($5.5k/book) vs 252 −0.7. Gauges: $5/mo; skill_rank 0.092; score 0.046; net_a +224; making not counted yet; call_time 0.174.
+- Fleet making gauges dropping across the board this hour (median making_rank 0.55 from 0.76; 210 captured 284 from 400, 169 131 from 262) — market-wide low-capture period. Fleet median $229 / score 0.44; 210 $300, 251 $256, 169 $235; 252 $160. Prune order: 234 at $49 lowest, then ≈ $116; 171 protected ≈ 19 h. OTR gauges: none yet.
+
+## §2076 — 12:45 AM CT brief (NOTE; 171, 5 h 15 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 33%; no drift vs FROZEN. $30 two-sided 94%; $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +0.6 vs 252 +0.5 (flat window). Gauges: $5/mo; skill_rank **0.177**; score 0.088; net_a +341; making not counted yet; call_time 0.168.
+- Fleet making still falling (median making_rank 0.50; 210 captured 255, 169 118) — market-wide low-capture period continues. Fleet median $229 / score 0.43; 210 $300, 251 $256, 169 $235; 252 $160. Prune order: 234 $49, 121 $90, then ≈ $115; 171 protected ≈ 18.5 h. OTR gauges: none yet.
+
+## §2077 — 1:15 AM CT brief (NOTE; 171, 5 h 45 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 34%; no drift vs FROZEN. $30 two-sided 94%; $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +2.0 (+0.26 bp) vs 252 +3.3 (+0.34). Gauges: **$11/mo**; skill_rank 0.166; score 0.083; net_a +335; making not counted yet; call_time 0.161.
+- Fleet: **252 jumped to $407/mo** (skill_rank 0.85 + making 0.76 while the rest of the fleet's making fell — 210 captured 270, 251 276, 169 124). Fleet median $229 / score 0.43 / making_rank 0.50; 210 $304, 251 $258, 169 $230. Prune order: 234 $50, 27 $94, 121 $96, then ≈ $102; 171 protected ≈ 18 h. OTR gauges: none yet.
+
+## §2078 — 1:45 AM CT brief (NOTE; 171, 6 h 15 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 34%; no drift vs FROZEN. $30 two-sided 95%; $30 life p50 112 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 **Σα +8.4 (+1.03 bp)** on 25 books vs 252 +4.3 (+0.29). Gauges: $11/mo; **making_share first > 0 (0.0001)** — captured/realized/rank still 0; skill_rank 0.157; score 0.078; net_a +409; call_time 0.160.
+- Fleet median $229 / score 0.42 / making_rank 0.51; 252 $407, 210 $304, 251 $258, 169 $230. Prune order: 53 $13, 234 $49, 27 $94, 121 $95, then ≈ $101; 171 protected ≈ 17.5 h. OTR gauges: none yet.
+
+## §2079 — 2:15 AM CT brief (NOTE; 171, 6 h 45 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 34%; no drift vs FROZEN. $30 two-sided 94%; $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 **Σα +8.3 (+0.79 bp)** vs 252 +5.9 (+0.61). Gauges: **$19/mo**; **making counted: captured 1.7 / realized 0.6 (q 0.33) / rank 0.014** (first, ≈ 6.75 h after registration — 165 took ≈ 5 h, 253 ≈ 12 h); skill_rank 0.181; score 0.098; net_a +460; call_time 0.167.
+- Fleet median $227 / score 0.42 / making_rank 0.49; 252 $430, 210 $284, 251 $248, 169 $212. Prune line ≈ $99–103; 171 protected ≈ 17 h. OTR gauges: none yet.
+
+## §2080 — 2:46 AM CT brief (NOTE; 171, 7 h 15 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 34%; no drift vs FROZEN. $30 two-sided 91%; $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 **Σα +19.1 (+1.40 bp)** on 33 books vs 252 +2.8. Gauges: $19/mo; making captured 6.9 / realized 2.2 (q 0.31) / **rank 0.044**; skill_rank 0.197; score 0.120; net_a +525; call_time 0.165.
+- Fleet median $227 / score 0.41 / making_rank 0.47; 252 $430, 210 $284, 251 $248, 169 $212. Prune line ≈ $103; 171 protected ≈ 16.5 h. OTR gauges: none yet.
+
+## §2081 — 3:15 AM CT brief (NOTE; 171, 7 h 45 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 27% (daily tape rotation at 09:07 UTC — short windows in the order-life / skill reads); no drift vs FROZEN. $30 two-sided 91%.
+- Live skill (since rotation): 171 Σα +5.9 (+1.31 bp) on 13 books vs 252 −1.1. Gauges: $19/mo; making captured **18.5** / realized 5.6 (q 0.30) / **rank 0.072**; skill_rank 0.184; score 0.128; net_a +545; call_time 0.166.
+- Fleet median $227 / score 0.42 / making_rank 0.50; 252 $430, 210 $284, 251 $248, 169 $212. Prune line ≈ $102; 171 protected ≈ 16 h. OTR gauges: none yet.
+
+## §2082 — 3:45 AM CT brief (NOTE; 171, 8 h 15 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 27%; no drift vs FROZEN. $30 two-sided 86% (B-only 300, S-only 240 of 3,840 — inventory caps on a few $30 books); $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +3.8 (+0.91 bp) vs 252 +1.4. Gauges: **$34/mo ($1.13/d)**; making captured 24.5 / realized 7.4 (q 0.30) / rank 0.060; skill_rank 0.181; score 0.121; net_a +543; call_time 0.169.
+- Fleet median $227 / score 0.40 / making_rank 0.51; 252 $408, 210 $278, 251 $238, 169 $205. Prune line ≈ $113; 171 protected ≈ 15.5 h. OTR gauges: none yet.
+
+## §2083 — 4:15 AM CT brief (NOTE; 171, 8 h 45 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 27%; no drift vs FROZEN. $30 two-sided 84% (B-only 300, S-only 300 — inventory caps); $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +1.5 (+0.38 bp) on 15 books vs 252 +6.5. Gauges: $34/mo; making captured **33.8** / realized 10.0 (q 0.30) / rank 0.067; skill_rank 0.125; score 0.096; net_a +545; call_time 0.173.
+- Fleet median $227 / score 0.41 / making_rank 0.52; 252 $408, 210 $278, 251 $238, 169 $205. Prune line ≈ $84–113; 171 protected ≈ 15 h. OTR gauges: none yet.
+
+## §2084 — 4:45 AM CT brief (NOTE; 171, 9 h 15 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 27%; no drift vs FROZEN. $30 two-sided 86%; $30 life p50 116 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα −0.6 on 10 books vs 252 −0.1 (quiet window). Gauges: **$49/mo ($1.63/d)**; making captured 38.7 / realized 11.2 (q 0.29) / **rank 0.097**; skill_rank 0.153; score 0.125; net_a +585; call_time 0.193.
+- Fleet median $236 / score 0.40 / making_rank 0.49; 252 $400, 210 $277, 251 $240, 169 $214. Prune line ≈ $125; 171 protected ≈ 14.5 h. OTR gauges: none yet.
+
+## §2085 — 5:15 AM CT brief (NOTE; 171, 9 h 45 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 28%; no drift vs FROZEN. $30 two-sided 83% (B-only 240, S-only 431 — inventory caps); $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα −0.7 on 23 books ($4.8k/book) vs 252 +5.2. Gauges: $49/mo; making captured 44.8 / realized 12.8 (q 0.29) / **rank 0.111**; skill_rank 0.152; score 0.132; net_a +573; call_time 0.201.
+- Fleet median $236 / score 0.42 / making_rank 0.50; 252 $400, 210 $277, 251 $240, 169 $214. Prune line ≈ $123; 171 protected ≈ 14 h. OTR gauges: none yet.
+
+## §2086 — 5:45 AM CT brief (NOTE; 171, 10 h 15 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 28%; no drift vs FROZEN. $300 p50 0 s; $30 life p50 120 s.
+- **Watch: $30 two-sidedness drifting down** — SIDES30 both 3,000 / B-only 240 / S-only 600 (**78%**; 100% at start, 94% at midnight, 86% at 4:45). All missing sides = inventory cap (≈ 10 books capped long, ≈ 4 short) as $30 positions slowly accumulate to the 400-unit cap (≈ $12k). Not acted on (FROZEN; no tests overnight) — morning item.
+- Live skill ($300, 4 sim min): 171 **Σα +15.4 (+1.34 bp)** on 20 books ($5.8k/book) vs 252 +3.9. Gauges: $49/mo; making captured 54.0 / realized 17.1 (q 0.32) / **rank 0.131**; skill_rank 0.177; score 0.154; net_a +643; call_time 0.162.
+- Fleet median $236 / score 0.45 / making_rank 0.51; 252 $400, 210 $277, 251 $240, 169 $214. Prune line ≈ $124; 171 protected ≈ 13.5 h. OTR gauges: none yet.
+
+## §2087 — 6:15 AM CT brief (NOTE; 171, 10 h 45 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 28%; no drift vs FROZEN. $30 two-sided **77%** (S-only 660 = ≈ 11 books capped long, B-only 240) — still drifting (morning item); $30 life p50 111 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +7.5 (+0.94 bp) vs 252 +5.3. Gauges: **$55/mo ($1.83/d)**; making captured 56.6 / realized 17.8 (q 0.31) / rank 0.132; skill_rank 0.199; score 0.166; net_a +674; call_time 0.156.
+- Fleet median $245 / score 0.44 / making_rank 0.50; 252 $391, 210 $277, 251 $240, 169 $231. Prune line ≈ $130; 171 protected ≈ 13 h. OTR gauges: none yet.
+
+## §2088 — 6:45 AM CT brief (NOTE; 171, 11 h 15 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 28%; no drift vs FROZEN. **$30 two-sided 73%** (S-only 780 = 13 books capped long, B-only 256) — still drifting (morning item); $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +8.4 (+1.16 bp) vs 252 +1.1. Gauges: $55/mo; making captured 66.4 / realized 21.3 (q 0.32) / rank 0.135; skill_rank 0.224; score 0.180; net_a +801; call_time 0.164.
+- Fleet median $245 / score 0.47 / making_rank 0.50; 252 $391, 210 $277, 251 $240, 169 $231. Prune order: 157 $9, 28 $10, then ≈ $130; 171 protected ≈ 12.5 h. OTR gauges: none yet.
+
+## §2089 — 7:15 AM CT brief (NOTE; 171, 11 h 45 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 28%; no drift vs FROZEN. $30 two-sided 73% (S-only 734, B-only 300 — morning item); $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 **Σα +27.0 (+2.96 bp)** on 14 books vs 252 +2.5. Gauges: $56/mo; making captured **85.3** / realized 26.8 (q 0.31) / **rank 0.199**; skill_rank 0.242; **score 0.220**; net_a +923; call_time **0.144**.
+- Fleet median $237 / score 0.49 / making_rank 0.52; 252 $362, 210 $264, 169 $229, 251 $227. Prune order: 157 $8, 28 $9, then ≈ $115; 171 protected ≈ 12 h. OTR gauges: none yet.
+
+## §2090 — 7:45 AM CT brief (NOTE; 171, 12 h 15 min old; no tests overnight)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 28%; no drift vs FROZEN. $30 two-sided 73% (S-only 720, B-only 300); $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +10.4 (+1.35 bp) on 13 books vs 252 +5.8. Gauges: $56/mo; making captured 89.5 / realized 27.1 (q 0.30) / rank 0.184; skill_rank 0.262; score 0.223; net_a +964; call_time 0.162.
+- Fleet median $237 / score 0.48 / making_rank 0.52; 252 $362, 210 $264, 169 $229, 251 $227. Prune order: 28 $9, then ≈ $115; 171 protected ≈ 11.5 h. OTR gauges: none yet.
+
+## §2091 — 8:15 AM CT brief (NOTE; 171, 12 h 45 min old)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 29%; no drift vs FROZEN. $30 two-sided 72% (S-only 780, B-only 300); $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +4.7 (+0.48 bp) vs 252 +5.2 (+0.48). Gauges: **$61/mo ($2.03/d)**; making captured 94.2 / realized 28.4 (q 0.30) / rank 0.176; skill_rank 0.271; score 0.224; net_a +975; call_time 0.177.
+- Fleet median $234 / score 0.50 / making_rank 0.52; 252 $334, 210 $251, 251 $218, 169 $215. Prune line ≈ $114; 171 protected ≈ 11 h. OTR gauges: none yet.
+- **§2091 add (8:20 AM):** user: leave the $30 two-sidedness drift alone on 171 until the testnet miner exists (no cap/unwind test on 171).
+
+## §2092 — 8:40 AM CT — user away (laptop open): NO tests, NO restarts on 171; briefs + a read-only clean-window comparison at ≈ 2 PM CT (171 vs 210/251/169: making captured, net α, ranks).
+
+## §2093 — 8:45 AM CT brief (NOTE; 171, 13 h 15 min old; no tests / restarts)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 29%; no drift vs FROZEN. $30 two-sided 73% (left alone until testnet, user 8:20 AM); $30 life p50 116 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +7.9 (+0.96 bp) on 11 books ($7.6k/book) vs 252 +6.9 (+0.61). Gauges: $61/mo; making captured **109.3** / realized 35.0 (q 0.32) / rank 0.179; skill_rank 0.278; score 0.229; net_a +998; call_time 0.166. vs 210: captured 245.5, net_a +941, skill 0.35; 251: 247.5, +1,147, 0.43.
+- Fleet median $234 / score 0.50; 252 $334, 210 $251, 251 $218, 169 $215. Prune line ≈ $114; 171 protected ≈ 10.5 h. OTR gauges: none yet.
+
+## §2094 — 9:15 AM CT brief (NOTE; 171, 13 h 45 min old; no tests / restarts)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 29%; no drift vs FROZEN. $30 two-sided 76%; $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 **Σα +14.5 (+1.08 bp)** on 22 books vs 252 +2.3. Gauges: $61/mo; making captured 107.7 / realized 36.6 (q 0.34) / rank 0.188; skill_rank 0.289; score **0.239**; net_a +1,050; call_time 0.163.
+- Fleet median $234 / score 0.52; 252 $334, 210 $251 (captured 241), 251 $218 (244), 169 $215. Prune line ≈ $117; 171 protected ≈ 10 h. OTR gauges: none yet.
+
+## §2095 — 9:45 AM CT brief (NOTE; 171, 14 h 15 min old; no tests / restarts)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 29%; no drift vs FROZEN. $30 two-sided 78%; $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +12.7 (+0.92 bp) on 22 books vs 252 +8.6. Gauges: **$73/mo ($2.43/d)**; making captured 91.4 / realized 30.4 (q 0.33) / rank 0.169; skill_rank 0.290; score 0.230; net_a +1,077; call_time 0.161.
+- Fleet median $234 / score 0.51; 252 $307, 210 $241 (captured 237), 251 $217 (220), 169 $204. Prune line ≈ $98–115; 171 protected ≈ 9.5 h. OTR gauges: none yet.
+
+## §2096 — 10:15 AM CT brief (NOTE; 171, 14 h 45 min old; no tests / restarts)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 29%; no drift vs FROZEN. $30 two-sided 76%; $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +5.8 (+1.01 bp) on 13 books vs 252 −3.1. Gauges: $73/mo; making captured 100.1 / realized 32.3 (q 0.32) / rank **0.126** (dipped); skill_rank 0.273; score 0.200; net_a +979; call_time 0.167.
+- Fleet median $234 / score 0.47 / making_rank 0.53; 252 $307, 210 $241 (captured 246), 251 $217 (232), 169 $204. Prune line ≈ $98–114; 171 protected ≈ 9 h. OTR gauges: none yet.
+- Note: the score has plateaued at ≈ 0.20–0.24 for 3 h (making_rank 0.13–0.20, skill_rank 0.27–0.29) — the clean-window read at 2 PM will confirm the settled level.
+
+## §2097 — 10:45 AM CT brief (NOTE; 171, 15 h 15 min old — lookback now ≈ full; no tests / restarts)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 29%; no drift vs FROZEN. $30 two-sided 76%; $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα −1.4 on 13 books vs 252 +0.8 (quiet). Gauges: **$74/mo ($2.47/d)**; making captured 103.1 / realized 33.4 (q 0.32) / rank 0.155; skill_rank 0.226; score 0.191; net_a +946; call_time 0.173.
+- Fleet median $226 / score 0.50 / making_rank 0.53; 252 $284, 210 $235 (captured 232), 251 $213 (214), 169 $201. Prune line ≈ $82–110; 171 protected ≈ 8.5 h. OTR gauges: none yet.
+
+## §2098 — 11:15 AM CT brief (NOTE; 171, 15 h 45 min old; no tests / restarts)
+- Testnet TAO: 0 (first query timed out; retry below the brief). No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 29%; no drift vs FROZEN. $30 two-sided **72%** (S-only 960 = 16 books capped long); $30 life p50 113 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +5.9 (+0.84 bp) vs 252 −0.8. Gauges: $74/mo; making captured 110.0 / realized 36.8 (q 0.33) / rank 0.163; skill_rank 0.221; score 0.192; net_a +910; call_time 0.174.
+- Fleet median $226 / score 0.48; 252 $284, 210 $235 (captured 240), 251 $213 (218), 169 $201. **Prune line ≈ $122** (lowest non-immune 25 $122, 125 $123); 171 protected ≈ 8 h. OTR gauges: none yet.
