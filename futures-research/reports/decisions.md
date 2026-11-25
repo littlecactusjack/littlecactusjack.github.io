@@ -30490,3 +30490,129 @@ User: if $300 carries our making but we're far from the fleet, how would the $30
 - **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 29%; no drift vs FROZEN. $30 two-sided **72%** (S-only 960 = 16 books capped long); $30 life p50 113 s; $300 p50 0 s.
 - Live skill ($300, 4 sim min): 171 Σα +5.9 (+0.84 bp) vs 252 −0.8. Gauges: $74/mo; making captured 110.0 / realized 36.8 (q 0.33) / rank 0.163; skill_rank 0.221; score 0.192; net_a +910; call_time 0.174.
 - Fleet median $226 / score 0.48; 252 $284, 210 $235 (captured 240), 251 $213 (218), 169 $201. **Prune line ≈ $122** (lowest non-immune 25 $122, 125 $123); 171 protected ≈ 8 h. OTR gauges: none yet.
+
+## §2099 — 11:45 AM CT brief (NOTE; 171, 16 h 15 min old; no tests / restarts)
+- Testnet TAO: **0**. No new alerts.
+- **171 REGISTERED**; 0 tracebacks / 0 fallbacks; PACE 0; disk 30%; no drift vs FROZEN. $30 two-sided 75% (S-only 900); $30 life p50 120 s; $300 p50 0 s.
+- Live skill ($300, 4 sim min): 171 Σα +6.2 (+0.90 bp) vs 252 +0.7. Gauges: $74/mo; making captured 95.8 / realized 33.3 (q 0.35) / rank 0.156; skill_rank 0.256; score 0.206; net_a +903; call_time 0.173.
+- Fleet median $226 / score 0.46; 252 $284, 210 $235 (captured 237), 251 $213 (197), 169 $201. Prune line ≈ $116; 171 protected ≈ 7.5 h. OTR gauges: none yet.
+
+## §2100 — 12:15 PM CT brief, UID 171 (NOTE, 2026-11-24)
+- Testnet TAO 0 (t1 not registered). No new alerts. 171 REGISTERED; 0 tracebacks/fallbacks, PACE 0, disk 30%, no drift vs FROZEN.
+- $30 two-sided ≈ 75% (both 2880 / B 60 / S 900; missing-B from inventory, as known). $30 life p50 120 s; $300 p50 0 s.
+- Live skill 4 min: 171 Σα +6.9 (+0.66 bp, 16 books) vs 252 +9.9 (+0.66 bp, 40 books).
+- Gauges: 171 $76/mo, score 0.174, skill_rank 0.214, making_rank 0.134, captured 97.5 / realized 32.5, net α 881. Fleet median $221 / 0.458; 210 $230 (cap 253.6), 251 $203 (205.8), 169 $197, 252 $262.
+- Prune line ≈ $121 (154 $121, 170 $122, 125 $124); 171 protected ≈ 7 h more. No tests/restarts (user rule).
+
+## §2101 — 12:45 PM CT brief, UID 171 (NOTE, 2026-11-24)
+- Testnet TAO 0. No new alerts (tail = older 165/171 items). 171 REGISTERED; 0 tracebacks/fallbacks, PACE 0, disk 30%, no drift vs FROZEN.
+- $30 two-sided ≈ 75% (unchanged). $30 life p50 120 s; $300 p50 0 s.
+- Gauges: 171 $76/mo, score 0.173, skill_rank 0.174, making_rank 0.172, captured 87.4 / realized 29.2, net α 826. Fleet median $221 / 0.445; 210 $230 (cap 238.3), 251 $203 (198.9), 169 $197, 252 $262.
+- Prune line rose to ≈ $127 (43 $127, 160 $132; 154/170/125 left the list); 171 protected ≈ 6.7 h more. No tests/restarts.
+
+## §2102 — Why 171's skill rank is low (NOTE, 2026-11-24 ≈ 1:00 PM CT, read-only)
+- Window: sim now 53235 vs our start 39426 = 3.84 sim h > 3 sim h lookback → all gauges are now from clean (post-start) time. Pay ($76) still lags: score EMA half-life = 3 sim h from 0 (≈ 59% converged) + weight smoothing.
+- Validator skill gauges (171 / 210 / 251 / 169 / 252): net α 783 / 1278 / 1242 / 4138 / 9810; notional 5.7M / 8.4M / 7.6M / 13.0M / 10.9M → α per notional 1.38 / 1.52 / 1.63 / 3.18 / 9.0 bp; skill (kappa) 0.23 / 1.10 / 1.10 / 2.18 / 3.71; books kept 112 / 73 / 79 / 132 / 136; skill_shrunk 4.9 / 13.4 / 12.5 / 29.9 / 69.0 → skill_rank 0.162 / 0.272 / 0.278 / 0.503 / 0.734. Coverage/p11/pool factors all 1.
+- Diagnosis: rank follows skill_shrunk ≈ kappa-driven. Our gap is consistency across books (kappa 0.23 vs 1.10: α spread over 112 books with many negative ones), not total α or bp alone. skill_net_alpha_mark_alt = −309 (theirs positive) → our α depends on the mark; at the alternate mark we lose. The +0.66 bp live 4-min reads are short and at one mark; over 3 sim h we are slightly below 210/251 per notional.
+- Drop since last briefs: net α 881 → 826 → 783 as the window rolls (recent α weaker than the part leaving); fleet ranks moved slightly too.
+- Next: testnet job — per-book α sign consistency + mark_alt robustness on $300 (no change on 171).
+
+## §2103 — 1:20 PM CT brief, UID 171 (NOTE, 2026-11-24; delayed by user wifi outage)
+- Testnet TAO 0. No new alerts. 171 REGISTERED; 0 tracebacks/fallbacks, PACE 0, disk 30%, no drift vs FROZEN; tape still growing.
+- $30 two-sided ≈ 75% (2886/60/894). $30 life p50 120 s; $300 p50 0 s. OTR gauges still absent.
+- Gauges: 171 $67/mo (from $76), score 0.172, skill_rank 0.173, making_rank 0.171, captured 94.5 / realized 32.2, net α 819. Fleet median $220 / 0.442; 210 $231 (cap 258.7), 251 $200 (210.6), 169 $197, 252 $242.
+- Prune line ≈ $123 (167 $123, 122 $125, 114 $126); 171 protected ≈ 6.2 h more. No tests/restarts.
+
+## §2104 — Deep validator dive + full stat comparison; T1 (OTR) started (2026-11-24 ≈ 1:36 PM CT)
+User 1:30 PM: no test TAO → tests back ON for 171 on mainnet until ≈ 7 PM; deep validator dive; compare every stat vs fleet + yesterday; big gaps first; chained tests (memory feedback-mainnet-tests-2026-11-24.md; validator model in mvtrx-validator-model.md).
+- **Validator pipeline (repo068):** making = Σ_b 2·min(C_buy, C_sell) (clamp on total) × clamp(ΣR/ΣC, 0, 1) × P11 × S3 × **OTR min(1, 200/msgs-per-fill)**; skill = sign-gated, hurdle-filtered kappa (consistency), rank among positives; score = 0.5·making_rank + 0.5·skill_rank, EMA 3 sim h before pay.
+- **Gauges now (171 / 210 / 251 / 169 / fleet median):** making 12.0 / 109 / 72.5 / 23.1 / 80.1; realized 32.3 / 109 / 72.5 / 23.1 / 80.1 → **OTR factor 171 = 0.37, fleet 1.0**. Per block: placed 4,636 + cancelled 4,571 over 17 fills = **542 msgs/fill** (210 57, 251 44, 169 101, 252 89). skill 0.25 / 1.13 / 1.13 / 2.12 / 1.45; net α 777 / 1,339 / 1,299 / 4,203 / 2,012; mark_alt α −292 (fleet positive). at_best_seconds 18k vs 142k–201k; best_size 2.7M vs 15M; order_books 139 vs 192; refused 513/block (fleet 0).
+- **vs yesterday (165, 11-23 3–7 PM CT):** realized ≈ 120–133 vs 210 ≈ 350–375 (0.34×) → 171 today 32 vs 210 ≈ 100 (0.32×): same relative making; whole market shrank ≈ 3.5×. 165 was never OTR-discounted (making = realized) → validators adopted 0.6.8 OTR ≈ 11-24 02:00 CT. Skill net α ≈ 0.75–1.1× 210 both days (unchanged); kappa unchanged low.
+- **Rank map now:** making 12 → 0.175, 32 → 0.31, 60 → 0.45, 80 → 0.60; skill 0.25 → 0.14, 1.0 → 0.25, 1.5 → 0.34, 2.0 → 0.51.
+- **$300 tape (15 sim min):** 171 7.7 fills/min, median $975, depth mostly 1+ behind; 210 60/min median **$76**, 30% inside the prior touch + 36% at it (front of queue, small flow); 251 48/min $76; 169 33/min $78.
+- **Validator-basis capture (fillrecs2, 15 sim min):** two-sided realized $/sim min 171 0.20 (all $30) vs 210 0.25, 251 0.19, 169 0.09; $300 two-sided ≈ 0 for everyone now. 171 $300 R −0.08 bp drags quality (miner-wide R/C 0.45).
+- **Message sources ($300, msgsrc300.py, per sim min):** placements 2,783 = re-price 2,701 (by ticks: 0: 295, 1: 1,256, 2: 456, 3: 266, 4: 161, 5: 119, 6+: 148) + re-entry after pull 82. Tight-pull toggling is NOT the source.
+- **Ranking of gaps:** (1) OTR 0.37 (biggest, mechanical); (2) realized volume ≈ ½ median; (3) skill kappa 0.25 vs ≥ 1.1; (4) time/size at best.
+- **T1 (OTR) started 19:36:10 UTC (sim 53518):** live_params_171.json = FROZEN + mk_vol_debounce 5 + mk_vol_lag 2 (diffed: only those; backup live_params_171.pre-T1.json). No restart. Reads: msgs/fill (MSGS + block gauges), fills, validator-basis C/R per class vs fleet, skill Σα; early ≈ 1:50 PM, verdict ≈ 2:40 PM CT.
+
+## §2105 — Fleet fill size vs order size (NOTE, 2026-11-24 ≈ 1:52 PM CT)
+- User: we changed our sizes to copy fleet fills and the fleet's fill size keeps moving. Measured on the $300 books, from the 15-sim-min tape (per maker order id):
+  - 210: 3,726 fills on 1,746 orders (2.1 fills/order); $ filled per order median $2,744, p90 $3,636; fill median $76.
+  - 251: 2.1 fills/order; per order median $3,483, p90 $3,640; fill median $77. 169: 1.4; $3,561 / $3,651; fill median $1,964.
+  - 171: 855 fills on 665 orders (1.3); per order median $1,506, p90 $11,830; fill median $1,495.
+- → The fleet's ORDER size is stable at ≈ $3.6k (same as §1278 weeks ago). The $76 median fill is just small takers chewing those orders. Fill size is an outcome; never a copy target. The real gap is how many of our orders get hit at all (665 vs 1,746) = queue position / presence.
+- User: authority to run tests and make changes without asking (spending/keys/registrations excluded).
+
+## §2106 — T1 whole-miner read → same-time A/B build (agents ece7d785); AB1 = T1 + $30 unwind on odd books (2026-11-24 ≈ 2:02 PM CT)
+- **T1 whole-miner (19:36–20:01 UTC, sim 53518–≈53800):** MSGS per sim min ≈ 4,000–4,150 (vol 1,311–1,399 / calm 399–500 placements) vs ≈ 6,550 before (−38%); SPREAD300 lag-kept 438–585, debounce-kept 1,515–1,715 per sim min. Validator block gauges: placed 2,848 + cancelled 2,851 over **43 fills = 133 msgs/fill** (before 542) → OTR factor 1.0 in that block. Tape (sim 53520–53740, 3.7 min, thin): 171 $300 fills **23.7/min (before 7.6)**, but $300 C −0.22 / R −0.34 bp (fleet $300 R 169 −0.01, 210 +0.07, 251 −0.05); $30 R +0.37 bp. Skill (4 min) Σα +7.4 vs 252 +11.8. → Messages fixed; $300 fill quality unclear (too few minutes). Continued as arm 1 below.
+- **$30 cap diagnosis:** 15 of 64 $30 books sit at the 400-unit cap (inv = max_inv 0.3) every minute → buy side missing (840 side-rounds/min = 22%). The skew prices the sell side to unwind, but the §1933 stay-behind rule (mk_low_behind 1) moves it back to 1 tick behind the others' best → the position never clears.
+- **Build ece7d785** (speed/patch_arms_unwind.py; backup agents/QuoteAgent.py.bak-b424e5df): (1) `arms` live-reloadable (arm k on books with id mod (K+1) = k; knobs validated against LIVE_KNOBS/limits); (2) **mk_low_unwind** (0 = off): on a capped $30 book the reducing side joins the others' best and is exempt from behind/keep; (3) MSGS split per arm (vol.a0 / vol.a1 …), BEHIND30 adds "unwind N". equiv171.py: 0 instruction diffs, tape identical at defaults; no crash with unwind on. newminer.sh → ece7d785.
+- **Restart 20:01:41 UTC**; 0 tracebacks; FASTDEC on; regcheck REGISTERED. live_params_171.json = FROZEN + mk_low_unwind 0 + **arms "mk_vol_lag:2+mk_vol_debounce:5+mk_low_unwind:1"** → arm 0 (even books) = FROZEN, arm 1 (odd books) = T1 + unwind, same window. Warm-up to ≈ 20:17 UTC; reads per arm: messages (MSGS .a0/.a1), fills, validator-basis C/R and two-sided per class by book parity, skill α by parity; first read ≈ 2:35 PM, verdict ≈ 3:20 PM CT.
+
+## §2107 — AB2: third arm = asymmetric keep (lag 3, no debounce) (2026-11-24 ≈ 2:08 PM CT)
+- User: fills were good because of our pricing; don't move an order unless quality needs it. Reasoning: a resting order whose target moved AWAY (order now behind target) is safer (better price if hit) and keeps queue place; one whose target moved TOWARD/through it (order ahead) is the adverse-selection case. T1's debounce held 1-tick moves in BOTH directions (≈ 1,600 debounce-kept/min vs ≈ 500 lag-kept), so part of its extra fills may be the bad kind. mk_vol_lag keeps only behind-target orders (1..lag ticks), ahead orders are cancelled at once.
+- Speed check: call_time 171 0.176 s vs 210 0.171, fleet median 0.19, 252 0.145 → level with the fleet, not faster.
+- **Live 20:07:53 UTC (no restart):** arms "mk_vol_lag:2+mk_vol_debounce:5+mk_low_unwind:1 / mk_vol_lag:3+mk_low_unwind:1" → arm 0 (book id mod 3 = 0) FROZEN, arm 1 T1 + unwind, arm 2 lag 3 + unwind. Reads per arm with K=3 (speed/sumfrk.py, MSGS .a0/.a1/.a2). Window from ≈ 20:18 UTC (post-restart warm-up); first read ≈ 2:35 PM, verdict ≈ 3:20 PM CT.
+
+## §2108 — 2:43 PM CT brief + AB read: fills collapsed after the 20:01 restart; cold-start pacing removed (pace_cold 0) (NOTE)
+- Testnet TAO 0; no new alerts; 171 REGISTERED; 0 tracebacks/fallbacks; disk 35%; live == AB2; agents ece7d785.
+- **Messages per arm (sim min 20:17–20:22 UTC):** vol placements a0 677–831 / a1 430–559 / a2 283–392 (−48% for lag 3, −40% for T1); calm a0 144–195 / a1 111–156 / a2 117–134. Per-arm totals (20:22): a0 1,873 / a1 1,235 / **a2 1,162 (−38%)** → asymmetric keep cuts as much as T1.
+- **$30 unwind works:** SIDES30 both 3,515–3,540 of 3,840 (**92%**, was 77%); missing-B 240–265 (was 840); unwind 60–98 sides/min. (Arm 0's $30 books still capped.)
+- **Problem: our fills collapsed after the 20:01 restart in ALL arms** (incl. FROZEN arm 0): $300 fills/sim min 26–38 (T1 window) and ≈ 8 (pre-T1) → 0–3; block gauge 6 fills → ≈ 1,000 msgs/fill. Fleet dipped only mildly (210 25–58, 251 21–60). Deep (≥ 5-tick) sweep prints continued (250–540/min vs 335–650). Our $300 order depth distribution unchanged (mostly 5–8 ticks behind best, before and after). Pre-restart $300 fills were 99% one-sided per book (lean-side directional fills, not making).
+- **Restart-sensitive state found:** service ran pace_cold=1, pace_start 1,500 → after any restart each book's pacing bucket starts near-empty → soft-pacing size factor ≈ (1,500 + 5,000)/(18,750 + 5,000) ≈ 0.27, falling toward 0.05 after a fill; refill ≈ $5.2/sim s → ≈ 55 sim min (≈ 4 wall h today). Ledger median $41k of $450k cap → no cap risk. **Restarted 20:32:33 UTC with pace_cold=0** (unit backup /opt/mvtrx/mvtrx-x3.service.bak-pacecold); 0 tracebacks; REGISTERED. First minutes after: $300 fills 10, 5 (partial 2) → recovering but not yet at T1 levels; watching.
+- AB per-arm capture/skill not readable yet (≈ 2 sim min of clean data). Gauges: 171 score 0.194, making 11.9 / realized 30.9 (OTR 0.38), skill 0.28, skill_rank 0.214, net α 824; prune line ≈ $96–118 (201 $96, 122 $116, 155 $118).
+
+## §2109 — 2:47 PM CT brief (NOTE; AB2 running, post pace_cold restart)
+- Testnet TAO 0; no new alerts; 171 REGISTERED; 0 tracebacks/fallbacks; PACE 0; disk 36%; live == AB2.
+- Fills after the 20:32 warm restart (per sim min, $300): 10, 5, 2, 5 — still low, but the fleet fell too in the latest minutes (210 59 → 16, 251 40 → 7): market quieting; the T1 window (26–38) may have been sweep-heavy. Per arm (all classes, last 4 min): a0 7/2/2/3, a1 4/5/2/3, a2 2/4/1/5 — too few to separate.
+- MSGS (last sim min): vol a0 805 / a1 461 / a2 (cut off in log, prior ≈ 390); calm a0 120 / a1 171 / a2 89; lag-kept 908, debounce-kept 515.
+- $30: two-sided 3,567 of 3,840 (93%); unwind 54 sides/min.
+- Block gauges: 171 placed 3,110 + cancelled 3,025 over 19 fills = **323 msgs/fill** (210 34, 251 42, 252 89). Applying arm 2 to all books (−38%) would put us ≈ 200 at this fill rate.
+- Gauges: score 0.197; making 13.7 / realized 35.6 (OTR 0.38); making_rank 0.194; skill 0.287 / rank 0.200; net α 850. Fleet median score 0.491. Prune line ≈ $96 (201), next $116–118; 171 $67, protected ≈ 4.7 h.
+
+## §2110 — AB2 read (8.2 sim min, sim 54160–54653) → AB3: arm 2 = T1 + unwind + $300 two-sided touch (mk_vol_lean_only 0) (2026-11-24 ≈ 3:22 PM CT)
+- Health: no new alerts; REGISTERED; 0 tracebacks; PACE 0; disk 37%; testnet TAO 0. (21:13–21:17 UTC ssh timeouts from the laptop side; box fine.)
+- **Messages per sim min (avg since 20:50 UTC):** a0 (FROZEN) vol 1,472 + calm 318 + $30 121 = 1,911; a1 (T1 + unwind) 920 + 385 + 135 = 1,440 (−25%); a2 (lag 3 + unwind) 980 + 231 + 190 = 1,401 (−27%).
+- **Fills / capture per arm (validator basis, all classes):** a0 4.9/min, C +0.91 / R +0.30 bp (R/C 0.33); **a1 5.7/min, C +1.16 / R +0.36 (0.31)**; a2 3.8/min, C +0.85 / R +0.12 (0.15). → msgs/fill a0 ≈ 390, **a1 ≈ 253**, a2 ≈ 369. $300 R negative in every arm (a0 −0.33, a1 −0.19, a2 −0.41 bp): our $300 fills lose at 20 s regardless of the keep rule. $30 R +0.35…+0.67 bp in all arms.
+- Verdict (thin, 8 sim min): **a1 (T1 + unwind) ≥ a0 on capture with the best msgs/fill → leading candidate**; a2 (asymmetric lag 3) no better on messages and lower R → dropped for now (noisy; may revisit).
+- **The real making gap is two-sidedness, not messages:** two-sided C per sim min 171 $0.17 (all from $30) vs 210 $1.25, 251 $0.65; realized two-sided 0.16 vs 0.42 / 0.38. Our $300 quoting is one-sided by design: mk_vol_lean_only 1 (adopted 11-14, §1464, on a TIE under the old captured basis) puts a touch order only on the lean-jump side → pre-restart $300 fills were 99% one-sided per book → ≈ 0 $300 making credit under the per-book two-sided rule.
+- **AB3 live 21:21:57 UTC (sim 54726, no restart):** arms "T1 + unwind / T1 + unwind + mk_vol_lean_only 0" → a0 FROZEN, a1 T1 + unwind, **a2 T1 + unwind + touch orders on BOTH sides of $300 books** (lean jump still steps in on its side). Read: $300 per-book two-sided C/R, fills, messages, skill α per arm; first read ≈ 3:50 PM, verdict ≈ 4:20 PM CT.
+
+## §2111 — 3:50 PM CT brief + AB3 first read (4.3 sim min, sim 54740–54997) + pooled a0/a1 (12.5 sim min) (NOTE)
+- Health: testnet TAO 0; no new alerts; REGISTERED; 0 tracebacks/fallbacks; PACE 0; disk 38%; live == AB3.
+- **AB3 per arm (msgs per sim min / fills per min → msgs per fill):** a0 FROZEN 2,065 / 6.8 → ≈ 304; a1 T1 + unwind 1,254 / 8.4 → ≈ 149; **a2 T1 + unwind + two-sided $300 touch 1,350 / 18.4 → ≈ 73**. Validator block: 171 placed 3,425 + cancelled 3,343 over **90 fills = 75 msgs/fill** (morning 542) → OTR factor would be 1.0.
+- a2 $300: 16.1 fills/min (a1 7.0, a0 5.6), C +0.13 / R −0.19 bp → adds volume with slightly negative R (drag on the quality ratio ≈ 10% at current sizes). a0 all R/C 0.74, a1 0.37, a2 0.15 (4.3 min — noisy).
+- **Correction to §2110:** short-window per-book two-sided C on $300 is ≈ 0 for the fleet too (210 $0.01, 251 $0.04 per sim min over 12.5 min) — the per-book min needs the full 3-h window to fill both sides; one-sided lean fills over 15 min do NOT mean zero credit over 3 h. The fleet's in-window making credit comes from $30.
+- **Pooled a0 vs a1 (12.5 sim min):** $30: a0 C +1.65 / R +0.94 bp, R/C 0.57, two-sided C $0.53/min on ⅓ of the books (≈ $1.6/min scaled) vs **210 whole miner $1.43, 251 $0.58** → our $30 making now matches/beats the top makers per book. a1 $30 R/C 0.41 (unwind side fills at the touch keep less). $300: a0 C −0.13 / R −0.21; a1 C +0.23 / R −0.09. All-class R/C a0 0.50 vs a1 0.32 vs 210 0.51.
+- **Read:** in-window making per book is now at fleet level on $30; the validator gauges (realized 37.8 vs 210 120) lag because the 3-sim-h window (≈ 13 wall h today) still holds the capped/one-sided and OTR-heavy hours. The OTR fix can come from fills (a2) rather than holding orders. T1's holding may cost kept share (a1 0.32–0.41 vs a0 0.50–0.57) — not yet separable from noise.
+- Gauges: score 0.166; making 14.6 / realized 37.8 (OTR 0.39); making_rank 0.193; skill 0.266 / rank 0.139; net α 777. Fleet median score 0.464. Prune line ≈ $111 (220), 112 (58), 115 (131); 171 $63; protected ≈ 3.6 h.
+- AB3 continues; verdict ≈ 4:20 PM CT with ≈ 10+ sim min per arm.
+
+## §2112 — Unseen-risk audit of the making leg: one-sided negative books subtract DOUBLE (2026-11-24 ≈ 4:10 PM CT)
+User: is there anything unseen that would stop making from reaching the median once the validator catches up?
+- Checked: only 5EWwdZB7 publishes scoring gauges (5E7Rbx shows 0 for all); making_basis realized, horizon 20 s, making_floor_scale 0 (off), fee weight 0.005 (config says it is stepped UP later as maker fees fall → future risk for high-fee makers; our maker fee per $ ≈ 74 bp of Mf vs fleet 54–66).
+- **Exact validator credit (repo068 code, speed/fillrecs3.py + speed/credit.py), sim 54160–55146 (16.4 min):** balanced_reward_per_book adds 2·min(C_buy_b, C_sell_b) per book WITHOUT a per-book clamp, so a one-sided book with negative C adds 2× its loss.
+  | | $30 sum/min (+books / −books; one-sided of books) | $300 sum/min | total → credit |
+  |---|---|---|---|
+  | 171 | +0.22 (+0.82 / −0.60; 29 of 42) | −0.45 | −0.23 → 0 |
+  | 210 | +1.00 (+1.31 / −0.31; 15 of 46) | −0.41 | +0.59 (× q 0.54) |
+  | 251 | +0.32 (+0.86 / −0.54; 26 of 53) | −0.39 | ≈ 0 |
+  | 169 | +0.03 | −0.75 | 0 |
+- → **§2111's "$30 matches 210" was wrong** (per-arm ×3 scaling + clamping each side at 0). Exact: our $30 two-sided sum ≈ ¼–⅕ of 210's; our negative $30 books are 2× theirs and 29 of 42 books one-sided. The $300 class drags EVERY maker ≈ −0.4/min (one-sided adverse fills), ours included; 210 survives on its $30 surplus.
+- Short windows bias this negative (books haven't filled both sides); the validator's 3-h sums are kinder (our realized gauge 41 vs 210 123). Background job: the same exact decomposition over the tape's full span (sim 44300/45823–55100 ≈ 2.6 sim h) → /tmp/fr3_3h.jsonl, to reproduce the gauge and split it by class.
+- AB3 per-arm raw two-sided since sim 54740 (6.8 min, thin): $300 a0 −0.19, a1 −0.09, **a2 −0.32** per ⅓ of books → the both-sided $300 arm (OTR fix via fills) deepens the $300 drag; OTR only multiplies a POSITIVE sum, so the sum must be positive first.
+- New priority order for making: (1) a positive two-sided SUM — cut one-sided negative-C fills (mostly $300 adverse lean/sweep fills; $30 negative books) and raise $30 both-sides books; (2) then OTR (messages per fill).
+
+## §2113 — 3-hour exact making decomposition (reproduces the gauge) + session handoff (2026-11-24 ≈ 4:15 PM CT)
+- Health 22:07 UTC: REGISTERED; 0 tracebacks; no new alerts; live == AB3 (unchanged — user: no new test; new session next).
+- **Exact validator making over sim 45823–55100 (154.6 min, repo068 code; speed/fillrecs3.py → /tmp/fr3_3h.jsonl, speed/credit.py):**
+  | | all: two-sided C/min, quality, credit/min | $30: two-sided, quality, credit, notional/min | $300: two-sided, quality, notional/min |
+  |---|---|---|---|
+  | 171 | $0.64, 0.33, **$0.21** | $0.80, 0.41, $0.33, $11.7k | ≤ 0, 0.06, $20.5k |
+  | 210 | $1.54, 0.44, **$0.68** | $1.38, 0.49, $0.67, $17.0k | $0.16, 0.31, $33.0k |
+  | 251 | $1.13, 0.35, **$0.40** | $1.20, 0.46, $0.55, $16.7k | ≤ 0, 0.00, $30.4k |
+  171/210 credit 0.31 ≈ gauge realized 41/123 (0.33) → the method reproduces the validator. Over 3 h, 162 of 189 books are two-sided (the §2112 short-window "29 of 42 one-sided" was window bias; the double-negative effect costs ≈ $0.16/min via $300, not the whole total).
+- **Making gap vs 210, factor by factor (pre-OTR credit 0.31×):** $30 notional 0.69×; $30 two-sided C per $ ≈ 0.84×; miner-wide quality 0.75× (0.33 vs 0.44 — our $300 quality 0.06 drags it; $30 alone 0.41 vs 0.49); $300 two-sided sum ≤ 0 vs +0.16. Then OTR 0.38× (fixable via messages/fills, §2104–2111).
+- 171 captured C by condition (3 h): $30 at best +1.05 bp ($1.09M), 1 behind +1.62 bp ($651k), 2+ behind −0.14; $300 everything ≈ +0.14–0.24 bp (inside +1.09 but only $27k); no $300 spread bucket is strongly negative — the $300 problem is the 20-s markout (quality 0.06), not the capture.
+- **Next targets (for the new session):** (1) $300 markout quality (0.06 vs 210 0.31) — it drags the whole miner's quality; (2) $30 volume (+45% to reach 210) at the 1-behind/at-best mix; (3) OTR last. Skill (kappa 0.27 vs 1.3) after making.
+- AB3 left running unchanged (a2 = both-sided $300 deepens the $300 drag — the new session should switch arm 2 off first). Background job finished. Brief cron stopped for the session change.
